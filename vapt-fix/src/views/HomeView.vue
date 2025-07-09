@@ -1,5 +1,8 @@
 <script lang="ts">
-
+export default {
+  name: 'HomeView',
+  // Add your options here
+}
 </script>
 
 <template>
