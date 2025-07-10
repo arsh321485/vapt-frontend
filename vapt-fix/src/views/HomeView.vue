@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+=======
+<script lang="ts">
+export default {
+  name: 'HomeView',
+  // Add your options here
+}
+</script>
+>>>>>>> fae337f9d16643c70f44c0256b069071123d2bf2
 
 <template>
   <main>
