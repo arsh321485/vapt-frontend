@@ -1,6 +1,5 @@
 
-/* hero section */
-
+/* iPad Pro */
 @media (max-width: 1200px) {
   .hero-section div h1 {
     font-size: 6vw;
@@ -9,6 +8,22 @@
   .hero-section .cyber-bg {
     width: 45vw;
   }
+
+  .card-fixed {
+    width: 364px;
+    height: 200px; 
+  }
+
+  .card-top-bg {
+    width: 364px;
+    height: 200px; 
+  }
+
+  .card-wrapper {
+    row-gap: 240px;
+    column-gap: 70px;
+  }
+
 }
 
 /* iPad Air */
@@ -28,10 +43,26 @@
     width: 60vw;
   }
 
-    .result-box {
-        height: 188px;
-        width: 330px; 
-    }
+  .result-box {
+    height: 188px;
+    width: 330px; 
+  }
+
+  .card-fixed {
+    width: 300px;
+    height: 200px; 
+  }
+
+  .card-top-bg {
+    width: 300px;
+    height: 200px; 
+  }
+
+  .card-wrapper {
+    row-gap: 270px;
+    column-gap: 70px;
+  }
+
 }
 
 /* iPad Mini */
@@ -78,6 +109,22 @@
     .our-approach-box h1 {
         font-size: 35px;
     }
+
+    .card-fixed {
+    width: 300px;
+    height: 200px; 
+  }
+
+  .card-top-bg {
+    width: 300px;
+    height: 200px; 
+  }
+
+  .card-wrapper {
+    row-gap: 280px;
+    column-gap: 70px;
+  }
+
 }
 
 /* Samsung Galaxy S8+ */
@@ -133,4 +180,12 @@
     .our-approach-box h1 {
         font-size: 25px;
     }
+
+    .card-wrapper {
+      row-gap: 210px;
+      /* column-gap: 70px; */
+  }
+
+
+
 }

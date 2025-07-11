@@ -87,47 +87,107 @@
     </section>
 
     <!-- Our Approach to Quick Remediation -->
-     <section class="our-approach">
-      <div class="container-fluid">
-        <div class="row">
+    <section class="our-approach">
+      <div class="container-fluid g-0">
+        <div class="row gx-0">
           <div class="col-lg-12 our-approach-top">
           </div>
         </div>
-        
-        <div class="row our-approach-box">
-          <div class="text-center mt-3">
+      </div>
+
+      <div class="container-fluid our-approach-box py-3">
+        <div class="text-center">
               <p><i class="bi bi-puzzle-fill"></i> Our solution</p>
               <h1>Our Approach to Quick<br> Remediation</h1>
+        </div>
+        <div class="container my-5">
+        <div class="card-wrapper">
+          <!-- Card 1 -->
+          <div class="card-fixed">
+            <div class="card-top-bg">
+              <img src="" alt="">
+            </div>
+            <h4 class="text-white mt-4">AI driven contextual insights</h4>
+            <p>AI-driven contextual insights analyze your infrastructure in real time, identifying not just vulnerabilities but the surrounding conditions, usage patterns, and dependencies that make them critical.
+            </p>
           </div>
-          <!-- <div class="col-lg-12">
-            <div class="col-lg-6">
-              <div style="background: linear-gradient(107.2deg, #28282F 1.06%, #090913 99.51%);height: 300px;width: 400px;">
-                <img src="" alt="">
-              </div>
-              <h3>AI driven contextual insights</h3>
-              <p>AI-driven contextual insights analyze your infrastructure in real time, identifying not just vulnerabilities but the surrounding conditions, usage patterns, and dependencies that make them critical.</p>
+          <!-- Card 2 -->
+          <div class="card-fixed">
+            <div class="card-top-bg">
+              <img src="" alt="">
             </div>
-            <div class="col-lg-6">
-
+            <h4 class="text-white mt-4">Step-by-step guidance</h4>
+            <p>Each fix comes with detailed, step-by-step instructions tailored to your system—no guesswork, no confusion.
+            </p>
+          </div>
+          <!-- Card 3 -->
+          <div class="card-fixed">
+            <div class="card-top-bg">
+              <img src="" alt="">
             </div>
-            <div class="col-lg-6">
-
+            <h4 class="text-white mt-4">Workflow automation</h4>
+            <p>Automate repetitive tasks like detection, patch deployment, and follow-up checks—so your team can focus on critical decisions.
+            </p>
+          </div>
+          <!-- Card 4 -->
+          <div class="card-fixed">
+            <div class="card-top-bg">
+              <img src="" alt="">
             </div>
-            <div class="col-lg-6">
-
-            </div>
-          </div> -->
+            <h4 class="text-white mt-4">Evidence based validation</h4>
+            <p>Every fix we recommend is backed by proof-of-success data. You’ll get clear, verifiable evidence that each vulnerability has been resolve.</p>
+          </div>
         </div>
-        
-
         </div>
+      </div>
+
+      <div class="container-fluid g-0">
+        <div class="row gx-0">
+          <div class="col-lg-12 our-approach-bottom">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Automation is not enough, Human intelligence matters -->
+    <section class="automation fluid-padding">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-6">
+            <p class="warning"><i class="bi bi-puzzle-fill"></i> Our solution</p>
+            <h1 class="fw-semibold display-4">Automation is not enough, Human  intelligence matters</h1>
+            <p class="mt-3 mb-4 automation-para">While automation speeds up repetitive tasks, remediation requires human judgment. Our platform acts as your co-pilot:</p>
+            <ul class="lh-lg automation-list">
+              <li>AI offers initial triage and suggested fixes.</li>
+              <li>Security experts validate and refine recommendations.</li>
+              <li>Teams get precise, actionable steps they can trust.</li>
+            </ul>
+            <p class="mt-3 automation-para">This hybrid approach reduces false positives, accelerates remediation, and ensures secure releases.</p>
+          </div>
+          <div class="col-lg-6 d-flex justify-content-center align-items-center">
+            <img src="../assets/images/automation-img.png" alt="" class="img-fluid">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Insights -->
+     <section class="insights fluid-padding">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 text-center">
+            <p class="insight-icon"><i class="bi bi-puzzle-fill"></i> Insights</p>
+            <h1>Insights</h1>
+          </div>
+        </div>
+      </div>
      </section>
 
   </main>
 </template>
 
 <script lang="ts">
-import Header from '../components/Header.vue';
+import Header from '@/components/Header.vue';
 export default {
   name: 'HomeView',
   components: {
@@ -135,3 +195,4 @@ export default {
   }
 };
 </script>
+

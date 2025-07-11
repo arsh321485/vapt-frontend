@@ -191,6 +191,7 @@ body {
   transition: background-color 0.3s ease;
 }
 
+/* Our Approach to Quick Remediation */
 .our-approach-top {
   height: 90px;
   background-color: rgba(21, 21, 29, 1);
@@ -200,7 +201,7 @@ body {
 
 .our-approach-box {
   background: linear-gradient(180deg, #18181F 0%, #090913 100%);
-  height: 400px;
+  /* height: 2000px; */
 }
 
 .our-approach-box p {
@@ -210,4 +211,83 @@ body {
 .our-approach-box h1 {
  color: white;
  font-size: 50px;
+}
+
+.card-top-bg {
+  background: linear-gradient(107.2deg, #28282F 1.06%, #090913 99.51%);
+  width: 464px;
+  height: 280px;
+  border-radius: 8px;
+}
+
+.card-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 220px;
+  column-gap: 70px;
+  padding-bottom: 130px;
+}
+
+.card-fixed {
+  width: 464px;
+  height: 280px;
+  border-radius: 8px;
+}
+
+.card-top-bg img {
+  max-height: 80px;
+  margin-bottom: 15px;
+}
+
+.card-wrapper .card-fixed p {
+  color:rgba(255, 255, 255, 0.5)
+}
+
+.our-approach-bottom {
+  height: 90px;
+  background-color: rgba(11, 11, 21, 1);
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+}
+
+/* automation */
+.automation .automation-para {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.automation ul li {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.automation-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.automation-list li {
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.automation-list li::before {
+  content: '✔';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  background-color: black;
+  color: rgba(90, 68, 255, 1);
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+}
+
+/* insights */
+.insight-icon {
+  color: rgba(24, 0, 205, 1);
 }
