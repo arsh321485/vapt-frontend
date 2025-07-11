@@ -63,6 +63,10 @@
     column-gap: 70px;
   }
 
+  .process-step-wrapper {
+    padding-bottom: 245px;
+  }
+
 }
 
 /* iPad Mini */
@@ -123,6 +127,10 @@
   .card-wrapper {
     row-gap: 280px;
     column-gap: 70px;
+  }
+
+  .process-step-wrapper {
+    padding-bottom: 235px;
   }
 
 }
@@ -186,6 +194,12 @@
       /* column-gap: 70px; */
   }
 
+  .process-step-wrapper {
+    padding-bottom: 20px;
+  }
 
+  .fix-card .btn {
+  padding: 7px 20px;
+}
 
 }

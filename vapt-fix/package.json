@@ -21,8 +21,9 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^22.15.32",
+    "@typescript-eslint/utils": "^8.36.0",
     "@vitejs/plugin-vue": "^6.0.0",
-    "@vue/eslint-config-typescript": "^14.5.1",
+    "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.29.0",
     "eslint-plugin-oxlint": "~1.1.0",

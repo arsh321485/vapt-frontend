@@ -151,7 +151,10 @@
 
     <!-- Automation is not enough, Human intelligence matters -->
     <section class="automation fluid-padding">
-      <div class="container-fluid">
+      <div class="container-fluid position-relative">
+        <!-- Purple shadow element -->
+      <div class="automation-glow"></div>
+
         <div class="row">
           <div class="col-lg-6">
             <p class="warning"><i class="bi bi-puzzle-fill"></i> Our solution</p>
@@ -180,18 +183,146 @@
             <h1>Insights</h1>
           </div>
         </div>
+
+          <div class="row py-4 mb-lg-5">
+            <div class="col-lg-4 col-md-6">
+              <div class="card insights-card mb-4">
+              <img src="../assets/images/insight-img-1.jpg" class="card-img-top" alt="...">
+              <div class="card-body">
+                <div class="d-flex justify-content-start gap-3 insights-detail">
+                  <p class="mb-0 insights-date">Tue, 12 December</p>
+                  <p class="mb-0 with-dot insights-name">April Parker</p>
+                </div>
+                <h4 class="card-title fw-semibold lh-sm">How We Fixed a Critical Vulnerability in Under 24 Hours</h4>
+                <p class="card-text insights-para">How We Fixed a Critical Vulnerability in Under 24 Hours.</p>
+                <a href="#" class="card-link text-decoration-none">Read More</a>
+              </div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="card insights-card mb-4">
+              <img src="../assets/images/insight-img-2.jpg" class="card-img-top" alt="...">
+              <div class="card-body">
+                <div class="d-flex justify-content-start gap-3 insights-detail">
+                  <p class="mb-0 insights-date">Tue, 12 December</p>
+                  <p class="mb-0 with-dot insights-name">April Parker</p>
+                </div>
+                <h4 class="card-title fw-semibold lh-sm">How We Fixed a Critical Vulnerability in Under 24 Hours</h4>
+                <p class="card-text insights-para">How We Fixed a Critical Vulnerability in Under 24 Hours.</p>
+                <a href="#" class="card-link text-decoration-none">Read More</a>
+              </div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="card insights-card mb-4">
+              <img src="../assets/images/insight-img-3.jpg" class="card-img-top" alt="...">
+              <div class="card-body">
+                <div class="d-flex justify-content-start gap-3 insights-detail">
+                  <p class="mb-0 insights-date">Tue, 12 December</p>
+                  <p class="mb-0 with-dot insights-name">April Parker</p>
+                </div>
+                <h4 class="card-title fw-semibold lh-sm">How We Fixed a Critical Vulnerability in Under 24 Hours</h4>
+                <p class="card-text insights-para">How We Fixed a Critical Vulnerability in Under 24 Hours.</p>
+                <a href="#" class="card-link text-decoration-none">Read More</a>
+              </div>
+              </div>
+            </div>
+          </div>
       </div>
      </section>
+
+    <!-- Our vetting process -->
+     <section class="vetting fluid-padding">
+      <div class="container-fluid position-relative">
+         <!-- Shadow on the left -->
+       <div class="purple-glow"></div>
+        <div class="row text-center mb-5 pb-lg-5">
+          <p class="vetting-icon"><i class="bi bi-puzzle-fill"></i> Our solution</p>
+          <h1 class="vetting-head">Our vetting process</h1>
+        </div>
+
+        <div class="row text-center process-step-wrapper pt-4">
+        <!-- Step 1 -->
+        <div class="col-md-3 col-12 mb-4 position-relative step">
+          <div class="step-number">1</div>
+          <h5 class="step-title">Initial discovery and intake</h5>
+          <p class="step-desc">
+            We collect system information (infrastructure, platforms, tools) and review past incidents.
+          </p>
+          <!-- Right dashed line -->
+          <div class="dashed-line d-none d-md-block"></div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="col-md-3 col-12 mb-4 position-relative step">
+          <div class="step-number">2</div>
+          <h5 class="step-title">Vulnerability Identification</h5>
+          <p class="step-desc">
+            We perform vulnerability scans using automated tools. Conduct manual testing to find edge-case or logic-based flaws.
+          </p>
+          <!-- Right dashed line -->
+          <div class="dashed-line d-none d-md-block"></div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="col-md-3 col-12 mb-4 position-relative step">
+          <div class="step-number">3</div>
+          <h5 class="step-title">Verification and Validation</h5>
+          <p class="step-desc">
+            We confirm vulnerabilities are real (not false positives) and reproduce and document the issue.
+          </p>
+          <!-- Right dashed line -->
+          <div class="dashed-line d-none d-md-block"></div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="col-md-3 col-12 mb-4 position-relative step">
+          <div class="step-number">4</div>
+          <h5 class="step-title">Fix Recommendation Design</h5>
+          <p class="step-desc">
+            We suggest step-by-step remediation tailored to the environment.
+          </p>
+        </div>
+        </div>
+        <!-- Bottom glow shadow -->
+        <div class="bottom-glow"></div>
+
+        <div class="row justify-content-center"> 
+          <div class="col-lg-10 fix-card py-lg-5 px-lg-5 py-md-4 px-md-4 py-3 px-3 position-relative">
+            <!-- Bottom Shadow Glow -->
+          <div class="start-fixing-glow"></div>
+            <div class="row position-relative" style="z-index: 1;">
+            <div class="col-lg-6 col-md-6 mb-3">
+              <h1 class="mb-3">Start Fixing Critical Bugs Instantly.</h1>
+                <p class="my-4">Identify, prioritize, and fix security flaws fast. Reduce risk with zero-friction setup and smart automation.</p>
+                <button type="button" class="btn btn-light rounded-pill fw-semibold mt-4">
+              Fix your vulnerabilities now 
+              <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
+            </button>
+            </div>
+            <div class="col-lg-6 col-md-6 text-center">
+              <img src="../assets/images/start-fixing-img.png" alt="" class="img-fluid" style="height: 280px;width: 320px;">
+            </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+     </section>
+
+     <Footer />
 
   </main>
 </template>
 
 <script lang="ts">
 import Header from '@/components/Header.vue';
+import Footer from '@/components/Footer.vue';
 export default {
   name: 'HomeView',
   components: {
-    Header
+    Header,
+    Footer
   }
 };
 </script>

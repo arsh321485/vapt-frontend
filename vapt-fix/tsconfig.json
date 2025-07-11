@@ -10,11 +10,29 @@
 //   ]
 // }
 
+
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "noImplicitThis": true,
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "useDefineForClassFields": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    // 🟡 Optional extras if using aliases/import.meta
     "baseUrl": ".",
     "paths": {
       "@/": ["src/"]
-    }
-  }
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src", "vite.config.ts", "eslint.config.ts"]
 }
