@@ -485,3 +485,156 @@ body {
   color: rgba(255, 255, 255, 1);
   font-size: 16px;
 }
+
+/* stepper */
+.stepper-btn {
+  background-color: rgba(90, 68, 255, 1);
+  color: white;
+  padding: 5px 40px;
+}
+
+.stepper-btn:hover {
+  background-color: rgb(114, 96, 252);
+  color: white;
+}
+
+/* location */
+.welcome-bg {
+  background-color: #F6F6F8;
+  border-radius: 24px;
+}
+
+.welcome-head {
+  font-size: 44px;
+}
+
+.welcome-subhead {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.location-card {
+  background:rgba(255, 255, 255, 1);
+  box-shadow: 0px 2px 20px 0px rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+}
+
+.location-icon {
+  background-color: rgba(242, 242, 246, 1);
+  border-radius: 50%;
+  height: 52px;
+  width: 52px;
+}
+
+.rounded-input {
+  border-radius: 32px;
+  padding:10px 20px ;
+}
+
+.add-location-btn {
+  background-color: rgb(145, 140, 187);
+}
+
+.add-location-btn:hover {
+  background-color: rgba(90, 68, 255, 1);
+  color: white;
+}
+
+.location-subtext {
+  font-size: 13px;
+}
+
+.add-users {
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 24px;
+  box-shadow: 0px 2px 20px 0px rgba(0, 0, 0, 0.06);
+}
+
+.upload-btn {
+  border: 2px solid rgb(145, 140, 187);
+  color: rgb(145, 140, 187);
+  border-radius: 32px;
+  padding: 8px 24px;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+  border: 2px solid rgba(90, 68, 255, 1);
+  color: rgba(90, 68, 255, 1);
+}
+
+.rounded-select .vs__dropdown-toggle{
+  border-radius: 32px;
+  padding: 22px 20px; 
+  display: flex;
+  align-items: center;
+  color: #525457;
+}
+
+.rounded-select .vs__dropdown-menu {
+  border-radius: 15px;
+  font-size: 16px;
+  padding: 10px 15px;
+}
+
+.search-input {
+  border-radius: 32px;
+  font-size: 16px;
+  padding: 12px 20px;
+}
+
+.thead-bg th {
+  background-color: rgba(246, 246, 248, 1);
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+.users-table td {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.team-tab {
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  transition: background-color 0.3s;
+}
+.team-tab:hover {
+  background-color: rgba(90, 68, 255, 0.1);
+}
+.team-tab.active {
+  background-color: rgba(90, 68, 255, 0.1);
+  font-weight: 500;
+  color: #5a44ff;
+}
+
+.fixed-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.col-role {
+  width: 25%;
+}
+
+.col-member {
+  width: 40%;
+}
+
+.col-location {
+  width: 35%;
+}
+
+.rounded-input-form {
+  border-radius: 4px;
+  height: 40px;
+}
+.input-group span {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
