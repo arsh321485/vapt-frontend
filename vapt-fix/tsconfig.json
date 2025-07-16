@@ -15,7 +15,6 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "bundler",
     "moduleDetection": "force",
     "jsx": "preserve",
     "jsxImportSource": "vue",
@@ -26,6 +25,8 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+    "moduleResolution": "Node",
+"noEmit": true,
 
     // 🟡 Optional extras if using aliases/import.meta
     "baseUrl": ".",

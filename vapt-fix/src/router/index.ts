@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-// import LocationView from '../views/LocationView.vue'
+import LocationView from '../views/LocationView.vue'
+import ConfigureteamsView from '../views/Configureteams.vue'
+import UploadReportView from '../views/UploadReportView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,11 +20,21 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
-    // {
-    //   path: '/location',
-    //   name: 'location',
-    //   component: LocationView,
-    // },
+    {
+      path: '/location',
+      name: 'location',
+      component: LocationView,
+    },
+     {
+              path: '/configureteams',
+              name: 'configureteams',
+              component: ConfigureteamsView,
+            },
+            {
+              path: '/uploadreport',
+              name: 'uploadreport',
+              component: UploadReportView,
+            },
   ],
 })
 
