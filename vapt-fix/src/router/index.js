@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import LocationView from '../views/LocationView.vue'
 import Configureteams from '../views/Configureteams.vue'
+import UploadReport from '../views/UploadReportView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,11 @@ const router = createRouter({
             path: '/configureteams',
             name: 'configureteams',
             component: Configureteams,
+        },
+        {
+            path: '/uploadreport',
+            name: 'uploadreport',
+            component: UploadReport,
         },
     ],
 });

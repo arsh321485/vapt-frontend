@@ -90,6 +90,10 @@
         margin-top: 40px;
     }
 
+    .scrolling-track img {
+    height: 40px;
+  }
+
     .fluid-padding {
         padding-left: 30px;
         padding-right: 30px;
