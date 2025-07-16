@@ -35,7 +35,11 @@
                 <div class="step-circle">4</div>
                 <div class="label">All done</div>
             </div>
-            <button type="button" class="btn stepper-btn mt-5">Next <i class="bi bi-arrow-right-circle-fill ms-1"></i></button>
+            <!-- <button type="button" class="btn stepper-btn mt-5">Next <i class="bi bi-arrow-right-circle-fill ms-1"></i></button> -->
+             <router-link to="/configureteams" class="btn stepper-btn mt-5" tag="button">
+  Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+</router-link>
+
             </div>
             
         </div>

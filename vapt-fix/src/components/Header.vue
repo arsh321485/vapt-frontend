@@ -26,12 +26,16 @@
             <a class="nav-link text-white" href="#">Partners</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-white" href="#">Vulnerability Explorer</a>
+            <a class="nav-link text-white" href="/location">Vulnerability Explorer</a>
             </li>
         </ul>
 
         <!-- Right-aligned button -->
-        <button class="btn text-white navbar-btn">Fix Your Vulnerabilities Now <i class="bi bi-arrow-right-circle-fill ms-1"></i></button>
+        <!-- <button class="btn text-white navbar-btn">Fix Your Vulnerabilities Now <i class="bi bi-arrow-right-circle-fill ms-1"></i></button> -->
+        <router-link to="/location" class="btn text-white navbar-btn" tag="button">
+  Fix Your Vulnerabilities Now 
+  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+</router-link>
         </div>
     </div>
     </nav>
