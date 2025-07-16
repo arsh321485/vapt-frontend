@@ -11,9 +11,10 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.nav, __VLS_intrinsicElements.n
 __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
     ...{ class: "container-fluid" },
 });
-__VLS_asFunctionalElement(__VLS_intrinsicElements.a, __VLS_intrinsicElements.a)({
-    ...{ class: "navbar-brand text-white me-5" },
-    href: "#",
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/logo1.png",
+    ...{ class: "me-5" },
+    alt: "logo",
 });
 __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
     ...{ class: "navbar-toggler" },
@@ -80,8 +81,6 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.i, __VLS_intrinsicElements.i)(
 /** @type {__VLS_StyleScopedClasses['navbar-expand-lg']} */ ;
 /** @type {__VLS_StyleScopedClasses['fixed-top']} */ ;
 /** @type {__VLS_StyleScopedClasses['container-fluid']} */ ;
-/** @type {__VLS_StyleScopedClasses['navbar-brand']} */ ;
-/** @type {__VLS_StyleScopedClasses['text-white']} */ ;
 /** @type {__VLS_StyleScopedClasses['me-5']} */ ;
 /** @type {__VLS_StyleScopedClasses['navbar-toggler']} */ ;
 /** @type {__VLS_StyleScopedClasses['navbar-toggler-icon']} */ ;

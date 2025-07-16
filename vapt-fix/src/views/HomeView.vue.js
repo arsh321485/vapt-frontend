@@ -61,6 +61,119 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.img)({
     alt: "Cyber Security",
     ...{ class: "center-img" },
 });
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "row mt-5" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "scroll-banner" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "scroll-track" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client1.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client2.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client3.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client4.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client5.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client6.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client7.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client8.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client9.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client10.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client11.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client12.jpg",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client13.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client1.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client2.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client3.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client4.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client5.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client6.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client7.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client8.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client9.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client10.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client11.png",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client12.jpg",
+    alt: "",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.img, __VLS_intrinsicElements.img)({
+    src: "../assets/images/clients/client13.png",
+    alt: "",
+});
 __VLS_asFunctionalElement(__VLS_intrinsicElements.section, __VLS_intrinsicElements.section)({
     ...{ class: "remidiation-section fluid-padding" },
 });
@@ -589,6 +702,10 @@ const __VLS_6 = __VLS_5({}, ...__VLS_functionalComponentArgsRest(__VLS_5));
 /** @type {__VLS_StyleScopedClasses['col-sm-12']} */ ;
 /** @type {__VLS_StyleScopedClasses['cyber-bg']} */ ;
 /** @type {__VLS_StyleScopedClasses['center-img']} */ ;
+/** @type {__VLS_StyleScopedClasses['row']} */ ;
+/** @type {__VLS_StyleScopedClasses['mt-5']} */ ;
+/** @type {__VLS_StyleScopedClasses['scroll-banner']} */ ;
+/** @type {__VLS_StyleScopedClasses['scroll-track']} */ ;
 /** @type {__VLS_StyleScopedClasses['remidiation-section']} */ ;
 /** @type {__VLS_StyleScopedClasses['fluid-padding']} */ ;
 /** @type {__VLS_StyleScopedClasses['container-fluid']} */ ;
