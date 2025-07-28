@@ -28,34 +28,34 @@
         <div class="scroll-banner">
         <div class="scroll-track">
           <!-- Original images -->
-          <img src="../assets/images/clients/client1.png" alt="">
-          <img src="../assets/images/clients/client2.png" alt="">
-          <img src="../assets/images/clients/client3.png" alt="">
-          <img src="../assets/images/clients/client4.png" alt="">
-          <img src="../assets/images/clients/client5.png" alt="">
-          <img src="../assets/images/clients/client6.png" alt="">
-          <img src="../assets/images/clients/client7.png" alt="">
-          <img src="../assets/images/clients/client8.png" alt="">
-          <img src="../assets/images/clients/client9.png" alt="">
-          <img src="../assets/images/clients/client10.png" alt="">
-          <img src="../assets/images/clients/client11.png" alt="">
-          <img src="../assets/images/clients/client12.jpg" alt="">
-          <img src="../assets/images/clients/client13.png" alt="">
+          <img src="../assets/images/clients/client-1.png" alt="">
+          <img src="../assets/images/clients/client-2.png" alt="">
+          <img src="../assets/images/clients/client-3.png" alt="">
+          <img src="../assets/images/clients/client-4.png" alt="">
+          <img src="../assets/images/clients/client-5.png" alt="">
+          <img src="../assets/images/clients/client-6.png" alt="">
+          <img src="../assets/images/clients/client-7.png" alt="">
+          <img src="../assets/images/clients/client-8.png" alt="">
+          <img src="../assets/images/clients/client-9.png" alt="">
+          <img src="../assets/images/clients/client-10.png" alt="">
+          <img src="../assets/images/clients/client-11.png" alt="">
+          <img src="../assets/images/clients/client-12.jpg" alt="">
+          <img src="../assets/images/clients/client-13.png" alt="">
 
           <!-- Duplicate images for seamless loop -->
-          <img src="../assets/images/clients/client1.png" alt="">
-          <img src="../assets/images/clients/client2.png" alt="">
-          <img src="../assets/images/clients/client3.png" alt="">
-          <img src="../assets/images/clients/client4.png" alt="">
-          <img src="../assets/images/clients/client5.png" alt="">
-          <img src="../assets/images/clients/client6.png" alt="">
-          <img src="../assets/images/clients/client7.png" alt="">
-          <img src="../assets/images/clients/client8.png" alt="">
-          <img src="../assets/images/clients/client9.png" alt="">
-          <img src="../assets/images/clients/client10.png" alt="">
-          <img src="../assets/images/clients/client11.png" alt="">
-          <img src="../assets/images/clients/client12.jpg" alt="">
-          <img src="../assets/images/clients/client13.png" alt="">
+          <img src="../assets/images/clients/client-1.png" alt="">
+          <img src="../assets/images/clients/client-2.png" alt="">
+          <img src="../assets/images/clients/client-3.png" alt="">
+          <img src="../assets/images/clients/client-4.png" alt="">
+          <img src="../assets/images/clients/client-5.png" alt="">
+          <img src="../assets/images/clients/client-6.png" alt="">
+          <img src="../assets/images/clients/client-7.png" alt="">
+          <img src="../assets/images/clients/client-8.png" alt="">
+          <img src="../assets/images/clients/client-9.png" alt="">
+          <img src="../assets/images/clients/client-10.png" alt="">
+          <img src="../assets/images/clients/client-11.png" alt="">
+          <img src="../assets/images/clients/client-12.jpg" alt="">
+          <img src="../assets/images/clients/client-13.png" alt="">
         </div>
         </div>
       </div>

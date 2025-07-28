@@ -26,7 +26,7 @@
             <a class="nav-link text-white" href="#">Partners</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-white" href="/location">Vulnerability Explorer</a>
+            <a class="nav-link text-white" href="#">Vulnerability Explorer</a>
             </li>
         </ul>
 

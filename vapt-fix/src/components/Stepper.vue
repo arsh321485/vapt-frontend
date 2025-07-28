@@ -4,9 +4,10 @@
     <div class="container-fluid">
     <div class="row">
         <div class="d-flex justify-content-center py-2">
-            <div class="stepper ">
-                <a class="navbar-brand fs-3 fw-semibold" href="#">vaptfix</a>
-        
+            <div class="stepper mt-3">
+                <!-- <a class="navbar-brand fs-3 fw-semibold" href="#">vaptfix</a> -->
+              <img src="../assets/images/logo2.png" alt="">
+
             <div class="step active">
                 <div class="step-circle">1</div>
                 <div class="label">Add location and users</div>
@@ -43,12 +44,9 @@
             </div>
             
         </div>
-        </div>
-
-                </div>
-      
-        </section>
-        
+    </div>
+    </div>
+    </section>
     </main>
 </template>
 

@@ -7,6 +7,13 @@
                 <div class="col-lg-5 col-md-6 text-white">
                      <img src="../assets/images/logo1.png"  alt="logo">
                     <p class="mt-4">Eliminate Vulnerabilities Before They<br> Become Threats.</p>
+                    <!-- <div> -->
+                        <img src="../assets/images/iso-standards/logo1.png" alt="" class="iso-logo me-2">
+                        <img src="../assets/images/iso-standards/logo2.png" alt="" class="iso-logo me-2">
+                        <img src="../assets/images/iso-standards/logo3.png" alt="" class="iso-logo me-2">
+                        <img src="../assets/images/iso-standards/logo4.png" alt="" class="iso-logo me-2">
+                        <img src="../assets/images/iso-standards/logo5.png" alt="" class="iso-logo me-2">
+                    <!-- </div> -->
                 </div>
                 <div class="col-lg-7 col-md-6 text-white d-flex flex-column justify-content-end">
                     <div>
@@ -18,11 +25,13 @@
                             <!-- <li>Insights</li> -->
                         </ul>
                     </div>
+
                     <div class="d-flex justify-content-between">
                         <p style="font-size: 13px;">© 2025 Vaptfix. Engineered and designed worldwide. All rights reserved.</p>
                         <p style="font-size: 13px;">Terms of use</p>
                         <p style="font-size: 13px;">Privacy Policy</p>
                     </div>
+                    
                 </div>
             </div>
         </div>

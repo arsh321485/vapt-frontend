@@ -1,0 +1,112 @@
+<template>
+    <main>
+     <div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="row overflow-hidden w-100">
+      <!-- Left Form Section -->
+      <div class="col-lg-6 col-md-12 p-5 form-section">
+        <h1 class="form-heading mb-3">Welcome back!</h1>
+        <p class="form-subheading mb-4">Login into your account to start fixing.</p>
+
+        <div class="mb-3 mt-5 d-flex gap-2">
+          <button class="btn btn-google"><img src="../assets/images/google-icon.png" style="height: 20px;width: 20px;margin-top: -1px;"/> Login with Google</button>
+          <button class="btn btn-microsoft"><img src="../assets/images/microsoft-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Microsoft</button>
+        </div>
+
+        <form>
+          <div class="mb-3 mt-4">
+            <label class="form-label">Organisation name</label>
+            <input type="text" class="form-control" placeholder="Enter your first name" style="border: 1px solid #422CE9;">
+          </div>
+          <div class="mb-4 mt-4">
+            <label class="form-label">Your password</label>
+            <input type="password" class="form-control" placeholder="Enter your password">
+          </div>
+          <button type="submit" class="btn btn-vaptfix w-100 py-2">
+            Login into VAPTfix <i class="bi bi-arrow-right-circle-fill"></i>  
+          </button>
+        </form>
+
+        <p class="mt-4 text-center">Don’t have an account? <span><router-link to="/signup" class="text-decoration-none" tag="button" style="color: #422CE9;">Signup</router-link></span></p>
+      </div>
+
+      <!-- Right Image Section -->
+      <div class="col-lg-6 d-none d-lg-block image-section pt-5">
+        <img src="../assets/images/signin.jpg" alt="" style="width: 455px;height: 500px;border-radius: 15px;">
+      </div>
+    </div>
+  </div>
+
+
+    </main>
+</template>
+
+<script>
+
+import Vue3Select from 'vue3-select';
+import 'vue3-select/dist/vue3-select.css';
+
+export default {
+  name: 'SigninView',
+  components: {
+    Vue3Select
+  }
+};
+</script>
+
+<style scoped>
+    .form-control {
+      border-radius: 20px;
+      padding: 8px 13px;
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.25);
+    }
+
+    .btn-google {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      color: rgba(0, 0, 0, 0.87);
+      border-radius: 50px;
+      width: 200px;
+    }
+
+    .btn-microsoft {
+      background-color: #fff;
+      color: rgba(0, 0, 0, 0.87);
+      border: 1px solid #ddd;
+      border-radius: 50px;
+      width: 230px;
+    }
+
+    .btn-vaptfix {
+      background-color: #422CE9;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+    }
+
+    .btn-vaptfix i {
+      margin-left: 5px;
+    }
+
+    .form-heading {
+      font-weight: 500;
+    }
+
+    .form-subheading {
+      color: #6c757d;
+    }
+
+    .form-label {
+      font-weight: 500;
+    }
+
+    .signup-link {
+      color: #422CE9;
+      text-decoration: none;
+    }
+    .signup-link:hover {
+      text-decoration: underline;
+    }
+</style>

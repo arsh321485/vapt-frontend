@@ -1,4 +1,11 @@
 
+/* larger screen */
+@media screen and (min-width: 1920px) {
+  .menubar-col1 {
+    width: 4%;
+  }
+}
+
 /* iPad Pro */
 @media (max-width: 1200px) {
   .hero-section div h1 {
@@ -22,6 +29,10 @@
   .card-wrapper {
     row-gap: 240px;
     column-gap: 70px;
+  }
+
+  .menubar-col1 {
+    width: 7%;
   }
 
 }
