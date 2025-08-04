@@ -45,7 +45,7 @@
           <img src="../assets/images/clients/client-9.png" alt="">
           <img src="../assets/images/clients/client-10.png" alt="">
           <img src="../assets/images/clients/client-11.png" alt="">
-          <img src="../assets/images/clients/client-12.jpg" alt="">
+          <img src="../assets/images/clients/client-12.png" alt="">
           <img src="../assets/images/clients/client-13.png" alt="">
 
           <!-- Duplicate images for seamless loop -->
@@ -60,7 +60,7 @@
           <img src="../assets/images/clients/client-9.png" alt="">
           <img src="../assets/images/clients/client-10.png" alt="">
           <img src="../assets/images/clients/client-11.png" alt="">
-          <img src="../assets/images/clients/client-12.jpg" alt="">
+          <img src="../assets/images/clients/client-12.png" alt="">
           <img src="../assets/images/clients/client-13.png" alt="">
         </div>
         </div>
