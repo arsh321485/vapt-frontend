@@ -1,25 +1,26 @@
 <template>
     <main>
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
+      
     <div class="row overflow-hidden w-100">
-    <!-- <img src="../assets/images/smaller-logo.png" alt="" style="height: 25px;width: 40px;"> -->
       <!-- Left Form Section --> 
-      <div class="col-lg-6 p-5 form-section">
+      <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
+        <img src="../assets/images/logo2.png" alt="" class="mb-4">
         <h1 class="form-heading mb-2">Get started now</h1>
         <p class="form-subheading mb-4">Join VAPTfix, fix your vulnerabilities now</p>
 
-        <div class="mb-3 d-flex gap-2">
-          <button class="btn btn-google"><img src="../assets/images/google-icon.png" style="height: 20px;width: 20px;margin-top: -1px;"/> Login with Google</button>
-          <button class="btn btn-microsoft"><img src="../assets/images/microsoft-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Microsoft</button>
+        <div class="mb-3 d-lg-flex d-md-flex gap-2">
+          <button class="btn btn-google mb-2 mb-md-0 mb-lg-0 w-100"><img src="../assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
+          <button class="btn btn-microsoft w-100"><img src="../assets/images/microsoft-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Microsoft</button>
         </div>
 
         <form class="mt-5">
           <div class="row mb-3">
-            <div class="col">
+            <div class="col-12 col-md-6 mb-2 mb-md-0">
               <label class="form-label">First name</label>
               <input type="text" class="form-control" style="border: 1px solid #422CE9;" placeholder="Enter your first name">
             </div>
-            <div class="col">
+            <div class="col-12 col-md-6">
               <label class="form-label">Last name</label>
               <input type="text" class="form-control" placeholder="Enter your last name">
             </div>
@@ -44,8 +45,8 @@
       </div>
 
       <!-- Right Image Section -->
-      <div class="col-lg-6 image-section d-lg-block pt-5">
-        <img src="../assets/images/signup.jpg" alt="" style="width: 500px;height: 700px;border-radius: 15px;">
+      <div class="col-lg-6 image-section d-none d-lg-block pt-5">
+        <img src="../assets/images/signup.jpg" alt="" style="width: 455px;height: 700px;border-radius: 15px;">
       </div>
     </div>
   </div>
@@ -65,57 +66,3 @@ export default {
   }
 };
 </script>
-
-
-<style scoped>
-  .form-control{
-    border-radius: 50px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 20px;
-  }
-
-  .form-control:focus {
-    box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.25);
-  }
-
-    .btn-google {
-      border: 1px solid #ddd;
-      border-radius: 50px;
-      color: rgba(0, 0, 0, 0.87);
-      width: 200px;
-    }
-
-    .btn-microsoft {
-      border: 1px solid #ddd;
-      border-radius: 50px;
-      color: rgba(0, 0, 0, 0.87);
-      width: 250px;
-    }
-
-    .btn-vaptfix {
-      background-color: #422CE9;
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-    }
-    .btn-vaptfix:hover{
-      background-color: #1c09ab;
-      color: #fff;
-    }
-
-    .form-heading {
-      font-weight: 500;
-      font-size: 40px;
-      color: #000000;
-    }
-
-    .form-subheading {
-      color: #00000099;
-      font-size: 14px;
-    }
-
-    .form-label {
-      font-weight: 500; 
-    }
-</style>

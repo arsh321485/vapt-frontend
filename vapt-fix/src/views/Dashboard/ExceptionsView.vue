@@ -1,8 +1,8 @@
 <template>
     <main>
         <section>
-            <div class="container-fluid">
-                <div class="row gx-0" style="margin:0 !important;padding: 0 !important;">
+            <div class="container-fluid px-0">
+                <div class="row gx-0 no-gutters">
                     <DashboardHeader />
                 </div>
                 <div class="row">
@@ -35,10 +35,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -49,10 +55,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -63,10 +75,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -77,10 +95,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -91,10 +115,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -105,10 +135,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -138,10 +174,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -152,10 +194,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -166,10 +214,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -180,10 +234,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -194,10 +254,16 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -208,16 +274,22 @@
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
                                             <td>
-                                                <button class="btn fixes-btn">
-                                                    Take action
+                                                <div class="d-flex justify-content-around">
+                                                    <button class="btn fixes-btn">
+                                                    Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
+                                                <button class="btn fixes-red-btn">
+                                                    Decline 
+                                                    <i class="bi bi-arrow-right-circle-fill"></i>
+                                                </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -259,8 +331,8 @@ export default {
     color:rgba(49, 33, 177, 1);
     font-weight: 600;
 }
-.fixes-btn {
-    color:rgba(49, 33, 177, 1);
+.fixes-red-btn {
+    color:rgba(170, 0, 0, 1);
     font-weight: 600;
 }
 </style>

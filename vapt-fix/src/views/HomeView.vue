@@ -12,7 +12,13 @@
           <h1>Secure your assets with proven fixes and clear steps.</h1>
           <p class="hero-text">Security isn’t just about finding flaws—it’s about fixing them fast. We close the gaps that reports leave behind, giving you lasting protection.</p>
           <div class="hero-div-btn">
-            <button type="button" class="btn hero-btn">Fix your vulnerabilities now <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i></button>
+            <!-- <button type="button" class="btn hero-btn">Fix your vulnerabilities now <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i></button> -->
+             <router-link to="/location">
+  <button type="button" class="btn hero-btn">
+    Fix your vulnerabilities now
+    <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
+  </button>
+</router-link>
           </div>
         </div>
         <div class="col-lg-6 col-md-12 col-sm-12">

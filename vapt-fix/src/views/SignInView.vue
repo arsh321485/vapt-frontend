@@ -3,13 +3,14 @@
      <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
       <!-- Left Form Section -->
-      <div class="col-lg-6 col-md-12 p-5 form-section">
+      <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
+        <img src="../assets/images/logo2.png" alt="" class="mb-4">
         <h1 class="form-heading mb-3">Welcome back!</h1>
         <p class="form-subheading mb-4">Login into your account to start fixing.</p>
 
-        <div class="mb-3 mt-5 d-flex gap-2">
-          <button class="btn btn-google"><img src="../assets/images/google-icon.png" style="height: 20px;width: 20px;margin-top: -1px;"/> Login with Google</button>
-          <button class="btn btn-microsoft"><img src="../assets/images/microsoft-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Microsoft</button>
+        <div class="mb-3 mt-5 d-lg-flex d-md-flex gap-2">
+          <button class="btn btn-google mb-2 mb-md-0 mb-lg-0 w-100"><img src="../assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
+          <button class="btn btn-microsoft w-100"><img src="../assets/images/microsoft-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Microsoft</button>
         </div>
 
         <form>
@@ -31,7 +32,7 @@
 
       <!-- Right Image Section -->
       <div class="col-lg-6 d-none d-lg-block image-section pt-5">
-        <img src="../assets/images/signin.jpg" alt="" style="width: 455px;height: 500px;border-radius: 15px;">
+        <img src="../assets/images/signin.jpg" alt="" class="img-fluid" style="height: 500px;border-radius: 15px;">
       </div>
     </div>
   </div>
@@ -53,7 +54,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<!-- <style scoped>
     .form-control {
       border-radius: 20px;
       padding: 8px 13px;
@@ -109,4 +110,4 @@ export default {
     .signup-link:hover {
       text-decoration: underline;
     }
-</style>
+</style> -->

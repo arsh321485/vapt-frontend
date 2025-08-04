@@ -1,9 +1,9 @@
 
 /* larger screen */
 @media screen and (min-width: 1920px) {
-  .menubar-col1 {
+  /* .menubar-col1 {
     width: 4%;
-  }
+  } */
 }
 
 /* iPad Pro */
@@ -216,5 +216,9 @@
   .fix-card .btn {
   padding: 7px 20px;
 }
+  .form-heading {
+      font-size: 30px;
+    }
+
 
 }

@@ -1,8 +1,8 @@
 <template>
   <main>
     <section>
-      <div class="container-fluid">
-        <div class="row gx-0" style="margin:0 !important;padding: 0 !important;">
+      <div class="container-fluid px-0">
+        <div class="row gx-0 no-gutters">
           <DashboardHeader />
         </div>
         <div class="row">

@@ -11,6 +11,12 @@ import SupportTicketView from '../views/Dashboard/SupportTicketView.vue'
 import FixesView from '../views/Dashboard/FixesView.vue'
 import ExceptionsView from '../views/Dashboard/ExceptionsView.vue'
 import VulnerabilityRegisterView from '../views/Dashboard/VulnerabilityRegisterView.vue'
+import Onboarding1View from '../views/Dashboard/Onboarding1View.vue'
+import AdminDashboardOnboardingView from '../views/Dashboard/AdminDashboardOnboardingView.vue'
+import MitigationStrategyView from '../views/Dashboard/MitigationStrategyView.vue'
+import AssetsView from '../views/Dashboard/AssetsView.vue'
+import VulnerabilityExplorerView from '../views/VulnerabilityExplorerView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,12 +27,9 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: '/vulnerabilityexplorer',
+      name: 'vulnerabilityexplorer',
+      component: VulnerabilityExplorerView,
     },
     {
       path: '/location',
@@ -83,6 +86,27 @@ const router = createRouter({
       name: 'vulnerabilityregister',
       component: VulnerabilityRegisterView,
     },
+    {
+      path: '/onboarding1',
+      name: 'onboarding1',
+      component: Onboarding1View,
+    },
+    {
+      path: '/admindashboardonboarding',
+      name: 'admindashboardonboarding',
+      component: AdminDashboardOnboardingView,
+    },
+    {
+      path: '/mitigationstrategy',
+      name: 'mitigationstrategy',
+      component: MitigationStrategyView,
+    },
+    {
+      path: '/assets',
+      name: 'assets',
+      component: AssetsView,
+    },
+    
 
   ],
 })
