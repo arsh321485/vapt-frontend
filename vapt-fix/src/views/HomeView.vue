@@ -30,7 +30,14 @@
           </div>
         </div>
       </div>
-      <div class="row mt-5">
+      
+     </div>
+    </section>
+     
+    <!-- Why post VAPT Remidiation is broken -->
+    <section class="remidiation-section fluid-padding">
+      <div class="container-fluid">
+        <div class="row mb-5">
         <div class="scroll-banner">
         <div class="scroll-track">
           <!-- Original images -->
@@ -65,12 +72,6 @@
         </div>
         </div>
       </div>
-     </div>
-    </section>
-     
-    <!-- Why post VAPT Remidiation is broken -->
-    <section class="remidiation-section fluid-padding">
-      <div class="container-fluid">
         <div class="row">
           <div class="col-lg-6">
             <p class="warning"><i class="bi bi-exclamation-triangle-fill"></i> The problem</p>

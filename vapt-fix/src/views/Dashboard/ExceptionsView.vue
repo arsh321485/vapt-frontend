@@ -10,8 +10,16 @@
                         <DashboardMenu />
                     </div>
 
-                    <div class="col-11 pt-2 pb-3 px-4">
-                        <h2 class="ticket-head mt-3">Exceptions</h2>
+                    <div class="col-11 pt-2 pb-3 px-4 pe-5">
+                        <div class="d-flex justify-content-between">
+                            <div><h2 class="ticket-head mt-4">Exceptions</h2></div>
+                            <div>
+                                <button type="button" class="btn pending-approval-btn rounded-pill mt-4">
+                                Go premium and get exclusive Compensatory control support from us
+                                <i class="bi bi-arrow-right ms-1 fs-5"></i>
+                            </button>
+                            </div>
+                        </div>
                         <div class="row mt-5">
                             <h6 class="fw-semibold mb-3">Requested today</h6>
                             <div class="table-responsive">

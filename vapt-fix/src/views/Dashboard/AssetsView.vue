@@ -193,6 +193,7 @@
                     <div class="row">
                         <div class="d-flex gap-3">
                                 <button class="btn btn-primary btn-pill active-tab fw-semibold">All</button>
+                                <button class="btn btn-pill btn-outline-secondary" style="color: maroon;">Critical</button>
                                 <button class="btn btn-outline-secondary btn-pill text-danger">High</button>
                                 <button class="btn btn-outline-secondary btn-pill text-warning">Medium</button>
                                 <button class="btn btn-outline-secondary btn-pill text-success">Low</button>
@@ -373,7 +374,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
   .asset-item {
     padding: 12px 16px;
     position: relative;

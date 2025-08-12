@@ -16,6 +16,10 @@ import AdminDashboardOnboardingView from '../views/Dashboard/AdminDashboardOnboa
 import MitigationStrategyView from '../views/Dashboard/MitigationStrategyView.vue'
 import AssetsView from '../views/Dashboard/AssetsView.vue'
 import VulnerabilityExplorerView from '../views/VulnerabilityExplorerView.vue'
+import MissingSecurityUpdatesView from '../views/Dashboard/MissingSecurityUpdatesView.vue'
+import VulnerabilityCardView from '../views/Dashboard/VulnerabilityCardView.vue'
+import YourTeamView from '../views/Dashboard/YourTeamView.vue'
+import PricingplansView from '../views/PricingplansView.vue'
 
 
 const router = createRouter({
@@ -25,6 +29,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+    },
+    {
+      path: '/pricingplan',
+      name: 'pricingplan',
+      component: PricingplansView,
     },
     {
       path: '/vulnerabilityexplorer',
@@ -47,10 +56,33 @@ const router = createRouter({
       component: UploadReportView,
     },
     {
-      path: '/dashboard1',
-      name: 'dashboard1',
-      component: Dashboard1View,
+      path: '/onboarding1',
+      name: 'onboarding1',
+      component: Onboarding1View,
     },
+    {
+      path: '/admindashboardonboarding',
+      name: 'admindashboardonboarding',
+      component: AdminDashboardOnboardingView,
+    },
+    {
+      path: '/mitigationstrategy',
+      name: 'mitigationstrategy',
+      component: MitigationStrategyView,
+    },
+    {
+      path: '/missingsecurityupdates',
+      name: 'missingsecurityupdates',
+      component: MissingSecurityUpdatesView,
+    },
+    {
+      path: '/vulnerabilitycard',
+      name: 'vulnerabilitycard',
+      component: VulnerabilityCardView,
+    },
+
+
+
     {
       path: '/signup',
       name: 'signup',
@@ -61,6 +93,12 @@ const router = createRouter({
       name: 'signin',
       component: SignInView,
     },
+    {
+      path: '/dashboard1',
+      name: 'dashboard1',
+      component: Dashboard1View,
+    },
+
     {
       path: '/createnewticket',
       name: 'createnewticket',
@@ -85,28 +123,17 @@ const router = createRouter({
       path: '/vulnerabilityregister',
       name: 'vulnerabilityregister',
       component: VulnerabilityRegisterView,
-    },
-    {
-      path: '/onboarding1',
-      name: 'onboarding1',
-      component: Onboarding1View,
-    },
-    {
-      path: '/admindashboardonboarding',
-      name: 'admindashboardonboarding',
-      component: AdminDashboardOnboardingView,
-    },
-    {
-      path: '/mitigationstrategy',
-      name: 'mitigationstrategy',
-      component: MitigationStrategyView,
-    },
+    }, 
     {
       path: '/assets',
       name: 'assets',
       component: AssetsView,
     },
-    
+    {
+      path: '/yourteam',
+      name: 'yourteam',
+      component: YourTeamView,
+    },
 
   ],
 })

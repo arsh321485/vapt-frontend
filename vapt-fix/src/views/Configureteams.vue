@@ -31,9 +31,7 @@
                             <div>
                             <p class="text-muted location-subtext">You can add upto 10 locations.</p>
                             </div>
-                            <!-- <div class="mb-3 ms-3" style="margin-top: -20px;">
-                                <img src="../assets/images/info.png" alt="">
-                            </div> -->
+                            
                             <div class="position-relative">
     <!-- Info Icon -->
     <div class="mb-3 ms-3" style="margin-top: -20px;">
@@ -117,9 +115,9 @@
       </td>
     </tr>
   </tbody>
-</table>
+        </table>
       </div>
-    </div>
+      </div>
   
                 </div>
               </div>

@@ -10,13 +10,13 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-2 pb-3">
+          <div class="col-11 pt-2 pb-3 pe-4">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <h2 class="">Vulnerability Management Program</h2>
-              <button type="button" class="btn pending-approval-btn rounded-pill">
+              <!-- <button type="button" class="btn pending-approval-btn rounded-pill">
                 11 Compensatory controls pending approval
                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
-              </button>
+              </button> -->
             </div>
 
             <div class="row">
@@ -251,7 +251,7 @@
 
                     <!-- SECOND BOXES (after clicking Next) -->
                     <div v-if="showSecondBox" class="assign-popup d-flex gap-4 mt-3">
-                      <div class="white-box card border-0 shadow py-3 ps-3 pe-5">
+                      <!-- <div class="white-box card border-0 shadow py-3 ps-3 pe-5">
                         <p class="ps-2" style="color: rgba(0, 0, 0, 0.6);">Assign to:</p>
                         <ul class="ps-2 list-unstyled">
                           <li class="mb-2">
@@ -301,14 +301,16 @@
                         <input type="date" value="2025-07-24" class="form-control" />
                         <br />
                         <button class="btn text-light" style="background-color: rgba(49, 33, 177, 1);border-radius: 20px;"><i class="bi bi-check-circle"></i> Done</button>
-                      </div>
+                      </div> -->
 
                       <div v-if="showTooltip" class="black-tooltip">
                         <h6>Assign users</h6>
                         <p class="mb-0" style="font-size: 13px;">
                           Assign users to a vulnerability, set a deadline and track their progress.
                         </p>
-                        <button class="btn mt-5" style="color: rgba(194, 186, 255, 1);font-weight: 600;" @click="showTooltip = false">Next <i class="bi bi-chevron-right" style="font-weight: 600;"></i></button>
+                        <router-link to="/admindashboardonboarding">
+                        <button class="btn mt-5" style="color: rgba(194, 186, 255, 1);font-weight: 600;">Next <i class="bi bi-chevron-right" style="font-weight: 600;"></i></button>
+                        </router-link>
                       </div>
                     </div>
                   </div>

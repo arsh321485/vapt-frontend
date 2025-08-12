@@ -10,7 +10,7 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-2 pb-3">
+          <div class="col-11 pt-2 pb-3 pe-4">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <h2 class="">Vulnerability Management Program</h2>
               <button type="button" class="btn pending-approval-btn rounded-pill">
@@ -195,9 +195,12 @@
                       </div>
                       </div>
                       <div class="mt-3">
-                        <p style="color: rgba(49, 33, 177, 1); font-weight: 600;">
+                        <!-- <p style="color: rgba(49, 33, 177, 1); font-weight: 600;">
                           More details <i class="bi bi-arrow-right"></i>
-                        </p>
+                        </p> -->
+                        <router-link to="/mitigationstrategy">
+                          <button class="btn" style="color: rgba(49, 33, 177, 1); font-weight: 600;">More details <i class="bi bi-arrow-right"></i></button>
+                        </router-link>
                       </div>
                     </div>
                   </div>

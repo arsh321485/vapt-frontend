@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import './responsive.css';
+/* @import './responsive.css'; */
 
 * {
   margin: 0px;
@@ -99,6 +99,7 @@ html, body {
 
 .hero-section .hero-btn:hover {
   background-color: #4836d6;
+  color: white;
 }
 
 .hero-section .cyber-bg {
@@ -762,10 +763,10 @@ html, body {
   border-radius: 50%;
 }
 
+
 .sidebar {
-  /* width: 60px; */
   background-color: rgba(246, 246, 248, 1);
-  height: 1000px;
+  height: 1100px;
 }
 
 .sidebar-dot {
@@ -1113,4 +1114,29 @@ html, body {
   cursor: pointer;
   font-size: 20px;
   color: white;
+}
+
+/* vulnerabiltity explorer */
+.vulnerability-explorer {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F6F6 100%);
+}
+
+
+.vuln-exp-heading {
+  font-size: 48px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.vuln-exp-subhead {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* pricing page */
+.pricing-card-subhead {
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+  font-size: 15px;
 }

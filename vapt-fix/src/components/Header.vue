@@ -14,20 +14,27 @@
         <!-- Left nav links -->
         <ul class="navbar-nav me-auto gap-4">
             <li class="nav-item">
-            <a class="nav-link active text-white" aria-current="page" href="#">Home</a>
+              <router-link to="/" class="nav-link active text-white text-decoration-none" aria-current="page" >
+                Home
+              </router-link>
             </li>
             <li class="nav-item">
             <a class="nav-link text-white" href="#">Features</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-white" href="#">Pricing</a>
+              <router-link to="/pricingplan" class="nav-link text-white text-decoration-none">
+                Pricing
+              </router-link>
             </li>
             <li class="nav-item">
             <a class="nav-link text-white" href="#">Partners</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-white" href="#">Vulnerability Explorer</a>
+              <router-link to="/vulnerabilityexplorer" class="nav-link text-white text-decoration-none">
+                Vulnerability Explorer
+              </router-link>
             </li>
+
         </ul>
 
         <!-- Right-aligned button -->
