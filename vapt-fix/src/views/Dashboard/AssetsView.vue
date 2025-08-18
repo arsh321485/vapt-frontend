@@ -354,7 +354,7 @@
                                     <div class="d-flex justify-content-start gap-3">
                                         
                                     </div>
-                                    <div class="d-flex justify-content-start gap-3">
+                                    <div class="d-flex justify-content-start gap-5">
                                         <div class="d-flex flex-column" style="width: 400px;">
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
                                             <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
@@ -363,11 +363,9 @@
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
                                             <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
                                         </div>
+                                        
                                         <div>
-                                          <router-link to="/vulnerabilitycard" class="btn border-0" style="color: rgba(49, 33, 177, 1);font-weight: 600">Remediate <i class="bi bi-arrow-right"></i></router-link>
-                                        </div>
-                                        <div>
-                                          <router-link to="" class="btn border-0" style="color: rgba(49, 33, 177, 1);font-weight: 600">fix now <i class="bi bi-arrow-right"></i></router-link>
+                                          <router-link to="/vulnerabilitycard" class="btn border-0" style="color: rgba(49, 33, 177, 1);font-weight: 600">fix now <i class="bi bi-arrow-right"></i></router-link>
                                         </div>
                                     </div>
                                     <div class="d-flex flex-column">
