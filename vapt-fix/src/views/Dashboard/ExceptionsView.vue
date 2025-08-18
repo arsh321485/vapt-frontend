@@ -83,10 +83,11 @@
         <h4 class="modal-title" id="approveModalLabel">Approve Compensatory Control?</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body pt-5 pb-4">
+      <div class="modal-body pt-4 pb-4">
+        <p class="text-muted pb-3">Do you want to approve VMware ESXi 7.0/8.0 Sandbox... ?</p>
         <div class="d-flex justify-content-start gap-3 mt-3">
             <button class="btn rounded-pill text-light" style="background-color: rgba(49, 33, 177, 1);">Approve Compensatory Control</button>
-            <button class="btn border-0 text-danger" style="font-weight: 600;">Decline</button>
+            <button class="btn border-0 text-danger" data-bs-dismiss="modal" style="font-weight: 600;">Decline</button>
         </div>
       </div>
       <!-- <div class="modal-footer">
@@ -108,8 +109,8 @@
             <label for="exampleFormControlTextarea1" class="form-label text-muted">Reason for declining the compensatory control..</label>
             <textarea class="form-control" id="exampleFormControlTextarea1" style="border-radius: 8px;" rows="3"></textarea>
         <div class="d-flex justify-content-start gap-3 mt-3">
-            <button class="btn rounded-pill text-light" style="background-color: rgba(49, 33, 177, 1);" @click="showDeclinePopup">Decline Compensatory Control</button>
-            <button class="btn border-0 text-danger" style="font-weight: 600;">Decline</button>
+            <button class="btn rounded-pill text-light" style="background-color: rgba(49, 33, 177, 1);">Decline Compensatory Control</button>
+            <button class="btn border-0 text-danger" data-bs-dismiss="modal" style="font-weight: 600;">Decline</button>
         </div>
       </div>
       <!-- <div class="modal-footer">
@@ -384,25 +385,7 @@ export default {
         DashboardMenu,
         DashboardHeader
     },
-    methods: {
-    showDeclinePopup() {
-      Swal.fire({
-        title: "Do you want to approve the decline request?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Yes",
-        cancelButtonText: "No",
-        confirmButtonColor: "#3121b1", // matches your button color
-        cancelButtonColor: "#6c757d",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire("Approved!", "The decline request has been approved.", "success");
-        } else {
-          Swal.fire("Cancelled", "No action taken.", "info");
-        }
-      });
-    },
-  },
+   
 };
 </script>
 
