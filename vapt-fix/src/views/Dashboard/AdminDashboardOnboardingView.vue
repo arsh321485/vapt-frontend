@@ -52,10 +52,16 @@
                     </div>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <div class="bar maroon vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
+                      </div>
+                      <div class="text-center">
                         <div id="highAge" class="fs-5 fw-semibold">56</div>
                         <div class="bar red vul-bar mt-1"></div>
-                        <small class="text-danger mt-1 d-block">● High</small>
+                        <small class="mt-1 d-block" style="color: red;">● High</small>
                       </div>
+                      
                       <div class="text-center">
                         <div id="mediumAge" class="fs-5 fw-semibold">127</div>
                         <div class="bar yellow vul-bar mt-1"></div>
@@ -81,9 +87,14 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-end mb-1">
                       <div class="text-center">
+                        <div id="highCount" class="fs-4 fw-semibold">1d 10hrs</div>
+                        <div class="bar maroon w-100 mt-1"></div>
+                        <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
+                      </div>
+                      <div class="text-center">
                         <div id="highCount" class="fs-4 fw-semibold">2d 11hrs</div>
                         <div class="bar red w-100 mt-1"></div>
-                        <small class="text-danger mt-1 d-block">● High</small>
+                        <small class="mt-1 d-block" style="color: red;">● High</small>
                       </div>
                       <div class="text-center">
                         <div id="mediumCount" class="fs-4 fw-semibold">3d 4hrs</div>
@@ -208,7 +219,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                         </div>
-                        <input type="date" class="form-control" />
+                        <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
@@ -218,7 +231,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                       </div>
-                      <input type="date" class="form-control" />
+                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
@@ -228,7 +243,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                       </div>
-                      <input type="date" class="form-control" />
+                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
@@ -238,7 +255,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                       </div>
-                      <input type="date" class="form-control" />
+                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
                     </div>
                   </div>

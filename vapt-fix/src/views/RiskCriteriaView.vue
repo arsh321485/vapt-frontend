@@ -90,10 +90,18 @@
                                 </div>
                                 <div>
                                 <select id="Critical" name="Critical" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);margin-left: 8px;">
-                                    <option value="">5 days from assignment</option>
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
+                              
+                                    <option value="">1 Day</option>
+                                    <option value="">2 Day</option>
+                                    <option value="">3 Day</option>
+                                    <option value="">4 Day</option>
+                                    <option value="">5 Day</option>
+                                    <option value="">6 Day</option>
+                                    <option value="">1 Week</option>
+                                    <option value="">2 Week</option>
+                                    <option value="">3 Week</option>
+                                    <option value="">4 Week</option>
+                                    <option value="">5 Week</option>
                                 </select>
                                 </div>
                             </div>
@@ -115,10 +123,17 @@
                             </div>
                             <div>
                                 <select id="High" name="High" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);">
-                                    <option value="">5 days from assignment</option>
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
+                                    <option value="">1 Day</option>
+                                    <option value="">2 Day</option>
+                                    <option value="">3 Day</option>
+                                    <option value="">4 Day</option>
+                                    <option value="">5 Day</option>
+                                    <option value="">6 Day</option>
+                                    <option value="">1 Week</option>
+                                    <option value="">2 Week</option>
+                                    <option value="">3 Week</option>
+                                    <option value="">4 Week</option>
+                                    <option value="">5 Week</option>
                                 </select>
                             </div>
                             </div>
@@ -143,10 +158,17 @@
                                 </div>
                                 <div>
                                 <select id="Medium" name="Medium" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);">
-                                    <option value="">5 days from assignment</option>
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
+                                    <option value="">1 Day</option>
+                                    <option value="">2 Day</option>
+                                    <option value="">3 Day</option>
+                                    <option value="">4 Day</option>
+                                    <option value="">5 Day</option>
+                                    <option value="">6 Day</option>
+                                    <option value="">1 Week</option>
+                                    <option value="">2 Week</option>
+                                    <option value="">3 Week</option>
+                                    <option value="">4 Week</option>
+                                    <option value="">5 Week</option>
                                 </select>
                                 </div>
                             </div>
@@ -168,10 +190,17 @@
                             </div>
                             <div>
                                 <select id="Low" name="Low" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);margin-left: 5px;">
-                                    <option value="">5 days from assignment</option>
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
+                                    <option value="">1 Day</option>
+                                    <option value="">2 Day</option>
+                                    <option value="">3 Day</option>
+                                    <option value="">4 Day</option>
+                                    <option value="">5 Day</option>
+                                    <option value="">6 Day</option>
+                                    <option value="">1 Week</option>
+                                    <option value="">2 Week</option>
+                                    <option value="">3 Week</option>
+                                    <option value="">4 Week</option>
+                                    <option value="">5 Week</option>
                                 </select>
                             </div>
                             </div>

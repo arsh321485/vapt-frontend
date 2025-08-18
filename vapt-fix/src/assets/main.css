@@ -847,7 +847,7 @@ html, body {
 }
 
 .vul-bar {
-  width: 120px;
+  width: 80px;
 }
 
 .bar {
@@ -856,7 +856,11 @@ html, body {
 }
 
 .bar.red {
-  background-color: darkred;
+  background-color: red;
+}
+
+.bar.maroon {
+  background-color: maroon;
 }
 
 .bar.yellow {

@@ -12,10 +12,11 @@
 
           <div class="col-11 pt-2 pb-3 pe-5">
             <div class="row">
-                <div class="col-11">
+                <div class="col-12">
                 <div class="d-flex justify-content-between my-4">
                 <h2>Mitigation Strategy</h2>
-                <button class="btn download-report-btn" @click="showPopup = true"><i class="bi bi-download me-2"></i> Download report</button>
+                <div class="d-flex justify-content-between gap-3">
+                  <button class="btn download-report-btn" @click="showPopup = true"><i class="bi bi-download me-2"></i> Download report</button>
 
                   <!-- Overlay Popup -->
                 <div
@@ -159,11 +160,19 @@
                   </div>
                 </div>
 
+                <div class="dropdown">
+                          <div class="dropdown-btn"> Select location</div>
+                          <div class="dropdown-content">
+                              <a href="#">Greece</a>
+                              <a href="#">Germany</a>
+                              <a href="#">Bahrain</a>
+                          </div>
+                          </div>
+                </div>
+
                 </div>
                 </div>
-                <div class="col-1">
-                    <!-- blank -->
-                </div>
+                
             </div>
 
             <div class="row">
@@ -193,7 +202,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                         </div>
-                        <input type="date" class="form-control" />
+                        <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
@@ -203,7 +214,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                       </div>
-                      <input type="date" class="form-control" />
+                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
@@ -213,7 +226,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                       </div>
-                      <input type="date" class="form-control" />
+                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
@@ -223,7 +238,9 @@
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
                         </div>
                       </div>
-                      <input type="date" class="form-control" />
+                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
+                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
                       </div>
               </div>
             </div>
@@ -841,6 +858,32 @@ export default {
       showPopup: false,
     };
   },
+  mounted() {
+    const dropdown = document.querySelector('.dropdown');
+    const btn = dropdown.querySelector('.dropdown-btn');
+    const options = dropdown.querySelectorAll('.dropdown-content a');
+
+    // Toggle dropdown open/close
+    btn.addEventListener('click', () => {
+      dropdown.classList.toggle('show');
+    });
+
+    // Set selected option
+    options.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.textContent = option.textContent; // update button text
+        dropdown.classList.remove('show'); // close dropdown
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  },
   watch: {
     showPopup(newVal) {
       if (newVal) {
@@ -882,7 +925,7 @@ export default {
 .download-report-btn {
     font-weight: 600;
     font-size: 15px;
-    padding: 10px 30px;
+    padding: 10px 15px;
     /* margin-right: 150px; */
     color: rgba(49, 33, 177, 1);
     background-color: white;
@@ -1027,4 +1070,57 @@ export default {
   .rounded-pill:hover {
     background-color: transparent;
   }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+.dropdown-btn {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 50px;
+    padding: 8px 40px 8px 16px; /* extra right padding for the arrow */
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: "▼"; /* arrow symbol */
+    font-size: 12px;
+    color: #333;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: 4px;
+}
+
+.dropdown-content a {
+    padding: 8px 12px;
+    display: block;
+    text-decoration: none;
+    color: black;
+    border-radius: 8px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
+}
 </style>

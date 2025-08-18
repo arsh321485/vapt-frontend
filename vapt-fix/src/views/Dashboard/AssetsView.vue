@@ -286,8 +286,15 @@
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(49, 33, 177, 1)"></span>
                             <span>Open</span>
                         </span>
-                        </div>
-                        
+                            </div>
+                            <div class="dropdown">
+                          <div class="dropdown-btn"> Select location</div>
+                          <div class="dropdown-content">
+                              <a href="#">Greece</a>
+                              <a href="#">Germany</a>
+                              <a href="#">Bahrain</a>
+                          </div>
+                          </div>
                         </div>
                     </div>
 
@@ -496,7 +503,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<script>
 import DashboardMenu from "@/components/DashboardMenu.vue";
 import DashboardHeader from "@/components/DashboardHeader.vue";
 
@@ -505,7 +512,33 @@ export default {
   components: {
     DashboardMenu,
     DashboardHeader,
-  }
+  },
+   mounted() {
+    const dropdown = document.querySelector('.dropdown');
+    const btn = dropdown.querySelector('.dropdown-btn');
+    const options = dropdown.querySelectorAll('.dropdown-content a');
+
+    // Toggle dropdown open/close
+    btn.addEventListener('click', () => {
+      dropdown.classList.toggle('show');
+    });
+
+    // Set selected option
+    options.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.textContent = option.textContent; // update button text
+        dropdown.classList.remove('show'); // close dropdown
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  },
 };
 </script>
 
@@ -639,4 +672,58 @@ export default {
      --bs-accordion-border-color: none;
      --bs-accordion-body-padding-y: 0;
 }
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+.dropdown-btn {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 50px;
+    padding: 4px 20px 4px 12px; /* extra right padding for the arrow */
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: "▼"; /* arrow symbol */
+    font-size: 12px;
+    color: #333;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: 4px;
+}
+
+.dropdown-content a {
+    padding: 8px 12px;
+    display: block;
+    text-decoration: none;
+    color: black;
+    border-radius: 8px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
+}
+
 </style>

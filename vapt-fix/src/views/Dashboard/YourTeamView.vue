@@ -42,6 +42,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -58,6 +59,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -74,6 +76,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -90,6 +93,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -106,6 +110,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -122,6 +127,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -138,6 +144,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -154,6 +161,7 @@
                                 </div>
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
