@@ -20,6 +20,7 @@ import MissingSecurityUpdatesView from '../views/Dashboard/MissingSecurityUpdate
 import VulnerabilityCardView from '../views/Dashboard/VulnerabilityCardView.vue'
 import YourTeamView from '../views/Dashboard/YourTeamView.vue'
 import PricingplansView from '../views/PricingplansView.vue'
+import RiskCriteriaView from '../views/RiskCriteriaView.vue'
 
 
 const router = createRouter({
@@ -46,9 +47,9 @@ const router = createRouter({
       component: LocationView,
     },
     {
-      path: '/configureteams',
-      name: 'configureteams',
-      component: ConfigureteamsView,
+      path: '/riskcriteria',
+      name: 'riskcriteria',
+      component: RiskCriteriaView,
     },
     {
       path: '/uploadreport',

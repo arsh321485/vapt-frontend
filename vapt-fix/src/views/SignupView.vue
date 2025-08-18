@@ -7,7 +7,7 @@
       <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
         <img src="../assets/images/logo2.png" alt="" class="mb-4">
         <h1 class="form-heading mb-2">Get started now</h1>
-        <p class="form-subheading mb-4">Join VAPTfix, fix your vulnerabilities now</p>
+        <p class="form-subheading mb-4">Join vaptfix, fix your vulnerabilities now</p>
 
         <div class="mb-3 d-lg-flex d-md-flex gap-2">
           <button class="btn btn-google mb-2 mb-md-0 mb-lg-0 w-100"><img src="../assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
@@ -34,10 +34,30 @@
             <input type="url" class="form-control" placeholder="Enter your organisation URL">
           </div>
           <div class="mb-4 mt-4">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" placeholder="Enter your email">
+          </div>
+          <div class="mb-4 mt-4">
             <label class="form-label">Your password</label>
             <input type="password" class="form-control" placeholder="Pick a password">
           </div>
-          <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3">Signup for VAPTfix <i class="bi bi-arrow-right-circle-fill"></i></button>
+
+          <div style="padding:10px;border:1px solid #ccc;border-radius:4px;
+            width:300px;display:flex;align-items:center;justify-content:space-between;">
+  
+            <!-- Left side: tick box -->
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="checkbox" id="captcha-check" style="width:20px;height:20px;cursor:pointer;">
+              <label for="captcha-check" style="cursor:pointer;">I'm not a robot</label>
+            </div>
+
+  <!-- Right side: fake recaptcha logo -->
+  <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" 
+       alt="recaptcha" style="height:30px;">
+</div>
+
+
+          <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3">Signup for vaptfix <i class="bi bi-arrow-right-circle-fill"></i></button>
         </form>
         <p class="text-center pt-3 mt-2">Already have an account? <span> <router-link to="/signin" class="text-decoration-none" tag="button" style="color: #422CE9;">Signin</router-link></span></p>
 

@@ -149,8 +149,8 @@
             <div class="card-top-bg">
               <img src="" alt="">
             </div>
-            <h4 class="text-white mt-4">AI driven contextual insights</h4>
-            <p>AI-driven contextual insights analyze your infrastructure in real time, identifying not just vulnerabilities but the surrounding conditions, usage patterns, and dependencies that make them critical.
+            <h4 class="text-white mt-4">some head here</h4>
+            <p>some para here.
             </p>
           </div>
           <!-- Card 2 -->

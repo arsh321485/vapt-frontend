@@ -13,30 +13,56 @@
                   <img src="../assets/images/waving-hand.png" alt="">
                 </div>
                 <div class="col-11">
-                  <h1 class="fw-semibold welcome-head"> Welcome to VAPTfix!</h1>
-                  <p class="welcome-subhead">Before we fix your information assets, ....</p>
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <h1 class="fw-semibold welcome-head"> Welcome to vaptfix!</h1>
+                      <p class="welcome-subhead">Before we fix your information assets, ....</p>
+                    </div>
+                    <div>
+                      
+                      
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-lg-9 location-card py-4 px-4">
                   <div class="row">
-                    <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-geo-alt-fill fs-4"></i>
+                    <div class="d-flex justify-content-start">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                      <i class="bi bi-geo-alt-fill fs-5"></i>
+                    </div>
+                    <h5 class="fw-semibold ms-2 mt-2" >Add location</h5>
                     </div>
                     <div class="col-lg-7">
-                      <h5 class="fw-semibold">Add location</h5>
-                      <p class="text-muted location-subtext">You can add upto 10 locations.</p>
-                      <!-- <small class="text-muted">You can add upto 10 locations.</small> -->
+                      
+                      <!-- <p class="text-muted location-subtext">You can add upto 10 locations.</p> -->
+                      
                     </div>
                   </div>
-                  <div class="row">
-                    <div class="col-8">
+                  <div class="row mt-2">
+                    <div class="col-5">
                       <input type="text" class="form-control rounded-input" id="locationName"
                         placeholder="Enter the name of the location..." />
                     </div>
-                    <div class="col-4">
-                      <button class="btn py-2 px-4 add-location-btn text-light" type="submit"><i
+                    <div class="col-3">
+                      <button class="btn btn-sm mt-2 add-location-btn text-light" type="submit"><i
                           class="bi bi-plus me-2"></i>Add location </button>
+                    </div>
+                    <div class="col-4 pt-1">
+                      <div class="avatar-container">
+                        <div class="avatar ava-green">GM</div>
+                        <div class="avatar ava-blue">UK</div>
+                        <div class="avatar ava-yellow">BH</div>
+                        <div class="avatar ava-black show-locations" id="locationsBtn">+3</div>
+                        <div class="popup-box" id="popupBox">
+                            <ul>
+                                <li>New York</li>
+                                <li>Los Angeles</li>
+                                <li>Bangalore</li>
+                            </ul>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -44,19 +70,22 @@
               <div class="row mt-4">
                 <div class="col-lg-12 add-users py-4 px-4">
                   <div class="row">
-                    <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-person-fill fs-4"></i>
+                    <div class="d-flex justify-content-start">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                      <i class="bi bi-person-fill fs-5"></i>
+                    </div>
+                    <h5 class="fw-semibold ms-2 mt-2">Add users</h5>
                     </div>
                     <div class="col-lg-4">
-                      <h5 class="fw-semibold">Add users</h5>
-                      <p class="text-muted location-subtext">You can add upto 10 locations.</p>
+                      
+                      <!-- <p class="text-muted location-subtext">You can add upto 10 locations.</p> -->
                     </div>
-                    <div class="col-3">
+                    <!-- <div class="col-3">
                       <input type="file" ref="fileInput" accept=".csv" @change="handleFileUpload"
                         style="display: none" />
                       <button class="btn upload-btn" @click="triggerFileInput"><i class="bi bi-upload me-2"></i> Upload
                         CSV</button>
-                    </div>
+                    </div> -->
                   </div>
                   <form>
 
@@ -199,16 +228,20 @@ export default {
       roleOptions: ['Patch Management', 'Configuration Management', 'Network Security', 'Architectural Flaws']
     };
   },
-  methods: {
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        console.log("Selected file:", file.name);
-      }
+  mounted() {
+    const avatarBtn = document.getElementById('locationsBtn');
+  const popupBox = document.getElementById('popupBox');
+
+avatarBtn.addEventListener('click', () => {
+    popupBox.style.display = popupBox.style.display === 'block' ? 'none' : 'block';
+});
+
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+    if (!avatarBtn.contains(e.target) && !popupBox.contains(e.target)) {
+        popupBox.style.display = 'none';
     }
+});
   }
 };
 </script>
@@ -229,5 +262,47 @@ export default {
 ::v-deep(.compact-select .vs__dropdown-menu) {
   margin-left: 8px;
   width: 240px;
+}
+
+.show-locations {
+    width: 40px;
+    height: 40px;
+    background-color: black;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    font-weight: bold;
+}
+
+.popup-box {
+    display: none;
+    position: absolute;
+    top: 250px;
+    right: 240px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    padding: 8px 12px;
+    z-index: 10;
+    min-width: 150px;
+}
+
+.popup-box ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.popup-box li {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.popup-box li:last-child {
+    border-bottom: none;
 }
 </style>

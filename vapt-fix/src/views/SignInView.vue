@@ -15,15 +15,31 @@
 
         <form>
           <div class="mb-3 mt-4">
-            <label class="form-label">Organisation name</label>
-            <input type="text" class="form-control" placeholder="Enter your first name" style="border: 1px solid #422CE9;">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" placeholder="Enter your email" style="border: 1px solid #422CE9;">
           </div>
           <div class="mb-4 mt-4">
             <label class="form-label">Your password</label>
             <input type="password" class="form-control" placeholder="Enter your password">
           </div>
-          <button type="submit" class="btn btn-vaptfix w-100 py-2">
-            Login into VAPTfix <i class="bi bi-arrow-right-circle-fill"></i>  
+
+          <div style="padding:10px;border:1px solid #ccc;border-radius:4px;
+            width:300px;display:flex;align-items:center;justify-content:space-between;">
+  
+  <!-- Left side: tick box -->
+  <div style="display:flex;align-items:center;gap:10px;">
+    <input type="checkbox" id="captcha-check" style="width:20px;height:20px;cursor:pointer;">
+    <label for="captcha-check" style="cursor:pointer;">I'm not a robot</label>
+  </div>
+
+  <!-- Right side: fake recaptcha logo -->
+  <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" 
+       alt="recaptcha" style="height:30px;">
+</div>
+
+
+          <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-4">
+            Login into vaptfix <i class="bi bi-arrow-right-circle-fill"></i>  
           </button>
         </form>
 

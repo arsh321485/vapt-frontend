@@ -24,7 +24,7 @@
                 <div class="card pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i></div>
-                    <p class="assets-para">Total assets</p>
+                    <p class="assets-para">Total assets<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="justify-content-start">
                     <div style="
@@ -52,7 +52,7 @@
                   <div class="col-md-5">
                     <div class="d-flex flex-row justify-content-start gap-2">
                       <div class="assets-icon text-center"><i class="bi bi-laptop"></i></div>
-                      <p class="assets-para">Vulnerabilities</p>
+                      <p class="assets-para">Vulnerabilities<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
                     <div class="justify-content-start">
                       <div style="
@@ -78,7 +78,7 @@
                   <!-- Vulnerability aging -->
                   <div class="col-md-6">
                     <div class="mb-2">
-                      <p class="assets-para">Vulnerability aging</p>
+                      <p class="assets-para">Vulnerability aging<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
                     <div class="d-flex justify-content-between align-items-end mb-1">
                       <div class="justify-content-start">
@@ -134,7 +134,7 @@
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i></div>
-                    <p class="assets-para">Patch compliance rate</p>
+                    <p class="assets-para">Patch compliance rate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="justify-content-start">
                     <div style="
@@ -156,7 +156,7 @@
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i></div>
-                    <p class="assets-para">Mean time to remediate</p>
+                    <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="justify-content-start">
                     <div style="
@@ -178,7 +178,7 @@
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i></div>
-                    <p class="assets-para">Exceptions approved</p>
+                    <p class="assets-para">Exceptions approved<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="justify-content-start">
                     <div style="
@@ -200,7 +200,7 @@
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i></div>
-                    <p class="assets-para">Remediation Throughput</p>
+                    <p class="assets-para">Remediation Throughput<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="justify-content-start">
                     <div style="
@@ -242,7 +242,7 @@
                           Using this widget, you can manage, assign and set deadline for vulnerabilities of different categories.
                           Assign
                         </p>
-                        <button class="btn text-light mt-4" @click="handleNextClick">
+                        <button class="btn text-light mt-4 border-0" @click="handleNextClick">
                           Next <i class="bi bi-chevron-right"></i>
                         </button>
                       </div>
@@ -251,57 +251,7 @@
 
                     <!-- SECOND BOXES (after clicking Next) -->
                     <div v-if="showSecondBox" class="assign-popup d-flex gap-4 mt-3">
-                      <!-- <div class="white-box card border-0 shadow py-3 ps-3 pe-5">
-                        <p class="ps-2" style="color: rgba(0, 0, 0, 0.6);">Assign to:</p>
-                        <ul class="ps-2 list-unstyled">
-                          <li class="mb-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="avatar ava-green">AB</span>
-                            <span style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Aditi Bose</span>
-                            <a href="#" class="ms-auto text-decoration-none" style="font-size: 15px;color: rgba(49, 33, 177, 1);font-weight: 500;">Assign</a>
-                          </div>
-                          </li>
-                          <li class="mb-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="avatar ava-blue">SK</span>
-                            <span style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Sharad Kulkarni</span>
-                            <a href="#" class="ms-auto text-decoration-none" style="font-size: 15px;color: rgba(49, 33, 177, 1);font-weight: 500;">Assign</a>
-                          </div>
-                          </li>
-                          <li class="mb-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="avatar ava-yellow">CK</span>
-                            <span style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Chetan Kumar</span>
-                            <a href="#" class="ms-auto text-decoration-none" style="font-size: 15px;color: rgba(49, 33, 177, 1);font-weight: 500;">Assign</a>
-                          </div>
-                          </li>
-                          <li class="mb-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="avatar ava-blue">SK</span>
-                            <span style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Akshay</span>
-                            <a href="#" class="ms-auto text-decoration-none" style="font-size: 15px;color: rgba(49, 33, 177, 1);font-weight: 500;">Assign</a>
-                          </div>
-                          </li>
-                          <li class="mb-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="avatar ava-blue">SK</span>
-                            <span style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Akshay</span>
-                            <a href="#" class="ms-auto text-decoration-none" style="font-size: 15px;color: rgba(49, 33, 177, 1);font-weight: 500;">Assign</a>
-                          </div>
-                          </li>
-                          <li class="mb-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="avatar ava-blue">SK</span>
-                            <span style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Akshay</span>
-                            <a href="#" class="ms-auto text-decoration-none" style="font-size: 15px;color: rgba(49, 33, 177, 1);font-weight: 500;">Assign</a>
-                          </div>
-                          </li>
-                        </ul>
-                        <p style="color: rgba(0, 0, 0, 0.6);">Set a deadline:</p>
-                        <input type="date" value="2025-07-24" class="form-control" />
-                        <br />
-                        <button class="btn text-light" style="background-color: rgba(49, 33, 177, 1);border-radius: 20px;"><i class="bi bi-check-circle"></i> Done</button>
-                      </div> -->
+                      
 
                       <div v-if="showTooltip" class="black-tooltip">
                         <h6>Assign users</h6>
@@ -309,7 +259,7 @@
                           Assign users to a vulnerability, set a deadline and track their progress.
                         </p>
                         <router-link to="/admindashboardonboarding">
-                        <button class="btn mt-5" style="color: rgba(194, 186, 255, 1);font-weight: 600;">Next <i class="bi bi-chevron-right" style="font-weight: 600;"></i></button>
+                        <button class="btn mt-5 border-0" style="color: rgba(194, 186, 255, 1);font-weight: 600;">Next <i class="bi bi-chevron-right" style="font-weight: 600;"></i></button>
                         </router-link>
                       </div>
                     </div>
@@ -336,7 +286,7 @@
 
                   <div class="row mx-2 my-4">
                     <div class="d-flex justify-content-between">
-                      <div class="avatar-container">
+                      <!-- <div class="avatar-container">
                         <p style="color: rgba(0, 0, 0, 1); font-weight: 500; margin-top: 15px">
                           Assign to:
                         </p>
@@ -345,6 +295,11 @@
                         <div class="avatar ava-yellow">CK</div>
                         <div class="avatar ava-pink">MH</div>
                         <div class="avatar ava-black">+5</div>
+                      </div> -->
+                      <div class="d-flex flex-row gap-2" style="font-size: 15px;">
+                        <span style="color: rgba(0, 0, 0, 0.6);">Deadline:</span>
+                        <span style="color:rgba(0, 0, 0, 0.87);"> 24th July, 2025</span>
+                        <span style="color: rgba(49, 33, 177, 1);">Edit</span>
                       </div>
                       <div>
                         <p style="color: rgba(49, 33, 177, 1); font-weight: 600">

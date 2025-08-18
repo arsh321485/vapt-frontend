@@ -15,7 +15,7 @@
                 <div class="col-11">
                 <div class="d-flex justify-content-between my-4">
                 <h2>Mitigation Strategy</h2>
-                <button class="btn download-report-btn" @click="showPopup = true"><i class="bi bi-download me-2"></i> Download global report</button>
+                <button class="btn download-report-btn" @click="showPopup = true"><i class="bi bi-download me-2"></i> Download report</button>
 
                   <!-- Overlay Popup -->
                 <div
@@ -35,11 +35,21 @@
                     ></button>
 
                     <!-- Heading -->
-                    <h2 class="mb-2 text-center">Global Report</h2>
+                    <h2 class="mb-2 text-center">Report</h2>
                     <p class="mb-2 text-center" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Create a report</p>
-                    <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                      <div class="dropdown">
+                      <div class="dropdown-btn"> Select location</div>
+                      <div class="dropdown-content">
+                          <a href="#">Greece</a>
+                          <a href="#">Germany</a>
+                          <a href="#">Bahrain</a>
+                      </div>
+                      </div>
+                    <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3" style="padding: 15px 18px;">
                       June 1 - June 30 <i class="bi bi-calendar-minus"></i>
                     </button>
+                    </div>
 
                     <!-- Accordion -->
                     <div class="accordion" id="globalReportAccordion">
@@ -174,23 +184,48 @@
             </div>
 
             <div class="row my-4">
-                <div class="col-6 my-3">
-                    <!-- <div class="d-flex justify-content-between"> -->
-                    <!-- <p class="d-flex align-items-center gap-2 mb-0">
-                    <span style="color: rgba(0, 0, 0, 0.6);font-weight: 500;">Assigned to:</span>
-                    <span class="avatar ava-green" style="color: #198754; background-color: #d1e7dd;">AB</span>
-                    <span style="color: rgba(0, 0, 0, 0.87);font-weight: 500;">Aditi Bose</span>
-                    </p> -->
-                    <p class="d-flex align-items-center gap-2 mb-0">
-                    <span style="color: rgba(0, 0, 0, 0.6);font-weight: 500;">Deadline:</span>
-                    <span style="color: rgba(0, 0, 0, 0.87);font-weight: 500;">24th July, 2025</span>
-                    <span style="color: rgba(49, 33, 177, 1);font-weight: 600;">Edit</span>
-                    </p>
-                <!-- </div> -->
-                </div>
-                <div class="col-6">
-                    <!-- blank -->
-                </div>
+              <div class="d-flex gap-4 my-3">
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
+                        <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                        </div>
+                        <input type="date" class="form-control" />
+                      </div>
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                      <button class="btn btn-outline-secondary rounded-pill text-danger d-flex align-items-center justify-content-center w-100">High</button>
+                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                      </div>
+                      <input type="date" class="form-control" />
+                      </div>
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                      <button class="btn btn-outline-secondary rounded-pill text-warning d-flex align-items-center justify-content-center w-100">Medium</button>
+                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                      </div>
+                      <input type="date" class="form-control" />
+                      </div>
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                      <button class="btn btn-outline-secondary rounded-pill text-success d-flex align-items-center justify-content-center w-100">Low</button>
+                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                      </div>
+                      <input type="date" class="form-control" />
+                      </div>
+              </div>
             </div>
 
             <div class="row">
@@ -198,42 +233,25 @@
                     <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">Missing security updates</p>
                     <div class="row">
                         <div class="col-3">
-                          <div class="card py-3 px-3" style="border-radius: 12px;">
-                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                          <div class="card py-4 px-3" style="border-radius: 12px;">
+                                
                                 <div class="d-flex justify-content-between">
-                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
-                                    <!-- <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p> -->
-                                     <router-link to="/missingsecurityupdates">
-                                      <button class="btn mt-4" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></button>
-                                    </router-link>
+                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
+                                    
                                 </div>
-                                <div class="d-flex justify-content-start">
+                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
+                                  VMware ESXi 7.0/8.0 Sandbox Escape...
+                                </h4>
+                                <div class="d-flex justify-content-start mt-2">
                                     <i class="bi bi-microsoft me-2"></i>
                                      
                                     <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
                                 </div>
-                                <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                                </div>
+                                 <div class="text-end">
+                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                      Details <i class="bi bi-arrow-right" style="vertical-align:1px;"></i>
+                                    </router-link>
+                                 </div>
                           </div>
                         </div>
                         <div class="col-3">
@@ -808,7 +826,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<script>
 import DashboardMenu from "@/components/DashboardMenu.vue";
 import DashboardHeader from "@/components/DashboardHeader.vue";
 
@@ -823,8 +841,42 @@ export default {
       showPopup: false,
     };
   },
+  watch: {
+    showPopup(newVal) {
+      if (newVal) {
+        this.$nextTick(() => {
+          const dropdown = this.$el.querySelector('.dropdown');
+          const btn = dropdown.querySelector('.dropdown-btn');
+          const options = dropdown.querySelectorAll('.dropdown-content a');
+
+          // Toggle dropdown open/close
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+          });
+
+          // Set selected option
+          options.forEach(option => {
+            option.addEventListener('click', (e) => {
+              e.preventDefault();
+              btn.textContent = option.textContent;
+              dropdown.classList.remove('show');
+            });
+          });
+
+          // Close dropdown when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+              dropdown.classList.remove('show');
+            }
+          }, { once: true });
+        });
+      }
+    }
+  }
 };
 </script>
+
 
 <style scoped>
 .download-report-btn {
@@ -874,4 +926,105 @@ export default {
     .nav-item i {
         margin-right: 5px;
     }
+    .dropdown {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+.dropdown-btn {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 50px;
+    padding: 4px 20px 4px 12px; /* extra right padding for the arrow */
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: "▼"; /* arrow symbol */
+    font-size: 12px;
+    color: #333;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: 4px;
+}
+
+.dropdown-content a {
+    padding: 8px 12px;
+    display: block;
+    text-decoration: none;
+    color: black;
+    border-radius: 8px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
+}
+
+.truncated-text {
+    color: rgba(0, 0, 0, 0.87);
+    white-space: nowrap;       /* Keep text in one line */
+    overflow: hidden;          /* Hide overflowing text */
+    text-overflow: ellipsis;   /* Show "..." */
+    width: 200px;              /* Adjust width as needed */
+    cursor: pointer;           /* Show pointer on hover */
+  }
+
+  .tooltip-text {
+    visibility: hidden;
+    width: max-content;
+    max-width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 6px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    line-height: 1.3;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Arrow position */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+
+  .info-icon:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .rounded-pill:hover {
+    background-color: transparent;
+  }
 </style>

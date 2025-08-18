@@ -16,20 +16,20 @@
             <div class="line active"></div>
 
 
-            <!-- <div class="step">
+            <div class="step">
                 <div class="step-circle">2</div>
-                <div class="label">Configure teams</div>
-            </div> -->
+                <div class="label">Risk Criteria</div>
+            </div> 
 
-            <!-- <div class="line"></div> -->
+            <div class="line"></div>
 
             
             <div class="step">
-                <div class="step-circle">2</div>
+                <div class="step-circle">3</div>
                 <div class="label">Vulnerability report</div>
             </div>
 
-            <!-- <div class="line"></div> -->
+             <!-- <div class="line"></div> -->
 
             
             <!-- <div class="step">
@@ -37,7 +37,7 @@
                 <div class="label">All done</div>
             </div> -->
             <!-- <button type="button" class="btn stepper-btn mt-5">Next <i class="bi bi-arrow-right-circle-fill ms-1"></i></button> -->
-             <router-link to="/uploadreport" class="btn stepper-btn mt-5" tag="button">
+             <router-link to="/riskcriteria" class="btn stepper-btn mt-5" tag="button">
   Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
 </router-link>
 

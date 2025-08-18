@@ -81,9 +81,9 @@
 
       <!-- Bottom Profile Circle -->
       <div class="mt-auto d-flex flex-column align-items-center">
-        <div style="background-color: #eae8ff;height:50px;width:50px;border-radius: 50%;align-items: center;display: flex;justify-content: center;margin-bottom: 10px">
+        <!-- <div style="background-color: #eae8ff;height:50px;width:50px;border-radius: 50%;align-items: center;display: flex;justify-content: center;margin-bottom: 10px">
           <img src="../assets/images/robot.png" alt="" style="height: 40px;width: 40px;" class="mb-2"></img>
-        </div>
+        </div> -->
           <i class="bi bi-info-circle fs-5"></i>
           <p class="menu-heading ms-2">How it Works</p>
         <div class="circle-bottom">A</div>

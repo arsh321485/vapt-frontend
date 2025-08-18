@@ -16,8 +16,8 @@
                 <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="d-flex gap-2 my-3">
-                    <button class="btn btn-outline-secondary btn-sm py-1 px-2" style="border-radius: 20px;"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
-                    <button class="btn btn-outline-secondary btn-sm py-1 px-2" style="border-radius: 20px;"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
+                    <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button>
                     </div>
                 </div>
                 <!-- Asset List -->
@@ -37,7 +37,29 @@
                         <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
                     </div>
                     </div>
-                    <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a>
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                    </div>
+                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
                     </div>
 
                     <!-- Other Items -->
@@ -55,7 +77,29 @@
                         <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
                     </div>
                     </div>
-                    <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a>
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                    </div>
+                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
                     </div>
 
                     <div class="asset-item border-bottom">
@@ -72,7 +116,29 @@
                         <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
                     </div>
                     </div>
-                    <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a>
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                    </div>
+                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
                     </div>
 
                     <div class="asset-item border-bottom">
@@ -89,7 +155,29 @@
                         <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
                     </div>
                     </div>
-                    <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a>
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                    </div>
+                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
                     </div>
 
                     <div class="asset-item border-bottom">
@@ -106,7 +194,29 @@
                         <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
                     </div>
                     </div>
-                    <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a>
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                    </div>
+                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
                     </div>
 
                     <div class="asset-item border-bottom">
@@ -123,7 +233,29 @@
                         <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
                     </div>
                     </div>
-                    <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a>
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                    </div>
+                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
                     </div>
 
                 </div>
@@ -155,9 +287,7 @@
                             <span>Open</span>
                         </span>
                         </div>
-                        <div>
-                            <button class="btn" style="background-color: rgba(49, 33, 177, 1);border-radius: 26px;color: white;font-weight: 500;font-size: 15px;"><i class="bi bi-arrow-bar-up me-1"></i> Share</button>
-                        </div>
+                        
                         </div>
                     </div>
 
@@ -181,7 +311,7 @@
                     <div class="row px-3 py-4">
                     <div class="d-flex justify-content-between tab-wrapper position-relative">
                     <p class="nav-item active" style="width: 25%;color: rgba(49, 33, 177, 1);"> Vulnerabilities</p>
-                    <p class="nav-item" style="width: 25%;"> Remediation Tasks</p>
+                    
                     <p class="nav-item" style="width: 25%;"> Exception Requests</p>
                     <p class="nav-item" style="width: 25%;"> Related</p>
 
@@ -197,39 +327,47 @@
                                 <button class="btn btn-outline-secondary btn-pill text-danger">High</button>
                                 <button class="btn btn-outline-secondary btn-pill text-warning">Medium</button>
                                 <button class="btn btn-outline-secondary btn-pill text-success">Low</button>
-                                <button class="btn btn-outline-secondary btn-pill text-success">Due Date</button>
+                                
                             </div>
                     </div>
 
                     <div class="row py-4">
                         <div class="accordion border-0" id="accordionExample">
+
                             <div class="accordion-item border-0 border-bottom">
                                 <h2 class="accordion-header" id="headingOne">
                                 <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                   <div class="d-flex justify-content-start align-items-center gap-4">
+                                   <div class="d-flex justify-content-start align-items-center gap-3">
                                     <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
                                     <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
                                     <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                                         <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                                         <span>High</span>
+                                        
                                     </span>
+                                    
                                    </div> 
                                 </button>
                                 </h2>
                                 <div id="collapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                 <div class="accordion-body border-top-0">
                                     <div class="d-flex justify-content-start gap-3">
-                                        <p style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 16px;">View fix(5 steps) <i class="bi bi-arrow-right"></i></p>
-                                        <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 14px;">Estimated effort: 2 days 11 hours</p>
+                                        
                                     </div>
-                                    <div class="d-flex justify-content-start gap-5">
-                                        <div class="d-flex flex-column">
+                                    <div class="d-flex justify-content-start gap-3">
+                                        <div class="d-flex flex-column" style="width: 400px;">
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a<br> sandbox escape vulnerability.</p>
+                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
                                         </div>
                                         <div class="d-flex flex-column">
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
                                             <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
+                                        </div>
+                                        <div>
+                                          <router-link to="/vulnerabilitycard" class="btn border-0" style="color: rgba(49, 33, 177, 1);font-weight: 600">Remediate <i class="bi bi-arrow-right"></i></router-link>
+                                        </div>
+                                        <div>
+                                          <router-link to="" class="btn border-0" style="color: rgba(49, 33, 177, 1);font-weight: 600">fix now <i class="bi bi-arrow-right"></i></router-link>
                                         </div>
                                     </div>
                                     <div class="d-flex flex-column">

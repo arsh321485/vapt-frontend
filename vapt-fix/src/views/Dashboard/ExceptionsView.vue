@@ -20,6 +20,17 @@
                             </button>
                             </div>
                         </div>
+
+                        <div class="row mt-3">
+                            <div class="d-flex justify-content-start gap-3">
+                                <button class="btn rounded-pill border px-4" style="background-color: rgba(230, 227, 255, 1);color: rgba(49, 33, 177, 1);">All</button>
+                                <button class="btn rounded-pill border px-4" style="color: rgba(0, 115, 12, 1);">Approved</button>
+                                <button class="btn rounded-pill border px-4" style="color: rgba(170, 0, 0, 1);">Declined</button>
+                                <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
+                                <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button>
+                            </div>
+                        </div>
+
                         <div class="row mt-5">
                             <h6 class="fw-semibold mb-3">Requested today</h6>
                             <div class="table-responsive">
@@ -44,14 +55,70 @@
                                             <td>23/06/25</td>
                                             <td>
                                                 <div class="d-flex justify-content-around">
-                                                    <button class="btn fixes-btn">
+                                                    <!-- <button class="btn fixes-btn">
                                                     Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
                                                 </button>
                                                 <button class="btn fixes-red-btn">
                                                     Decline 
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
+                                                </button> -->
+                                                <!-- Approve Button -->
+<button class="btn fixes-btn border-0" data-bs-toggle="modal" data-bs-target="#approveModal">
+  Approve
+  <i class="bi bi-arrow-right-circle-fill"></i>
+</button>
+
+<!-- Decline Button -->
+<button class="btn fixes-red-btn border-0" data-bs-toggle="modal" data-bs-target="#declineModal">
+  Decline
+  <i class="bi bi-arrow-right-circle-fill"></i>
+</button>
+
+<!-- Approve Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="approveModalLabel">Approve Compensatory Control?</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-5 pb-4">
+        <div class="d-flex justify-content-start gap-3 mt-3">
+            <button class="btn rounded-pill text-light" style="background-color: rgba(49, 33, 177, 1);">Approve Compensatory Control</button>
+            <button class="btn border-0 text-danger" style="font-weight: 600;">Decline</button>
+        </div>
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<!-- Decline Modal -->
+<div class="modal fade" id="declineModal" tabindex="-1" aria-labelledby="declineModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="declineModalLabel">Decline Compensatory Control?</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+            <label for="exampleFormControlTextarea1" class="form-label text-muted">Reason for declining the compensatory control..</label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" style="border-radius: 8px;" rows="3"></textarea>
+        <div class="d-flex justify-content-start gap-3 mt-3">
+            <button class="btn rounded-pill text-light" style="background-color: rgba(49, 33, 177, 1);" @click="showDeclinePopup">Decline Compensatory Control</button>
+            <button class="btn border-0 text-danger" style="font-weight: 600;">Decline</button>
+        </div>
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
                                                 </div>
                                             </td>
                                         </tr>
@@ -186,11 +253,11 @@
                                                     <button class="btn fixes-btn">
                                                     Approve
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                <button class="btn fixes-red-btn">
-                                                    Decline 
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
+                                                    </button>
+                                                    <button class="btn fixes-red-btn">
+                                                        Decline 
+                                                        <i class="bi bi-arrow-right-circle-fill"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -309,13 +376,33 @@
 <script lang="ts">
 import DashboardMenu from '@/components/DashboardMenu.vue';
 import DashboardHeader from '@/components/DashboardHeader.vue';
+import Swal from "sweetalert2";
 
 export default {
     name: 'ExceptionsView',
     components: {
         DashboardMenu,
         DashboardHeader
-    }
+    },
+    methods: {
+    showDeclinePopup() {
+      Swal.fire({
+        title: "Do you want to approve the decline request?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        confirmButtonColor: "#3121b1", // matches your button color
+        cancelButtonColor: "#6c757d",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire("Approved!", "The decline request has been approved.", "success");
+        } else {
+          Swal.fire("Cancelled", "No action taken.", "info");
+        }
+      });
+    },
+  },
 };
 </script>
 

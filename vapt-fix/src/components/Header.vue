@@ -39,10 +39,10 @@
 
         <!-- Right-aligned button -->
         <!-- <button class="btn text-white navbar-btn">Fix Your Vulnerabilities Now <i class="bi bi-arrow-right-circle-fill ms-1"></i></button> -->
-        <router-link to="/location" class="btn text-white navbar-btn" tag="button">
-  Fix Your Vulnerabilities Now 
-  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-</router-link>
+        <div class="d-flex justify-content-start gap-2">
+          <router-link to="/signup" class="text-white text-decoration-none" tag="button">Signup / </router-link>
+        <router-link to="/signin" class="text-white text-decoration-none" tag="button">Signin</router-link>
+        </div>
         </div>
     </div>
     </nav>

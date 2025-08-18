@@ -13,11 +13,18 @@
           <div class="col-11 pt-2 pb-3 pe-4">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <h2 class="">Vulnerability Management Program</h2>
-              <button type="button" class="btn pending-approval-btn rounded-pill">
-                11 Compensatory controls pending approval
-                <i class="bi bi-arrow-right ms-1 fs-5"></i>
-              </button>
-            </div>
+              
+                
+                  <div class="dropdown">
+                      <div class="dropdown-btn"> Select location</div>
+                      <div class="dropdown-content">
+                          <a href="#">Greece</a>
+                          <a href="#">Germany</a>
+                          <a href="#">Bahrain</a>
+                      </div>
+                      </div>
+                  </div>
+           
 
             <div class="row">
               <div class="col-3">
@@ -25,7 +32,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total assets</p>
+                    <p class="assets-para">Total assets<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <h1 class="text-212">212</h1>
@@ -41,7 +48,7 @@
                     <div class="d-flex flex-row justify-content-start gap-2">
                       <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                       </div>
-                      <p class="assets-para">Vulnerabilities</p>
+                      <p class="assets-para">Vulnerabilities<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
@@ -70,7 +77,7 @@
                   <!-- Vulnerability aging -->
                   <div class="col-md-6">
                     <div class="mb-2">
-                      <p class="assets-para">Vulnerability aging</p>
+                      <p class="assets-para">Mitigation Timeline<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
                     <div class="d-flex justify-content-between align-items-end mb-1">
                       <div class="text-center">
@@ -100,7 +107,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Patch compliance rate</p>
+                    <p class="assets-para">Patch compliance rate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2 py-3">
                     <h1 class="text-78">78%</h1>
@@ -115,7 +122,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Mean time to remediate</p>
+                    <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2 py-3">
                     <h1 class="text-78">2d 11 hrs</h1>
@@ -127,7 +134,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Exceptions approved</p>
+                    <p class="assets-para">Exceptions approved<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2 py-3">
                     <h1 class="text-78">32</h1>
@@ -139,7 +146,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Remediation Throughput</p>
+                    <p class="assets-para">Remediation Throughput<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2 py-3">
                     <h1 class="text-78">32</h1>
@@ -156,6 +163,10 @@
                 <div class="card pb-2 pt-3 px-3">
                   <div class="d-flex flex-row align-items-center justify-content-between py-3">
                     <h4 class="fw-semibold">Mitigation Strategy</h4>
+                    <button type="button" class="btn pending-approval-btn rounded-pill">
+                11 Compensatory controls pending approval
+                <i class="bi bi-arrow-right ms-1 fs-5"></i>
+              </button>
                   </div>
                   <div class="row mt-3">
                     <div class="col-12">
@@ -178,29 +189,56 @@
 
                   <div class="row mx-2 my-4">
                     <div class="d-flex justify-content-between">
-                      <div class="d-flex justify-content-between gap-5">
-                        <div class="avatar-container">
-                        <p style="color: rgba(0, 0, 0, 0.6); font-weight: 500; margin-top: 15px">
-                          Assigned to :
-                        </p>
-                        <div class="avatar ava-green">AB</div>
-                        <p style="margin-top: 18px;font-weight: 500;">Aditi Bose</p>
-                        <div class="avatar ava-blue"><i class="bi bi-plus-lg"></i></div>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                        <p style="color: rgba(0, 0, 0, 0.6); font-weight: 500; margin-top: 15px">
-                          Deadline: <span style="color: rgba(0, 0, 0, 1);">24th July, 2025</span>
-                        </p>
-                        <p style="color: rgba(49, 33, 177, 1);margin-top: 13px;">Edit</p>
-                      </div>
-                      </div>
-                      <div class="mt-3">
-                        <!-- <p style="color: rgba(49, 33, 177, 1); font-weight: 600;">
-                          More details <i class="bi bi-arrow-right"></i>
-                        </p> -->
+                        <div class="mt-2">
+                          <span style="color: rgba(0, 0, 0, 0.87);">Assigned to Patch Management team </span> 
+                        </div>
+                      <div>
                         <router-link to="/mitigationstrategy">
-                          <button class="btn" style="color: rgba(49, 33, 177, 1); font-weight: 600;">More details <i class="bi bi-arrow-right"></i></button>
+                          <button class="btn border-0" style="color: rgba(49, 33, 177, 1); font-weight: 600;">More details <i class="bi bi-arrow-right"></i></button>
                         </router-link>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-4 my-3">
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                          <button class="btn btn-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
+                        <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                        </div>
+                        <input type="date" class="form-control" />
+                      </div>
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                      <button class="btn btn-outline-secondary btn-pill text-danger d-flex align-items-center justify-content-center w-100">High</button>
+                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                      </div>
+                      <input type="date" class="form-control" />
+                      </div>
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                      <button class="btn btn-outline-secondary btn-pill text-warning d-flex align-items-center justify-content-center w-100">Medium</button>
+                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                      </div>
+                      <input type="date" class="form-control" />
+                      </div>
+                      <div class="d-flex flex-column gap-3">
+                        <div class="d-flex justify-content-between">
+                      <button class="btn btn-outline-secondary btn-pill text-success d-flex align-items-center justify-content-center w-100">Low</button>
+                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
+                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
+                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
+                        </div>
+                      </div>
+                      <input type="date" class="form-control" />
                       </div>
                     </div>
                   </div>
@@ -212,7 +250,7 @@
                           <div class="card p-4 h-100" style="border-radius: 12px">
                             <p class="estimated-text">Missing security updates</p>
                             <h1 class="text-212 mt-auto">212</h1>
-                            <div class="d-flex align-items-center gap-3">
+                            <!-- <div class="d-flex align-items-center gap-3">
                               <span class="d-flex align-items-center">
                                 <span
                                   class="rounded-circle me-1"
@@ -241,14 +279,14 @@
                                 ></span>
                                 <span class="text-success fw-bold">0</span>
                               </span>
-                            </div>
+                            </div> -->
                           </div>
                         </div>
                         <div class="col-3">
                           <div class="card p-4 h-100" style="border-radius: 12px">
                             <p class="estimated-text">OS vulns. by version</p>
                             <h1 class="text-212 mt-auto">212</h1>
-                            <div class="d-flex align-items-center gap-3">
+                            <!-- <div class="d-flex align-items-center gap-3">
                               <span class="d-flex align-items-center">
                                 <span
                                   class="rounded-circle me-1"
@@ -277,14 +315,14 @@
                                 ></span>
                                 <span class="text-success fw-bold">0</span>
                               </span>
-                            </div>
+                            </div> -->
                           </div>
                         </div>
                         <div class="col-3">
                           <div class="card p-4 h-100" style="border-radius: 12px">
                             <p class="estimated-text">App vulns. by software packages</p>
                             <h1 class="text-212 mt-auto">212</h1>
-                            <div class="d-flex align-items-center gap-3">
+                            <!-- <div class="d-flex align-items-center gap-3">
                               <span class="d-flex align-items-center">
                                 <span
                                   class="rounded-circle me-1"
@@ -313,14 +351,14 @@
                                 ></span>
                                 <span class="text-success fw-bold">0</span>
                               </span>
-                            </div>
+                            </div> -->
                           </div>
                         </div>
                         <div class="col-3 me-auto">
                           <div class="card p-4 h-100" style="border-radius: 12px">
                             <p class="estimated-text">End of life systems</p>
                             <h1 class="text-212 mt-auto">212</h1>
-                            <div class="d-flex align-items-center gap-3">
+                            <!-- <div class="d-flex align-items-center gap-3">
                               <span class="d-flex align-items-center">
                                 <span
                                   class="rounded-circle me-1"
@@ -349,7 +387,7 @@
                                 ></span>
                                 <span class="text-success fw-bold">0</span>
                               </span>
-                            </div>
+                            </div> -->
                           </div>
                         </div>
                       </div>
@@ -414,7 +452,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<script>
 import DashboardMenu from '@/components/DashboardMenu.vue';
 import DashboardHeader from '@/components/DashboardHeader.vue';
 
@@ -423,7 +461,34 @@ export default {
   components: {
     DashboardMenu,
     DashboardHeader
-  }
+  },
+  mounted() {
+    const dropdown = document.querySelector('.dropdown');
+    const btn = dropdown.querySelector('.dropdown-btn');
+    const options = dropdown.querySelectorAll('.dropdown-content a');
+
+    // Toggle dropdown open/close
+    btn.addEventListener('click', () => {
+      dropdown.classList.toggle('show');
+    });
+
+    // Set selected option
+    options.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.textContent = option.textContent; // update button text
+        dropdown.classList.remove('show'); // close dropdown
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+    
+  },
 };
 </script>
 
@@ -448,6 +513,10 @@ export default {
   height: 36px;
 }
 
+.btn-pill:hover {
+  background-color: transparent;
+}
+
 .active-tab {
   background-color: #EAE8FF;
   color: #3121B1;
@@ -469,4 +538,93 @@ export default {
     color: rgba(0, 0, 0, 1);
     font-weight: 500;
 }
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+.dropdown-btn {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 50px;
+    padding: 8px 40px 8px 16px; /* extra right padding for the arrow */
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: "▼"; /* arrow symbol */
+    font-size: 12px;
+    color: #333;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: 4px;
+}
+
+.dropdown-content a {
+    padding: 8px 12px;
+    display: block;
+    text-decoration: none;
+    color: black;
+    border-radius: 8px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: max-content;
+    max-width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 6px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    line-height: 1.3;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Arrow position */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+
+  .info-icon:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
 </style>
