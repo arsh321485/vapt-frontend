@@ -167,7 +167,7 @@
                               <a href="#">Germany</a>
                               <a href="#">Bahrain</a>
                           </div>
-                          </div>
+                </div>
                 </div>
 
                 </div>
@@ -197,14 +197,41 @@
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
-                        <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
-                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
-                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                        </div>
+                        
                         </div>
                         <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
+                      10 Days <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
+
+                    <!-- Inline Input (hidden by default) -->
+<div id="inlineInput" class="mt-2" style="display: none;">
+  <input type="text" class="form-control d-inline w-50" id="userInput" placeholder="Enter something...">
+  <button class="btn btn-primary ms-2" id="saveBtn">Save</button>
+</div>
+
+                    <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h6 class="modal-title" id="exampleModalLabel">Reason for changing mitigation deadline to <span id="modalText"></span></h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <textarea class="form-control" style="border-radius: 8px;" id="exampleFormControlTextarea1" rows="3"></textarea>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
                       </div>
                       <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between">
@@ -883,6 +910,31 @@ export default {
         dropdown.classList.remove('show');
       }
     });
+
+    const plusIcon = document.getElementById('plusIcon');
+  const inlineInput = document.getElementById('inlineInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const userInput = document.getElementById('userInput');
+  const modalText = document.getElementById('modalText');
+
+  // Show input when clicking plus icon
+  plusIcon.addEventListener('click', () => {
+    inlineInput.style.display = 'block';
+  });
+
+  // On Save -> show modal with text
+  saveBtn.addEventListener('click', () => {
+    const text = userInput.value.trim();
+    if (text) {
+      modalText.textContent = text; // Put text inside modal
+      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+      modal.show();
+      userInput.value = ''; // clear input
+      inlineInput.style.display = 'none'; // hide input after save
+    } else {
+      alert('Please enter something!');
+    }
+  });
   },
   watch: {
     showPopup(newVal) {
