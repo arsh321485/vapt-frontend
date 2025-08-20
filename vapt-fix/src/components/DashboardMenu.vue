@@ -56,7 +56,8 @@
         <div>
           <router-link to="/mitigationstrategy">
           <button class="btn border-0">
-          <i class="bi bi-file-earmark fs-5"></i>
+          <!-- <i class="bi bi-shield-check fs-5"></i> -->
+           <i class="bi bi-diagram-3 fs-5"></i>
           <p class="menu-heading">Mitigation Strategy</p>
           </button>
           </router-link>

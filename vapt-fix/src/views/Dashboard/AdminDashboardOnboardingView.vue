@@ -217,7 +217,8 @@
                         
                         </div>
                         <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      10 Days <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i>
+                      10 Days 
+                      <!-- <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i> -->
                         </button>
 
                         <!-- Inline Input (hidden by default) -->

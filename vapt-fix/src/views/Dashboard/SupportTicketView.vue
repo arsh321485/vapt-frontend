@@ -11,7 +11,17 @@
                     </div>
 
                     <div class="col-11 pt-2 pb-3 px-4">
-                        <h2 class="ticket-head mt-3">Support tickets</h2>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h2 class="ticket-head mt-3">Support tickets</h2>
+                            </div>
+                            <div>
+                                <button type="button" class="btn pending-approval-btn rounded-pill mt-4">
+                                Choose premium and ask vaptfix for support 
+                                <i class="bi bi-arrow-right ms-1 fs-5"></i>
+                            </button>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
                                 <div class="d-flex gap-3">
@@ -20,8 +30,10 @@
                                     <button class="btn btn-outline-secondary btn-pill other-btn">Closed</button>
                                 </div>
                                 <div>
-                                    <button type="submit" class="btn btn-ticket py-2 px-5"><i class="bi bi-plus-lg"></i>
+                                    <router-link to="/createnewticket">
+                                        <button type="submit" class="btn btn-ticket py-2 px-5"><i class="bi bi-plus-lg"></i>
                                         Create a new ticket</button>
+                                    </router-link>
                                 </div>
                             </div>
                         </div>
@@ -36,6 +48,7 @@
                                             <th scope="col">Asset</th>
                                             <th scope="col">Description</th>
                                             <th scope="col">Category</th>
+                                            <th scope="col">Status</th>
                                             <th scope="col">Date requested</th>
                                         </tr>
                                     </thead>
@@ -46,6 +59,7 @@
                                             <td>192.68.1.42</td>
                                             <td>This is the description. This is the description.</td>
                                             <td>Bug</td>
+                                            <td>Open</td>
                                             <td>23/06/2025</td>
                                         </tr>
                                         <tr>
@@ -54,6 +68,7 @@
                                             <td>192.68.1.42</td>
                                             <td>This is the description. This is the description.</td>
                                             <td>Help</td>
+                                            <td>Close</td>
                                             <td>23/06/2025</td>
                                         </tr>
                                         <tr>
@@ -62,6 +77,7 @@
                                             <td>192.68.1.42</td>
                                             <td>This is the description. This is the description.</td>
                                             <td>Feature request</td>
+                                            <td>Close</td>
                                             <td>23/06/2025</td>
                                         </tr>
                                         <tr>
@@ -70,6 +86,7 @@
                                             <td>192.68.1.42</td>
                                             <td>This is the description. This is the description.</td>
                                             <td>Feature request</td>
+                                            <td>Open</td>
                                             <td>23/06/2025</td>
                                         </tr>
                                         <tr>
@@ -78,6 +95,7 @@
                                             <td>192.68.1.42</td>
                                             <td>This is the description. This is the description.</td>
                                             <td>Feature request</td>
+                                            <td>Open</td>
                                             <td>23/06/2025</td>
                                         </tr>
                                     </tbody>

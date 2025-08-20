@@ -13,7 +13,7 @@
                     <div class="col-11 pt-2 pb-3 px-4">
                         <div class="row">
                             <div class="col-5 py-3">
-                                <router-link to="#" class="text-decoration-none" tag="button"
+                                <router-link to="/supportticket" class="text-decoration-none" tag="button"
                                     style="color: rgba(49, 33, 177, 1);"><i class="bi bi-arrow-left"></i>
                                     Back</router-link>
                                 <h2 class="ticket-head mt-3">Create a new ticket</h2>

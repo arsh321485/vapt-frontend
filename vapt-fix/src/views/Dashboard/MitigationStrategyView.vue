@@ -200,7 +200,8 @@
                         
                         </div>
                         <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      10 Days <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i>
+                      10 Days 
+                      <!-- <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i> -->
                         </button>
 
                     <!-- Inline Input (hidden by default) -->
@@ -293,7 +294,7 @@
                                 </div>
                                  <div class="text-end">
                                   <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
-                                      Details <i class="bi bi-arrow-right" style="vertical-align:1px;"></i>
+                                      Details <i class="bi bi-arrow-right"></i>
                                     </router-link>
                                  </div>
                           </div>

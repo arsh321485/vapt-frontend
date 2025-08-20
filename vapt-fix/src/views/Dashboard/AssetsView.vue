@@ -14,11 +14,26 @@
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
                 <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-center gap-2 mb-3 me-2">
                     <div class="d-flex gap-2 my-3">
                     <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
                     <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button>
                     </div>
+                  
+                    <!-- <div class="d-flex">
+                    <input class="form-control form-control-sm" style="padding-top: 7px;padding-bottom: 7px;" type="search" placeholder="Search" aria-label="Search">
+                    </div> -->
+                    <div class="position-relative">
+  <input 
+    class="form-control form-control-sm" 
+    style="padding-top: 7px; padding-bottom: 7px; border-radius: 20px;" 
+    type="search" 
+    placeholder="Search vul. by name" 
+    aria-label="Search"
+  >
+  <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 text-secondary"></i>
+</div>
+                  
                 </div>
                 <!-- Asset List -->
                 <div class="d-flex flex-column gap-3">

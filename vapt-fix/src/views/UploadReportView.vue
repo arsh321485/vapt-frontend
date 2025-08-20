@@ -5,49 +5,49 @@
     <div class="row">
         <div class="col-lg-2">
             <!-- <Stepper /> -->
-             <section class="bg-light">
-    <div class="container-fluid">
-    <div class="row">
-        <div class="d-flex justify-content-center py-2">
-            <div class="stepper mt-3">
-                <!-- <a class="navbar-brand fs-3 fw-semibold" href="#">vaptfix</a> -->
-              <img src="../assets/images/logo2.png" alt="">
+            <section class="bg-light">
+              <div class="container-fluid">
+              <div class="row">
+                  <div class="d-flex justify-content-center py-2">
+                      <div class="stepper mt-3">
+                          <!-- <a class="navbar-brand fs-3 fw-semibold" href="#">vaptfix</a> -->
+                        <img src="../assets/images/logo2.png" alt="">
 
-            <div class="step active">
-                <div class="step-circle">1</div>
-                <div class="label">Add location and users</div>
-            </div>
+                      <div class="step active">
+                          <div class="step-circle">1</div>
+                          <div class="label">Add location and users</div>
+                      </div>
 
-            <div class="line active"></div>
+                      <div class="line active"></div>
 
 
-            <div class="step">
-                <div class="step-circle">2</div>
-                <div class="label">Risk Criteria</div>
-            </div> 
+                      <div class="step">
+                          <div class="step-circle">2</div>
+                          <div class="label">Risk Criteria</div>
+                      </div> 
 
-            <div class="line"></div>
+                      <div class="line"></div>
 
-            
-            <div class="step">
-                <div class="step-circle">3</div>
-                <div class="label">Vulnerability report</div>
-            </div>
+                      
+                      <div class="step">
+                          <div class="step-circle">3</div>
+                          <div class="label">Vulnerability report</div>
+                      </div>
 
-             <router-link to="/onboarding1" class="btn stepper-btn mt-5" tag="button">
-  Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-</router-link>
+                      <router-link to="/onboarding1" class="btn stepper-btn mt-5" tag="button">
+            Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+          </router-link>
 
-            </div>
-            
-        </div>
-    </div>
-    </div>
-              </section>
+                      </div>
+                      
+                  </div>
+              </div>
+              </div>
+            </section>
         </div>
         <div class="col-lg-10 my-3">
             <div class="container-fluid welcome-bg py-5 px-5">
-              <div class="row">
+              <div class="row ps-4">
                 <div class="col-1 d-flex justify-content-center align-items-center mb-3">
                   <img src="../assets/images/waving-hand.png" alt="">
                 </div>
@@ -57,7 +57,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row ps-5">
                 <div class="col-lg-8 location-card p-5 mb-5">
                   <div class="row">
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
@@ -88,40 +88,64 @@
                 </div>
               </div>
               
-              <div class="row">
-                <div class="col-lg-8 location-card text-center py-5">
-  <!-- File Upload UI (only shown if not uploading) -->
-  <div v-if="!uploadingStarted">
-    <!-- Hidden File Input -->
-    <input
-      type="file"
-      ref="fileInput"
-      accept=".csv,application/pdf"
-      @change="handleFileUpload"
-      style="display: none"
-    />
+              <div class="row ps-5 gap-5">
+                <!-- PDF / CSV Upload -->
+                <div class="col-lg-5 location-card text-center py-5">
+                  <div v-if="!pdfUploadingStarted">
+                    <input
+                      type="file"
+                      ref="pdfFileInput"
+                      accept=".csv,application/pdf"
+                      @change="handlePdfFileUpload"
+                      style="display: none"
+                    />
+                    <button class="btn upload-report-btn" @click="triggerPdfFileInput">
+                      <i class="bi bi-arrow-up-circle fs-5"></i>
+                    </button>
+                    <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
+                    <p class="text-muted location-subtext">You can upload a PDF or a CSV file</p>
+                  </div>
 
-    <!-- Trigger Button -->
-    <button class="btn upload-report-btn" @click="triggerFileInput">
-      <i class="bi bi-arrow-up-circle fs-5"></i>
-    </button>
-
-    <!-- Heading -->
-    <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
-    <p class="text-muted location-subtext">You can upload a PDF or a CSV file</p>
-  </div>
-
-  <!-- Upload Progress UI (only shown after file selected) -->
-  <div v-if="uploadingStarted" class="upload-box mt-4">
-    <div class="progress-bar-container">
-      <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
-    </div>
-    <p class="text-muted mt-2">Uploading... ({{ uploadProgress }}%)</p>
-    <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
-    <p class="text-muted">{{ uploadedFileSize }}</p>
-  </div>
+                  <div v-if="pdfUploadingStarted" class="upload-box mt-4">
+                    <div class="progress-bar-container">
+                      <div class="progress-bar" :style="{ width: pdfUploadProgress + '%' }"></div>
+                    </div>
+                    <p class="text-muted mt-2">
+                      {{ pdfUploadProgress < 100 ? 'Uploading... (' + pdfUploadProgress + '%)' : 'Uploaded ✅' }}
+                    </p>
+                    <h5 class="fw-bold mt-1">{{ uploadedPdfFileName }}</h5>
+                    <p class="text-muted">{{ uploadedPdfFileSize }}</p>
+                  </div>
                 </div>
 
+                <!-- AWS Excel Upload -->
+                <div class="col-lg-5 location-card text-center py-5">
+                  <div v-if="!awsUploadingStarted">
+                    <input
+                      type="file"
+                      ref="awsFileInput"
+                      accept=".xls,.xlsx"
+                      @change="handleAwsFileUpload"
+                      style="display: none"
+                    />
+                    <button class="btn upload-report-btn" @click="triggerAwsFileInput">
+                      <i class="bi bi-arrow-up-circle fs-5"></i>
+                    </button>
+                    <h4 class="fw-bold mt-3">Upload AWS Inspector Report</h4>
+                    <p class="text-muted location-subtext">You can upload Excel file (.xls, .xlsx)</p>
+                  </div>
+
+                  <div v-if="awsUploadingStarted" class="upload-box mt-4">
+                    <div class="progress-bar-container">
+                      <div class="progress-bar" :style="{ width: awsUploadProgress + '%' }"></div>
+                    </div>
+                    <p class="text-muted mt-2">
+                      {{ awsUploadProgress < 100 ? 'Uploading... (' + awsUploadProgress + '%)' : 'Uploaded ✅' }}
+                    </p>
+                    <h5 class="fw-bold mt-1">{{ uploadedAwsFileName }}</h5>
+                    <p class="text-muted">{{ uploadedAwsFileSize }}</p>
+                  </div>
+                </div>
               </div>
               
             </div>
@@ -145,41 +169,79 @@ export default {
     Stepper,
     Vue3Select
   },
-   data() {
-    return {
-      uploadProgress: 0,
-      uploadingStarted: false,
-      uploadedFileName: '',
-      uploadedFileSize: ''
-    };
+  data() {
+  return {
+    // PDF upload states
+    pdfUploadProgress: 0,
+    pdfUploadingStarted: false,
+    uploadedPdfFileName: '',
+    uploadedPdfFileSize: '',
+
+    // AWS Excel upload states
+    awsUploadProgress: 0,
+    awsUploadingStarted: false,
+    uploadedAwsFileName: '',
+    uploadedAwsFileSize: ''
+  };
+},
+methods: {
+  // ---------- PDF / CSV Upload ----------
+  triggerPdfFileInput() {
+    this.$refs.pdfFileInput.click();
   },
-  methods: {
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+  handlePdfFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      // Hide file UI and show progress
-      this.uploadingStarted = true;
-      this.uploadedFileName = file.name;
-      this.uploadedFileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+    this.pdfUploadingStarted = true;
+    this.uploadedPdfFileName = file.name;
+    this.uploadedPdfFileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
 
-      // Simulate upload
-      this.simulateUpload();
-    },
-    simulateUpload() {
-      this.uploadProgress = 0;
-      const interval = setInterval(() => {
-        if (this.uploadProgress < 100) {
-          this.uploadProgress += 1;
-        } else {
-          clearInterval(interval);
-        }
-      }, 50); // Simulated speed
+    this.simulatePdfUpload();
+  },
+  simulatePdfUpload() {
+    this.pdfUploadProgress = 0;
+    const interval = setInterval(() => {
+      if (this.pdfUploadProgress < 100) {
+        this.pdfUploadProgress += 1;
+      } else {
+        clearInterval(interval);
+      }
+    }, 50);
+  },
+
+  // ---------- AWS Excel Upload ----------
+  triggerAwsFileInput() {
+    this.$refs.awsFileInput.click();
+  },
+  handleAwsFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const validExtensions = ['.xls', '.xlsx'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!validExtensions.includes(fileExtension)) {
+      alert("Please upload a valid Excel file (.xls or .xlsx)");
+      return;
     }
+
+    this.awsUploadingStarted = true;
+    this.uploadedAwsFileName = file.name;
+    this.uploadedAwsFileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+    this.simulateAwsUpload();
   },
+  simulateAwsUpload() {
+    this.awsUploadProgress = 0;
+    const interval = setInterval(() => {
+      if (this.awsUploadProgress < 100) {
+        this.awsUploadProgress += 1;
+      } else {
+        clearInterval(interval);
+      }
+    }, 50);
+  }
+},
   mounted() {
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');
