@@ -775,8 +775,16 @@ html, body {
   border-radius: 50%;
 }
 
-.bi-house-door {
-  color: rgba(49, 33, 177, 1);
+.btn .menu-heading,
+.btn .nav-menu {
+  color: #6c757d;
+}
+
+/* active style */
+.activeBtn .menu-heading,
+.activeBtn .nav-menu {
+  color: rgba(49, 33, 177, 1); 
+  font-weight: 600;
 }
 
 .circle-logo {
@@ -1143,4 +1151,29 @@ html, body {
   color: rgba(0, 0, 0, 0.6);
   font-weight: 500;
   font-size: 15px;
+}
+
+/* user */
+.assets-green-icon {
+  background-color: rgb(183, 241, 187);
+  color: rgb(0, 119, 10);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.assets-yellow-icon {
+  background-color: rgb(236, 207, 137);
+  color: rgba(195, 136, 0, 1);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.assets-red-icon {
+  background-color: rgb(243, 206, 206);
+  color: rgba(173, 0, 0, 1);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
 }
