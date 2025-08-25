@@ -49,7 +49,7 @@
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
+                                    
                                     
                                 </select></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
@@ -75,8 +75,7 @@
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
-                                    
+                                   
                                 </select></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
@@ -101,7 +100,7 @@
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
+                                    
                                     
                                 </select></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
@@ -127,7 +126,6 @@
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
                                     
                                 </select></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
@@ -153,7 +151,31 @@
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
+                                   
+                                </select></div>
+                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
+                                <i class="bi bi-dash-circle me-1"></i> Remove
+                                </a>
+                            </div>
+                            <hr class="my-2">
+
+                            <!-- Repeat this block for each member -->
+                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
+                                <div class="d-flex align-items-center">
+                                <div
+                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
+                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
+                                    AB
+                                </div>
+                                <span class="fw-medium text-dark">Aditi Bose</span>
+                                </div>
+                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
+                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
+                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
+                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
+                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
+                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
+                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
                                     
                                 </select></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
@@ -179,7 +201,6 @@
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
                                     
                                 </select></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
@@ -205,33 +226,7 @@
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
                                     
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
-
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    <option class="text-dark"style="font-size: 15px;">All</option>
                                     
                                 </select></div>
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">

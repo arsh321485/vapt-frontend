@@ -280,7 +280,7 @@
                       <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
                           <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
                           <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                        </div>
+                      </div>
                       </div>
                       <button type="button" class="btn patch-btn rounded-pill text-nowrap">
                       June 1 - June 30 <i class="bi bi-calendar-minus"></i>

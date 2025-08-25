@@ -14,25 +14,22 @@
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
                 <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
-                <div class="d-flex justify-content-between align-items-center gap-2 mb-3 me-2">
+                <div class="d-flex justify-content-between align-items-center  mb-3">
                     <div class="d-flex gap-2 my-3">
                     <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
                     <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button>
                     </div>
                   
-                    <!-- <div class="d-flex">
-                    <input class="form-control form-control-sm" style="padding-top: 7px;padding-bottom: 7px;" type="search" placeholder="Search" aria-label="Search">
-                    </div> -->
                     <div class="position-relative">
-  <input 
-    class="form-control form-control-sm" 
-    style="padding-top: 7px; padding-bottom: 7px; border-radius: 20px;" 
-    type="search" 
-    placeholder="Search vul. by name" 
-    aria-label="Search"
-  >
-  <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 text-secondary"></i>
-</div>
+                    <input 
+                      class="form-control form-control-sm" 
+                      style="padding-top: 7px; padding-bottom: 7px; border-radius: 20px;" 
+                      type="search" 
+                      placeholder="Search vul. by name" 
+                      aria-label="Search"
+                    >
+                    <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 text-secondary"></i>
+                    </div>
                   
                 </div>
                 <!-- Asset List -->
@@ -303,13 +300,13 @@
                         </span>
                             </div>
                             <div class="dropdown">
-                          <div class="dropdown-btn"> Select location</div>
-                          <div class="dropdown-content">
+                            <div class="dropdown-btn"> Select location</div>
+                            <div class="dropdown-content">
                               <a href="#">Greece</a>
                               <a href="#">Germany</a>
                               <a href="#">Bahrain</a>
-                          </div>
-                          </div>
+                            </div>
+                            </div>
                         </div>
                     </div>
 
@@ -373,9 +370,9 @@
                                 </h2>
                                 <div id="collapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                 <div class="accordion-body border-top-0">
-                                    <div class="d-flex justify-content-start gap-3">
+                                    <div class="d-flex justify-content-between gap-3">
                                         
-                                    </div>
+                                    
                                     <div class="d-flex justify-content-start gap-5">
                                         <div class="d-flex flex-column" style="width: 400px;">
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
@@ -385,10 +382,11 @@
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
                                             <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
                                         </div>
-                                        
-                                        <div>
-                                          <router-link to="/vulnerabilitycard" class="btn border-0" style="color: rgba(49, 33, 177, 1);font-weight: 600">fix now <i class="bi bi-arrow-right"></i></router-link>
                                         </div>
+                                        <div class="d-flex flex-column">
+                                            <button class="btn rounded-pill px-3" style="background-color: rgba(49, 33, 177, 1);color: white;"><i class="bi bi-magic"></i> Fix Now</button> 
+                                        </div>
+                                        
                                     </div>
                                     <div class="d-flex flex-column">
                                         <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
@@ -698,7 +696,7 @@ export default {
     background-color: white;
     border: 1px solid rgba(0, 0, 0, 0.16);
     border-radius: 50px;
-    padding: 4px 20px 4px 12px; /* extra right padding for the arrow */
+    padding: 8px 20px 8px 12px; /* extra right padding for the arrow */
     cursor: pointer;
     position: relative;
 }

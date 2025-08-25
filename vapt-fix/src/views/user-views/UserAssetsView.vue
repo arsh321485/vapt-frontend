@@ -13,11 +13,21 @@
           <div class="col-11 pt-2 pb-3 pe-5">
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
-                <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
+                <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assigned Assets (210)</h5>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="d-flex gap-2 my-3">
                     <button class="btn btn-outline-secondary btn-sm py-1 px-2" style="border-radius: 20px;"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
                     <button class="btn btn-outline-secondary btn-sm py-1 px-2" style="border-radius: 20px;"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    </div>
+                    <div class="position-relative">
+                    <input 
+                      class="form-control form-control-sm" 
+                      style="padding-top: 7px; padding-bottom: 7px; border-radius: 20px;" 
+                      type="search" 
+                      placeholder="Search vul. by name" 
+                      aria-label="Search"
+                    >
+                    <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 text-secondary"></i>
                     </div>
                 </div>
                 <!-- Asset List -->
@@ -47,8 +57,8 @@
                             <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color:rgba(130, 91, 0, 1)"></span>
-                            <span style="color:rgba(130, 91, 0, 1);">Medium 5</span>
+                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
+                            <span class="text-warning">Medium 5</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
@@ -84,8 +94,8 @@
                             <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color:rgba(130, 91, 0, 1)"></span>
-                            <span style="color:rgba(130, 91, 0, 1);">Medium 5</span>
+                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
+                            <span class="text-warning">Medium 5</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
@@ -119,8 +129,8 @@
                             <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color:rgba(130, 91, 0, 1)"></span>
-                            <span style="color:rgba(130, 91, 0, 1);">Medium 5</span>
+                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
+                            <span class="text-warning">Medium 5</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
@@ -154,8 +164,8 @@
                             <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color:rgba(130, 91, 0, 1)"></span>
-                            <span style="color:rgba(130, 91, 0, 1);">Medium 5</span>
+                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
+                            <span class="text-warning">Medium 5</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
@@ -189,8 +199,8 @@
                             <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color:rgba(130, 91, 0, 1)"></span>
-                            <span style="color:rgba(130, 91, 0, 1);">Medium 5</span>
+                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
+                            <span class="text-warning">Medium 5</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
@@ -224,8 +234,8 @@
                             <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color:rgba(130, 91, 0, 1)"></span>
-                            <span style="color:rgba(130, 91, 0, 1);">Medium 5</span>
+                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
+                            <span class="text-warning">Medium 5</span>
                         </span></div>
                         <div style="font-size: 12px;"><span class="d-flex align-items-center">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
@@ -254,18 +264,25 @@
                         <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
                         <div class="d-flex justify-content-between">
                             <div class="d-flex justify-content-start gap-3">
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.42</div>
-                        <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
-                        </span>
-                        <span class="d-flex align-items-center badge-open">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(49, 33, 177, 1)"></span>
-                            <span>Open</span>
-                        </span>
-                        </div>
-                        <div>
-                            <button class="btn" style="background-color: rgba(49, 33, 177, 1);border-radius: 26px;color: white;font-weight: 500;font-size: 15px;"><i class="bi bi-arrow-bar-up me-1"></i> Share</button>
+                            <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.42</div>
+                            <span class="d-flex align-items-center badge-critical">
+                                <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+                                <span>Critical</span>
+                            </span>
+                            <span class="d-flex align-items-center badge-open">
+                                <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(49, 33, 177, 1)"></span>
+                                <span>Open</span>
+                            </span>
+                                </div>
+                            <div>
+                            <div class="dropdown">
+                          <div class="dropdown-btn"> Select location</div>
+                          <div class="dropdown-content">
+                              <a href="#">Greece</a>
+                              <a href="#">Germany</a>
+                              <a href="#">Bahrain</a>
+                          </div>
+                            </div>
                         </div>
                         </div>
                     </div>
@@ -290,7 +307,7 @@
                     <div class="row px-3 py-4">
                     <div class="d-flex justify-content-between tab-wrapper position-relative">
                     <p class="nav-item active" style="width: 25%;color: rgba(49, 33, 177, 1);"> Vulnerabilities</p>
-                    <p class="nav-item" style="width: 25%;"> Remediation Tasks</p>
+                    
                     <p class="nav-item" style="width: 25%;"> Exception Requests</p>
                     <p class="nav-item" style="width: 25%;"> Related</p>
 
@@ -306,7 +323,7 @@
                                 <button class="btn btn-outline-secondary btn-pill text-danger">High</button>
                                 <button class="btn btn-outline-secondary btn-pill text-warning">Medium</button>
                                 <button class="btn btn-outline-secondary btn-pill text-success">Low</button>
-                                <button class="btn btn-outline-secondary btn-pill text-success">Due Date</button>
+                                
                             </div>
                     </div>
 
@@ -341,7 +358,7 @@
                                         </div>
                                         <div class="d-flex flex-column">
                                             <button class="btn rounded-pill px-3" style="background-color: rgba(49, 33, 177, 1);color: white;"><i class="bi bi-magic"></i> Fix Now</button>
-                                            <p class="text-center mt-2" style="font-size: 13px;">6 steps</p>
+                                            
                                         </div>
                                     </div>
                                     <div class="d-flex flex-column">
@@ -481,7 +498,33 @@ export default {
   components: {
     DashboardMenu,
     DashboardHeader,
-  }
+  },
+  mounted() {
+    const dropdown = document.querySelector('.dropdown');
+    const btn = dropdown.querySelector('.dropdown-btn');
+    const options = dropdown.querySelectorAll('.dropdown-content a');
+
+    // Toggle dropdown open/close
+    btn.addEventListener('click', () => {
+      dropdown.classList.toggle('show');
+    });
+
+    // Set selected option
+    options.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.textContent = option.textContent; // update button text
+        dropdown.classList.remove('show'); // close dropdown
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  },
 };
 </script>
 
@@ -614,5 +657,58 @@ export default {
 .accordion {
      --bs-accordion-border-color: none;
      --bs-accordion-body-padding-y: 0;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+.dropdown-btn {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 50px;
+    padding: 8px 20px 8px 12px;
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: "▼"; /* arrow symbol */
+    font-size: 12px;
+    color: #333;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: 4px;
+}
+
+.dropdown-content a {
+    padding: 8px 12px;
+    display: block;
+    text-decoration: none;
+    color: black;
+    border-radius: 8px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
 }
 </style>

@@ -89,63 +89,38 @@
               </div>
               
               <div class="row ps-5 gap-5">
-                <!-- PDF / CSV Upload -->
-                <div class="col-lg-5 location-card text-center py-5">
-                  <div v-if="!pdfUploadingStarted">
-                    <input
-                      type="file"
-                      ref="pdfFileInput"
-                      accept=".csv,application/pdf"
-                      @change="handlePdfFileUpload"
-                      style="display: none"
-                    />
-                    <button class="btn upload-report-btn" @click="triggerPdfFileInput">
-                      <i class="bi bi-arrow-up-circle fs-5"></i>
-                    </button>
-                    <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
-                    <p class="text-muted location-subtext">You can upload a PDF or a CSV file</p>
-                  </div>
-
-                  <div v-if="pdfUploadingStarted" class="upload-box mt-4">
-                    <div class="progress-bar-container">
-                      <div class="progress-bar" :style="{ width: pdfUploadProgress + '%' }"></div>
-                    </div>
-                    <p class="text-muted mt-2">
-                      {{ pdfUploadProgress < 100 ? 'Uploading... (' + pdfUploadProgress + '%)' : 'Uploaded ✅' }}
-                    </p>
-                    <h5 class="fw-bold mt-1">{{ uploadedPdfFileName }}</h5>
-                    <p class="text-muted">{{ uploadedPdfFileSize }}</p>
-                  </div>
+              <div class="col-lg-8 location-card text-center py-5">
+                <!-- Upload button before file selected -->
+                <div v-if="!uploadingStarted">
+                  <input
+                    type="file"
+                    ref="pdfFileInput"
+                    accept=".nessus,.xml,.csv,.pdf,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    @change="handleFileUpload"
+                    style="display: none"
+                  />
+                  <button class="btn upload-report-btn" @click="triggerFileInput">
+                    <i class="bi bi-arrow-up-circle fs-5"></i>
+                  </button>
+                  <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
+                  <p class="text-muted location-subtext">
+                    You can upload a PDF, CSV, Nessus, XML or Excel file
+                  </p>
                 </div>
 
-                <!-- AWS Excel Upload -->
-                <div class="col-lg-5 location-card text-center py-5">
-                  <div v-if="!awsUploadingStarted">
-                    <input
-                      type="file"
-                      ref="awsFileInput"
-                      accept=".xls,.xlsx"
-                      @change="handleAwsFileUpload"
-                      style="display: none"
-                    />
-                    <button class="btn upload-report-btn" @click="triggerAwsFileInput">
-                      <i class="bi bi-arrow-up-circle fs-5"></i>
-                    </button>
-                    <h4 class="fw-bold mt-3">Upload AWS Inspector Report</h4>
-                    <p class="text-muted location-subtext">You can upload Excel file (.xls, .xlsx)</p>
+                <!-- Upload progress after file selected -->
+                <div v-if="uploadingStarted" class="upload-box mt-4">
+                  <div class="progress-bar-container">
+                    <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
                   </div>
-
-                  <div v-if="awsUploadingStarted" class="upload-box mt-4">
-                    <div class="progress-bar-container">
-                      <div class="progress-bar" :style="{ width: awsUploadProgress + '%' }"></div>
-                    </div>
-                    <p class="text-muted mt-2">
-                      {{ awsUploadProgress < 100 ? 'Uploading... (' + awsUploadProgress + '%)' : 'Uploaded ✅' }}
-                    </p>
-                    <h5 class="fw-bold mt-1">{{ uploadedAwsFileName }}</h5>
-                    <p class="text-muted">{{ uploadedAwsFileSize }}</p>
-                  </div>
+                  <p class="text-muted mt-2">
+                    {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }}
+                  </p>
+                  <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
+                  <p class="text-muted">{{ uploadedFileSize }}</p>
                 </div>
+              </div>
+
               </div>
               
             </div>
@@ -170,78 +145,55 @@ export default {
     Vue3Select
   },
   data() {
-  return {
-    // PDF upload states
-    pdfUploadProgress: 0,
-    pdfUploadingStarted: false,
-    uploadedPdfFileName: '',
-    uploadedPdfFileSize: '',
-
-    // AWS Excel upload states
-    awsUploadProgress: 0,
-    awsUploadingStarted: false,
-    uploadedAwsFileName: '',
-    uploadedAwsFileSize: ''
-  };
-},
-methods: {
-  // ---------- PDF / CSV Upload ----------
-  triggerPdfFileInput() {
-    this.$refs.pdfFileInput.click();
+    return {
+      uploadingStarted: false,
+      uploadedFileName: "",
+      uploadedFileSize: "",
+      uploadProgress: 0,
+    };
   },
-  handlePdfFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+  methods: {
+    // Trigger hidden input
+    triggerFileInput() {
+      this.$refs.pdfFileInput.click();
+    },
 
-    this.pdfUploadingStarted = true;
-    this.uploadedPdfFileName = file.name;
-    this.uploadedPdfFileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+    // Handle file selection
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-    this.simulatePdfUpload();
-  },
-  simulatePdfUpload() {
-    this.pdfUploadProgress = 0;
-    const interval = setInterval(() => {
-      if (this.pdfUploadProgress < 100) {
-        this.pdfUploadProgress += 1;
-      } else {
-        clearInterval(interval);
+      // Allowed extensions
+      const allowedExtensions = ["pdf", "csv", "nessus", "xml", "xls", "xlsx"];
+      const extension = file.name.split(".").pop().toLowerCase();
+
+      if (!allowedExtensions.includes(extension)) {
+        alert("Invalid file type! Please upload PDF, CSV, Nessus, XML, or Excel file.");
+        event.target.value = ""; // reset input
+        return;
       }
-    }, 50);
+
+      // Save file details
+      this.uploadingStarted = true;
+      this.uploadedFileName = file.name;
+      this.uploadedFileSize = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+
+      // Simulate upload
+      this.simulateFileUpload();
+    },
+
+    // Simulated upload progress
+    simulateFileUpload() {
+      this.uploadProgress = 0;
+      const interval = setInterval(() => {
+        if (this.uploadProgress < 100) {
+          this.uploadProgress += 1;
+        } else {
+          clearInterval(interval);
+        }
+      }, 50);
+    },
   },
-
-  // ---------- AWS Excel Upload ----------
-  triggerAwsFileInput() {
-    this.$refs.awsFileInput.click();
-  },
-  handleAwsFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const validExtensions = ['.xls', '.xlsx'];
-    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-    if (!validExtensions.includes(fileExtension)) {
-      alert("Please upload a valid Excel file (.xls or .xlsx)");
-      return;
-    }
-
-    this.awsUploadingStarted = true;
-    this.uploadedAwsFileName = file.name;
-    this.uploadedAwsFileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-
-    this.simulateAwsUpload();
-  },
-  simulateAwsUpload() {
-    this.awsUploadProgress = 0;
-    const interval = setInterval(() => {
-      if (this.awsUploadProgress < 100) {
-        this.awsUploadProgress += 1;
-      } else {
-        clearInterval(interval);
-      }
-    }, 50);
-  }
-},
   mounted() {
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');

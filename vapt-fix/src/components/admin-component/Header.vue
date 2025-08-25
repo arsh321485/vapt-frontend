@@ -33,6 +33,11 @@
                 Vulnerability Explorer
               </router-link>
             </li>
+            <li class="nav-item">
+              <router-link to="/usersignup" class="nav-link text-white text-decoration-none">
+                Dashboard screen
+              </router-link>
+            </li>
 
         </ul>
 

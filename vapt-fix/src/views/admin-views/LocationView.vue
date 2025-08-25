@@ -100,20 +100,31 @@
                             <th class="col-3">Select Location</th>
                             <th class="col-3">Member Role</th>
                           </tr>
-                        </thead>
+                        </thead>    
                         <tbody>
-                          <td class="col-2 px-2"><input type="text"
-                              class="form-control form-control-sm border-bottom rounded-0" v-model="firstName" /></td>
-                          <td class="col-2 px-2"><input type="text"
-                              class="form-control form-control-sm border-bottom rounded-0" v-model="lastName" /></td>
-                          <td class="col-2 px-2"><input type="email"
-                              class="form-control form-control-sm border-bottom rounded-0" v-model="email" /></td>
-                          <td class="col-3">
-                            <Vue3Select v-model="location" :options="locationOptions" class="compact-select" />
-                          </td>
-                          <td class="col-3">
-                            <Vue3Select v-model="role" :options="roleOptions" class="compact-select" />
-                          </td>
+                          <tr>
+                            <td class="col-2 px-2">
+                              <input type="text"
+                                class="form-control form-control-sm border-bottom rounded-0"
+                                v-model="firstName" />
+                            </td>
+                            <td class="col-2 px-2">
+                              <input type="text"
+                                class="form-control form-control-sm border-bottom rounded-0"
+                                v-model="lastName" />
+                            </td>
+                            <td class="col-2 px-2">
+                              <input type="email"
+                                class="form-control form-control-sm border-bottom rounded-0"
+                                v-model="email" />
+                            </td>
+                            <td class="col-3">
+                              <Vue3Select v-model="location" :options="locationOptions" class="compact-select" />
+                            </td>
+                            <td class="col-3">
+                              <Vue3Select v-model="role" :options="roleOptions" class="compact-select" />
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                       <div class="row">
@@ -137,7 +148,8 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <td class="col-2 px-2"><input type="text"
+                          <tr>
+                            <td class="col-2 px-2"><input type="text"
                               class="form-control form-control-sm border-bottom rounded-0" v-model="firstName" /></td>
                           <td class="col-2 px-2"><input type="text"
                               class="form-control form-control-sm border-bottom rounded-0" v-model="lastName" /></td>
@@ -149,6 +161,7 @@
                           <td class="col-3">
                             <Vue3Select v-model="role" :options="roleOptions" class="compact-select" />
                           </td>
+                          </tr>
                         </tbody>
                       </table>
                       <div class="row">

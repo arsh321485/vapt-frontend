@@ -32,6 +32,7 @@ import PendingvulnerabilitiesView from '../views/user-views/Pendingvulnerabiliti
 import PendingvulnerabilitycardView from '../views/user-views/PendingvulnerabilitycardView.vue'
 import UserVulnerabilityregisterView from '../views/user-views/UserVulnerabilityregisterView.vue'
 import UserDashboard1View from '../views/user-views/UserDashboard1View.vue'
+import UserSignupView from '../views/user-views/UserSignupView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -146,6 +147,11 @@ const router = createRouter({
 
 
     // user path
+    {
+      path: '/usersignup',
+      name: 'usersignup',
+      component: UserSignupView,
+    },
     {
       path: '/userdashboard',
       name: 'userdashboard1',

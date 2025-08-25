@@ -54,13 +54,13 @@
           </router-link>
         </div>
 
-        <div>
+        <!-- <div>
           <router-link to="/delayedvulnerabilities">
           <button class="btn border-0" :class="{ activeBtn: isActive('/delayedvulnerabilities') }">
           <i class="bi bi-clock fs-5 nav-menu"></i>
           <p class="menu-heading">Delayed</p></button>
           </router-link>
-        </div>
+        </div> -->
       </div>
 
       <!-- Bottom Profile Circle -->

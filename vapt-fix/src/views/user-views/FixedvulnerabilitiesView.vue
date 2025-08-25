@@ -11,10 +11,22 @@
                     </div>
 
                     <div class="col-11 pt-3 pb-3 px-4 pe-5">
-                      <router-link to="/userdashboard" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
-                        <i class="bi bi-arrow-left"></i> Back to home
-                      </router-link>
-                        <h2 class="ticket-head mt-3">Fixed vulnerabilities</h2>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <router-link to="/userdashboard" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
+                                <i class="bi bi-arrow-left"></i> Back to home
+                                </router-link>
+                                <h2 class="ticket-head mt-3">Fixed vulnerabilities</h2>
+                            </div>
+                            <div class="dropdown mt-2">
+                            <div class="dropdown-btn"> Select location</div>
+                            <div class="dropdown-content">
+                              <a href="#">Greece</a>
+                              <a href="#">Germany</a>
+                              <a href="#">Bahrain</a>
+                            </div>
+                            </div>
+                        </div>
 
                         <div class="row mt-4">  
                             <div class="d-flex gap-3">
@@ -26,7 +38,13 @@
                                 <button class="btn btn-outline-secondary btn-pill text-dark">June 1 - June 30 <i
                                         class="bi bi-calendar-minus ms-2"></i>
                                     </button>
-                                
+                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
+                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
+                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
+                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
+                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
+                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
+                                </select></div>
                                 
                             </div>
                         </div>
@@ -36,9 +54,10 @@
                                     <thead class="raised-table">
                                         <tr>
                                             <th scope="col">Vul. name</th>
+                                            <th scope="col">Assets</th>
                                             <th scope="col">OS</th>
+                                            <th scope="col">Severity</th>
                                             <th scope="col">Assigned on</th>
-                                            <th scope="col">Dependency</th>
                                             <th scope="col">Fixed on</th>
                                             
                                             
@@ -49,7 +68,61 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>High</td>
+                                            <td>Windows 10</td>
+                                            <td class="text-danger">High</td>
+                                            <td>23/06/2025</td>
+                                            <td>23/06/2025</td>
+                                            
+                                            <td><router-link to="/pendingvulnerabilitycard">
+                                                <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button>
+                                            </router-link></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td class="text-warning">Medium</td>
+                                            <td>23/06/2025</td>
+                                            <td>23/06/2025</td>
+                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td style="color: maroon;">Critical</td>
+                                            <td>23/06/2025</td>
+                                            <td>23/06/2025</td>
+                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td class="text-success">Low</td>
+                                            <td>23/06/2025</td>
+                                            <td>23/06/2025</td>
+                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td class="text-danger">High</td>
+                                            <td>23/06/2025</td>
+                                            <td>23/06/2025</td>
+                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td class="text-warning">Medium</td>
                                             <td>23/06/2025</td>
                                             <td>23/06/2025</td>
                                             
@@ -59,53 +132,8 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Medium</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
+                                            <td>Windows 10</td>
+                                            <td class="text-danger">High</td>
                                             <td>23/06/2025</td>
                                             <td>23/06/2025</td>
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">View Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
@@ -133,8 +161,33 @@ export default {
     components: {
         DashboardMenu,
         DashboardHeader
-    }
-    
+    },
+    mounted() {
+    const dropdown = document.querySelector('.dropdown');
+    const btn = dropdown.querySelector('.dropdown-btn');
+    const options = dropdown.querySelectorAll('.dropdown-content a');
+
+    // Toggle dropdown open/close
+    btn.addEventListener('click', () => {
+      dropdown.classList.toggle('show');
+    });
+
+    // Set selected option
+    options.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.textContent = option.textContent; // update button text
+        dropdown.classList.remove('show'); // close dropdown
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  },
     
 };
 </script>
@@ -195,5 +248,58 @@ export default {
     background-color: rgba(49, 33, 177, 1);
     border-radius: 30px;
     border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+.dropdown-btn {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 50px;
+    padding: 8px 20px 8px 12px; /* extra right padding for the arrow */
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: "▼"; /* arrow symbol */
+    font-size: 12px;
+    color: #333;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: 4px;
+}
+
+.dropdown-content a {
+    padding: 8px 12px;
+    display: block;
+    text-decoration: none;
+    color: black;
+    border-radius: 8px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
 }
 </style>
