@@ -194,12 +194,13 @@ class FashionAttributeExtractor:
                     )
                 
                 caption = self.processor.decode(output[0], skip_special_tokens=True)
-                logger.debug(f"Generated caption: {caption}")
+                logger.debug(f"   🤖 AI Generated caption: {caption}")
                 
                 # Extract attributes
                 attributes = self.extract_attributes_from_caption(caption)
                 attributes["caption"] = caption
                 
+                logger.debug(f"   🔍 Attribute extraction completed")
                 return attributes
                 
             except Exception as e:
@@ -267,11 +268,15 @@ class FashionAttributeExtractor:
             self.stats["processed"] += 1
             url = row.get("Image URL", "")
             
-            logger.info(f"Processing {idx + 1}/{len(df)}: {url}")
+            logger.info(f"🔄 Processing {idx + 1}/{len(df)}")
+            logger.info(f"   🔗 URL: {url}")
             
             # Validate URL
             if not self.validate_url(url):
-                logger.warning(f"Invalid URL at row {idx}: {url}")
+                logger.warning(f"⚠️  INVALID URL at row {idx}")
+                logger.warning(f"   🔗 URL: {url}")
+                logger.warning(f"   ❌ Skipping this row")
+                logger.warning("-" * 80)
                 self.stats["invalid_urls"] += 1
                 continue
             
@@ -287,14 +292,50 @@ class FashionAttributeExtractor:
                 df.at[idx, 'Caption'] = attributes['caption']
                 
                 self.stats["successful"] += 1
-                logger.info(f"Successfully processed row {idx}")
+                
+                # Log detailed extraction results
+                logger.info(f"✅ Row {idx} COMPLETED - Extracted attributes:")
+                logger.info(f"   📝 Caption: {attributes['caption']}")
+                logger.info(f"   👔 Neckline: {attributes['neckline']}")
+                logger.info(f"   👗 Silhouette: {attributes['silhouette']}")
+                logger.info(f"   ⚡ Waistline: {attributes['waistline']}")
+                logger.info(f"   👕 Sleeves: {attributes['sleeves']}")
+                
+                # Calculate and log confidence for this row
+                extracted_attrs = [attributes['neckline'], attributes['silhouette'], 
+                                 attributes['waistline'], attributes['sleeves']]
+                unknown_count = sum(1 for attr in extracted_attrs if attr in ['Unknown', 'Error'])
+                confidence = ((4 - unknown_count) / 4) * 100
+                logger.info(f"   📊 Confidence: {confidence:.1f}% ({4-unknown_count}/4 attributes identified)")
+                logger.info("-" * 80)
                 
             except Exception as e:
-                logger.error(f"Failed to process row {idx}: {e}")
+                logger.error(f"❌ FAILED to process row {idx}: {e}")
+                logger.error(f"   🔗 URL: {url}")
+                logger.error("-" * 80)
                 self.stats["failed"] += 1
             
             # Add small delay to avoid overwhelming servers
             time.sleep(0.5)
+            
+            # Log progress summary every 10 rows
+            if (idx + 1) % 10 == 0:
+                elapsed_time = time.time() - self.stats["start_time"]
+                avg_time_per_image = elapsed_time / (idx + 1)
+                remaining_images = len(df) - (idx + 1)
+                estimated_remaining_time = remaining_images * avg_time_per_image
+                
+                logger.info("=" * 80)
+                logger.info(f"📊 PROGRESS SUMMARY - Processed {idx + 1}/{len(df)} images")
+                logger.info(f"   ✅ Successful: {self.stats['successful']}")
+                logger.info(f"   ❌ Failed: {self.stats['failed']}")
+                logger.info(f"   ⚠️  Invalid URLs: {self.stats['invalid_urls']}")
+                logger.info(f"   ⏱️  Elapsed time: {elapsed_time/60:.1f} minutes")
+                logger.info(f"   🚀 Average time per image: {avg_time_per_image:.1f} seconds")
+                logger.info(f"   ⏳ Estimated remaining time: {estimated_remaining_time/60:.1f} minutes")
+                success_rate = (self.stats['successful'] / max(self.stats['processed'], 1)) * 100
+                logger.info(f"   📈 Success rate: {success_rate:.1f}%")
+                logger.info("=" * 80)
         
         # Clean and standardize data
         df = self.clean_and_standardize_data(df)

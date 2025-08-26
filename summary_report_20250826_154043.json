@@ -1,0 +1,52 @@
+{
+  "total_records": 5,
+  "processing_stats": {
+    "processed": 5,
+    "successful": 3,
+    "failed": 0,
+    "invalid_urls": 2,
+    "start_time": 1756222837.685135,
+    "processing_time": 5.949917316436768
+  },
+  "attribute_distributions": {
+    "Neckline": {
+      "Unknown": 5
+    },
+    "Silhouette": {
+      "Unknown": 5
+    },
+    "Waistline": {
+      "Unknown": 5
+    },
+    "Sleeves": {
+      "Unknown": 4,
+      "Puff Sleeves": 1
+    }
+  },
+  "data_quality": {
+    "Neckline": {
+      "valid_extractions": "0",
+      "unknown_values": "5",
+      "error_values": "0",
+      "accuracy_rate": 0.0
+    },
+    "Silhouette": {
+      "valid_extractions": "0",
+      "unknown_values": "5",
+      "error_values": "0",
+      "accuracy_rate": 0.0
+    },
+    "Waistline": {
+      "valid_extractions": "0",
+      "unknown_values": "5",
+      "error_values": "0",
+      "accuracy_rate": 0.0
+    },
+    "Sleeves": {
+      "valid_extractions": "1",
+      "unknown_values": "4",
+      "error_values": "0",
+      "accuracy_rate": 20.0
+    }
+  }
+}
