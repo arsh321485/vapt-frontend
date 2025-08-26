@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+"""
+Windows-Compatible Fashion Attribute Extractor
+
+This version is specifically designed to work on Windows systems with proper
+encoding handling to avoid Unicode issues.
+"""
+
 import pandas as pd
 import requests
 from transformers import BlipProcessor, BlipForConditionalGeneration
@@ -13,18 +21,82 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
 import warnings
+import sys
+import os
 warnings.filterwarnings('ignore')
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('fashion_extraction.log'),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+# Set UTF-8 encoding for Windows
+if sys.platform.startswith('win'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    
+    # Set environment variable for UTF-8
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+
+# Configure logging with proper encoding
+class SafeFormatter(logging.Formatter):
+    """Custom formatter that handles encoding issues"""
+    def format(self, record):
+        # Remove or replace problematic Unicode characters
+        formatted = super().format(record)
+        # Replace common problematic characters with ASCII equivalents
+        replacements = {
+            '\u2713': '[OK]',      # checkmark
+            '\u2717': '[X]',       # X mark
+            '\u26a0': '[!]',       # warning
+            '\u23f1': '[TIME]',    # stopwatch
+            '\u1f4ca': '[CHART]',  # chart
+            '\u1f4dd': '[NOTE]',   # memo
+            '\u1f454': '[SHIRT]',  # shirt
+            '\u1f457': '[DRESS]',  # dress
+            '\u1f455': '[TSHIRT]', # t-shirt
+            '\u26a1': '[BOLT]',    # lightning bolt
+        }
+        
+        for unicode_char, replacement in replacements.items():
+            formatted = formatted.replace(unicode_char, replacement)
+        
+        # Remove any remaining non-ASCII characters that might cause issues
+        try:
+            formatted.encode('cp1252')
+        except UnicodeEncodeError:
+            formatted = formatted.encode('ascii', 'replace').decode('ascii')
+        
+        return formatted
+
+# Setup logging with safe formatter
+def setup_logging():
+    """Setup logging with Windows-compatible encoding"""
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    
+    # Clear any existing handlers
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+    
+    # Create formatter
+    formatter = SafeFormatter(
+        '%(asctime)s - %(levelname)s - %(message)s'
+    )
+    
+    # File handler with UTF-8 encoding
+    try:
+        file_handler = logging.FileHandler('fashion_extraction.log', encoding='utf-8')
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    except Exception as e:
+        print(f"Warning: Could not create log file: {e}")
+    
+    # Console handler with safe encoding
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    
+    return logger
+
+# Initialize logger
+logger = setup_logging()
 
 class FashionAttributeExtractor:
     def __init__(self, model_name: str = "Salesforce/blip-image-captioning-base"):
@@ -358,14 +430,15 @@ class FashionAttributeExtractor:
         df.to_excel(excel_file, index=False)
         logger.info(f"Saved Excel file: {excel_file}")
         
-        # Save CSV
+        # Save CSV with UTF-8 encoding
         csv_file = f"{output_prefix}_{timestamp}.csv"
-        df.to_csv(csv_file, index=False)
+        df.to_csv(csv_file, index=False, encoding='utf-8-sig')  # BOM for Windows Excel compatibility
         logger.info(f"Saved CSV file: {csv_file}")
         
-        # Save JSON
+        # Save JSON with UTF-8 encoding
         json_file = f"{output_prefix}_{timestamp}.json"
-        df.to_json(json_file, orient='records', indent=2)
+        with open(json_file, 'w', encoding='utf-8') as f:
+            df.to_json(f, orient='records', indent=2, force_ascii=False)
         logger.info(f"Saved JSON file: {json_file}")
         
         # Generate summary
@@ -403,10 +476,10 @@ class FashionAttributeExtractor:
                     "accuracy_rate": (valid_count / len(df)) * 100
                 }
         
-        # Save summary as JSON
+        # Save summary as JSON with UTF-8 encoding
         summary_file = f"{output_prefix}.json"
-        with open(summary_file, 'w') as f:
-            json.dump(summary, f, indent=2, default=str)
+        with open(summary_file, 'w', encoding='utf-8') as f:
+            json.dump(summary, f, indent=2, default=str, ensure_ascii=False)
         logger.info(f"Saved summary report: {summary_file}")
         
         # Create visualizations
@@ -417,7 +490,11 @@ class FashionAttributeExtractor:
     def create_visualizations(self, df: pd.DataFrame, output_prefix: str):
         """Create visualizations of attribute distributions"""
         try:
-            plt.style.use('seaborn-v0_8')
+            # Set matplotlib to use a backend that works on Windows
+            import matplotlib
+            matplotlib.use('Agg')  # Use Anti-Grain Geometry backend
+            
+            plt.style.use('default')  # Use default style instead of seaborn
             attribute_columns = ['Neckline', 'Silhouette', 'Waistline', 'Sleeves']
             
             # Create subplots
@@ -480,6 +557,10 @@ def main():
     # Configuration
     input_file = "Best_Seller_Tags.xlsx"  # Update with your file path
     output_prefix = "fashion_data_processed"
+    
+    # Print system information
+    logger.info(f"Running on {sys.platform} with Python {sys.version}")
+    logger.info(f"Current encoding: {sys.stdout.encoding}")
     
     # Initialize extractor
     extractor = FashionAttributeExtractor()
