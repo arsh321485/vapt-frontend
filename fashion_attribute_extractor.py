@@ -39,44 +39,106 @@ class FashionAttributeExtractor:
                 "sweetheart": "Sweetheart",
                 "v-neck": "V-neck",
                 "v neck": "V-neck",
+                "v neckline": "V-neck",
+                "deep v": "V-neck",
                 "scoop": "Scoop",
+                "scoop neck": "Scoop",
                 "crew": "Crew",
+                "crew neck": "Crew",
                 "round neck": "Crew",
+                "rounded neck": "Crew",
                 "boat neck": "Boat",
                 "bateau": "Boat",
+                "boatneck": "Boat",
                 "halter": "Halter",
+                "halter neck": "Halter",
+                "halter top": "Halter",
                 "off shoulder": "Off-shoulder",
                 "off-shoulder": "Off-shoulder",
+                "off the shoulder": "Off-shoulder",
                 "one shoulder": "One-shoulder",
+                "one-shoulder": "One-shoulder",
+                "single shoulder": "One-shoulder",
                 "strapless": "Strapless",
+                "bandeau": "Strapless",
+                "tube top": "Strapless",
                 "square": "Square",
+                "square neck": "Square",
+                "square neckline": "Square",
                 "high neck": "High neck",
+                "high neckline": "High neck",
                 "mock neck": "Mock neck",
+                "mock turtle": "Mock neck",
                 "cowl": "Cowl",
-                "keyhole": "Keyhole"
+                "cowl neck": "Cowl",
+                "draped neck": "Cowl",
+                "keyhole": "Keyhole",
+                "keyhole neck": "Keyhole",
+                "cut out": "Keyhole",
+                "turtleneck": "High neck",
+                "turtle neck": "High neck",
+                "jewel neck": "Crew",
+                "portrait": "Portrait",
+                "portrait collar": "Portrait"
             },
             "silhouette": {
                 "a-line": "A-line",
                 "a line": "A-line",
+                "a-line dress": "A-line",
                 "flowy": "A-line",
+                "flowing": "A-line",
                 "fit and flare": "A-line",
+                "fitted bodice": "A-line",
                 "mermaid": "Mermaid",
+                "mermaid style": "Mermaid",
                 "trumpet": "Mermaid",
                 "fishtail": "Mermaid",
                 "sheath": "Sheath",
+                "sheath dress": "Sheath",
                 "column": "Sheath",
+                "column dress": "Sheath",
                 "straight": "Sheath",
+                "straight dress": "Sheath",
                 "slim": "Sheath",
+                "slim fit": "Sheath",
                 "bodycon": "Sheath",
+                "body con": "Sheath",
+                "fitted": "Sheath",
+                "tight fitting": "Sheath",
                 "ball gown": "Ball gown",
                 "ballgown": "Ball gown",
+                "ball gown style": "Ball gown",
                 "princess": "Ball gown",
+                "princess style": "Ball gown",
+                "full skirt": "Ball gown",
+                "voluminous": "Ball gown",
                 "empire": "Empire",
+                "empire waist": "Empire",
+                "empire style": "Empire",
                 "shift": "Shift",
+                "shift dress": "Shift",
+                "straight shift": "Shift",
                 "wrap": "Wrap",
+                "wrap dress": "Wrap",
+                "wrap style": "Wrap",
                 "asymmetric": "Asymmetric",
+                "asymmetrical": "Asymmetric",
+                "uneven hem": "Asymmetric",
                 "high-low": "High-low",
-                "hi-lo": "High-low"
+                "hi-lo": "High-low",
+                "high low": "High-low",
+                "mullet hem": "High-low",
+                "tea length": "A-line",
+                "midi": "A-line",
+                "maxi": "A-line",
+                "floor length": "A-line",
+                "gown": "A-line",
+                "evening gown": "A-line",
+                "formal dress": "A-line",
+                "cocktail dress": "Sheath",
+                "pant suit": "Straight",
+                "pantsuit": "Straight",
+                "suit": "Straight"
             },
             "waistline": {
                 "empire": "Empire",
@@ -92,28 +154,53 @@ class FashionAttributeExtractor:
             },
             "sleeves": {
                 "sleeveless": "Sleeveless",
+                "no sleeves": "Sleeveless",
+                "without sleeves": "Sleeveless",
                 "strapless": "Sleeveless",
                 "tank": "Sleeveless",
+                "tank top": "Sleeveless",
+                "spaghetti strap": "Sleeveless",
+                "spaghetti straps": "Sleeveless",
+                "thin straps": "Sleeveless",
                 "long sleeve": "Long sleeves",
                 "long-sleeve": "Long sleeves",
+                "long sleeved": "Long sleeves",
                 "full sleeve": "Long sleeves",
+                "full length sleeve": "Long sleeves",
                 "short sleeve": "Short sleeves",
                 "short-sleeve": "Short sleeves",
+                "short sleeved": "Short sleeves",
                 "cap sleeve": "Cap sleeves",
                 "cap-sleeve": "Cap sleeves",
+                "cap sleeved": "Cap sleeves",
                 "three quarter": "3/4 sleeves",
                 "3/4 sleeve": "3/4 sleeves",
+                "three-quarter": "3/4 sleeves",
                 "elbow": "3/4 sleeves",
+                "elbow length": "3/4 sleeves",
                 "puff sleeve": "Puff sleeves",
+                "puff sleeved": "Puff sleeves",
                 "puffed": "Puff sleeves",
+                "puffy sleeves": "Puff sleeves",
                 "balloon": "Puff sleeves",
+                "balloon sleeves": "Puff sleeves",
                 "bell sleeve": "Bell sleeves",
+                "bell sleeves": "Bell sleeves",
                 "flare": "Bell sleeves",
+                "flared sleeves": "Bell sleeves",
                 "bishop": "Bishop sleeves",
+                "bishop sleeves": "Bishop sleeves",
                 "flutter": "Flutter sleeves",
+                "flutter sleeves": "Flutter sleeves",
                 "kimono": "Kimono sleeves",
+                "kimono sleeves": "Kimono sleeves",
                 "dolman": "Dolman sleeves",
-                "raglan": "Raglan sleeves"
+                "dolman sleeves": "Dolman sleeves",
+                "raglan": "Raglan sleeves",
+                "raglan sleeves": "Raglan sleeves",
+                "off shoulder sleeves": "Off-shoulder sleeves",
+                "cold shoulder": "Cold shoulder",
+                "split sleeves": "Split sleeves"
             }
         }
         
@@ -163,14 +250,82 @@ class FashionAttributeExtractor:
             "sleeves": "Unknown"
         }
         
-        # Extract each attribute type
+        # Enhanced extraction with more context clues
+        # Extract each attribute type with priority scoring
         for attr_type, mappings in self.attribute_mappings.items():
+            best_match = None
+            best_score = 0
+            
             for keyword, standard_term in mappings.items():
                 if keyword in caption_lower:
-                    attributes[attr_type] = standard_term
-                    break  # Use first match to avoid conflicts
+                    # Score based on keyword specificity (longer keywords get higher scores)
+                    # Also give higher priority to exact matches
+                    score = len(keyword.split())
+                    if keyword == standard_term.lower():  # Exact match bonus
+                        score += 2
+                    if score > best_score:
+                        best_match = standard_term
+                        best_score = score
+            
+            if best_match:
+                attributes[attr_type] = best_match
+        
+        # Additional inference rules based on common dress descriptions
+        self._apply_inference_rules(caption_lower, attributes)
         
         return attributes
+    
+    def _apply_inference_rules(self, caption_lower: str, attributes: Dict[str, str]):
+        """Apply inference rules to improve attribute detection"""
+        
+        # Gown/dress type inference
+        if "gown" in caption_lower and attributes["silhouette"] == "Unknown":
+            if "ball" in caption_lower or "princess" in caption_lower:
+                attributes["silhouette"] = "Ball gown"
+            elif "mermaid" in caption_lower:
+                attributes["silhouette"] = "Mermaid"  # Override for mermaid gowns
+            elif "evening" in caption_lower or "formal" in caption_lower:
+                attributes["silhouette"] = "A-line"  # Common for evening gowns
+        
+        # Pant suit handling
+        if "pant suit" in caption_lower or "pantsuit" in caption_lower:
+            attributes["silhouette"] = "Straight"  # Pant suits are typically straight
+            attributes["sleeves"] = "Long sleeves"  # Most pant suits have long sleeves
+        
+        # Formal dress inference
+        if "formal" in caption_lower and attributes["silhouette"] == "Unknown":
+            attributes["silhouette"] = "A-line"  # Most formal dresses are A-line
+        
+        # Wedding/bridal inference
+        if any(word in caption_lower for word in ["wedding", "bridal", "bride"]):
+            if attributes["silhouette"] == "Unknown":
+                attributes["silhouette"] = "A-line"
+            if attributes["sleeves"] == "Unknown":
+                attributes["sleeves"] = "Sleeveless"  # Many bridal dresses are sleeveless
+        
+        # Mother of the bride inference
+        if "mother of the bride" in caption_lower:
+            if attributes["sleeves"] == "Unknown":
+                attributes["sleeves"] = "3/4 sleeves"  # Common for mother of bride dresses
+            if attributes["neckline"] == "Unknown":
+                attributes["neckline"] = "Scoop"  # Conservative neckline
+        
+        # Color and fabric clues
+        if "sequin" in caption_lower or "beaded" in caption_lower:
+            if attributes["silhouette"] == "Unknown":
+                attributes["silhouette"] = "Sheath"  # Sequined dresses often fitted
+        
+        # Length clues for silhouette
+        if "floor length" in caption_lower or "long dress" in caption_lower:
+            if attributes["silhouette"] == "Unknown":
+                attributes["silhouette"] = "A-line"
+        
+        # Sleeve inference from dress type
+        if attributes["sleeves"] == "Unknown":
+            if "tank" in caption_lower or "spaghetti" in caption_lower:
+                attributes["sleeves"] = "Sleeveless"
+            elif "jacket" in caption_lower or "blazer" in caption_lower:
+                attributes["sleeves"] = "Long sleeves"
     
     def analyze_image(self, url: str, max_retries: int = 3) -> Dict[str, str]:
         """Analyze single image and extract fashion attributes"""
@@ -183,17 +338,41 @@ class FashionAttributeExtractor:
                 # Process image
                 image = Image.open(response.raw).convert("RGB")
                 
-                # Generate caption
+                # Generate multiple captions with different approaches for better coverage
                 inputs = self.processor(image, return_tensors="pt")
+                
+                # Generate detailed caption
                 with torch.no_grad():
                     output = self.model.generate(
                         **inputs, 
-                        max_length=100,
-                        num_beams=5,
-                        early_stopping=True
+                        max_length=150,  # Longer captions for more details
+                        num_beams=8,     # More beams for better quality
+                        early_stopping=True,
+                        do_sample=True,   # Add some randomness
+                        temperature=0.7,  # Control randomness
+                        num_return_sequences=1
                     )
                 
                 caption = self.processor.decode(output[0], skip_special_tokens=True)
+                
+                # Try to generate a second caption with different parameters for more coverage
+                try:
+                    with torch.no_grad():
+                        output2 = self.model.generate(
+                            **inputs,
+                            max_length=120,
+                            num_beams=5,
+                            do_sample=True,
+                            temperature=0.9,
+                            num_return_sequences=1
+                        )
+                    caption2 = self.processor.decode(output2[0], skip_special_tokens=True)
+                    # Combine captions for richer description
+                    combined_caption = f"{caption}. {caption2}"
+                    caption = combined_caption
+                except:
+                    # If second caption fails, use the first one
+                    pass
                 logger.debug(f"   AI Generated caption: {caption}")
                 
                 # Extract attributes
