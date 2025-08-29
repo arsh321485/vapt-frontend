@@ -42,6 +42,11 @@
             <input type="password" class="form-control" placeholder="Pick a password">
           </div>
 
+          <div class="mb-4">
+  <label class="form-label">Confirm password</label>
+  <input type="password" class="form-control" placeholder="Re-enter your password">
+</div>
+
           <div style="padding:10px;border:1px solid #ccc;border-radius:4px;
             width:300px;display:flex;align-items:center;justify-content:space-between;">
   
@@ -57,7 +62,9 @@
 </div>
 
 
-          <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3">Signup for vaptfix <i class="bi bi-arrow-right-circle-fill"></i></button>
+          <router-link to="/">
+            <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3">Signup for vaptfix <i class="bi bi-arrow-right-circle-fill"></i></button>
+          </router-link>
         </form>
         <p class="text-center pt-3 mt-2">Already have an account? <span> <router-link to="/signin" class="text-decoration-none" tag="button" style="color: #422CE9;">Signin</router-link></span></p>
 

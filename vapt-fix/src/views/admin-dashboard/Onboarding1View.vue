@@ -13,6 +13,8 @@
           <div class="col-11 pt-2 pb-3 pe-4">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <h2 class="">Vulnerability Management Program</h2>
+              
+
               <!-- <button type="button" class="btn pending-approval-btn rounded-pill">
                 11 Compensatory controls pending approval
                 <i class="bi bi-arrow-right ms-1 fs-5"></i>

@@ -295,7 +295,12 @@
                         <div class="col-3">
                           <div class="card p-4 h-100" style="border-radius: 12px">
                             <p class="estimated-text">Missing security updates</p>
-                            <h1 class="text-212 mt-auto">212</h1>
+                            <div class="d-flex justify-content-end">
+                              <h1 class="text-212 mt-auto">212</h1>
+                              <router-link to="/" class="text-decoration-none ms-2" style="color: rgba(49, 33, 177, 1);margin-top: 37px;">
+                                View details
+                              </router-link>
+                            </div>
                             <!-- <div class="d-flex align-items-center gap-3">
                               <span class="d-flex align-items-center">
                                 <span

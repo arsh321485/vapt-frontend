@@ -68,7 +68,7 @@
       <!-- Bottom Profile Circle -->
       <div class="mt-auto d-flex flex-column align-items-center">
           <i class="bi bi-info-circle fs-5"></i>
-          <p class="menu-heading ms-2">How it Works</p>
+          <router-link to="/howitwork" class="menu-heading ms-2 text-decoration-none">How it Works</router-link>
         <div class="circle-bottom">A</div>
       </div>
     </div>
@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { useRoute } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 export default {
   name: 'DashboardMenu',
   setup() {

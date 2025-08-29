@@ -38,15 +38,20 @@
                 Dashboard screen
               </router-link>
             </li>
-
+            
         </ul>
 
-        <!-- Right-aligned button -->
-        <!-- <button class="btn text-white navbar-btn">Fix Your Vulnerabilities Now <i class="bi bi-arrow-right-circle-fill ms-1"></i></button> -->
+        
         <div class="d-flex justify-content-start gap-2">
           <router-link to="/signup" class="text-white text-decoration-none" tag="button">Signup / </router-link>
-        <router-link to="/signin" class="text-white text-decoration-none" tag="button">Signin</router-link>
+          <router-link to="/signin" class="text-white text-decoration-none" tag="button">Signin</router-link>
+          <!-- Static User Icon -->
+          <!-- <router-link to="/profile" class="text-center text-decoration-none">
+            <i class="bi bi-person-circle text-white fs-5"></i>
+            <p class="text-light mb-0" style="font-size: 14px;">John Doe</p>
+          </router-link> -->
         </div>
+
         </div>
     </div>
     </nav>

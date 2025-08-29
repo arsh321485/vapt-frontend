@@ -6,6 +6,7 @@ import UploadReportView from '../views/admin-views/UploadReportView.vue'
 import Dashboard1View from '../views/admin-dashboard/Dashboard1View.vue'
 import SignupView from '../views/admin-views/SignupView.vue'
 import SignInView from '../views/admin-views/SignInView.vue'
+import ForgotPasswordView from '../views/admin-views/ForgotPasswordView.vue'
 import CreateNewTicketView from '../views/admin-dashboard/CreateNewTicketView.vue'
 import SupportTicketView from '../views/admin-dashboard/SupportTicketView.vue'
 import FixesView from '../views/admin-dashboard/FixesView.vue'
@@ -21,6 +22,8 @@ import VulnerabilityCardView from '../views/admin-dashboard/VulnerabilityCardVie
 import YourTeamView from '../views/admin-dashboard/YourTeamView.vue'
 import PricingplansView from '../views/admin-views/PricingplansView.vue'
 import RiskCriteriaView from '../views/admin-views/RiskCriteriaView.vue'
+import HowitWork from '../components/admin-component/HowitWork.vue'
+import Profile from '../components/admin-component/Profile.vue'
 
 // user import
 import UserAssetsView from '../views/user-views/UserAssetsView.vue'
@@ -104,6 +107,11 @@ const router = createRouter({
       component: SignInView,
     },
     {
+      path: '/forgotpassword',
+      name: 'forgotpassword',
+      component: ForgotPasswordView,
+    },
+    {
       path: '/dashboard1',
       name: 'dashboard1',
       component: Dashboard1View,
@@ -143,6 +151,16 @@ const router = createRouter({
       path: '/yourteam',
       name: 'yourteam',
       component: YourTeamView,
+    },
+    {
+      path: '/howitwork',
+      name: 'howitwork',
+      component: HowitWork,
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile,
     },
 
 

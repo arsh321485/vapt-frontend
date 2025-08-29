@@ -21,6 +21,12 @@
           <div class="mb-4 mt-4">
             <label class="form-label">Your password</label>
             <input type="password" class="form-control" placeholder="Enter your password">
+            <!-- Forgot password link -->
+  <div class="text-end mt-1">
+    <a href="/forgotpassword" class="text-primary" style="font-size: 14px; text-decoration: none;">
+      Forgot Password?
+    </a>
+  </div>
           </div>
 
           <div style="padding:10px;border:1px solid #ccc;border-radius:4px;
@@ -38,12 +44,16 @@
 </div>
 
 
-          <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-4">
+          <router-link to="/">
+            <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-4">
             Login into vaptfix <i class="bi bi-arrow-right-circle-fill"></i>  
           </button>
+          </router-link>
         </form>
 
-        <p class="mt-4 text-center">Don’t have an account? <span><router-link to="/signup" class="text-decoration-none" tag="button" style="color: #422CE9;">Signup</router-link></span></p>
+        <p class="mt-4 text-center">Don’t have an account? <span>
+          <router-link to="/signup" class="text-decoration-none" tag="button" style="color: #422CE9;">Signup</router-link>
+        </span></p>
       </div>
 
       <!-- Right Image Section -->
@@ -70,60 +80,3 @@ export default {
 };
 </script>
 
-<!-- <style scoped>
-    .form-control {
-      border-radius: 20px;
-      padding: 8px 13px;
-    }
-
-    .form-control:focus {
-      box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.25);
-    }
-
-    .btn-google {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      color: rgba(0, 0, 0, 0.87);
-      border-radius: 50px;
-      width: 200px;
-    }
-
-    .btn-microsoft {
-      background-color: #fff;
-      color: rgba(0, 0, 0, 0.87);
-      border: 1px solid #ddd;
-      border-radius: 50px;
-      width: 230px;
-    }
-
-    .btn-vaptfix {
-      background-color: #422CE9;
-      color: #fff;
-      border: none;
-      border-radius: 30px;
-    }
-
-    .btn-vaptfix i {
-      margin-left: 5px;
-    }
-
-    .form-heading {
-      font-weight: 500;
-    }
-
-    .form-subheading {
-      color: #6c757d;
-    }
-
-    .form-label {
-      font-weight: 500;
-    }
-
-    .signup-link {
-      color: #422CE9;
-      text-decoration: none;
-    }
-    .signup-link:hover {
-      text-decoration: underline;
-    }
-</style> -->
