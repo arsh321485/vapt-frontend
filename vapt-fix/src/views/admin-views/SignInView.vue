@@ -23,9 +23,9 @@
             <input type="password" class="form-control" placeholder="Enter your password">
             <!-- Forgot password link -->
   <div class="text-end mt-1">
-    <a href="/forgotpassword" class="text-primary" style="font-size: 14px; text-decoration: none;">
+    <router-link to="/forgotpassword" class="text-primary" style="font-size: 14px; text-decoration: none;">
       Forgot Password?
-    </a>
+    </router-link>
   </div>
           </div>
 
