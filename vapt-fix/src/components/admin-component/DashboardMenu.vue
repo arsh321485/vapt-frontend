@@ -9,8 +9,8 @@
       <!-- Navigation Icons -->
       <div class="flex-grow-1 d-flex flex-column align-items-center gap-1 text-center">
          <div>
-          <router-link to="/onboarding1">
-          <button class="btn border-0" :class="{ activeBtn: isActive('/onboarding1') }"><i class="bi bi-house-door fs-5 nav-menu"></i>
+          <router-link to="/admindashboardonboarding">
+          <button class="btn border-0" :class="{ activeBtn: isActive('/admindashboardonboarding') }"><i class="bi bi-house-door fs-5 nav-menu"></i>
           <p class="menu-heading">Home</p></button>
           </router-link>
          </div>
@@ -67,9 +67,9 @@
 
       <!-- Bottom Profile Circle -->
       <div class="mt-auto d-flex flex-column align-items-center">
-          <i class="bi bi-info-circle fs-5"></i>
-          <router-link to="/howitwork" class="menu-heading ms-2 text-decoration-none">How it Works</router-link>
-        <div class="circle-bottom">A</div>
+          <!-- <i class="bi bi-info-circle fs-5"></i>
+          <router-link to="/howitwork" class="menu-heading ms-2 text-decoration-none">How it Works</router-link> -->
+        <div class="circle-bottom mb-2">A</div>
       </div>
     </div>
 

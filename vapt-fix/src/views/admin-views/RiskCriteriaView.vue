@@ -79,7 +79,7 @@
                                   class="rounded-circle me-1"
                                   style="width: 6px; height: 6px; background-color: rgba(177, 35, 24, 1)"
                                 ></span>
-                                <span class="fw-bold" style="color: rgba(177, 35, 24, 1);">Critical</span>
+                                <span class="fw-bold" style="color: rgba(177, 35, 24, 1);">Critical <span class="text-danger">*</span></span>
                                 <span class="info-icon" style="position:  relative; display: inline-block;"><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i>
                                   <span class="tooltip-text">
                                     Please choose the remediation timeframe corresponding to the assigned Critical<br>
@@ -112,7 +112,7 @@
                                   class="rounded-circle me-1"
                                   style="width: 6px; height: 6px; background-color: rgba(235, 50, 35, 1)"
                                 ></span>
-                                <span class="fw-bold" style="color: rgba(235, 50, 35, 1);">High</span>
+                                <span class="fw-bold" style="color: rgba(235, 50, 35, 1);">High <span class="text-danger">*</span></span>
                                 <span class="info-icon" style="position:  relative; display: inline-block;"><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i>
                                   <span class="tooltip-text">
                                     Please choose the remediation timeframe corresponding to the assigned high<br>
@@ -147,7 +147,7 @@
                                   class="rounded-circle me-1"
                                   style="width: 6px; height: 6px; background-color: rgba(201, 142, 0, 1)"
                                 ></span>
-                                <span class="fw-bold" style="color: rgba(201, 142, 0, 1);">Medium</span>
+                                <span class="fw-bold" style="color: rgba(201, 142, 0, 1);">Medium <span class="text-danger">*</span></span>
                                 <span class="info-icon" style="position:  relative; display: inline-block;"><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i>
                                   <span class="tooltip-text">
                                     Please choose the remediation timeframe corresponding to the assigned medium<br>
@@ -179,7 +179,7 @@
                                   class="rounded-circle me-1"
                                   style="width: 6px; height: 6px; background-color: rgba(78, 172, 91, 1)"
                                 ></span>
-                                <span class="fw-bold" style="color: rgba(78, 172, 91, 1);">Low</span>
+                                <span class="fw-bold" style="color: rgba(78, 172, 91, 1);">Low <span class="text-danger">*</span></span>
                                 <span class="info-icon" style="position:  relative; display: inline-block;"><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i>
                                   <span class="tooltip-text">
                                     Please choose the remediation timeframe corresponding to the assigned low<br>

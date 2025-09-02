@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // admin import
+import Login from '../components/admin-component/Login.vue'
 import HomeView from '../views/admin-views/HomeView.vue'
 import LocationView from '../views/admin-views/LocationView.vue'
 import UploadReportView from '../views/admin-views/UploadReportView.vue'
@@ -24,6 +25,7 @@ import PricingplansView from '../views/admin-views/PricingplansView.vue'
 import RiskCriteriaView from '../views/admin-views/RiskCriteriaView.vue'
 import HowitWork from '../components/admin-component/HowitWork.vue'
 import Profile from '../components/admin-component/Profile.vue'
+import ChangePasswordView from '../views/admin-views/ChangePasswordView.vue'
 
 // user import
 import UserAssetsView from '../views/user-views/UserAssetsView.vue'
@@ -43,6 +45,11 @@ const router = createRouter({
     // admin path
     {
       path: '/',
+      name: 'login',
+      component: Login,
+    },
+    {
+      path: '/home',
       name: 'home',
       component: HomeView,
     },
@@ -162,7 +169,11 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
     },
-
+    {
+      path: '/changepassword',
+      name: 'changepassword',
+      component: ChangePasswordView,
+    },
 
     // user path
     {

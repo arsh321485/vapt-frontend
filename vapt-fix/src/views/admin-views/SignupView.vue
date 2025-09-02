@@ -1,9 +1,7 @@
 <template>
     <main>
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
-      
     <div class="row overflow-hidden w-100">
-      <!-- Left Form Section --> 
       <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
         <img src="@/assets/images/logo2.png" alt="" class="mb-4">
         <h1 class="form-heading mb-2">Get started now</h1>
@@ -43,32 +41,26 @@
           </div>
 
           <div class="mb-4">
-  <label class="form-label">Confirm password</label>
-  <input type="password" class="form-control" placeholder="Re-enter your password">
-</div>
+            <label class="form-label">Confirm password</label>
+            <input type="password" class="form-control" placeholder="Re-enter your password">
+          </div>
 
           <div style="padding:10px;border:1px solid #ccc;border-radius:4px;
             width:300px;display:flex;align-items:center;justify-content:space-between;">
   
-            <!-- Left side: tick box -->
             <div style="display:flex;align-items:center;gap:10px;">
               <input type="checkbox" id="captcha-check" style="width:20px;height:20px;cursor:pointer;">
               <label for="captcha-check" style="cursor:pointer;">I'm not a robot</label>
             </div>
-
-  <!-- Right side: fake recaptcha logo -->
-  <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" 
-       alt="recaptcha" style="height:30px;">
-</div>
-
-
+            <!-- Right side: fake recaptcha logo -->
+            <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" 
+                alt="recaptcha" style="height:30px;">
+          </div>
           <router-link to="/">
             <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3">Signup for vaptfix <i class="bi bi-arrow-right-circle-fill"></i></button>
           </router-link>
         </form>
         <p class="text-center pt-3 mt-2">Already have an account? <span> <router-link to="/signin" class="text-decoration-none" tag="button" style="color: #422CE9;">Signin</router-link></span></p>
-
-
       </div>
 
       <!-- Right Image Section -->
@@ -82,7 +74,6 @@
 </template>
 
 <script>
-
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
 

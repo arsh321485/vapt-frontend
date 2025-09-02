@@ -13,7 +13,7 @@
         <!-- Left nav links -->
         <ul class="navbar-nav me-auto gap-4">
             <li class="nav-item">
-              <router-link to="/" class="nav-link active text-white text-decoration-none" aria-current="page" >
+              <router-link to="/home" class="nav-link active text-white text-decoration-none" aria-current="page" >
                 Home
               </router-link>
             </li>

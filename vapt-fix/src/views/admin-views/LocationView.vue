@@ -32,13 +32,9 @@
                       <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-geo-alt-fill fs-5"></i>
                     </div>
-                    <h5 class="fw-semibold ms-2 mt-2" >Add location</h5>
+                    <h5 class="fw-semibold ms-2 mt-2">Add location <span class="text-danger">*</span></h5>
                     </div>
-                    <div class="col-lg-7">
-                      
-                      <!-- <p class="text-muted location-subtext">You can add upto 10 locations.</p> -->
-                      
-                    </div>
+                    
                   </div>
                   <div class="row mt-2">
                     <div class="col-5">
@@ -76,22 +72,17 @@
                     </div>
                     <h5 class="fw-semibold ms-2 mt-2">Add users</h5>
                     </div>
-                    <div class="col-lg-4">
-                      
-                      <!-- <p class="text-muted location-subtext">You can add upto 10 locations.</p> -->
-                    </div>
-                    <!-- <div class="col-3">
-                      <input type="file" ref="fileInput" accept=".csv" @change="handleFileUpload"
-                        style="display: none" />
-                      <button class="btn upload-btn" @click="triggerFileInput"><i class="bi bi-upload me-2"></i> Upload
-                        CSV</button>
-                    </div> -->
                   </div>
                   <form>
 
                     <div class="row px-3 g-3 mb-4">
-                      <h5 class="text-dark d-block mb-2 mt-4">Internal</h5>
-                      <table class="table align-middle table-borderless">
+                      <h6 class="d-block mt-5 mb-0 fw-semibold">User Type</h6>
+                      <select class="form-select w-25">
+                        <option selected disabled>Select type</option>
+                        <option value="internal">Internal</option>
+                        <option value="external">External</option>
+                      </select>
+                        <table class="table align-middle table-borderless">
                         <thead class="table-light">
                           <tr>
                             <th class="col-2">First Name</th>
@@ -124,43 +115,6 @@
                             <td class="col-3">
                               <Vue3Select v-model="role" :options="roleOptions" class="compact-select" />
                             </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-2">
-                          <button class="btn btn-sm px-3 add-location-btn text-light" type="submit"><i
-                              class="bi bi-plus me-2"></i>Add user </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row px-3 g-3 mb-4">
-                      <h5 class="text-dark d-block mb-2 mt-4">External</h5>
-                      <table class="table align-middle table-borderless">
-                        <thead class="table-light">
-                          <tr>
-                            <th class="col-2">First Name</th>
-                            <th class="col-2">Last Name</th>
-                            <th class="col-2">Email</th>
-                            <th class="col-3">Select Location</th>
-                            <th class="col-3">Member Role</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td class="col-2 px-2"><input type="text"
-                              class="form-control form-control-sm border-bottom rounded-0" v-model="firstName" /></td>
-                          <td class="col-2 px-2"><input type="text"
-                              class="form-control form-control-sm border-bottom rounded-0" v-model="lastName" /></td>
-                          <td class="col-2 px-2"><input type="email"
-                              class="form-control form-control-sm border-bottom rounded-0" v-model="email" /></td>
-                          <td class="col-3">
-                            <Vue3Select v-model="location" :options="locationOptions" class="compact-select" />
-                          </td>
-                          <td class="col-3">
-                            <Vue3Select v-model="role" :options="roleOptions" class="compact-select" />
-                          </td>
                           </tr>
                         </tbody>
                       </table>

@@ -4,22 +4,29 @@
     <div class="row overflow-hidden w-100">
         <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
             <img src="@/assets/images/logo2.png" alt="" class="mb-4">
-            <h3 class="mb-2">Forgot Password</h3>
-            <p class="text-muted mb-4">
-                Enter your registered email to reset your password.
-            </p>
+            <h3 class="mb-4">Change Password</h3>
+            
             <div class="mb-4">
-                <label for="email" class="form-label">Email</label>
+                <label for="password" class="form-label">New Password</label>
                 <input
-                type="email"
-                id="email"
+                type="password"
+                id="password"
                 class="form-control"
-                placeholder="Enter your email"
+                placeholder="Enter new password"
+                />
+            </div>
+            <div class="mb-4">
+                <label for="password" class="form-label">Confirm New Password</label>
+                <input
+                type="password"
+                id="password"
+                class="form-control"
+                placeholder="Re-enter new password"
                 />
             </div>
             
-            <router-link to="/changepassword" class="btn w-100 btn-vaptfix" style="background-color: #422CE9;">
-                Send Reset Link
+            <router-link to="/" class="btn w-100 btn-vaptfix" style="background-color: #422CE9;">
+                Save Password
             </router-link>
             
         </div>
@@ -35,7 +42,7 @@
 
 <script>
 export default {
-  name: "ForgotPasswordView",
+  name: "ChangePasswordView",
   data() {
     return {
       showMessage: false,

@@ -4,6 +4,8 @@
         <div class="row mt-5 mb-2">
     <!-- Sidebar -->
     <div class="col-lg-5">
+     <!-- <img src="@/assets/images/logo2.png" alt="" class="mb-4"> -->
+
       <div class="card shadow-lg p-5" style="border-radius: 20px;">
         <!-- Profile Icon & Name -->
         <div class="text-center mb-4">

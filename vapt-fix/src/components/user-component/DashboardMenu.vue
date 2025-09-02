@@ -65,9 +65,9 @@
 
       <!-- Bottom Profile Circle -->
       <div class="mt-auto d-flex flex-column align-items-center">
-          <i class="bi bi-info-circle fs-5"></i>
-          <p class="menu-heading ms-2">How it Works</p>
-        <div class="circle-bottom">A</div>
+          <!-- <i class="bi bi-info-circle fs-5"></i>
+          <p class="menu-heading ms-2">How it Works</p> -->
+        <div class="circle-bottom mb-2">A</div>
       </div>
     </div>
 

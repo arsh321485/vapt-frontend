@@ -41,7 +41,7 @@
                         </div>
 
                         <div class="row mt-5">
-                            <h6 class="fw-semibold mb-3">Requested today</h6>
+                            
                             <div class="table-responsive">
                                 <table class="table align-middle table-borderless">
                                     <thead class="raised-table">
@@ -236,8 +236,8 @@
                                 </table>
                             </div>
                         </div>
-                            <div class="row mt-5">
-                            <h6 class="fw-semibold mb-3">Requested earlier this week</h6>
+                        <div class="row mt-5">
+                            <h6 class="fw-semibold mb-3 text-success">Approved</h6>
                             <div class="table-responsive">
                                 <table class="table align-middle table-borderless">
                                     <thead class="raised-table">
@@ -258,18 +258,7 @@
                                             <td>Windows 10</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td>
-                                                <div class="d-flex justify-content-around">
-                                                    <button class="btn fixes-btn">
-                                                    Approve
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                    </button>
-                                                    <button class="btn fixes-red-btn">
-                                                        Decline 
-                                                        <i class="bi bi-arrow-right-circle-fill"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
+                                            
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -278,18 +267,7 @@
                                             <td>Windows 10</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td>
-                                                <div class="d-flex justify-content-around">
-                                                    <button class="btn fixes-btn">
-                                                    Approve
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                <button class="btn fixes-red-btn">
-                                                    Decline 
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                </div>
-                                            </td>
+                                            
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -298,18 +276,7 @@
                                             <td>Windows 10</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td>
-                                                <div class="d-flex justify-content-around">
-                                                    <button class="btn fixes-btn">
-                                                    Approve
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                <button class="btn fixes-red-btn">
-                                                    Decline 
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                </div>
-                                            </td>
+                                            
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -318,18 +285,7 @@
                                             <td>Windows 10</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td>
-                                                <div class="d-flex justify-content-around">
-                                                    <button class="btn fixes-btn">
-                                                    Approve
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                <button class="btn fixes-red-btn">
-                                                    Decline 
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                </div>
-                                            </td>
+                                            
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -338,18 +294,7 @@
                                             <td>Windows 10</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td>
-                                                <div class="d-flex justify-content-around">
-                                                    <button class="btn fixes-btn">
-                                                    Approve
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                <button class="btn fixes-red-btn">
-                                                    Decline 
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                </div>
-                                            </td>
+                                            
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -358,23 +303,85 @@
                                             <td>Windows 10</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td>
-                                                <div class="d-flex justify-content-around">
-                                                    <button class="btn fixes-btn">
-                                                    Approve
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                <button class="btn fixes-red-btn">
-                                                    Decline 
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>
-                                                </div>
-                                            </td>
+                                            
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                        <div class="row mt-5">
+                            <h6 class="fw-semibold mb-3 text-danger">Declined</h6>
+                            <div class="table-responsive">
+                                <table class="table align-middle table-borderless">
+                                    <thead class="raised-table">
+                                        <tr>
+                                            <th scope="col">Vul. name</th>
+                                            <th scope="col">Asset</th>
+                                            <th scope="col">Comment added</th>
+                                            <th scope="col">Requested by</th>
+                                            <th scope="col">Date requested</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="raised-tbody">
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td>Developer name</td>
+                                            <td>23/06/25</td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td>Developer name</td>
+                                            <td>23/06/25</td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td>Developer name</td>
+                                            <td>23/06/25</td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td>Developer name</td>
+                                            <td>23/06/25</td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td>Developer name</td>
+                                            <td>23/06/25</td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>Windows 10</td>
+                                            <td>Developer name</td>
+                                            <td>23/06/25</td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
+                        </div>
                     </div>
                 </div>
             </div>

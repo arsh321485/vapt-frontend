@@ -34,7 +34,7 @@
                           <div class="label">Vulnerability report</div>
                       </div>
 
-                      <router-link to="/onboarding1" class="btn stepper-btn mt-5" tag="button">
+                      <router-link to="/admindashboardonboarding" class="btn stepper-btn mt-5" tag="button">
             Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
           </router-link>
 
@@ -73,17 +73,18 @@
                     <div class="dropdown">
                     <div class="dropdown-btn"> Select location</div>
                     <div class="dropdown-content">
+                        <a href="#">Apply to all locations</a>
                         <a href="#">Greece</a>
                         <a href="#">Germany</a>
                         <a href="#">Bahrain</a>
                     </div>
                   </div>
-                  <div class="form-check mt-2">
-                  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-                  <label class="form-check-label text-muted" for="flexCheckChecked" style="font-size: 14px;">
+                  <!-- <div class="form-check mt-2">
+                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                  <label class="form-check-label text-muted" for="flexCheckDefault" style="font-size: 14px;">
                     Report applies to all location
                   </label>
-                  </div>
+                  </div> -->
                   </div>
                 </div>
               </div>
@@ -190,6 +191,13 @@ export default {
           this.uploadProgress += 1;
         } else {
           clearInterval(interval);
+          // ✅ Show alert when upload completes
+      Swal.fire({
+        title: "Upload Completed",
+        text: "We will mail you when the report is ready.",
+        icon: "success",
+        confirmButtonText: "OK"
+      });
         }
       }, 50);
     },
@@ -248,7 +256,7 @@ export default {
 .dropdown {
     position: relative;
     display: inline-block;
-    width: 200px;
+    width: 250px;
 }
 
 .dropdown-btn {
