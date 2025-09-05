@@ -16,7 +16,6 @@
                 <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex gap-2 my-3">
-                    <!-- <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button> -->
                     <form>
                       <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
                         <option value="" selected disabled>Sort by</option>
@@ -24,49 +23,48 @@
                         <option value="external">External</option>
                       </select>
                     </form>
-
-                    <!-- <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button> -->
-                  <div class="filter-dropdown d-inline">
-                  <!-- Filter Button -->
-                  <button
-                    class="btn btn-sm py-2 px-3 filter-btn dropdown-toggle"
-                    style="border-radius: 20px; border-color: rgba(0, 0, 0, 0.12);"
-                    data-bs-toggle="dropdown"
-                  >
-                    <i class="bi bi-funnel me-1"></i>
-                    {{ filterLabel }}
-                  </button>
-
-                  <!-- Filter Options -->
-                  <div class="dropdown-menu p-3 filter-content" style="min-width: 250px;">
-                    <!-- Severity -->
-                    <div class="mb-3">
-                      <label class="form-label fw-bold">Severity</label>
-                      <select class="form-select" v-model="selectedSeverity">
-                        <option value="">All</option>
-                        <option value="critical">Critical</option>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                      </select>
-                    </div>
-                    <!-- IP Address -->
-                    <div class="mb-3">
-                      <label class="form-label fw-bold">IP Address</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Enter IP address"
-                        v-model="ipAddress"
-                      />
-                    </div>
-                    <!-- Apply Button -->
-                    <button class="btn btn-primary w-100 btn-sm" @click="applyFilters">
-                      Apply Filters
+                    <div class="filter-dropdown d-inline">
+                    <!-- Filter Button -->
+                    <button
+                      class="btn btn-sm py-2 px-3 filter-btn dropdown-toggle"
+                      style="border-radius: 20px; border-color: rgba(0, 0, 0, 0.12);"
+                      data-bs-toggle="dropdown"
+                    >
+                      <i class="bi bi-funnel me-1"></i>
+                      {{ filterLabel }}
                     </button>
-                  </div>
-                  </div> 
-                  </div>
+
+                    <!-- Filter Options -->
+                    <div class="dropdown-menu p-3 filter-content" style="min-width: 250px;">
+                      <!-- Severity -->
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Severity</label>
+                        <select class="form-select" v-model="selectedSeverity">
+                          <option value="">All</option>
+                          <option value="critical">Critical</option>
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                      </div>
+                      <!-- IP Address -->
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">IP Address</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Enter IP address"
+                          v-model="ipAddress"
+                        />
+                      </div>
+                      <!-- Apply Button -->
+                      <button class="btn btn-primary w-100 btn-sm" @click="applyFilters">
+                        Apply Filters
+                      </button>
+                    </div>
+                    </div> 
+
+                    </div>
                 </div>
 
                 <div class="mb-4 pe-3">
@@ -323,14 +321,14 @@
                 </div>
                 <!-- Pagination -->
                 <nav class="mt-4 position-relative custom-pagination-wrapper">
-  <ul class="pagination pagination-sm mb-0 custom-pagination">
-    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"><a class="page-link" href="#">4</a></li>
-    <li class="page-item"><a class="page-link" href="#">5</a></li>
-    <li class="page-item"><a class="page-link" href="#">6</a></li>
-  </ul>
+                <ul class="pagination pagination-sm mb-0 custom-pagination">
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item"><a class="page-link" href="#">4</a></li>
+                  <li class="page-item"><a class="page-link" href="#">5</a></li>
+                  <li class="page-item"><a class="page-link" href="#">6</a></li>
+                </ul>
                 </nav>
                 </div>
 
@@ -392,7 +390,9 @@
           class="nav-link" 
           :class="{ active: activeTab === 'exceptions' }" 
           @click="activeTab = 'exceptions'">
-          Exception Requests
+          Exception Requests <span class="badge rounded-circle bg-danger ms-1" style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">
+    2
+  </span>
         </button>
       </li>
       <li class="nav-item">
@@ -569,114 +569,88 @@
                                 </div>
                             </div>
         </div>
-        <!-- exception requeted done  -->
-        <div class="accordion border-0" id="accordionExample">
-                            <div class="accordion-item border-0 border-bottom">
-                                <h2 class="accordion-header" id="expheadingOne">
-                                <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#expcollapseOne" aria-expanded="true" aria-controls="expcollapseOne">
-                                   <div class="d-flex justify-content-start align-items-center gap-3">
-                                    <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                    <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                        <span>High</span>
-                                        
-                                    </span>
-                                    
-                                   </div> 
-                                </button>
-                                </h2>
-                                <div id="expcollapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="expheadingOne" data-bs-parent="#accordionExample">
-                                <div class="accordion-body border-top-0">
-                                    <div class="d-flex justify-content-between gap-3">
-                                        
-                                    
-                                    <div class="d-flex justify-content-start gap-5">
-                                        <div class="d-flex flex-column" style="width: 400px;">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
-                                        </div>
-                                        </div>
-                                        
-                                        
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-        </div>
+        
         </div>
 
       <!-- Exception Requests -->
       <div v-if="activeTab === 'exceptions'">
-        <div class="accordion border-0" id="accordionExample">
-                            <div class="accordion-item border-0 border-bottom">
-                                <h2 class="accordion-header" id="expreqheadingOne">
-                                <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#expreqcollapseOne" aria-expanded="true" aria-controls="expreqcollapseOne">
-                                   <div class="d-flex justify-content-start align-items-center gap-3">
-                                    <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                    <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                        <span>High</span>
-                                        
-                                    </span>
-                                    
-                                   </div> 
-                                </button>
-                                </h2>
-                                <div id="expreqcollapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="exprewheadingOne" data-bs-parent="#accordionExample">
-                                <div class="accordion-body border-top-0">
-                                    <div class="d-flex justify-content-between gap-3">
-                                        
-                                    
-                                    <div class="d-flex justify-content-start gap-5">
-                                        <div class="d-flex flex-column" style="width: 400px;">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
-                                        </div>
-                                        </div>
-                                        
-                                        
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
+        <div class="d-flex justify-content-between align-items-center gap-3">
+          <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
+          <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+          <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
+          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+          <span>High</span>
+          </span>
+          <button class="btn btn-sm rounded-pill px-3" style="background-color: rgba(49, 33, 177, 1);color: white;"><i class="bi bi-magic"></i> Fix Now</button>   
+        </div> 
+        
+        <div class="d-flex justify-content-between align-items-center gap-3">
+          <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">5</p>
+          <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+          <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
+          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+          <span>High</span>
+          </span>
+          <button class="btn btn-sm rounded-pill px-3" style="background-color: rgba(49, 33, 177, 1);color: white;"><i class="bi bi-magic"></i> Fix Now</button>   
         </div>
       </div>
 
       <!-- Related -->
       <div v-if="activeTab === 'related'">
-        <!-- <ul>
-          <li>resource_id: arn:aws:ecr:ap-southeast-1:058264139340:repository/cdk-hnb659fds-container-assets-058264139340-ap-southeast-1/sha256:8f089469de5257336c326ed0f1df304d44f778feb5055bc9fc01ba5c4f6681ba</li>
-          <li>region: "ap-southeast-1"</li>
-          <li>affected_packages: "org.apache.tomcat.embed:tomcat-embed-core"</li>
-          <li>vendor_advisory: "https://nvd.nist.gov/vuln/detail/CVE-2024-52316"</li>
-        </ul> -->
-        <ul>
-  <li><strong>Resource ID:</strong> arn:aws:ecr:ap-southeast-1:058264139340:repository/...</li>
-  <li><strong>Region:</strong> ap-southeast-1</li>
-  <li><strong>Affected Packages:</strong> org.apache.tomcat.embed:tomcat-embed-core</li>
-  <li><strong>Vendor Advisory: </strong> 
-    <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a>
-  </li>
-</ul>
-
+        <div class="accordion border-0" id="accordionExample">
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            <div class="d-flex justify-content-start align-items-center gap-3">
+            <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
+            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+            <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
+            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+              <span>High</span>
+            </span>
+          </div> 
+            </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body border-top-0">
+              <ul>
+              <li><strong>Resource ID:</strong> arn:aws:ecr:ap-southeast-1:058264139340:repository/...</li>
+              <li><strong>Region:</strong> ap-southeast-1</li>
+              <li><strong>Affected Packages:</strong> org.apache.tomcat.embed:tomcat-embed-core</li>
+              <li><strong>Vendor Advisory: </strong> 
+              <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a>
+              </li>
+              </ul>   
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+            <div class="d-flex justify-content-start align-items-center gap-3">
+            <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">2</p>
+            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22226)</p>
+            <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
+            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+              <span>High</span>
+            </span>
+          </div> 
+            </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="accordion-body border-top-0">
+              <ul>
+              <li><strong>Resource ID:</strong> arn:aws:ecr:ap-southeast-1:058264139340:repository/...</li>
+              <li><strong>Region:</strong> ap-southeast-1</li>
+              <li><strong>Affected Packages:</strong> org.apache.tomcat.embed:tomcat-embed-core</li>
+              <li><strong>Vendor Advisory: </strong> 
+              <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a>
+              </li>
+              </ul>   
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
                     </div>        

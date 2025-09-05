@@ -70,58 +70,85 @@
                     </div>
                   </div> 
                   <div class="d-flex justify-content-start gap-3">
-                    <div class="dropdown">
-                    <div class="dropdown-btn"> Select location</div>
-                    <div class="dropdown-content">
-                        <a href="#">Apply to all locations</a>
-                        <a href="#">Greece</a>
-                        <a href="#">Germany</a>
-                        <a href="#">Bahrain</a>
-                    </div>
-                  </div>
-                  <!-- <div class="form-check mt-2">
-                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                  <label class="form-check-label text-muted" for="flexCheckDefault" style="font-size: 14px;">
-                    Report applies to all location
-                  </label>
-                  </div> -->
+                      <div>
+                          <select v-model="selectedLocation" class="form-select" @change="checkLocation">
+                            <option selected disabled value="">Select Location</option>
+                            <!-- <option>Apply for all locations</option>
+                            <option>Greece</option>
+                            <option>Germany</option>
+                            <option>Bahrain</option>
+                            <option>Delhi</option> -->
+                            <option
+      v-for="loc in locations"
+      :key="loc"
+      :value="loc"
+      :disabled="isAlreadyUploaded(loc)"
+    >
+      {{ loc }}
+    </option>
+                          </select>
+                      </div>
                   </div>
                 </div>
               </div>
               
-              <div class="row ps-5 gap-5">
+              <div class="row ps-5">
               <div class="col-lg-8 location-card text-center py-5">
-                <!-- Upload button before file selected -->
-                <div v-if="!uploadingStarted">
-                  <input
-                    type="file"
-                    ref="pdfFileInput"
-                    accept=".nessus,.xml,.csv,.pdf,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    @change="handleFileUpload"
-                    style="display: none"
-                  />
-                  <button class="btn upload-report-btn" @click="triggerFileInput">
-                    <i class="bi bi-arrow-up-circle fs-5"></i>
-                  </button>
-                  <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
-                  <p class="text-muted location-subtext">
-                    You can upload a PDF, CSV, Nessus, XML or Excel file
-                  </p>
-                </div>
+                 <!-- Upload box -->
+      <div class="text-center py-5">
+        <!-- Before upload -->
+        <div v-if="!uploadingStarted">
+          <input
+            type="file"
+            ref="pdfFileInput"
+            accept=".nessus,.xml,.csv,.pdf,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            @change="handleFileUpload"
+            style="display: none"
+          />
+          <button class="btn upload-report-btn" @click="triggerFileInput" :disabled="!selectedLocation">
+            <i class="bi bi-arrow-up-circle fs-5"></i>
+          </button>
+          <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
+          <p class="text-muted location-subtext">
+            You can upload a PDF, CSV, Nessus, XML or Excel file
+          </p>
+        </div>
 
-                <!-- Upload progress after file selected -->
-                <div v-if="uploadingStarted" class="upload-box mt-4">
-                  <div class="progress-bar-container">
-                    <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
-                  </div>
-                  <p class="text-muted mt-2">
-                    {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }}
-                  </p>
-                  <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
-                  <p class="text-muted">{{ uploadedFileSize }}</p>
+        <!-- Upload progress -->
+        <div v-if="uploadingStarted" class="upload-box mt-4">
+          <div class="progress-bar-container">
+            <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
+          </div>
+          <p class="text-muted mt-2">
+            {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }}
+          </p>
+          <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
+          <p class="text-muted">{{ uploadedFileSize }}</p>
+        </div>
+      </div>
+               </div>
+                
+              <div class="col-lg-4 py-2">
+                <div>
+                  
+                  <ul>
+          <li v-for="(file, index) in uploadedFiles" :key="index"><strong>{{ file.fileName }}</strong>
+            File has been uploaded for <strong>{{ file.location }}</strong>
+            <div class="d-flex flex-row gap-2 mt-1">
+              <button class="btn btn-sm btn-warning" @click="viewFile(file)">View</button>
+              <button class="btn btn-sm btn-danger ms-2" @click="removeFile(index)">Delete</button>
+            </div>
+          </li>
+        </ul>
                 </div>
               </div>
-
+              
+    <div
+      v-if="toastMessage"
+      class="toast-message"
+    >
+      {{ toastMessage }}
+    </div>
               </div>
               
             </div>
@@ -147,86 +174,94 @@ export default {
   },
   data() {
     return {
+      selectedLocation: "",
+      locations: ["Apply for all locations", "Greece", "Germany", "Bahrain", "Delhi"],
+    uploadedFiles: [],
       uploadingStarted: false,
+      uploadProgress: 0,
       uploadedFileName: "",
       uploadedFileSize: "",
-      uploadProgress: 0,
+      uploadedFiles: [],
+      toastMessage: ""
     };
   },
-  methods: {
-    // Trigger hidden input
+ methods: {
+  isAlreadyUploaded(location) {
+    return this.uploadedFiles.some(file => file.location === location);
+  },
+  checkLocation() {
+    if (this.isAlreadyUploaded(this.selectedLocation)) {
+      alert(`File is already uploaded for "${this.selectedLocation}"`);
+      this.selectedLocation = ""; // reset dropdown
+    }
+  },
     triggerFileInput() {
-      this.$refs.pdfFileInput.click();
-    },
-
-    // Handle file selection
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      // Allowed extensions
-      const allowedExtensions = ["pdf", "csv", "nessus", "xml", "xls", "xlsx"];
-      const extension = file.name.split(".").pop().toLowerCase();
-
-      if (!allowedExtensions.includes(extension)) {
-        alert("Invalid file type! Please upload PDF, CSV, Nessus, XML, or Excel file.");
-        event.target.value = ""; // reset input
-        return;
-      }
-
-      // Save file details
+    this.$refs.pdfFileInput.click();
+  },
+  handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file && this.selectedLocation) {
       this.uploadingStarted = true;
       this.uploadedFileName = file.name;
-      this.uploadedFileSize = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-
-      // Simulate upload
-      this.simulateFileUpload();
-    },
-
-    // Simulated upload progress
-    simulateFileUpload() {
+      this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
       this.uploadProgress = 0;
+
+      let progress = 0;
       const interval = setInterval(() => {
-        if (this.uploadProgress < 100) {
-          this.uploadProgress += 1;
-        } else {
+        if (progress >= 100) {
           clearInterval(interval);
-          // ✅ Show alert when upload completes
-      Swal.fire({
-        title: "Upload Completed",
-        text: "We will mail you when the report is ready.",
-        icon: "success",
-        confirmButtonText: "OK"
-      });
+
+          // ✅ Create URL for viewing
+          const fileURL = URL.createObjectURL(file);
+
+          this.uploadedFiles.push({
+            location: this.selectedLocation,
+            fileName: this.uploadedFileName,
+            fileURL: fileURL   
+          });
+
+          this.showToast(`File "${this.uploadedFileName}" uploaded for ${this.selectedLocation} ✅`);
+
+          this.selectedLocation = "";
+          this.uploadingStarted = false;
+          this.uploadProgress = 0;
+          this.uploadedFileName = "";
+          this.uploadedFileSize = "";
+          this.$refs.pdfFileInput.value = "";
+        } else {
+          progress += 20;
+          this.uploadProgress = progress;
         }
-      }, 50);
-    },
+      }, 500);
+    }
   },
-  mounted() {
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
-
-    // Toggle dropdown open/close
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    // Set selected option
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
-      });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
+  viewFile(file) {
+    // ✅ Open the uploaded file in a new tab
+    window.open(file.fileURL, "_blank");
+  },
+  removeFile(index) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This file will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.uploadedFiles.splice(index, 1);
+        Swal.fire("Deleted!", "Your file has been deleted.", "success");
       }
     });
+  },
+  showToast(message) {
+    this.toastMessage = message;
+    setTimeout(() => {
+      this.toastMessage = "";
+    }, 5000);
+  }
   }
 };
 </script>
@@ -263,13 +298,13 @@ export default {
     background-color: white;
     border: 1px solid rgba(0, 0, 0, 0.16);
     border-radius: 50px;
-    padding: 8px 40px 8px 16px; /* extra right padding for the arrow */
+    padding: 8px 40px 8px 16px; 
     cursor: pointer;
     position: relative;
 }
 
 .dropdown-btn::after {
-    content: "▼"; /* arrow symbol */
+    content: "▼"; 
     font-size: 12px;
     color: #333;
     position: absolute;
@@ -362,5 +397,26 @@ export default {
     transparent 4px,
     transparent 8px
   );
+}
+
+/* Simple toast styling */
+.toast-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #198754;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(20px); }
 }
 </style>

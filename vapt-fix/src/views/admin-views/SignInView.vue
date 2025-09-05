@@ -8,10 +8,60 @@
         <h1 class="form-heading mb-3">Welcome back!</h1>
         <p class="form-subheading mb-4">Login into your account to start fixing.</p>
 
-        <div class="mb-3 mt-5 d-lg-flex d-md-flex gap-2">
-          <button class="btn btn-google mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
-          <button class="btn btn-microsoft w-100"><img src="@/assets/images/microsoft-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Microsoft</button>
-        </div>
+        <div class="d-flex justify-content-center align-items-center gap-3 px-3">
+
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/google-icon.png" alt="google" />
+
+                        </button>
+
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/teams.png" alt="microsoftteams" />
+
+                        </button>
+
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/slack.png" alt="slack" />
+
+                        </button>
+
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/jira.png" alt="jira" />
+
+                        </button>
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/confluence.png" alt="Confluence " />
+
+                        </button>
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/asana.png" alt="asana" />
+
+                        </button>
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/monday.png" alt="monday.com" />
+
+                        </button>
+                        <button class="social-icon-btn">
+
+                            <img src="@/assets/images/notion.png" alt="notion" />
+
+                        </button>
+
+                    </div> 
+                    <div class="d-flex align-items-center mt-3">
+                      <hr class="flex-grow-1">
+                      <span class="mx-2 text-muted">or</span>
+                      <hr class="flex-grow-1">
+                    </div>
+
+        
 
         <form>
           <div class="mb-3 mt-4">
@@ -80,3 +130,46 @@ export default {
 };
 </script>
 
+<style scoped>
+.social-icon-btn {
+
+    width: 45px;
+
+    height: 45px;
+
+    border-radius: 50%;
+
+    border: 1px solid #ddd;
+
+    background-color: #fff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition: 0.3s;
+
+}
+
+.social-icon-btn img {
+
+    height: 18px;
+
+    width: auto;
+
+}
+
+.social-icon-btn:hover {
+
+    background-color: #f8f8f8;
+
+    border-color: #aaa;
+
+    transform: scale(1.05);
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+}
+</style>

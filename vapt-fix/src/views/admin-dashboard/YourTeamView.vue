@@ -43,15 +43,25 @@
                                 <span class="fw-medium text-dark">Aditi Bose</span>
                                 </div>
                                 <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    
-                                    
-                                </select></div>
+                                
+                                <div class="multi-select-dropdown" ref="dropdown">
+    <div class="dropdown-input" @click="toggleDropdown">
+      <span id="selectedOptionsText">{{ selectedOptionsText }}</span>
+      <span>&#9660;</span>
+    </div>
+
+    <div class="dropdown-list" v-show="isOpen">
+      <label v-for="option in roleOptions" :key="option.short">
+        <input
+          type="checkbox"
+          :value="option.short"
+          v-model="selectedOptions"
+        />
+        {{ option.full }}
+      </label>
+    </div>
+                                </div>
+                                
                                 <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
                                 <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
@@ -265,11 +275,98 @@ export default {
     components: {
         DashboardMenu,
         DashboardHeader
+    },
+    data() {
+    return {
+      isOpen: false,
+      selectedOptions: [],
+      roleOptions: [
+        { short: 'PM', full: 'Patch Management' },
+        { short: 'CM', full: 'Configuration Management' },
+        { short: 'NS', full: 'Network Security' },
+        { short: 'AF', full: 'Architectural Flaws' }
+      ],
+    };
+  },
+  computed: {
+    selectedOptionsText() {
+      return this.selectedOptions.length > 0 ? this.selectedOptions.join(', ') : 'Select options';
     }
+  },
+  methods: {
+    toggleDropdown() {
+      this.isOpen = !this.isOpen;
+    },
+    // Closes the dropdown when clicking outside the component
+    onClickOutside(event) {
+      if (this.$refs.dropdown && !this.$refs.dropdown.contains(event.target)) {
+        this.isOpen = false;
+      }
+    }
+  },
+  mounted() {
+    // Add event listener when the component is mounted
+    document.addEventListener('click', this.onClickOutside);
+  },
+  beforeUnmount() {
+    // Clean up the event listener when the component is unmounted
+    document.removeEventListener('click', this.onClickOutside);
+  }
 };
 </script>
 
 <style scoped>
+.multi-select-dropdown {
+    position: relative;
+    width: 300px;
+}
+
+.dropdown-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-input span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.dropdown-list {
+    position: absolute;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-top: none;
+    background-color: #fff;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.dropdown-list label {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-list label:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown-list input[type="checkbox"] {
+    margin-right: 10px;
+}
+
 .tab-wrapper {
         position: relative;
         border-bottom: 1px solid #e0e0e0;

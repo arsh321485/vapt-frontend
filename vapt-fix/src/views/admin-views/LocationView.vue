@@ -18,23 +18,20 @@
                       <h1 class="fw-semibold welcome-head"> Welcome to vaptfix!</h1>
                       <p class="welcome-subhead">Before we fix your information assets, ....</p>
                     </div>
-                    <div>
-                      
-                      
+                    <div>   
                     </div>
                   </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col-lg-9 location-card py-4 px-4">
+                <div class="col-lg-9 location-card py-4 px-4 ms-3">
                   <div class="row">
                     <div class="d-flex justify-content-start">
                       <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-geo-alt-fill fs-5"></i>
                     </div>
                     <h5 class="fw-semibold ms-2 mt-2">Add location <span class="text-danger">*</span></h5>
-                    </div>
-                    
+                    </div> 
                   </div>
                   <div class="row mt-2">
                     <div class="col-5">
@@ -48,24 +45,17 @@
                     <div class="col-4 pt-1">
                       <div class="avatar-container">
                         <div class="avatar ava-green">GM</div>
-                        <div class="avatar ava-blue">UK</div>
+                        <div class="avatar ava-blue">DH</div>
                         <div class="avatar ava-yellow">BH</div>
-                        <div class="avatar ava-black show-locations" id="locationsBtn">+3</div>
-                        <div class="popup-box" id="popupBox">
-                            <ul>
-                                <li>New York</li>
-                                <li>Los Angeles</li>
-                                <li>Bangalore</li>
-                            </ul>
-                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
               <div class="row mt-4">
-                <div class="col-lg-12 add-users py-4 px-4">
-                  <div class="row">
+                <div class="col-lg-12 add-users py-4 px-4 ms-3">
+                  <div class="row mb-3">
                     <div class="d-flex justify-content-start">
                       <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-person-fill fs-5"></i>
@@ -74,46 +64,66 @@
                     </div>
                   </div>
                   <form>
-
                     <div class="row px-3 g-3 mb-4">
-                      <h6 class="d-block mt-5 mb-0 fw-semibold">User Type</h6>
-                      <select class="form-select w-25">
-                        <option selected disabled>Select type</option>
-                        <option value="internal">Internal</option>
-                        <option value="external">External</option>
-                      </select>
-                        <table class="table align-middle table-borderless">
-                        <thead class="table-light">
-                          <tr>
-                            <th class="col-2">First Name</th>
-                            <th class="col-2">Last Name</th>
-                            <th class="col-2">Email</th>
-                            <th class="col-3">Select Location</th>
-                            <th class="col-3">Member Role</th>
-                          </tr>
-                        </thead>    
-                        <tbody>
-                          <tr>
-                            <td class="col-2 px-2">
+                      <table class="table align-middle table-borderless">
+                      <thead class="table-light">
+                      <tr>
+                        <th style="width: 15%;">User Type</th>
+                        <th style="width: 15%;">First Name</th>
+                        <th style="width: 15%;">Last Name</th>
+                        <th style="width: 25%;">Email</th> 
+                        <th style="width: 15%;">Select Location</th> 
+                        <th style="width: 15%;">Member Role</th>
+                      </tr>
+                      </thead>    
+                      <tbody>
+                      <tr>
+                            <td>
+                              <select class="form-select">
+                                <option selected disabled>Select type</option>
+                                <option value="internal">Internal</option>
+                                <option value="external">External</option>
+                              </select>
+                            </td>
+                            <td>
                               <input type="text"
                                 class="form-control form-control-sm border-bottom rounded-0"
-                                v-model="firstName" />
+                                />
                             </td>
-                            <td class="col-2 px-2">
+                            <td>
                               <input type="text"
-                                class="form-control form-control-sm border-bottom rounded-0"
-                                v-model="lastName" />
+                                class="form-control form-control-sm border-bottom rounded-0" />
                             </td>
-                            <td class="col-2 px-2">
+                            <td>
                               <input type="email"
                                 class="form-control form-control-sm border-bottom rounded-0"
-                                v-model="email" />
+                                />
                             </td>
-                            <td class="col-3">
-                              <Vue3Select v-model="location" :options="locationOptions" class="compact-select" />
+                            <td>
+                              <select class="form-select">
+                                <option selected disabled value="">Select location</option>
+                                <option value="">Germany</option>
+                                <option value="">Delhi</option>
+                                <option value="">Bahrain</option>
+                              </select>
                             </td>
-                            <td class="col-3">
-                              <Vue3Select v-model="role" :options="roleOptions" class="compact-select" />
+                            <td>
+                              <div class="multi-select-dropdown" ref="roleDropdown1">
+                                <div class="dropdown-input" @click="toggleDropdown('dropdown1')">
+                                  <span>{{ selectedRoleText1 }}</span>
+                                  <span>&#9660;</span>
+                                </div>
+                                <div class="dropdown-list" v-show="isOpen.dropdown1">
+                                  <label v-for="option in roleOptions" :key="option.short">
+                                    <input
+                                      type="checkbox"
+                                      :value="option.short"
+                                      v-model="selectedRoles1"
+                                    />
+                                    {{ option.full }}
+                                  </label>
+                                </div>
+                              </div>
                             </td>
                           </tr>
                         </tbody>
@@ -126,43 +136,79 @@
                       </div>
                     </div>
                   </form>
-
-                  <div class="row">
-                    <div class="col-7 pt-4">
-                      <h6 class="fw-semibold">Added users list (12)</h6>
-                    </div>
-                    <div class="col-3">
-                      <input type="text" class="form-control search-input" placeholder="Search for users..."
-                        v-model="searchQuery" />
-                    </div>
-                  </div>
-                  <div class="row mt-2">
-                    <div class="col-10">
-                      <table class="table">
-                        <thead class="thead thead-bg">
-                          <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Email</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody class="users-table">
-                          <tr>
-                            <td>Clarissa Ferry</td>
-                            <td>clarissaferry@acmecorp.com</td>
-                            <td><img src="@/assets/images/bin.png" alt=""></td>
-                          </tr>
-                          <tr>
-                            <td>Clarissa Ferry</td>
-                            <td>clarissaferry@acmecorp.com</td>
-                            <td><img src="@/assets/images/bin.png" alt=""></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
                 </div>
               </div>
+
+              <div class="row mt-4">
+                <div class="col-lg-12 add-users py-4 px-4 ms-3">
+                    <div class="row mb-3">
+                    <div class="d-flex justify-content-start">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                      <i class="bi bi-link-45deg fs-5"></i>
+                    </div>
+                    <h5 class="fw-semibold ms-2 mt-2">Create invite link</h5>
+                    </div>
+                    </div>
+                    <table class="table align-middle table-borderless">
+                        <thead class="table-light">
+                          <tr>
+                            <th class="col-2">User Type</th>                   
+                            <th class="col-2">Select Location</th>
+                            <th class="col-2">Member Role</th>
+                            <th class="col-2"></th>
+                            <th class="col-2"></th>
+                          </tr>
+                        </thead>    
+                        <tbody>
+                          <tr>
+                            <td class="col-2">
+                              <select class="form-select">
+                        <option selected disabled>Select type</option>
+                        <option value="internal">Internal</option>
+                        <option value="external">External</option>
+                      </select>
+                            </td>
+                            <td class="col-2">
+                              <select class="form-select">
+                                <option selected disabled>Select location</option>
+                                <option value="">Germany</option>
+                                <option value="">Delhi</option>
+                                <option value="">Bahrain</option>
+                              </select>
+                            </td>
+                            <td class="col-2">
+                             <div class="multi-select-dropdown" ref="roleDropdown2">
+                                <div class="dropdown-input" @click="toggleDropdown('dropdown2')">
+                                  <span>{{ selectedRoleText2 }}</span>
+                                  <span>&#9660;</span>
+                                </div>
+                                <div class="dropdown-list" v-show="isOpen.dropdown2">
+                                  <label v-for="option in roleOptions" :key="option.short">
+                                    <input
+                                      type="checkbox"
+                                      :value="option.short"
+                                      v-model="selectedRoles2"
+                                    />
+                                    {{ option.full }}
+                                  </label>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="col-2"> <button class="btn btn-primary" @click="copyInviteLink">Copy Link</button>
+                            </td>
+                            <td class="col-2" v-if="inviteUrl">
+                              <a :href="inviteUrl" target="_blank">{{ inviteUrl }}</a>
+                            </td>
+                            <td class="col-2" v-else>
+                              <!-- empty initially -->
+                            </td>
+                          </tr>
+                        </tbody>
+                    </table>
+                    
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -175,98 +221,144 @@
 
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
-import Vue3Select from 'vue3-select';
-import 'vue3-select/dist/vue3-select.css';
 
 export default {
-  name: 'LocationView',
-  components: {
-    Stepper,
-    Vue3Select
-  },
-  data() {
+    name: 'LocationView',
+    components: {
+       Stepper
+    },
+    data() {
     return {
-      location: '',
-      locationOptions: ['New York', 'Los Angeles', 'Chicago', 'Bangalore', 'Delhi'],
-      role: '',
-      roleOptions: ['Patch Management', 'Configuration Management', 'Network Security', 'Architectural Flaws']
+      isOpen: {
+        dropdown1: false,
+        dropdown2: false,
+      },
+      selectedRoles1: [],
+      selectedRoles2: [],
+      roleOptions: [
+        { short: 'PM', full: 'Patch Management' },
+        { short: 'CM', full: 'Configuration Management' },
+        { short: 'NS', full: 'Network Security' },
+        { short: 'AF', full: 'Architectural Flaws' }
+      ],
+      inviteUrl: "",
+      copied: false,
+      staticLink: "https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=L8C4sn"
     };
   },
+  computed: {
+    selectedRoleText1() {
+      return this.selectedRoles1.length > 0 ? this.selectedRoles1.join(', ') : 'Select roles';
+    },
+    selectedRoleText2() {
+      return this.selectedRoles2.length > 0 ? this.selectedRoles2.join(', ') : 'Select roles';
+    },
+  },
+  methods: {
+    toggleDropdown(dropdownName) {
+      for (const key in this.isOpen) {
+        if (key !== dropdownName) {
+          this.isOpen[key] = false;
+        }
+      }
+      this.isOpen[dropdownName] = !this.isOpen[dropdownName];
+    },
+    onClickOutside(event) {
+      const isClickInsideDropdown1 = this.$refs.roleDropdown1.contains(event.target);
+      const isClickInsideDropdown2 = this.$refs.roleDropdown2.contains(event.target);
+      if (!isClickInsideDropdown1) {
+        this.isOpen.dropdown1 = false;
+      }
+      if (!isClickInsideDropdown2) {
+        this.isOpen.dropdown2 = false;
+      }
+    },
+    async copyInviteLink() {
+      this.inviteUrl = this.staticLink;
+
+      try {
+        await navigator.clipboard.writeText(this.staticLink);
+        Swal.fire({
+          icon: "success",
+          title: "Link Copied!",
+          html: ` <p>The invite link has been copied:</p>
+            <a href="${this.staticLink}" 
+               target="_blank" 
+               style="text-decoration:underline;">
+               ${this.staticLink}
+            </a>`,
+          showConfirmButton: true,
+          confirmButtonText: "OK",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Failed to copy link!",
+        });
+      }
+    },
+  },
   mounted() {
-    const avatarBtn = document.getElementById('locationsBtn');
-    const popupBox = document.getElementById('popupBox');
-
-    avatarBtn.addEventListener('click', () => {
-    popupBox.style.display = popupBox.style.display === 'block' ? 'none' : 'block';
-});
-
-// Close popup when clicking outside
-document.addEventListener('click', (e) => {
-    if (!avatarBtn.contains(e.target) && !popupBox.contains(e.target)) {
-        popupBox.style.display = 'none';
-    }
-});
+    document.addEventListener('click', this.onClickOutside);
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.onClickOutside);
   }
 };
 </script>
 
 <style scoped>
-::v-deep(.compact-select .vs__dropdown-toggle) {
-  min-height: 40px;
-  padding: 4px 8px;
-  font-size: 0.875rem;
+.multi-select-dropdown {
+    position: relative;
+    width: 160px;
 }
 
-/* Optionally reduce the padding of options in dropdown */
-::v-deep(.compact-select .vs__dropdown-menu li) {
-  padding: 4px 8px;
-  font-size: 0.875rem;
+.dropdown-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-::v-deep(.compact-select .vs__dropdown-menu) {
-  margin-left: 8px;
-  width: 240px;
+.dropdown-input span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.show-locations {
-    width: 40px;
-    height: 40px;
-    background-color: black;
-    color: white;
-    border-radius: 50%;
+.dropdown-list {
+    position: absolute;
+    font-size: 13px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-top: none;
+    background-color: #fff;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.dropdown-list label {
     display: flex;
     align-items: center;
-    justify-content: center;
+    padding: 5px;
     cursor: pointer;
-    position: relative;
-    font-weight: bold;
 }
 
-.popup-box {
-    display: none;
-    position: absolute;
-    top: 250px;
-    right: 240px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    padding: 8px 12px;
-    z-index: 10;
-    min-width: 150px;
+.dropdown-list label:hover {
+    background-color: #f0f0f0;
 }
 
-.popup-box ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+.dropdown-list input[type="checkbox"] {
+    margin-right: 10px;
 }
 
-.popup-box li {
-    padding: 6px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.popup-box li:last-child {
-    border-bottom: none;
-}
 </style>
