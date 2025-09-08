@@ -35,7 +35,7 @@
                   </div>
                   <div class="row mt-2">
                     <div class="col-5">
-                      <input type="text" class="form-control rounded-input" id="locationName"
+                      <input type="text" class="form-control rounded-0 uniform-input" id="locationName"
                         placeholder="Enter the name of the location..." />
                     </div>
                     <div class="col-3">
@@ -68,50 +68,45 @@
                       <table class="table align-middle table-borderless">
                       <thead class="table-light">
                       <tr>
-                        <th style="width: 15%;">User Type</th>
-                        <th style="width: 15%;">First Name</th>
-                        <th style="width: 15%;">Last Name</th>
-                        <th style="width: 25%;">Email</th> 
-                        <th style="width: 15%;">Select Location</th> 
-                        <th style="width: 15%;">Member Role</th>
+                        <th class="text-center" style="width: 15%;">User Type</th>
+                        <th class="text-center" style="width: 15%;">First Name</th>
+                        <th class="text-center" style="width: 15%;">Last Name</th>
+                        <th class="text-center" style="width: 25%;">Email</th> 
+                        <th class="text-center" style="width: 15%;">Select Location</th> 
+                        <th class="text-center" style="width: 15%;">Member Role</th>
                       </tr>
                       </thead>    
                       <tbody>
                       <tr>
-                            <td>
-                              <select class="form-select">
-                                <option selected disabled>Select type</option>
-                                <option value="internal">Internal</option>
-                                <option value="external">External</option>
-                              </select>
-                            </td>
-                            <td>
-                              <input type="text"
-                                class="form-control form-control-sm border-bottom rounded-0"
-                                />
-                            </td>
-                            <td>
-                              <input type="text"
-                                class="form-control form-control-sm border-bottom rounded-0" />
-                            </td>
-                            <td>
-                              <input type="email"
-                                class="form-control form-control-sm border-bottom rounded-0"
-                                />
-                            </td>
-                            <td>
-                              <select class="form-select">
-                                <option selected disabled value="">Select location</option>
-                                <option value="">Germany</option>
-                                <option value="">Delhi</option>
-                                <option value="">Bahrain</option>
-                              </select>
-                            </td>
-                            <td>
+                        <td>
+                          <select class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                            <option selected disabled>Select type</option>
+                            <option value="internal">Internal</option>
+                            <option value="external">External</option>
+                          </select>
+                        </td>
+                        <td>
+                          <input type="text" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                        </td>
+                        <td>
+                          <input type="text" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                        </td>
+                        <td>
+                          <input type="email" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                        </td>
+                        <td>
+                          <select class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                            <option selected disabled value="">Select locati</option>
+                            <option value="">Germany</option>
+                            <option value="">Delhi</option>
+                            <option value="">Bahrain</option>
+                          </select>
+                        </td>
+                        <td>
                               <div class="multi-select-dropdown" ref="roleDropdown1">
-                                <div class="dropdown-input" @click="toggleDropdown('dropdown1')">
+                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown1')">
                                   <span>{{ selectedRoleText1 }}</span>
-                                  <span>&#9660;</span>
+                                  <span><i class="bi bi-chevron-down"></i></span>
                                 </div>
                                 <div class="dropdown-list" v-show="isOpen.dropdown1">
                                   <label v-for="option in roleOptions" :key="option.short">
@@ -124,9 +119,9 @@
                                   </label>
                                 </div>
                               </div>
-                            </td>
-                          </tr>
-                        </tbody>
+                        </td>
+                      </tr>
+                      </tbody>
                       </table>
                       <div class="row">
                         <div class="col-2">
@@ -138,6 +133,9 @@
                   </form>
                 </div>
               </div>
+              
+             
+
 
               <div class="row mt-4">
                 <div class="col-lg-12 add-users py-4 px-4 ms-3">
@@ -152,24 +150,23 @@
                     <table class="table align-middle table-borderless">
                         <thead class="table-light">
                           <tr>
-                            <th class="col-2">User Type</th>                   
-                            <th class="col-2">Select Location</th>
-                            <th class="col-2">Member Role</th>
-                            <th class="col-2"></th>
-                            <th class="col-2"></th>
+                            <th class="col-2 text-center">User Type</th>                   
+                            <th class="col-2 text-center">Select Location</th>
+                            <th class="col-2 text-center">Member Role</th>
+                            <th class="col-6 text-center">Copy Link</th>
                           </tr>
                         </thead>    
                         <tbody>
                           <tr>
                             <td class="col-2">
-                              <select class="form-select">
+                              <select class="form-select rounded-0 uniform-input">
                         <option selected disabled>Select type</option>
                         <option value="internal">Internal</option>
                         <option value="external">External</option>
                       </select>
                             </td>
                             <td class="col-2">
-                              <select class="form-select">
+                              <select class="form-select rounded-0 uniform-input">
                                 <option selected disabled>Select location</option>
                                 <option value="">Germany</option>
                                 <option value="">Delhi</option>
@@ -178,9 +175,9 @@
                             </td>
                             <td class="col-2">
                              <div class="multi-select-dropdown" ref="roleDropdown2">
-                                <div class="dropdown-input" @click="toggleDropdown('dropdown2')">
+                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
                                   <span>{{ selectedRoleText2 }}</span>
-                                  <span>&#9660;</span>
+                                  <span><i class="bi bi-chevron-down"></i></span>
                                 </div>
                                 <div class="dropdown-list" v-show="isOpen.dropdown2">
                                   <label v-for="option in roleOptions" :key="option.short">
@@ -194,13 +191,28 @@
                                 </div>
                               </div>
                             </td>
-                            <td class="col-2"> <button class="btn btn-primary" @click="copyInviteLink">Copy Link</button>
-                            </td>
-                            <td class="col-2" v-if="inviteUrl">
-                              <a :href="inviteUrl" target="_blank">{{ inviteUrl }}</a>
-                            </td>
-                            <td class="col-2" v-else>
-                              <!-- empty initially -->
+                            <td class="col-6">
+                              <div class="position-relative w-100">
+                            <textarea
+                              id="shareLink"
+                              class="form-control form-control-sm border-bottom rounded-0"
+                              rows="2"
+                              readonly
+                              @click="copyLink"
+                              style="resize: none; overflow: hidden;white-space: normal;height: 42px;padding: 0 8px;"
+                            >
+                      https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=e16G1P
+                            </textarea>
+
+                            <!-- Popup message -->
+                            <div
+                              id="copyPopup"
+                              class="position-absolute px-2 py-1 rounded small text-white"
+                              style="background: grey; top: -40px; left: 50px; display: none;"
+                            >
+                              Link Copied!
+                            </div>
+                              </div>
                             </td>
                           </tr>
                         </tbody>
@@ -240,10 +252,7 @@ export default {
         { short: 'CM', full: 'Configuration Management' },
         { short: 'NS', full: 'Network Security' },
         { short: 'AF', full: 'Architectural Flaws' }
-      ],
-      inviteUrl: "",
-      copied: false,
-      staticLink: "https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=L8C4sn"
+      ]
     };
   },
   computed: {
@@ -273,31 +282,20 @@ export default {
         this.isOpen.dropdown2 = false;
       }
     },
-    async copyInviteLink() {
-      this.inviteUrl = this.staticLink;
+    copyLink() {
+      const copyText = document.getElementById("shareLink");
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); // for mobile
+      navigator.clipboard.writeText(copyText.value);
 
-      try {
-        await navigator.clipboard.writeText(this.staticLink);
-        Swal.fire({
-          icon: "success",
-          title: "Link Copied!",
-          html: ` <p>The invite link has been copied:</p>
-            <a href="${this.staticLink}" 
-               target="_blank" 
-               style="text-decoration:underline;">
-               ${this.staticLink}
-            </a>`,
-          showConfirmButton: true,
-          confirmButtonText: "OK",
-        });
-      } catch (err) {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Failed to copy link!",
-        });
-      }
+      const popup = document.getElementById("copyPopup");
+      popup.style.display = "block";
+
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 2000);
     },
+    
   },
   mounted() {
     document.addEventListener('click', this.onClickOutside);
@@ -360,5 +358,10 @@ export default {
 .dropdown-list input[type="checkbox"] {
     margin-right: 10px;
 }
-
+.uniform-input {
+  height: 42px; 
+  line-height: 32px;
+  padding: 0 8px; 
+   
+}
 </style>

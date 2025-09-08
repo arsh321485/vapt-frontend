@@ -12,63 +12,60 @@
 
           <div class="col-11 pt-2 pb-3 pe-4">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
-              <h2 class="">Vulnerability Management Program</h2>
+              <div class="d-flex flex-row gap-2">
+                <h2>Vulnerability Management Program</h2>
+                 <!-- Calendar Button -->
+                  <button class="btn border-0" @click="$refs.dateInput.showPicker()">
+                    <i class="bi bi-calendar3"></i>
+                  </button>
+                  <input 
+                    type="date" 
+                    ref="dateInput" 
+                    style="position:absolute; opacity:0; pointer-events:none;left: 600px;top: 100px;" 
+                  />
+              </div>
               
                 <div class="d-flex flex-row gap-3 mt-3">
-                    <div>
-                                <button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-download me-2"></i> Download Report</button>
-                              </div>
+                <div>
+                <button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-download me-2"></i> Download Report</button>
+                </div>
 
-                               <!-- Overlay Popup -->
-                              <div
-                                v-if="showReport"
-                                class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                                style="background-color: rgba(0, 0, 0, 0.6); z-index: 1050;"
-                              >
-                                <div
-                                  class="bg-white p-4 rounded shadow"
-                                  style="width: 600px; max-height: 90vh; overflow-y: auto; position: relative;"
-                                >
-                                  <!-- Close Button -->
-                                  <button
-                                    @click="showReport = false"
-                                    class="btn-close position-absolute top-0 end-0 m-3"
-                                    aria-label="Close"
-                                  ></button>
+                <!-- Overlay Popup -->
+                  <div v-if="showReport" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                  style="background-color: rgba(0, 0, 0, 0.6); z-index: 1050;">
+                  <div class="bg-white p-4 rounded shadow" style="width: 600px; max-height: 90vh; overflow-y: auto; position: relative;">
+                  <!-- Close Button -->
+                  <button @click="showReport = false"
+                  class="btn-close position-absolute top-0 end-0 m-3"
+                  aria-label="Close"></button>
+                  <h2 class="mb-2 text-center">Download Report</h2>
+                    <p class="mb-2 text-center" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Download report</p>
+                    <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3"> June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
 
-                                  <!-- Heading -->
-                                  <h2 class="mb-2 text-center">Download Report</h2>
-                                  <p class="mb-2 text-center" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Download report</p>
-                                  <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3">
-                                    June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                                  </button>
-
-                                  <!-- Accordion -->
-                                  <div class="accordion" id="globalReportAccordion">
-                                    <div class="accordion-item">
-                                      <h2 class="accordion-header" id="headingOne">
-                                        <button
-                                          class="accordion-button"
-                                          type="button"
-                                          data-bs-toggle="collapse"
-                                          data-bs-target="#collapseOne"
-                                          aria-expanded="true"
-                                          aria-controls="collapseOne"
-                                        >
-                                          Assets(11) <span class="text-primary ms-2">4 selected</span>
-                                        </button>
-                                      </h2>
-                                      <div
-                                        id="collapseOne"
-                                        class="accordion-collapse collapse show"
-                                        aria-labelledby="headingOne"
-                                        data-bs-parent="#globalReportAccordion"
-                                      >
-                                        <div class="accordion-body">
-                                          Assets
-                                        </div>
-                                      </div>
-                                    </div>
+                    <!-- Accordion -->
+                    <div class="accordion" id="globalReportAccordion">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                        <button
+                          class="accordion-button"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#collapseOne"
+                          aria-expanded="true"
+                          aria-controls="collapseOne"
+                        >Assets(11) <span class="text-primary ms-2">4 selected</span>
+                        </button>
+                        </h2>
+                        <div id="collapseOne"
+                        class="accordion-collapse collapse show"
+                        aria-labelledby="headingOne"
+                        data-bs-parent="#globalReportAccordion">
+                        <div class="accordion-body">
+                         Assets
+                        </div>
+                        </div>
+                        </div>
 
                                     <div class="accordion-item">
                                       <h2 class="accordion-header" id="headingTwo">
@@ -121,20 +118,98 @@
                                     </div>
 
                                     
-                                  </div>
+                    </div>
 
-                                  <button class="btn download-btn btn-sm ms-3 mt-4"><i class="bi bi-download me-2"></i> Download report</button>
+                    <button class="btn download-btn btn-sm ms-3 mt-4"><i class="bi bi-download me-2"></i> Download report</button>
 
-                                </div>
-                              </div>
-                  <div class="dropdown">
+                    </div>
+                    </div>
+                    <div class="dropdown">
                       <div class="dropdown-btn"> Select location</div>
-                      <div class="dropdown-content">
-                          <a href="#">Greece</a>
-                          <a href="#">Germany</a>
-                          <a href="#">Bahrain</a>
-                      </div>
+                        <div class="dropdown-content">
+                        <a href="#">Greece</a>
+                        <a href="#">Germany</a>
+                        <a href="#">Bahrain</a>
+                        </div>
+                    </div>
+                  <!-- Notification Button -->
+                  <div>
+                    <button 
+                      class="btn border-0" 
+                      @click="toggleNotificationPanel"
+                    >
+                      <i class="bi bi-bell fs-5 nav-menu"></i>
+                    </button>
                   </div>
+                   
+                  <div class="notification-panel" :class="{ 'open': showNotifications, 'fullscreen': isFullscreen }">
+                  <div class="card shadow-lg border-0 rounded-4 bg-dark text-light h-100 d-flex flex-column">
+                  <!-- Header -->
+                  <div class="card-header d-flex justify-content-between align-items-center bg-dark border-0">
+                  <h5 class="mb-0 fw-semibold my-3 mx-3">Notifications</h5>
+                  <div>
+                  <!-- Filter -->
+                  <div class="btn-group me-2">
+                    <button 
+                      class="btn btn-sm btn-outline-light dropdown-toggle" 
+                      type="button" 
+                      data-bs-toggle="dropdown"
+                    >
+                      <i class="bi bi-filter"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" @click="filterType = ''">All</a></li>
+                      <li><a class="dropdown-item" @click="filterType = 'fixed'">Fixed Vulnerabilities</a></li>
+                      <li><a class="dropdown-item" @click="filterType = 'exception'">Exception Raised</a></li>
+                      <li><a class="dropdown-item" @click="filterType = 'assigned'">Assigned Vulnerabilities</a></li>
+                      <li><a class="dropdown-item" @click="filterType = 'report'">Reports</a></li>
+                    </ul>
+                  </div>
+
+                  <!-- Fullscreen -->
+                  <button class="btn btn-sm btn-outline-light me-2" @click="toggleFullscreen">
+                    <i class="bi bi-arrows-fullscreen"></i>
+                  </button>
+
+                  <!-- Close -->
+                  <button class="btn-close btn-close-white" @click="toggleNotificationPanel"></button>
+                </div>
+              </div>
+
+              <!-- Body -->
+              <div class="card-body px-3 pt-2" style="max-height: 500px; overflow-y: auto;">
+                <div 
+                  v-for="(notification, index) in filteredNotifications" 
+                  :key="index" 
+                  class="d-flex align-items-start py-2 border-bottom"
+                >
+                  <i :class="['me-3 fs-5', notification.icon, notification.color]"></i>
+                  <div>
+                   
+        <p 
+          class="mb-2" 
+          style="font-weight:100;" 
+          v-html="notification.message"
+          :class="{'text-secondary': notification.read}">
+        </p>
+             <small class="text-secondary">{{ notification.time }}</small>
+                  </div>
+                </div>
+
+                <p v-if="filteredNotifications.length === 0" class="text-center text-muted mt-3">
+                  No notifications found.
+                </p>
+              </div>
+                    <!-- Footer -->
+                    <div class="card-footer bg-dark border-0 d-flex justify-content-between mt-auto">
+                       <button class="btn btn-light btn-sm" @click="toggleShowAll">
+                       {{ showAll ? "View Less" : "View All Notifications" }}
+                        </button>
+                      <button class="btn btn-outline-light btn-sm" @click="markAllAsRead">Mark All as Read</button>
+                    </div>
+                  </div>
+                  </div>
+
                 </div>
             </div>
            
@@ -226,7 +301,7 @@
             </div>
 
             <div class="row mt-3">
-              <div class="col-3">
+              <div class="col-4">
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
@@ -241,7 +316,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-3">
+              <div class="col-4">
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
@@ -253,19 +328,31 @@
                   </div>
                 </div>
               </div>
-              <div class="col-3">
+              <div class="col-4">
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Exceptions approved<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Exceptions<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
-                  <div class="d-flex flex-row justify-content-start gap-2 py-3">
+                  <div class="d-flex flex-row gap-5 py-3">
                     <h1 class="text-78">32</h1>
+                    <div class="d-flex justify-content-center align-items-end mb-1">
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">14</div>
+                        <div class="bar red vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● Pending</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">18</div>
+                        <div class="bar blue vul-bar mt-1" style="color: blue;"></div>
+                        <small class="mt-1 d-block" style="color: blue;">● Approved</small>
+                      </div> 
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="col-3">
+              <!-- <div class="col-3">
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
@@ -279,7 +366,7 @@
                     </button>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
 
             <div class="row mt-3">
@@ -587,7 +674,42 @@ export default {
   data() {
     return {
       showReport: false,
+      showNotifications: false,
+      isFullscreen: false,
+      filterType: "",
+    showAll: false,
+      notifications: [
+        { type: "report", icon: "bi bi-file-text", color: "text-info", message: "A <b>new report</b> was added for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b>.", time: "2 min ago"  },
+        { type: "fixed", icon: "bi bi-check-circle", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> has been <span class='fw-semibold'>fixed</span>.", time: "10 min ago" },
+        { type: "assigned", icon: "bi bi-person-check", color: "text-primary", message: "A new vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> was <span class='fw-semibold'>assigned</span> to you.", time: "15 min ago" },
+        { type: "exception", icon: "bi bi-exclamation-triangle", color: "text-warning", message: "An <span class='fw-semibold'>exception</span> was raised for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b>.", time: "30 min ago" },
+        { type: "fixed", icon: "bi bi-shield-check", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> successfully <span class='fw-semibold'>resolved</span>.", time: "2 hours ago" },
+      ]
     };
+  },
+  computed: {
+    filteredNotifications() {
+    let list = this.filterType
+      ? this.notifications.filter(n => n.type === this.filterType)
+      : this.notifications;
+
+    // If not showing all, limit to visibleCount
+    return this.showAll ? list : list.slice(0, 4);
+  }
+  },
+   methods: {
+    toggleNotificationPanel() {
+    this.showNotifications = !this.showNotifications;
+  },
+  toggleFullscreen() {
+    this.isFullscreen = !this.isFullscreen;
+  },
+  markAllAsRead() {
+    this.notifications.forEach(n => n.read = true);
+  },
+  toggleShowAll() {
+    this.showAll = !this.showAll;
+  }
   },
   mounted() {
     const dropdown = document.querySelector('.dropdown');
@@ -620,6 +742,32 @@ export default {
 </script>
 
 <style scoped>
+.notification-panel {
+  position: fixed;
+  top: 0;
+  right: -520px;
+  width: 500px;
+  height: 100%;
+  background: #fff;
+  border-left: 1px solid #ddd;
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease-in-out;
+  z-index: 1050;
+}
+
+.notification-panel.open {
+  right: 0;
+}
+
+.notification-panel.fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  right: 0;
+  top: 0;
+}
+.dropdown-menu .dropdown-item {
+  cursor: pointer;
+}
 .calender-para {
   color: #3121B1;
   font-size: 14px;

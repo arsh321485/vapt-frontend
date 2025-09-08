@@ -879,6 +879,10 @@ html, body {
   background-color: green;
 }
 
+.bar.blue {
+  background-color: blue;
+}
+
 .text-78 {
   font-size: 40px;
   color: rgba(0, 0, 0, 1);
