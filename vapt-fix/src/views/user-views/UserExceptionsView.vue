@@ -50,7 +50,7 @@
                                         <tr>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
-                                            <th scope="col">Comment added</th>
+                                            <th scope="col">Comment by admin</th>
                                             <th scope="col">Date requested</th>
                                             <th scope="col">Status</th>
                                         </tr>
@@ -60,7 +60,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
+                                            <td>This issue is low risk in our environment</td>
                                             
                                             <td>23/06/25</td>
                                             <td><p style="color: rgba(179, 122, 0, 1);">Pending action</p></td>
@@ -69,7 +69,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
+                                            <td>Existing controls already mitigate the risk.</td>
                                             
                                             <td>23/06/25</td>
                                             <td>

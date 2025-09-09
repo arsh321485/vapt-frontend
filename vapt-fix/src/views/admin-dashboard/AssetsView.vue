@@ -13,7 +13,14 @@
           <div class="col-11 pt-2 pb-3 pe-5">
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
-                <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
+                <div class="d-flex justify-content-between">
+                  <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
+                  <div class="d-flex flex-row gap-3 me-3 mt-2">
+                    <i class="bi bi-trash fs-5" data-bs-toggle="tooltip" @click="handleDeleteClick" title="Remove an asset"></i>
+                    <i class="bi bi-eye-slash fs-5" data-bs-toggle="tooltip" title="Hold mitigation"></i>
+                  </div>
+
+                </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex gap-2 my-3">
                     <form>
@@ -82,7 +89,7 @@
 
                 <!-- Asset List -->
                 <div class="d-flex flex-column gap-3">
-                    <!-- Active Asset Item -->
+
                     <div class="asset-item active border-bottom" style="background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);">
                     <div class="d-flex justify-content-between">
                         <div class="d-flex justify-content-start gap-3">
@@ -119,10 +126,9 @@
                                 <span class="text-success fw-bold">0</span>
                               </span>
                     </div>
-                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
+                    
                     </div>
 
-                    <!-- Other Items -->
                     <div class="asset-item border-bottom">
                     <div class="d-flex justify-content-between">
                         <div class="d-flex justify-content-start gap-3">
@@ -159,7 +165,7 @@
                                 <span class="text-success fw-bold">0</span>
                               </span>
                     </div>
-                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
+                    
                     </div>
 
                     <div class="asset-item border-bottom">
@@ -237,7 +243,7 @@
                                 <span class="text-success fw-bold">0</span>
                               </span>
                     </div>
-                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
+                    
                     </div>
 
                     <div class="asset-item border-bottom">
@@ -276,7 +282,7 @@
                                 <span class="text-success fw-bold">0</span>
                               </span>
                     </div>
-                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
+                    
                     </div>
 
                     <div class="asset-item border-bottom">
@@ -315,7 +321,7 @@
                                 <span class="text-success fw-bold">0</span>
                               </span>
                     </div>
-                    <!-- <a href="#" class="view-link d-block mt-4 text-decoration-none" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View details →</a> -->
+                    
                     </div>
 
                 </div>
@@ -631,6 +637,10 @@
                       <th scope="row">Vendor Advisory</th>
                       <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
                     </tr>
+                    <tr>
+                      <th scope="row">Reference Link</th>
+                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -668,6 +678,10 @@
                     <tr>
                       <th scope="row">Vendor Advisory</th>
                       <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Reference Link</th>
+                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
                     </tr>
                   </tbody>
                 </table>   
@@ -727,6 +741,9 @@ export default {
     },
   },
    mounted() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');
     const options = dropdown.querySelectorAll('.dropdown-content a');

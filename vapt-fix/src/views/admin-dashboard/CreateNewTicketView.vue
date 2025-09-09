@@ -47,8 +47,19 @@
                                 </div>
                                 <button type="submit" class="btn btn-ticket py-2 px-5 mt-5"><i class="bi bi-plus-lg"></i> Create a new ticket</button>
                             </div>
-                            <div class="col-7">
+                            <div class="col-5">
                                 <!-- blank -->
+                            </div>
+                            <div class="col-2 pt-4">
+                                <div class="row py-3 px-3">
+                                    <select class="form-select rounded-pill" v-model="selectedLocation">
+                                        <option disabled value="">Select location</option>
+                                        <option value="germany">Germany</option>
+                                        <option value="delhi">Delhi</option>
+                                        <option value="bahrain">Bahrain</option>
+                                        <option value="greece">Greece</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -67,7 +78,12 @@ export default {
     components: {
         DashboardMenu,
         DashboardHeader
-    }
+    },
+    data() {
+    return {
+      selectedLocation: "greece" // default selected
+    };
+}
 };
 </script>
 

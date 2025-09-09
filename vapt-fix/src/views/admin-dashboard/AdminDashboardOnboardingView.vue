@@ -335,13 +335,11 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Patch compliance rate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Total Vulnerability Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2 py-3">
-                    <h1 class="text-78">78%</h1>
-                    <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
+                    <h1 class="text-78">78</h1>
+                    
                   </div>
                 </div>
               </div>
@@ -708,11 +706,34 @@ export default {
       filterType: "",
     showAll: false,
       notifications: [
-        { type: "report", icon: "bi bi-file-text", color: "text-info", message: "A <b>new report</b> was added for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b>.", time: "2 min ago"  },
-        { type: "fixed", icon: "bi bi-check-circle", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> has been <span class='fw-semibold'>fixed</span>.", time: "10 min ago" },
-        { type: "assigned", icon: "bi bi-person-check", color: "text-primary", message: "A new vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> was <span class='fw-semibold'>assigned</span> to you.", time: "15 min ago" },
-        { type: "exception", icon: "bi bi-exclamation-triangle", color: "text-warning", message: "An <span class='fw-semibold'>exception</span> was raised for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b>.", time: "30 min ago" },
-        { type: "fixed", icon: "bi bi-shield-check", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> successfully <span class='fw-semibold'>resolved</span>.", time: "2 hours ago" },
+        { type: "report", icon: "bi bi-file-text", color: "text-info", message: "A <b>new report</b> was added for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> from Patch Management.", time: "2 min ago"  },
+        { type: "fixed", icon: "bi bi-check-circle", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> has been <span class='fw-semibold'>fixed</span> from Configuration Management.", time: "10 min ago" },
+        { type: "assigned", icon: "bi bi-person-check", color: "text-primary", message: "A new vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> was <span class='fw-semibold'>assigned</span> to you from Network Security.", time: "15 min ago" },
+        { type: "exception", icon: "bi bi-exclamation-triangle", color: "text-warning", message: "An <span class='fw-semibold'>exception</span> was raised for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> from Architectural Flaws.", time: "30 min ago" },
+        
+        
+  { type: "mitigated", icon: "bi bi-shield-check", color: "text-success", message: "Vulnerability <b>Apache Struts RCE</b> has been successfully <span class='fw-semibold'>mitigated</span> by Security Team.", time: "5 min ago" },
+
+  { type: "deadline", icon: "bi bi-clock-history", color: "text-warning", message: "The <span class='fw-semibold'>deadline</span> for vulnerability <b>OpenSSL Buffer Overflow</b> has been <span class='fw-semibold'>extended</span> by Admin.", time: "12 min ago" },
+
+  { type: "exception-request", icon: "bi bi-journal-text", color: "text-primary", message: "An <span class='fw-semibold'>exception request</span> was submitted for <b>Windows SMBv1 Remote Exploit</b>.", time: "20 min ago" },
+
+  { type: "exception-approved", icon: "bi bi-check-circle", color: "text-success", message: "Exception request for <b>Oracle WebLogic RCE</b> has been <span class='fw-semibold'>approved</span>.", time: "45 min ago" },
+
+  { type: "exception-denied", icon: "bi bi-x-circle", color: "text-danger", message: "Exception request for <b>Apache Log4j JNDI Exploit</b> has been <span class='fw-semibold'>denied</span>.", time: "1 hour ago" },
+
+  { type: "ticket", icon: "bi bi-ticket-detailed", color: "text-info", message: "A new <b>ticket</b> was raised for vulnerability <b>MySQL Privilege Escalation</b>.", time: "2 hours ago" },
+
+  { type: "user-added", icon: "bi bi-person-plus", color: "text-success", message: "A <b>new user</b> was <span class='fw-semibold'>added</span> to the <b>Incident Response Team</b>.", time: "3 hours ago" },
+
+  { type: "user-deleted", icon: "bi bi-person-dash", color: "text-danger", message: "User <b>John Doe</b> was <span class='fw-semibold'>removed</span> from the <b>Patch Management Team</b>.", time: "5 hours ago" },
+
+  { type: "user-team-change", icon: "bi bi-people", color: "text-primary", message: "User <b>Alice Smith</b> was <span class='fw-semibold'>moved</span> to <b>Configuration Management</b>.", time: "6 hours ago" },
+
+  { type: "control-request", icon: "bi bi-shield-plus", color: "text-warning", message: "A <span class='fw-semibold'>compensatory control</span> request was raised for <b>Linux Kernel Privilege Escalation</b>.", time: "8 hours ago" },
+
+  { type: "asset-removed", icon: "bi bi-dash-circle", color: "text-secondary", message: "Asset <b>Legacy Server 192.168.1.25</b> was <span class='fw-semibold'>removed</span> from the vulnerability list.", time: "10 hours ago" }
+
       ],
       showCalendar: false,
       currentDate: new Date(),
@@ -759,7 +780,7 @@ export default {
     },
     prevMonth() {
       this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-      this.currentDate = new Date(this.currentDate); // force reactivity
+      this.currentDate = new Date(this.currentDate); 
     },
     nextMonth() {
       this.currentDate.setMonth(this.currentDate.getMonth() + 1);
@@ -782,7 +803,7 @@ export default {
     },
     handleDateClick(date) {
       if (this.vulnerabilities[date]) {
-        this.$router.push("/vulnerabilitycard");
+        this.$router.push("/assets");
       }
     
     },

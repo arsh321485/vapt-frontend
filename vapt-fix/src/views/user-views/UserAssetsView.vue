@@ -590,14 +590,30 @@
             </h2>
             <div id="collapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
             <div class="accordion-body border-top-0">
-              <ul>
-              <li><strong>Resource ID:</strong> arn:aws:ecr:ap-southeast-1:058264139340:repository/...</li>
-              <li><strong>Region:</strong> ap-southeast-1</li>
-              <li><strong>Affected Packages:</strong> org.apache.tomcat.embed:tomcat-embed-core</li>
-              <li><strong>Vendor Advisory: </strong> 
-              <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a>
-              </li>
-              </ul>   
+              <table class="table table-bordered table-striped">
+                  <tbody>
+                    <tr>
+                      <th scope="row">Resource ID</th>
+                      <td>arn:aws:ecr:ap-southeast-1:058264139340:repository/...</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Region</th>
+                      <td>ap-southeast-1</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Affected Packages</th>
+                      <td>org.apache.tomcat.embed:tomcat-embed-core</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Vendor Advisory</th>
+                      <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Reference Link</th>
+                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
+                    </tr>
+                  </tbody>
+                </table>  
               </div>
             </div>
           </div>
@@ -616,14 +632,30 @@
             </h2>
             <div id="collapseTwo" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
             <div class="accordion-body border-top-0">
-              <ul>
-              <li><strong>Resource ID:</strong> arn:aws:ecr:ap-southeast-1:058264139340:repository/...</li>
-              <li><strong>Region:</strong> ap-southeast-1</li>
-              <li><strong>Affected Packages:</strong> org.apache.tomcat.embed:tomcat-embed-core</li>
-              <li><strong>Vendor Advisory: </strong> 
-              <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a>
-              </li>
-              </ul>   
+              <table class="table table-bordered table-striped">
+                  <tbody>
+                    <tr>
+                      <th scope="row">Resource ID</th>
+                      <td>arn:aws:ecr:ap-southeast-1:058264139340:repository/...</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Region</th>
+                      <td>ap-southeast-1</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Affected Packages</th>
+                      <td>org.apache.tomcat.embed:tomcat-embed-core</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Vendor Advisory</th>
+                      <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Reference Link</th>
+                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
