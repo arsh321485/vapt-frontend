@@ -14,16 +14,45 @@
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <div class="d-flex flex-row gap-2">
                 <h2>Vulnerability Management Program</h2>
-                 <!-- Calendar Button -->
-                  <button class="btn border-0" @click="$refs.dateInput.showPicker()">
-                    <i class="bi bi-calendar3"></i>
-                  </button>
-                  <input 
-                    type="date" 
-                    ref="dateInput" 
-                    style="position:absolute; opacity:0; pointer-events:none;left: 600px;top: 100px;" 
-                  />
-              </div>
+                  <div>
+                    <!-- Calendar Button -->
+                    <button class="btn border-0" @click="toggleCalendar">
+                      <i class="bi bi-calendar3 fs-4"></i>
+                    </button>
+                    <div
+                      v-if="showCalendar"
+                      class="calendar border rounded p-3 shadow"
+                      style="width: 320px; position: absolute; background: #fff; z-index: 1000;"
+                    >
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <button class="btn btn-sm btn-light" @click="prevMonth">&lt;</button>
+                        <h6 class="mb-0">
+                          {{ monthYear }}
+                        </h6>
+                        <button class="btn btn-sm btn-light" @click="nextMonth">&gt;</button>
+                      </div>
+                      <div class="d-grid text-center fw-bold" style="grid-template-columns: repeat(7, 1fr);">
+                        <div v-for="day in weekDays" :key="day">{{ day }}</div>
+                      </div>
+                      <div
+                        class="d-grid text-center"
+                        style="grid-template-columns: repeat(7, 1fr); gap: 3px;"
+                      >
+                        <div v-for="n in firstDayOfMonth" :key="'empty-' + n"></div>
+                        <div
+                          v-for="date in daysInMonth"
+                          :key="date"
+                          class="p-2 border rounded"
+                          :class="getSeverityClass(date)"
+                          style="cursor: pointer;"
+                          @click="handleDateClick(date)"
+                        >
+                          {{ date }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               
                 <div class="d-flex flex-row gap-3 mt-3">
                 <div>
@@ -684,10 +713,37 @@ export default {
         { type: "assigned", icon: "bi bi-person-check", color: "text-primary", message: "A new vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> was <span class='fw-semibold'>assigned</span> to you.", time: "15 min ago" },
         { type: "exception", icon: "bi bi-exclamation-triangle", color: "text-warning", message: "An <span class='fw-semibold'>exception</span> was raised for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b>.", time: "30 min ago" },
         { type: "fixed", icon: "bi bi-shield-check", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> successfully <span class='fw-semibold'>resolved</span>.", time: "2 hours ago" },
-      ]
+      ],
+      showCalendar: false,
+      currentDate: new Date(),
+      weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      vulnerabilities: {
+        12: "critical",
+        15: "high",
+        20: "medium",
+        23: "low",
+      },
+    
     };
   },
   computed: {
+    daysInMonth() {
+      const year = this.currentDate.getFullYear();
+      const month = this.currentDate.getMonth();
+      return new Date(year, month + 1, 0).getDate();
+    },
+    firstDayOfMonth() {
+      const year = this.currentDate.getFullYear();
+      const month = this.currentDate.getMonth();
+      return new Date(year, month, 1).getDay();
+    },
+    monthYear() {
+      return this.currentDate.toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+    
+    },
     filteredNotifications() {
     let list = this.filterType
       ? this.notifications.filter(n => n.type === this.filterType)
@@ -698,6 +754,38 @@ export default {
   }
   },
    methods: {
+    toggleCalendar() {
+      this.showCalendar = !this.showCalendar;
+    },
+    prevMonth() {
+      this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+      this.currentDate = new Date(this.currentDate); // force reactivity
+    },
+    nextMonth() {
+      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      this.currentDate = new Date(this.currentDate);
+    },
+    getSeverityClass(date) {
+      const severity = this.vulnerabilities[date];
+      switch (severity) {
+        case "critical":
+          return "bg-maroon text-white";
+        case "high":
+          return "bg-red text-white";
+        case "medium":
+          return "bg-warning text-dark";
+        case "low":
+          return "bg-success text-white";
+        default:
+          return "";
+      }
+    },
+    handleDateClick(date) {
+      if (this.vulnerabilities[date]) {
+        this.$router.push("/vulnerabilitycard");
+      }
+    
+    },
     toggleNotificationPanel() {
     this.showNotifications = !this.showNotifications;
   },
@@ -742,6 +830,12 @@ export default {
 </script>
 
 <style scoped>
+.bg-maroon {
+  background-color: maroon !important;
+}
+.bg-red {
+  background-color: red !important;
+}
 .notification-panel {
   position: fixed;
   top: 0;

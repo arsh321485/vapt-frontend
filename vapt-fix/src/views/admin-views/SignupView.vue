@@ -2,7 +2,7 @@
     <main>
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
-      <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
+      <div class="col-lg-7 col-md-12 px-5 pt-4 pb-4 form-section">
         <img src="@/assets/images/logo2.png" alt="" class="mb-4">
         <h1 class="form-heading mb-2">Get started now</h1>
         <p class="form-subheading mb-4">Join vaptfix, fix your vulnerabilities now</p>
@@ -112,7 +112,7 @@
       </div>
 
       <!-- Right Image Section -->
-      <div class="col-lg-6 image-section d-none d-lg-block pt-5">
+      <div class="col-lg-5 image-section d-none d-lg-block pt-5">
         <img src="@/assets/images/signup.jpg" alt="" style="width: 455px;height: 700px;border-radius: 15px;">
       </div>
     </div>
@@ -136,9 +136,9 @@ export default {
 <style scoped>
 .social-icon-btn {
 
-    width: 45px;
+    width: 50px;
 
-    height: 45px;
+    height: 50px;
 
     border-radius: 50%;
 
@@ -158,7 +158,7 @@ export default {
 
 .social-icon-btn img {
 
-    height: 18px;
+    height: 22px;
 
     width: auto;
 
