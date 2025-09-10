@@ -44,9 +44,12 @@
                     </div>
                     <div class="col-4 pt-1">
                       <div class="avatar-container">
-                        <div class="avatar ava-green">GM</div>
+                        <!-- <div class="avatar ava-green">GM</div>
                         <div class="avatar ava-blue">DH</div>
-                        <div class="avatar ava-yellow">BH</div>
+                        <div class="avatar ava-yellow">BH</div> -->
+                        <div class="avatar ava-green" ref="germany" :title="locations.germany">GM</div>
+    <div class="avatar ava-blue" ref="delhi" :title="locations.delhi">DH</div>
+    <div class="avatar ava-yellow" ref="bahrain" :title="locations.bahrain">BH</div>
                       </div>
                     </div>
                   </div>
@@ -241,6 +244,11 @@ export default {
     },
     data() {
     return {
+      locations: {
+        germany: "Germany",
+        delhi: "Delhi",
+        bahrain: "Bahrain",
+      },
       isOpen: {
         dropdown1: false,
         dropdown2: false,
@@ -264,6 +272,12 @@ export default {
     },
   },
   methods: {
+    initTooltips() {
+      // Initialize bootstrap tooltips on refs
+      Object.values(this.$refs).forEach((el) => {
+        new bootstrap.Tooltip(el);
+      });
+    },
     toggleDropdown(dropdownName) {
       for (const key in this.isOpen) {
         if (key !== dropdownName) {
@@ -298,6 +312,7 @@ export default {
     
   },
   mounted() {
+    this.initTooltips();
     document.addEventListener('click', this.onClickOutside);
   },
   beforeUnmount() {

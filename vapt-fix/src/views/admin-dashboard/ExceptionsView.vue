@@ -385,7 +385,6 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import Swal from "sweetalert2";
 
 export default {
     name: 'ExceptionsView',

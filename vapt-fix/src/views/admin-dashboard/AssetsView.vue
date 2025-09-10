@@ -16,8 +16,8 @@
                 <div class="d-flex justify-content-between">
                   <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assets (210)</h5>
                   <div class="d-flex flex-row gap-3 me-3 mt-2">
-                    <i class="bi bi-trash fs-5" data-bs-toggle="tooltip" @click="handleDeleteClick" title="Remove an asset"></i>
-                    <i class="bi bi-eye-slash fs-5" data-bs-toggle="tooltip" title="Hold mitigation"></i>
+                    <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" @click="handleDeleteClick" title="Remove an asset"></i>
+                    <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" title="Hold mitigation"></i>
                   </div>
 
                 </div>
@@ -325,6 +325,7 @@
                     </div>
 
                 </div>
+                
                 <!-- Pagination -->
                 <nav class="mt-4 position-relative custom-pagination-wrapper">
                 <ul class="pagination pagination-sm mb-0 custom-pagination">
@@ -346,7 +347,7 @@
                         <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.42</div>
                         <span class="d-flex align-items-center badge-critical">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
+                            <span>High</span>
                         </span>
                         <span class="d-flex align-items-center badge-open">
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(49, 33, 177, 1)"></span>
@@ -372,11 +373,11 @@
                         </div>
                         <div class="d-flex flex-column">
                             <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Hostname</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">mickeymouse</p>
+                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">Bucket name</p>
                         </div>
                         <div class="d-flex flex-column">
                             <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Owner</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">mickeymouse2</p>
+                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">Admin(Greece)</p>
                         </div>
                     </div>
                     </div>
@@ -429,7 +430,7 @@
                                 <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                    <div class="d-flex justify-content-start align-items-center gap-3">
                                     <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">CVE-2024-22259 - org.springframework:spring-web</p>
                                     <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                                         <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                                         <span>High</span>
@@ -447,11 +448,11 @@
                                     <div class="d-flex justify-content-start gap-5">
                                         <div class="d-flex flex-column" style="width: 400px;">
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
+                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">PACKAGE_VULNERABILITY</p>
                                         </div>
                                         <div class="d-flex flex-column">
                                             <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
+                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">8.1</p>
                                         </div>
                                         </div>
                                         <div class="d-flex flex-column">
@@ -461,7 +462,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
+                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">Applications that use UriComponentsBuilder in Spring FrameworkÂ to parse an externally provided URL (e.g. through a query parameter) ANDÂ perform validation checks on the host of the parsed URL may be vulnerable to a open redirect https://cwe.mitre.org/data/definitions/601.html Â attack or to a SSRF attack if the URL is used after passing validation checks.This is the same as CVE-2024-22243 https://spring.io/security/cve-2024-22243 , but with different input.</p>
                                     </div>
                                 </div>
                                 </div>
@@ -580,24 +581,80 @@
 
       <!-- Exception Requests -->
       <div v-if="activeTab === 'exceptions'">
-        <div class="d-flex justify-content-between align-items-center gap-3">
+        <div class="d-flex justify-content-start align-items-center gap-3">
           <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
           <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
           <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
           <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
           <span>High</span>
           </span>
-          <button class="btn btn-sm rounded-pill px-3" style="background-color: rgba(49, 33, 177, 1);color: white;"><i class="bi bi-magic"></i> Fix Now</button>   
+          <button class="btn btn-sm fixes-btn" data-bs-toggle="modal" data-bs-target="#approveModal">
+            Approve
+          
+          </button>  
+          <button class="btn btn-sm fixes-red-btn" data-bs-toggle="modal" data-bs-target="#declineModal">
+            Decline
+          
+          </button>
+          
+          <!-- Approve Modal -->
+        <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title" id="approveModalLabel">Approve Compensatory Control?</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body pt-4 pb-4">
+                <p class="text-muted pb-3">Do you want to approve VMware ESXi 7.0/8.0 Sandbox... ?</p>
+                <div class="d-flex justify-content-start gap-3 mt-3">
+                    <button class="btn rounded-pill text-light" style="background-color: rgba(49, 33, 177, 1);">Approve Compensatory Control</button>
+                    <button class="btn border-0 text-danger" data-bs-dismiss="modal" style="font-weight: 600;">Decline</button>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+        <!-- Decline Modal -->
+        <div class="modal fade" id="declineModal" tabindex="-1" aria-labelledby="declineModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title" id="declineModalLabel">Decline Compensatory Control?</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                    <label for="exampleFormControlTextarea1" class="form-label text-muted">Reason for declining the compensatory control..</label>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" style="border-radius: 8px;" rows="3"></textarea>
+                <div class="d-flex justify-content-start gap-3 mt-3">
+                    <button class="btn rounded-pill text-light" style="background-color: rgba(49, 33, 177, 1);">Decline Compensatory Control</button>
+                    <button class="btn border-0 text-danger" data-bs-dismiss="modal" style="font-weight: 600;">Decline</button>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
         </div> 
         
-        <div class="d-flex justify-content-between align-items-center gap-3">
+        <div class="d-flex justify-content-start align-items-center gap-3">
           <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">5</p>
           <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
           <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
           <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
           <span>High</span>
           </span>
-          <button class="btn btn-sm rounded-pill px-3" style="background-color: rgba(49, 33, 177, 1);color: white;"><i class="bi bi-magic"></i> Fix Now</button>   
+          
+          <button class="btn btn-sm fixes-btn" data-bs-toggle="modal" data-bs-target="#approveModal">
+            Approve
+           
+          </button>  
+          <button class="btn btn-sm fixes-red-btn" data-bs-toggle="modal" data-bs-target="#declineModal">
+            Decline
+       
+          </button>
         </div>
       </div>
 
@@ -609,7 +666,7 @@
             <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
             <div class="d-flex justify-content-start align-items-center gap-3">
             <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">CVE-2024-22259 - org.springframework:spring-web</p>
             <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
               <span>High</span>
@@ -620,29 +677,34 @@
             <div id="collapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
             <div class="accordion-body border-top-0">
                 <table class="table table-bordered table-striped">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Resource ID</th>
-                      <td>arn:aws:ecr:ap-southeast-1:058264139340:repository/...</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Region</th>
-                      <td>ap-southeast-1</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Affected Packages</th>
-                      <td>org.apache.tomcat.embed:tomcat-embed-core</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Vendor Advisory</th>
-                      <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Reference Link</th>
-                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
-                    </tr>
-                  </tbody>
-                </table>
+                                      <tbody>
+                                        <tr>
+                                          <th scope="row">Resource ID</th>
+                                          <td>arn:aws:lambda:eu-central-1:211125372003:function:fra-sto-shr-uat-lda-evt-mgr-dbmigration:$LATEST</td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Region</th>
+                                          <td>eu-central-1</td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Affected Packages</th>
+                                          <td>org.springframework:spring-web</td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Vendor Advisory</th>
+                                          <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-22259" target="_blank">https://nvd.nist.gov/vuln/detail/CVE-2024-22259</a></td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Reference Url</th>
+                                          <td>
+                                            <ul class="list-unstyled lh-base">
+                                              <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-22259" target="_blank">https://nvd.nist.gov/vuln/detail/CVE-2024-22259</a></li>
+                                              <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-22259" target="_blank">https://nvd.nist.gov/vuln/detail/CVE-2024-22259</a></li>
+                                            </ul>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
               </div>
             </div>
           </div>
@@ -662,29 +724,34 @@
             <div id="collapseTwo" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
             <div class="accordion-body border-top-0">
               <table class="table table-bordered table-striped">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Resource ID</th>
-                      <td>arn:aws:ecr:ap-southeast-1:058264139340:repository/...</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Region</th>
-                      <td>ap-southeast-1</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Affected Packages</th>
-                      <td>org.apache.tomcat.embed:tomcat-embed-core</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Vendor Advisory</th>
-                      <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Reference Link</th>
-                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
-                    </tr>
-                  </tbody>
-                </table>   
+                                      <tbody>
+                                        <tr>
+                                          <th scope="row">Resource ID</th>
+                                          <td>arn:aws:lambda:eu-central-1:211125372003:function:fra-sto-shr-uat-lda-evt-mgr-dbmigration:$LATEST</td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Region</th>
+                                          <td>eu-central-1</td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Affected Packages</th>
+                                          <td>org.springframework:spring-web</td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Vendor Advisory</th>
+                                          <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-22259" target="_blank">https://nvd.nist.gov/vuln/detail/CVE-2024-22259</a></td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="row">Reference Url</th>
+                                          <td>
+                                            <ul class="list-unstyled lh-base">
+                                              <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-22259" target="_blank">https://nvd.nist.gov/vuln/detail/CVE-2024-22259</a></li>
+                                              <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-22259" target="_blank">https://nvd.nist.gov/vuln/detail/CVE-2024-22259</a></li>
+                                            </ul>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>  
               </div>
             </div>
           </div>
@@ -966,6 +1033,15 @@ export default {
   border: none;
   border-bottom: 2px solid rgba(49, 33, 177, 1); 
 }
-
+.fixes-btn {
+    background-color:rgba(49, 33, 177, 1);
+    border-radius: 15px;
+    color: white;
+}
+.fixes-red-btn {
+    background-color:rgba(170, 0, 0, 1);
+    border-radius: 15px;
+    color: white;
+}
 
 </style>

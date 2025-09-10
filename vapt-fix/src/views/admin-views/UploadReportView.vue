@@ -65,27 +65,16 @@
                     </div>
                     <div class="col-8 mb-3">
                       <h4 class="fw-semibold">Pick location to upload report for:</h4>
-                      <p class="text-muted" style="font-size: 15px;">Pick a location and then add a vulnerability report for it</p>
-                      
+                      <p class="text-muted" style="font-size: 15px;">Pick a location and then add a vulnerability report for it</p> 
                     </div>
                   </div> 
                   <div class="d-flex justify-content-start gap-3">
                       <div>
                           <select v-model="selectedLocation" class="form-select" @change="checkLocation">
                             <option selected disabled value="">Select Location</option>
-                            <!-- <option>Apply for all locations</option>
-                            <option>Greece</option>
-                            <option>Germany</option>
-                            <option>Bahrain</option>
-                            <option>Delhi</option> -->
-                            <option
-      v-for="loc in locations"
-      :key="loc"
-      :value="loc"
-      :disabled="isAlreadyUploaded(loc)"
-    >
-      {{ loc }}
-    </option>
+                            
+                            <option v-for="loc in locations" :key="loc" :value="loc" :disabled="isAlreadyUploaded(loc)">
+                             {{ loc }}</option>
                           </select>
                       </div>
                   </div>
@@ -93,62 +82,84 @@
               </div>
               
               <div class="row ps-5">
-              <div class="col-lg-8 location-card text-center py-5">
+              <div class="col-lg-6 location-card text-center py-5">
                  <!-- Upload box -->
-      <div class="text-center py-5">
-        <!-- Before upload -->
-        <div v-if="!uploadingStarted">
-          <input
-            type="file"
-            ref="pdfFileInput"
-            accept=".nessus,.xml,.csv,.pdf,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            @change="handleFileUpload"
-            style="display: none"
-          />
-          <button class="btn upload-report-btn" @click="triggerFileInput" :disabled="!selectedLocation">
-            <i class="bi bi-arrow-up-circle fs-5"></i>
-          </button>
-          <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
-          <p class="text-muted location-subtext">
-            You can upload a PDF, CSV, Nessus, XML or Excel file
-          </p>
-        </div>
+              <div class="text-center py-5">
+                <!-- Before upload -->
+                <div v-if="!uploadingStarted">
+                  <input
+                    type="file"
+                    ref="pdfFileInput"
+                    accept=".nessus,.xml,.csv,.pdf,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    @change="handleFileUpload"
+                    style="display: none"
+                  />
+                  <button class="btn upload-report-btn" @click="triggerFileInput" :disabled="!selectedLocation">
+                    <i class="bi bi-arrow-up-circle fs-5"></i>
+                  </button>
+                  <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
+                  <p class="text-muted location-subtext">
+                    You can upload a PDF, CSV, Nessus, XML or Excel file
+                  </p>
+                </div>
 
-        <!-- Upload progress -->
-        <div v-if="uploadingStarted" class="upload-box mt-4">
-          <div class="progress-bar-container">
-            <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
-          </div>
-          <p class="text-muted mt-2">
-            {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }}
-          </p>
-          <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
-          <p class="text-muted">{{ uploadedFileSize }}</p>
-        </div>
-      </div>
+                <!-- Upload progress -->
+                <div v-if="uploadingStarted" class="upload-box mt-4">
+                  <div class="progress-bar-container">
+                    <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
+                  </div>
+                  <p class="text-muted mt-2">
+                    {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }}
+                  </p>
+                  <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
+                  <p class="text-muted">{{ uploadedFileSize }}</p>
+                  <div v-if="uploadProgress === 100" class="d-flex justify-content-center gap-2 mt-3">
+                    
+                    <button 
+                      class="btn btn-sm btn-primary" 
+                      @click="viewFile(uploadedFiles[uploadedFiles.length - 1])">
+                      <i class="bi bi-eye"></i> View
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-danger" 
+                      @click="deleteProgressFile(uploadedFiles.length - 1)">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
                </div>
                 
-              <div class="col-lg-4 py-2">
-                <div>
-                  
-                  <ul>
-          <li v-for="(file, index) in uploadedFiles" :key="index"><strong>{{ file.fileName }}</strong>
-            File has been uploaded for <strong>{{ file.location }}</strong>
-            <div class="d-flex flex-row gap-2 mt-1">
-              <button class="btn btn-sm btn-warning" @click="viewFile(file)">View</button>
-              <button class="btn btn-sm btn-danger ms-2" @click="removeFile(index)">Delete</button>
-            </div>
-          </li>
-        </ul>
+              <div class="col-lg-6">
+                <div v-if="uploadedFiles.length > 0" class="card border-0 shadow-sm py-3 px-3" style="border-radius: 18px;">
+                <h6 class="text-center my-2">Uploaded Files <i class="bi bi-cloud-check"></i></h6>
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>File Name</th>
+                      <th>Location</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(file, index) in uploadedFiles" :key="index">
+                      <td><strong>{{ file.fileName }}</strong></td>
+                      <td>{{ file.location }}</td>
+                      <td>
+                        <div class="d-flex gap-2">
+                          <button class="btn btn-sm btn-primary" @click="viewFile(file)"><i class="bi bi-eye"></i></button>
+                          <button class="btn btn-sm btn-danger" @click="deleteProgressFile(index)"> <i class="bi bi-trash"></i></button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
                 </div>
               </div>
               
-    <div
-      v-if="toastMessage"
-      class="toast-message"
-    >
-      {{ toastMessage }}
-    </div>
+              <div
+                v-if="toastMessage"
+                class="toast-message"> {{ toastMessage }}</div>
               </div>
               
             </div>
@@ -190,72 +201,87 @@ export default {
     return this.uploadedFiles.some(file => file.location === location);
   },
   checkLocation() {
-    if (this.isAlreadyUploaded(this.selectedLocation)) {
-      alert(`File is already uploaded for "${this.selectedLocation}"`);
-      this.selectedLocation = ""; // reset dropdown
-    }
-  },
+  if (this.isAlreadyUploaded(this.selectedLocation)) {
+    alert(`File is already uploaded for "${this.selectedLocation}"`);
+    this.selectedLocation = ""; // reset dropdown
+  } else {
+    // ✅ Reset upload state when user selects new location
+    this.uploadingStarted = false;
+    this.uploadProgress = 0;
+    this.uploadedFileName = "";
+    this.uploadedFileSize = "";
+    this.$refs.pdfFileInput.value = "";
+  }
+},
+  
     triggerFileInput() {
     this.$refs.pdfFileInput.click();
   },
+  
   handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file && this.selectedLocation) {
-      this.uploadingStarted = true;
-      this.uploadedFileName = file.name;
-      this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
-      this.uploadProgress = 0;
+  const file = event.target.files[0];
+  if (file && this.selectedLocation) {
+    this.uploadingStarted = true;
+    this.uploadedFileName = file.name;
+    this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
+    this.uploadProgress = 0;
 
-      let progress = 0;
-      const interval = setInterval(() => {
-        if (progress >= 100) {
-          clearInterval(interval);
+    let progress = 0;
+    const interval = setInterval(() => {
+      if (progress >= 100) {
+        clearInterval(interval);
 
-          // ✅ Create URL for viewing
-          const fileURL = URL.createObjectURL(file);
+        // ✅ Create URL for viewing
+        const fileURL = URL.createObjectURL(file);
 
-          this.uploadedFiles.push({
-            location: this.selectedLocation,
-            fileName: this.uploadedFileName,
-            fileURL: fileURL   
-          });
+        this.uploadedFiles.push({
+          location: this.selectedLocation,
+          fileName: this.uploadedFileName,
+          fileURL: fileURL   
+        });
 
-          this.showToast(`File "${this.uploadedFileName}" uploaded for ${this.selectedLocation} ✅`);
+        this.showToast(`File "${this.uploadedFileName}" uploaded for ${this.selectedLocation} ✅`);
 
-          this.selectedLocation = "";
-          this.uploadingStarted = false;
-          this.uploadProgress = 0;
-          this.uploadedFileName = "";
-          this.uploadedFileSize = "";
-          this.$refs.pdfFileInput.value = "";
-        } else {
-          progress += 20;
-          this.uploadProgress = progress;
-        }
-      }, 500);
-    }
-  },
+        // ❌ Don't reset here
+        // Keep showing uploaded file in the progress card
+      } else {
+        progress += 20;
+        this.uploadProgress = progress;
+      }
+    }, 500);
+  }
+},
+
   viewFile(file) {
     // ✅ Open the uploaded file in a new tab
     window.open(file.fileURL, "_blank");
   },
-  removeFile(index) {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This file will be permanently deleted!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.uploadedFiles.splice(index, 1);
-        Swal.fire("Deleted!", "Your file has been deleted.", "success");
-      }
-    });
-  },
+  deleteProgressFile(index) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This file will be permanently deleted!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "No, cancel"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Remove file from list
+      this.uploadedFiles.splice(index, 1);
+
+      // ✅ Reset upload bar + file info
+      this.uploadingStarted = false;
+      this.uploadProgress = 0;
+      this.uploadedFileName = "";
+      this.uploadedFileSize = "";
+      this.$refs.pdfFileInput.value = "";
+
+      Swal.fire("Deleted!", "Your file has been deleted.", "success");
+    }
+  });
+},
   showToast(message) {
     this.toastMessage = message;
     setTimeout(() => {

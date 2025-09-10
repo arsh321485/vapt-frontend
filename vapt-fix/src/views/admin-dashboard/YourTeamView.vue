@@ -28,7 +28,7 @@
                             </div>
                             </div>
                         </div>
-                        <p style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Technical(internal) (32)</p>
+                        <h5 style="color: rgba(0, 0, 0, 1);font-weight: 600;">Internal (32)</h5>
                         <div class="row mb-5">
                             <div class="col-8">
                                 
@@ -280,7 +280,7 @@
                         </div>
 
                         <!-- technical(external) -->
-                        <p style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;">Technical(external) (5)</p>
+                        <h5 style="color: rgba(0, 0, 0, 1);font-weight: 600;">External (5)</h5>
                         <div class="row">
                             <div class="col-8">
                                 

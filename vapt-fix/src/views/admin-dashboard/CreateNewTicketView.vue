@@ -18,7 +18,18 @@
                                     Back</router-link>
                                 <h2 class="ticket-head mt-3">Create a new ticket</h2>
                                 <form>
-                                <label class="ps-1 mt-5 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
+                                    <label class="ps-1 mt-5" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
+                                    Category</label>
+                                <div class="position-relative" style="width: 260px;">
+                                     <select class="form-select ps-3 py-2 pe-5 placeholder-style"
+                                        style="background-color: rgba(246, 246, 246, 1); border: none; border-radius: 8px;">
+                                    <option value="" disabled selected hidden>Select a category...</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                                </div>
+                                <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
                                     Asset</label>
                                 <div class="position-relative" style="width: 260px;">
                                      <select class="form-select ps-3 py-2 pe-5 placeholder-style"
@@ -34,17 +45,7 @@
                                     </form>
                                     <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">Description</label>
                                     <textarea type="text" class="form-control py-2 " rows="7" placeholder="Write a description..." style="border:none;background-color: rgba(246, 246, 246, 1); border-radius: 8px;"></textarea>
-                                <label class="ps-1 mt-5 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
-                                    Category</label>
-                                <div class="position-relative" style="width: 260px;">
-                                     <select class="form-select ps-3 py-2 pe-5 placeholder-style"
-                                        style="background-color: rgba(246, 246, 246, 1); border: none; border-radius: 8px;">
-                                    <option value="" disabled selected hidden>Select a category...</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
-                                </select>
-                                </div>
+                                
                                 <button type="submit" class="btn btn-ticket py-2 px-5 mt-5"><i class="bi bi-plus-lg"></i> Create a new ticket</button>
                             </div>
                             <div class="col-5">

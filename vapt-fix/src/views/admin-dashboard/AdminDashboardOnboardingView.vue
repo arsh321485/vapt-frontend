@@ -172,9 +172,9 @@
                   </div>
                    
                   <div class="notification-panel" :class="{ 'open': showNotifications, 'fullscreen': isFullscreen }">
-                  <div class="card shadow-lg border-0 rounded-4 bg-dark text-light h-100 d-flex flex-column">
+                  <div class="card shadow-lg border-0 rounded-4 text-light h-100 d-flex flex-column bg-dark">
                   <!-- Header -->
-                  <div class="card-header d-flex justify-content-between align-items-center bg-dark border-0">
+                  <div class="card-header d-flex justify-content-between align-items-center border-0">
                   <h5 class="mb-0 fw-semibold my-3 mx-3">Notifications</h5>
                   <div>
                   <!-- Filter -->
@@ -230,7 +230,7 @@
                 </p>
               </div>
                     <!-- Footer -->
-                    <div class="card-footer bg-dark border-0 d-flex justify-content-between mt-auto">
+                    <div class="card-footer border-0 d-flex justify-content-between mt-auto">
                        <button class="btn btn-light btn-sm" @click="toggleShowAll">
                        {{ showAll ? "View Less" : "View All Notifications" }}
                         </button>
@@ -245,7 +245,8 @@
 
             <div class="row">
               <div class="col-3">
-                <div class="card pb-2 pt-3 px-3">
+                <router-link to="/assets" class="text-decoration-none">
+                  <div class="card pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
@@ -255,7 +256,8 @@
                     <h1 class="text-212">212</h1>
                     <p style="margin-top: 37px;">Avg. score: <span class="fw-bold">7.8</span></p>
                   </div>
-                </div>
+                  </div>
+                </router-link>
               </div>
               <div class="col-9 gx-5">
                 <!-- Vulnerabilities -->
@@ -330,20 +332,42 @@
             </div>
 
             <div class="row mt-3">
-              <div class="col-4">
+              <div class="col-5">
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total Vulnerability Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Total Vulnerabilities Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
-                  <div class="d-flex flex-row justify-content-start gap-2 py-3">
+                  <div class="d-flex flex-row justify-content-start gap-5 ps-3">
                     <h1 class="text-78">78</h1>
-                    
+                    <div class="d-flex justify-content-center align-items-end mb-1">
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <div class="bar maroon vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: maroon;">● Critical<br> fixed</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">56</div>
+                        <div class="bar red vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● High <br> fixed</small>
+                      </div>
+                      
+                      <div class="text-center">
+                        <div id="mediumAge" class="fs-5 fw-semibold">127</div>
+                        <div class="bar yellow vul-bar mt-1"></div>
+                        <small class="text-warning mt-1 d-block">● Medium<br> fixed</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="lowAge" class="fs-5 fw-semibold">42</div>
+                        <div class="bar green vul-bar mt-1"></div>
+                        <small class="text-success mt-1 d-block">● Low<br> fixed</small>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="col-4">
+              <div class="col-3">
                 <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
@@ -356,7 +380,8 @@
                 </div>
               </div>
               <div class="col-4">
-                <div class="card h-100 pb-2 pt-3 px-3">
+                <router-link to="/exceptions" class="text-decoration-none">
+                  <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
@@ -378,6 +403,7 @@
                     </div>
                   </div>
                 </div>
+                </router-link>
               </div>
               <!-- <div class="col-3">
                 <div class="card h-100 pb-2 pt-3 px-3">
@@ -427,8 +453,13 @@
 
                   <div class="row mx-2 my-4">
                     <div class="d-flex justify-content-between">
-                        <div class="mt-2">
-                          <span style="color: rgba(0, 0, 0, 0.87);">Assigned to Patch Management team </span> 
+                        <div class="mt-2 d-flex align-items-center">
+                          <span style="color: rgba(0, 0, 0, 0.87);">
+                            Assigned to Patch Management team
+                          </span>
+                          <span class="badge rounded-circle bg-primary ms-2 mt-1 d-flex align-items-center justify-content-center" style="width: 18px; height: 18px;">
+                            4
+                          </span>
                         </div>
                       <div>
                         <router-link to="/mitigationstrategy">
@@ -445,7 +476,7 @@
                         </div>
                         <button type="button" class="btn patch-btn rounded-pill text-nowrap">
                       10 Days 
-                      <!-- <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i> -->
+                      
                         </button>
 
                         <!-- Inline Input (hidden by default) -->
@@ -710,7 +741,7 @@ export default {
         { type: "fixed", icon: "bi bi-check-circle", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> has been <span class='fw-semibold'>fixed</span> from Configuration Management.", time: "10 min ago" },
         { type: "assigned", icon: "bi bi-person-check", color: "text-primary", message: "A new vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> was <span class='fw-semibold'>assigned</span> to you from Network Security.", time: "15 min ago" },
         { type: "exception", icon: "bi bi-exclamation-triangle", color: "text-warning", message: "An <span class='fw-semibold'>exception</span> was raised for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> from Architectural Flaws.", time: "30 min ago" },
-        
+        { type: "download", icon: "bi bi-download", color: "text-primary", message: "Your report has been downloaded successfully.", time: "10 min ago" },
         
   { type: "mitigated", icon: "bi bi-shield-check", color: "text-success", message: "Vulnerability <b>Apache Struts RCE</b> has been successfully <span class='fw-semibold'>mitigated</span> by Security Team.", time: "5 min ago" },
 
