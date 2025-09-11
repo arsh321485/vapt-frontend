@@ -608,9 +608,6 @@
                             <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                             <span>High</span>
                             </span>
-                            <!-- <button class="btn btn-sm fixes-btn">
-                              View raised requests
-                            </button>   -->
                             <button class="btn btn-sm fixes-btn" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
                               View raised requests
                             </button>

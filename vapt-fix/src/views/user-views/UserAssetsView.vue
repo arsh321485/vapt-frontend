@@ -318,7 +318,7 @@
                                 <span>Critical</span>
                             </span>
                             <span class="d-flex align-items-center badge-open">
-                                <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(49, 33, 177, 1)"></span>
+                                <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: White;"></span>
                                 <span>Open</span>
                             </span>
                                 </div>
@@ -768,8 +768,8 @@ export default {
   }
 
   .badge-open {
-    background-color: rgba(230, 227, 255, 1);
-    color: rgba(49, 33, 177, 1);
+    background-color: rgb(194, 60, 60);
+    color: white;
     font-weight: 600;
     font-size: 0.75rem;
     padding: 4px 8px;

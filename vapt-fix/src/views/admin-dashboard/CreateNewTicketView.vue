@@ -20,15 +20,15 @@
                                 <form>
                                     <label class="ps-1 mt-5 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
                                     Category</label>
-                                <div class="position-relative" >
-                                     <select class="form-select ps-3 py-2 pe-5 placeholder-style"
+                                    <div class="position-relative">
+                                     <select v-model="selectedCategory" class="form-select ps-3 py-2 pe-5 placeholder-style"
                                         style="background-color: rgba(246, 246, 246, 1); border: none; border-radius: 8px;">
                                     <option value="" disabled selected hidden>Select a category...</option>
-                                    <option >Report a bug ?</option>
-                                    <option >The fix steps not working (we contact the vendor on your behalf)?</option>
+                                    <option value="bug">Report a bug ?</option>
+                                    <option value="fix">The fix steps not working (we contact the vendor on your behalf)?</option>
                                     
-                                </select>
-                                </div>
+                                    </select>
+                                    </div>
                                 <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
                                     Asset</label>
                                 <div class="position-relative" style="width: 260px;">
@@ -43,9 +43,10 @@
                                     <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">Subject</label>
                                     <input type="text" class="form-control py-2" placeholder="Write a subject..." style="border:none;background-color: rgba(246, 246, 246, 1); border-radius: 8px;">
                                     </form>
+                                    <div class="mt-3">
                                     <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">Description</label>
-                                    <textarea type="text" class="form-control py-2 " rows="7" placeholder="Please make sure you have followed our steps. what is the real problem you are facing. which team do you want support from?" style="border:none;background-color: rgba(246, 246, 246, 1); border-radius: 8px;"></textarea>
-                                
+                                    <textarea type="text" class="form-control py-2 " rows="7" :placeholder="descriptionPlaceholder" style="border:none;background-color: rgba(246, 246, 246, 1); border-radius: 8px;"></textarea>
+                                    </div>
                                 <button type="submit" class="btn btn-ticket py-2 px-5 mt-5"><i class="bi bi-plus-lg"></i> Create a new ticket</button>
                             </div>
                             <div class="col-4">
@@ -82,9 +83,18 @@ export default {
     },
     data() {
     return {
-      selectedLocation: "greece" // default selected
+      selectedLocation: "greece", 
+      selectedCategory: "",
     };
-}
+},
+ computed: {
+    descriptionPlaceholder() {
+      if (this.selectedCategory === "fix") {
+        return "Please make sure you have followed our steps. What is the real problem you are facing? Which team do you want support from?"
+      }
+      return "Write your description here"
+    },
+  },
 };
 </script>
 
