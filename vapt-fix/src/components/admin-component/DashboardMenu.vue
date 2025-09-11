@@ -34,7 +34,7 @@
           <router-link to="/exceptions">
           <button class="btn border-0" :class="{ activeBtn: isActive('/exceptions') }">
           <i class="bi bi-exclamation-circle fs-5 nav-menu"></i>
-          <p class="menu-heading">Exceptions</p></button>
+          <p class="menu-heading">Support Requests</p></button>
           </router-link>
         </div>
 

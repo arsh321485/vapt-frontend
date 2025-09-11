@@ -138,19 +138,19 @@
                     <tr>
                       <th>File Name</th>
                       <th>Location</th>
-                      <th>Actions</th>
+                      <!-- <th>Actions</th> -->
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(file, index) in uploadedFiles" :key="index">
                       <td><strong>{{ file.fileName }}</strong></td>
                       <td>{{ file.location }}</td>
-                      <td>
+                      <!-- <td>
                         <div class="d-flex gap-2">
                           <button class="btn btn-sm btn-primary" @click="viewFile(file)"><i class="bi bi-eye"></i></button>
                           <button class="btn btn-sm btn-danger" @click="deleteProgressFile(index)"> <i class="bi bi-trash"></i></button>
                         </div>
-                      </td>
+                      </td> -->
                     </tr>
                   </tbody>
                 </table>

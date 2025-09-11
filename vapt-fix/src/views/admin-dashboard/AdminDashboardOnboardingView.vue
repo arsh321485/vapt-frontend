@@ -457,9 +457,10 @@
                           <span style="color: rgba(0, 0, 0, 0.87);">
                             Assigned to Patch Management team
                           </span>
-                          <span class="badge rounded-circle bg-primary ms-2 mt-1 d-flex align-items-center justify-content-center" style="width: 18px; height: 18px;">
-                            4
+                          <span class="badge rounded-pill bg-primary ms-2 mt-1 d-flex align-items-center justify-content-center" style="width: 80px; height: 18px;">
+                            4 Members
                           </span>
+                          
                         </div>
                       <div>
                         <router-link to="/mitigationstrategy">
