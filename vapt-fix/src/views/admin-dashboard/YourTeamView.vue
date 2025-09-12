@@ -197,7 +197,6 @@
                                     <div class="modal-body my-4 ms-3 me-4">
                                         <div class="container">
                                             <div class="row mb-3">
-                                            <!-- User Type -->
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">User Type</label>
                                                 <select class="form-select rounded-0 uniform-input">
@@ -206,8 +205,6 @@
                                                 <option value="external">External</option>
                                                 </select>
                                             </div>
-
-                                            <!-- Location -->
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">Select Location</label>
                                                 <select class="form-select rounded-0 uniform-input">
@@ -217,11 +214,9 @@
                                                 <option>Bahrain</option>
                                                 </select>
                                             </div>
-
-                                            <!-- Role -->
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">Member Role</label>
-                                                <div class="multi-select-dropdown" ref="roleDropdown3">
+                                                <div class="modal-multi-select-dropdown" ref="roleDropdown3">
                                                 <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown3')">
                                                     <span>{{ selectedRoleText3 }}</span>
                                                     <span><i class="bi bi-chevron-down"></i></span>
@@ -239,7 +234,7 @@
                                                 </div>
                                             </div>
                                             </div>
-                                            <div class="row">
+                                            <div class="row mb-4">
                                             <div class="col-12">
                                                 <label class="form-label fw-semibold text-center w-100">Copy Link</label>
                                                 <div class="position-relative w-100">
@@ -264,7 +259,63 @@
                                                 </div>
                                             </div>
                                             </div>
-                                            
+                                            <div class="row mb-3">
+                                            <div class="d-flex justify-content-start">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon me-2 mb-3">
+                      <i class="bi bi-person-fill fs-5"></i>
+                    </div>
+                                            <h5 class="fw-semibold mt-2 ">Add users</h5></div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold text-center w-100">User Type</label>
+                                                <select class="form-select rounded-0 uniform-input">
+                                                <option selected disabled>Select type</option>
+                                                <option value="internal">Internal</option>
+                                                <option value="external">External</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold text-center w-100">Select Location</label>
+                                                <select class="form-select rounded-0 uniform-input">
+                                                <option selected disabled>Select location</option>
+                                                <option>Germany</option>
+                                                <option>Delhi</option>
+                                                <option>Bahrain</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold text-center w-100">Member Role</label>
+                                                <div class="modal-multi-select-dropdown" ref="roleDropdown2">
+                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
+                                  <span>{{ selectedRoleText2 }}</span>
+                                  <span><i class="bi bi-chevron-down"></i></span>
+                                </div>
+                                <div class="dropdown-list" v-show="isOpen.dropdown2">
+                                  <label v-for="option in roleOptions" :key="option.short">
+                                    <input
+                                      type="checkbox"
+                                      :value="option.short"
+                                      v-model="selectedRoles2"
+                                    />
+                                    {{ option.full }}
+                                  </label>
+                                </div>
+                              </div>
+                                            </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                <label class="form-label fw-semibold text-center w-100">First Name</label>
+                                                <input class="form-control uniform-input rounded-0" type="text">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-semibold text-center w-100">Last Name</label>
+                                                    <input class="form-control rounded-0" type="text">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-semibold text-center w-100">Email</label>
+                                                    <input class="form-control rounded-0" type="email">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -502,6 +553,7 @@ export default {
     onClickOutside(event) {
       const isClickInsideDropdown1 = this.$refs.roleDropdown1.contains(event.target);
       const isClickInsideDropdown2 = this.$refs.roleDropdown2.contains(event.target);
+      const isClickInsideDropdown3 = this.$refs.roleDropdown3.contains(event.target);
       if (!isClickInsideDropdown1) {
         this.isOpen.dropdown1 = false;
       }
@@ -526,6 +578,11 @@ export default {
 .multi-select-dropdown {
     position: relative;
     width: 250px;
+}
+
+.modal-multi-select-dropdown {
+    position: relative;
+    /* width: 250px; */
 }
 
 .dropdown-input {
@@ -600,4 +657,10 @@ export default {
     .nav-item i {
         margin-right: 5px;
     }
+    .uniform-input {
+  height: 42px; 
+  line-height: 32px;
+  padding: 0 8px; 
+   
+}
 </style>
