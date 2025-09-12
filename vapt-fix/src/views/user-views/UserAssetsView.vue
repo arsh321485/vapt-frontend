@@ -367,7 +367,7 @@
           class="nav-link" 
           :class="{ active: activeTab === 'exceptions' }" 
           @click="activeTab = 'exceptions'">
-          Exception Requests <span class="badge rounded-circle bg-danger ms-1" style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">
+          Support Requests <span class="badge rounded-circle bg-danger ms-1" style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">
     2
   </span>
         </button>

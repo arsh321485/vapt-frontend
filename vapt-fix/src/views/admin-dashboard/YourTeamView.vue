@@ -196,7 +196,6 @@
                                     </div>
                                     <div class="modal-body my-4 ms-3 me-4">
                                         <div class="container">
-                                            <!-- Row 1: Type, Location, Role -->
                                             <div class="row mb-3">
                                             <!-- User Type -->
                                             <div class="col-md-4">
@@ -240,8 +239,6 @@
                                                 </div>
                                             </div>
                                             </div>
-
-                                            <!-- Row 2: Copy Link (full width) -->
                                             <div class="row">
                                             <div class="col-12">
                                                 <label class="form-label fw-semibold text-center w-100">Copy Link</label>
@@ -267,6 +264,7 @@
                                                 </div>
                                             </div>
                                             </div>
+                                            
                                         </div>
                                     </div>
 

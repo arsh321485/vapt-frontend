@@ -38,13 +38,7 @@
                                 <button class="btn btn-outline-secondary btn-pill text-dark">June 1 - June 30 <i
                                         class="bi bi-calendar-minus ms-2"></i>
                                     </button>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                </select></div>
+                                
                                 
                             </div>
                         </div>

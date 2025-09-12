@@ -205,33 +205,7 @@
                       <!-- <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i> -->
                         </button>
 
-                    <!-- Inline Input (hidden by default) -->
-<div id="inlineInput" class="mt-2" style="display: none;">
-  <input type="text" class="form-control d-inline w-50" id="userInput" placeholder="Enter something...">
-  <button class="btn btn-primary ms-2" id="saveBtn">Save</button>
-</div>
-
-                    <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h6 class="modal-title" id="exampleModalLabel">Reason for changing mitigation deadline to <span id="modalText"></span></h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <div class="modal-body">
-        <textarea class="form-control" style="border-radius: 8px;" id="exampleFormControlTextarea1" rows="3"></textarea>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
-      </div>
-      
-    </div>
-  </div>
-</div>
+                    
 
 
                       </div>

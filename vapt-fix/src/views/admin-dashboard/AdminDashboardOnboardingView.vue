@@ -172,15 +172,15 @@
                   </div>
                    
                   <div class="notification-panel" :class="{ 'open': showNotifications, 'fullscreen': isFullscreen }">
-                  <div class="card shadow-lg border-0 rounded-4 text-light h-100 d-flex flex-column bg-dark">
+                  <div class="card shadow-lg border-0 rounded-4 text-light h-100 d-flex flex-column" style="background-color: white;">
                   <!-- Header -->
                   <div class="card-header d-flex justify-content-between align-items-center border-0">
-                  <h5 class="mb-0 fw-semibold my-3 mx-3">Notifications</h5>
+                  <h5 class="mb-0 fw-semibold my-3 mx-3 text-dark">Notifications</h5>
                   <div>
                   <!-- Filter -->
                   <div class="btn-group me-2">
                     <button 
-                      class="btn btn-sm btn-outline-light dropdown-toggle" 
+                      class="btn btn-sm btn-light dropdown-toggle" 
                       type="button" 
                       data-bs-toggle="dropdown"
                     >
@@ -196,12 +196,12 @@
                   </div>
 
                   <!-- Fullscreen -->
-                  <button class="btn btn-sm btn-outline-light me-2" @click="toggleFullscreen">
+                  <button class="btn btn-sm btn-light me-2" @click="toggleFullscreen">
                     <i class="bi bi-arrows-fullscreen"></i>
                   </button>
 
                   <!-- Close -->
-                  <button class="btn-close btn-close-white" @click="toggleNotificationPanel"></button>
+                  <button class="btn-close btn-close-dark" @click="toggleNotificationPanel"></button>
                 </div>
               </div>
 
@@ -210,7 +210,7 @@
                 <div 
                   v-for="(notification, index) in filteredNotifications" 
                   :key="index" 
-                  class="d-flex align-items-start py-2 border-bottom"
+                  class="d-flex align-items-start py-2 border-bottom text-dark"
                 >
                   <i :class="['me-3 fs-5', notification.icon, notification.color]"></i>
                   <div>
@@ -231,10 +231,10 @@
               </div>
                     <!-- Footer -->
                     <div class="card-footer border-0 d-flex justify-content-between mt-auto">
-                       <button class="btn btn-light btn-sm" @click="toggleShowAll">
+                       <button class="btn btn-dark btn-sm" @click="toggleShowAll">
                        {{ showAll ? "View Less" : "View All Notifications" }}
                         </button>
-                      <button class="btn btn-outline-light btn-sm" @click="markAllAsRead">Mark All as Read</button>
+                      <button class="btn btn-dark btn-sm" @click="markAllAsRead">Mark All as Read</button>
                     </div>
                   </div>
                   </div>
@@ -385,7 +385,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Exceptions<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Support Requests<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row gap-5 py-3">
                     <h1 class="text-78">32</h1>
@@ -405,21 +405,7 @@
                 </div>
                 </router-link>
               </div>
-              <!-- <div class="col-3">
-                <div class="card h-100 pb-2 pt-3 px-3">
-                  <div class="d-flex flex-row justify-content-start gap-2">
-                    <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
-                    </div>
-                    <p class="assets-para">Remediation Throughput<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
-                  </div>
-                  <div class="d-flex flex-row justify-content-start gap-2 py-3">
-                    <h1 class="text-78">32</h1>
-                    <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
-                  </div>
-                </div>
-              </div> -->
+              
             </div>
 
             <div class="row mt-3">
@@ -428,7 +414,7 @@
                   <div class="d-flex flex-row align-items-center justify-content-between py-3">
                     <h4 class="fw-semibold">Mitigation Strategy</h4>
                     <button type="button" class="btn pending-approval-btn rounded-pill">
-                11 Compensatory controls pending approval
+                11 Support controls pending approval
                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
               </button>
                   </div>

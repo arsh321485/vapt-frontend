@@ -397,7 +397,7 @@
                             class="nav-link" 
                             :class="{ active: activeTab === 'exceptions' }" 
                             @click="activeTab = 'exceptions'">
-                            Exception Requests <span class="badge rounded-circle bg-danger ms-1" style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">
+                            Support Requests <span class="badge rounded-circle bg-danger ms-1" style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">
                       2
                     </span>
                           </button>
@@ -573,25 +573,33 @@
                                                   </div>
                                               </div>
                           </div>
-                          <div class="row mt-3 pt-3 px-4">
-                            <div class="card p-4 my-3">
+                          <div class="row mt-3 pt-3 px-3">
+                            <div class="card p-2 my-3">
                               <h4>Fixed</h4>
-                              <div class="d-flex justify-content-start align-items-center gap-3 mt-2">
+                              <div class="d-flex justify-content-start align-items-center gap-2 mt-2">
                                   <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
                                   <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
                                   <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                                   <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                                   <span>High</span>
                                   </span>
+                                  <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
+                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                                  <span>Close</span>
+                                  </span>
                                   <router-link to="/vulnerabilitycard" class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3" style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
                                 </div> 
                                 
-                                <div class="d-flex justify-content-start align-items-center gap-3">
+                                <div class="d-flex justify-content-start align-items-center gap-2">
                                   <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">5</p>
                                   <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
                                   <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                                   <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                                   <span>High</span>
+                                  </span>
+                                  <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
+                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                                  <span>Close</span>
                                   </span>
                                   <router-link to="/vulnerabilitycard" class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3" style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
                                 </div>
@@ -806,7 +814,6 @@ export default {
         severity: this.selectedSeverity,
         ip: this.ipAddress,
       });
-      // here you can filter your vulnerabilities list
     },
   },
    mounted() {
@@ -826,8 +833,8 @@ export default {
     options.forEach(option => {
       option.addEventListener('click', (e) => {
         e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
+        btn.textContent = option.textContent; 
+        dropdown.classList.remove('show');
       });
     });
 
@@ -869,6 +876,15 @@ export default {
 
   .badge-open {
     background-color: rgb(194, 60, 60);
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+
+  .badge-close {
+    background-color:green;
     color: white;
     font-weight: 600;
     font-size: 0.75rem;

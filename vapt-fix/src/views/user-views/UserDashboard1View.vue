@@ -12,10 +12,50 @@
 
           <div class="col-11 pt-2 pb-3 pe-5">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
-              <div>
-                <h2>Vulnerability Management Program</h2>
-                <p style="color: rgba(0, 0, 0, 0.6);font-size:16px;font-weight: 500;">Patch management team</p>
+              <div class="d-flex justify-content-start gap-2">
+                <div>
+                  <h2>Vulnerability Management Program</h2>
+                  <p style="color: rgba(0, 0, 0, 0.6);font-size:16px;font-weight: 500;">Patch management team</p>
+                </div>
+                <div>
+                    <button class="btn border-0" @click="toggleCalendar">
+                      <i class="bi bi-calendar3 fs-4"></i>
+                    </button>
+                    <div
+                      v-if="showCalendar"
+                      class="calendar border rounded p-3 shadow"
+                      style="width: 320px; position: absolute; background: #fff; z-index: 1000;"
+                    >
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <button class="btn btn-sm btn-light" @click="prevMonth">&lt;</button>
+                        <h6 class="mb-0">
+                          {{ monthYear }}
+                        </h6>
+                        <button class="btn btn-sm btn-light" @click="nextMonth">&gt;</button>
+                      </div>
+                      <div class="d-grid text-center fw-bold" style="grid-template-columns: repeat(7, 1fr);">
+                        <div v-for="day in weekDays" :key="day">{{ day }}</div>
+                      </div>
+                      <div
+                        class="d-grid text-center"
+                        style="grid-template-columns: repeat(7, 1fr); gap: 3px;"
+                      >
+                        <div v-for="n in firstDayOfMonth" :key="'empty-' + n"></div>
+                        <div
+                          v-for="date in daysInMonth"
+                          :key="date"
+                          class="p-2 border rounded"
+                          :class="getSeverityClass(date)"
+                          style="cursor: pointer;"
+                          @click="handleDateClick(date)"
+                        >
+                          {{ date }}
+                        </div>
+                      </div>
+                    </div>
+                </div>
               </div>
+
               <div class="d-flex flex-column gap-3">
                 <div class="d-flex justify-content-end">
                   <div class="dropdown">
@@ -28,14 +68,14 @@
                   </div>
                 </div>
                 <button type="button" class="btn pending-approval-btn rounded-pill">
-                11 Compensatory controls requested
+                11 Support requests raised
                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
               </button>
               </div>
             </div>
 
             <div class="row">
-              <div class="col-4">
+              <div class="col-3">
                 <div class="card pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
@@ -48,281 +88,779 @@
                   </div>
                 </div>
               </div>
-              <div class="col-4">
-                <div class="card pb-2 pt-3 px-3">
-                  <div class="d-flex flex-row justify-content-between gap-2">
+              <div class="col-9 gx-5">
+                <!-- Vulnerabilities -->
+                <div class="row px-3 pb-3"
+                  style="border: 1px solid rgba(217, 217, 217, 1);border-radius: 5px;padding-top: 15px;">
+                  <div class="col-md-5">
                     <div class="d-flex flex-row justify-content-start gap-2">
-                    <div class="assets-green-icon text-center"><i class="bi bi-check2" style="color: rgba(0, 105, 0, 1);"></i>
+                      <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
+                      </div>
+                      <p class="assets-para">Vulnerabilities<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
-                    <p class="assets-para">Fixed</p>
-                  </div>
-                  <router-link 
-                    to="/fixedvulnerabilities" 
-                    style="text-decoration: none; color: rgba(49, 33, 177, 1); font-weight: 600;"
-                  >
-                    Details <i class="bi bi-arrow-right"></i>
-                  </router-link>
-                  </div>
-                  <div class="d-flex flex-row justify-content-start gap-2">
-                    <h1 style="color: rgba(0, 105, 0, 1);font-weight: 500;font-size: 60px;">46</h1>
-                    
-                  </div>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="card pb-2 pt-3 px-3">
-                  <div class="d-flex flex-row justify-content-between gap-2">
-                    <div class="d-flex flex-row justify-content-start gap-2">
-                    <div class="assets-yellow-icon text-center"><i class="bi bi-three-dots"></i>
-                    </div>
-                    <p class="assets-para">Pending</p>
-                  </div>
-                  <router-link 
-                    to="/pendingvulnerabilities" 
-                    style="text-decoration: none; color: rgba(49, 33, 177, 1); font-weight: 600;"
-                  >
-                    Details <i class="bi bi-arrow-right"></i>
-                  </router-link>
-                  </div>
-                  <div class="d-flex flex-row justify-content-start gap-2">
-                    <h1 style="color: rgba(195, 136, 0, 1);font-weight: 500;font-size: 60px;">81</h1>
-                    
-                  </div>
-                </div>
-              </div>
-              <!-- <div class="col-3">
-                <div class="card pb-2 pt-3 px-3">
-                  <div class="d-flex flex-row justify-content-between gap-2">
-                    <div class="d-flex flex-row justify-content-start gap-2">
-                    <div class="assets-red-icon text-center"><i class="bi bi-clock"></i>
-                    </div>
-                    <p class="assets-para">Delayed</p>
-                  </div>
-                  <router-link 
-                    to="/delayedvulnerabilities" 
-                    style="text-decoration: none; color: rgba(49, 33, 177, 1); font-weight: 600;"
-                  >
-                    Details <i class="bi bi-arrow-right"></i>
-                  </router-link>
-                  </div>
-                  <div class="d-flex flex-row justify-content-start gap-2">
-                    <h1 style="color: rgba(173, 0, 0, 1);font-weight: 500;font-size: 60px;">35</h1>
-                    
-                  </div>
-                </div>
-              </div> -->
-            </div>
-
-            <div class="row mt-3">
-              <div class="col-12">
-                <div class="card pb-2 pt-3 px-3">
-                  <div class="d-flex flex-row align-items-center justify-content-between p-b3">
-                    <h4>Vulnerabilities assigned to you</h4>
-                     <router-link to="/userVulnerabilityregister" style="color: rgba(49, 33, 177, 1);font-weight: 500;text-decoration: none;">
-                      View all
-                     </router-link>
-                  </div>
-                  <div class="row mt-3">
-                    <div class="col-12">
-                      <div class="d-flex gap-3">
-                        <button class="btn btn-primary btn-pill active-tab fw-semibold">
-                          Due this week
-                        </button>
-                        <button class="btn btn-outline-secondary btn-pill text-dark">
-                          Steps <i class="bi bi-arrow-down"></i>
-                        </button>
-                        <button class="btn btn-pill btn-outline-secondary" style="color: maroon;">Critical</button>
-                                <button class="btn btn-outline-secondary btn-pill text-danger">High</button>
-                                <button class="btn btn-outline-secondary btn-pill text-warning">Medium</button>
-                                <button class="btn btn-outline-secondary btn-pill text-success">Low</button>
+                    <div class="d-flex justify-content-center align-items-end mb-1">
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <div class="bar maroon vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">56</div>
+                        <div class="bar red vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● High</small>
+                      </div>
+                      
+                      <div class="text-center">
+                        <div id="mediumAge" class="fs-5 fw-semibold">127</div>
+                        <div class="bar yellow vul-bar mt-1"></div>
+                        <small class="text-warning mt-1 d-block">● Medium</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="lowAge" class="fs-5 fw-semibold">42</div>
+                        <div class="bar green vul-bar mt-1"></div>
+                        <small class="text-success mt-1 d-block">● Low</small>
                       </div>
                     </div>
                   </div>
 
-                 <div class="row mt-5">
-                            <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
-                                        <tr>
-                                            <th scope="col">Vul. name</th>
-                                            <th scope="col">OS</th>
-                                            <th scope="col">Severity</th>
-                                            <th scope="col">Assigned on</th>
-                                            <!-- <th scope="col">Dependency</th> -->
-                                            <th scope="col">Total steps</th>
-                                            <th scope="col">Due on</th>
-                                            
-                                        </tr>
-                                    </thead>
-                                    <tbody class="raised-tbody">
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td class="text-danger">High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <!-- <td>23/06/2025 <i class="bi bi-plus-circle"></i></td> -->
-                                            <td>
-                                              <input
-                                              class="border-0"
-                                                type="date"
-                                                ref="dateInput"
-                                                v-model="selectedDate"
-                                                @click="openCalendar"
-                                              />
-                                            </td>
-                                            <td><router-link to="/userVulnerabilityregister" class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">
-                                              Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i>
-                                            </router-link></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td class="text-warning">Medium</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td>
-                                              <input
-                                              class="border-0"
-                                                type="date"
-                                                ref="dateInput"
-                                                v-model="selectedDate"
-                                                @click="openCalendar"
-                                              />
-                                            </td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td style="color: maroon;">Critical</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td>
-                                              <input
-                                              class="border-0"
-                                                type="date"
-                                                ref="dateInput"
-                                                v-model="selectedDate"
-                                                @click="openCalendar"
-                                              />
-                                            </td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td class="text-success">Low</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td>
-                                              <input
-                                              class="border-0"
-                                                type="date"
-                                                ref="dateInput"
-                                                v-model="selectedDate"
-                                                @click="openCalendar"
-                                              />
-                                            </td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td class="text-danger">High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td>
-                                              <input
-                                              class="border-0"
-                                                type="date"
-                                                ref="dateInput"
-                                                v-model="selectedDate"
-                                                @click="openCalendar"
-                                              />
-                                            </td>
-                                            <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
-                                        </tr>
-                                        
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                  
+                  <!-- Divider -->
+                  <div class="col-md-1 d-flex justify-content-center">
+                    <div class="divider-vertical"></div>
+                  </div>
+
+                  <!-- Vulnerability aging -->
+                  <div class="col-md-6">
+                    <div class="mb-2">
+                      <p class="assets-para">Mitigation Timeline<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mb-1">
+                      <div class="text-center">
+                        <div id="highCount" class="fs-4 fw-semibold">1d 10hrs</div>
+                        <div class="bar maroon w-100 mt-1"></div>
+                        <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="highCount" class="fs-4 fw-semibold">2d 11hrs</div>
+                        <div class="bar red w-100 mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● High</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="mediumCount" class="fs-4 fw-semibold">3d 4hrs</div>
+                        <div class="bar yellow w-100 mt-1"></div>
+                        <small class="text-warning mt-1 d-block">● Medium</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="lowCount" class="fs-4 fw-semibold">2d 2hrs</div>
+                        <div class="bar green w-100 mt-1"></div>
+                        <small class="text-success mt-1 d-block">● Low</small>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="row mt-3">
-              <div class="col-12">
-                <div class="card pb-2 pt-3 px-3">
-                  <div class="d-flex flex-row align-items-center justify-content-between p-b3">
-                    <h4>Compensatory controls requested</h4>
+              <div class="col-5">
+                <div class="card h-100 pb-2 pt-3 px-3">
+                  <div class="d-flex flex-row justify-content-start gap-2">
+                    <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
+                    </div>
+                    <p class="assets-para">Total Vulnerabilities Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
-
-                 <div class="row mt-2">
-                            <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
-                                        <tr>
-                                            <th scope="col">Vul. name</th>
-                                            <th scope="col">Asset</th>
-                                            <th scope="col">Comment added</th>
-                                            <th scope="col">Requested to</th>
-                                            <th scope="col">Date requested</th>
-                                            <th scope="col">Status</th>
-                                            
-                                        </tr>
-                                    </thead>
-                                    <tbody class="raised-tbody">
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td style="color: rgba(179, 122, 0, 1);">Pending action</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td style="color: rgba(179, 122, 0, 1);">Pending action</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td style="color: rgba(179, 122, 0, 1);">Pending action</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>High</td>
-                                            <td>23/06/2025</td>
-                                            <td>23/06/2025</td>
-                                            <td style="color: rgba(179, 122, 0, 1);">Pending action</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                  
+                  <div class="d-flex flex-row justify-content-start gap-5 ps-3">
+                    <h1 class="text-78">78</h1>
+                    <div class="d-flex justify-content-center align-items-end mb-1">
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <div class="bar maroon vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: maroon;">● Critical<br> fixed</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">56</div>
+                        <div class="bar red vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● High <br> fixed</small>
+                      </div>
+                      
+                      <div class="text-center">
+                        <div id="mediumAge" class="fs-5 fw-semibold">127</div>
+                        <div class="bar yellow vul-bar mt-1"></div>
+                        <small class="text-warning mt-1 d-block">● Medium<br> fixed</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="lowAge" class="fs-5 fw-semibold">42</div>
+                        <div class="bar green vul-bar mt-1"></div>
+                        <small class="text-success mt-1 d-block">● Low<br> fixed</small>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+              <div class="col-3">
+                <div class="card h-100 pb-2 pt-3 px-3">
+                  <div class="d-flex flex-row justify-content-start gap-2">
+                    <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
+                    </div>
+                    <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                  </div>
+                  <div class="d-flex flex-row justify-content-start gap-2 py-3">
+                    <h1 class="text-78">2d 11 hrs</h1>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                  <div class="card h-100 pb-2 pt-3 px-3">
+                  <div class="d-flex flex-row justify-content-start gap-2">
+                    <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
+                    </div>
+                    <p class="assets-para">Support Requests<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                  </div>
+                  <div class="d-flex flex-row gap-5 py-3">
+                    <h1 class="text-78">32</h1>
+                    <div class="d-flex justify-content-center align-items-end mb-1">
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">14</div>
+                        <div class="bar red vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● Pending</small>
+                      </div>
+                      <div class="text-center">
+                        <div id="highAge" class="fs-5 fw-semibold">18</div>
+                        <div class="bar blue vul-bar mt-1" style="color: blue;"></div>
+                        <small class="mt-1 d-block" style="color: blue;">● Approved</small>
+                      </div> 
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+
+            <div class="row mt-4">
+              <h4>Patch Management</h4>
+              <div class="d-flex gap-4 my-3">
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
+                      </div>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-danger">High</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
+                      </div>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-warning">Medium</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
+                      </div>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-success">Low</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
+                      </div>
+              </div>
+              <div class="row mt-2">
+                <div class="">
+                    <div class="d-flex justify-content-between">
+                      <p style="color: rgba(0, 0, 0, 0.6);font-weight: 
+                      600;font-size: 15px;">Missing security updates</p>
+                      <p style="cursor: pointer;color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View all</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                          <div class="card py-4 px-3" style="border-radius: 12px;">
+                                <div class="d-flex justify-content-between">
+                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
+                                    
+                                </div>
+                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
+                                  VMware ESXi 7.0/8.0 Sandbox Escape...
+                                </h4>
+                                <div class="d-flex justify-content-start mt-2">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                     
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                 <div class="text-end">
+                                  <router-link to="" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                      Details <i class="bi bi-arrow-right"></i>
+                                    </router-link>
+                                 </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1">
+                  <!-- blank -->
+                </div>
+              </div>
+
+            <div class="row my-5">
+                <div class="">
+                    <div class="d-flex justify-content-between">
+                      <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">Operating system vulnerabilities by version</p>
+                    <p style="cursor: pointer;color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View all</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1">
+                  <!-- blank -->
+                </div>
+            </div>
+
+            <div class="row my-5">
+                <div class="">
+                    <div class="d-flex justify-content-between">
+                      <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">Application vulnerabilities by software packages</p>
+                    <p style="cursor: pointer;color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View all</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1">
+                  <!-- blank -->
+                </div>
+            </div>
+
+            <div class="row my-5">
+                <div class="">
+                    <div class="d-flex justify-content-between">
+                      <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">End of life systems requiring replacement</p>
+                    <p style="cursor: pointer;color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View all</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="card py-3 px-3" style="border-radius: 12px;">
+                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
+                                <div class="d-flex justify-content-between">
+                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
+                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                                <span class="text-danger fw-bold">11</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
+                                <span class="text-danger fw-bold">4</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                                <span class="text-warning fw-bold">8</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1"
+                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                                <span class="text-success fw-bold">0</span>
+                              </span>
+                                </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1">
+                  <!-- blank -->
+                </div>
+            </div>
             </div>
 
           </div>
@@ -344,19 +882,68 @@ export default {
   },
   data() {
     return {
-      selectedDate: "2025-06-23",
+      showCalendar: false,
+      currentDate: new Date(),
+      weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      vulnerabilities: {
+        12: "critical",
+        15: "high",
+        20: "medium",
+        23: "low",
+      },
     };
   },
   computed: {
-    formattedDate() {
-      if (!this.selectedDate) return "";
-      const [year, month, day] = this.selectedDate.split("-");
-      return `${day}/${month}/${year}`; 
+    daysInMonth() {
+      const year = this.currentDate.getFullYear();
+      const month = this.currentDate.getMonth();
+      return new Date(year, month + 1, 0).getDate();
+    },
+    firstDayOfMonth() {
+      const year = this.currentDate.getFullYear();
+      const month = this.currentDate.getMonth();
+      return new Date(year, month, 1).getDay();
+    },
+    monthYear() {
+      return this.currentDate.toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+    
     },
   },
   methods: {
-    openCalendar() {
-      this.$refs.dateInput.click();
+    toggleCalendar() {
+      this.showCalendar = !this.showCalendar;
+    },
+    prevMonth() {
+      this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+      this.currentDate = new Date(this.currentDate); 
+    },
+    nextMonth() {
+      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      this.currentDate = new Date(this.currentDate);
+    },
+    getSeverityClass(date) {
+      const severity = this.vulnerabilities[date];
+      switch (severity) {
+        case "critical":
+          return "bg-maroon text-white";
+        case "high":
+          return "bg-red text-white";
+        case "medium":
+          return "bg-warning text-dark";
+        case "low":
+          return "bg-success text-white";
+        default:
+          return "";
+      }
+    },
+    handleDateClick(date) {
+      if (this.vulnerabilities[date]) {
+        this.$router.push("/userassets");
+      }
+    
     },
   },
    mounted() {
@@ -389,6 +976,12 @@ export default {
 </script>
 
 <style scoped>
+.bg-maroon {
+  background-color: maroon !important;
+}
+.bg-red {
+  background-color: red !important;
+}
 .calender-para {
   color: #3121B1;
   font-size: 14px;

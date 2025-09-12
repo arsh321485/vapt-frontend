@@ -28,17 +28,16 @@
                         <div class="row mt-3">
                             <div class="d-flex justify-content-start gap-3">
                                 <button class="btn rounded-pill border px-4" style="background-color: rgba(230, 227, 255, 1);color: rgba(49, 33, 177, 1);">All</button>
-                                <!-- <button class="btn rounded-pill border px-4" style="color: rgba(0, 115, 12, 1);">Approved</button>
-                                <button class="btn rounded-pill border px-4" style="color: rgba(170, 0, 0, 1);">Declined</button> -->
+                                
                                 <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
                                 <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
+                                <!-- <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
                                     <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
                                     <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
                                     <option class="text-dark" style="font-size: 15px;">Network Security</option>
                                     <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                </select></div>
+                                </select></div> -->
                             </div>
                         </div>
                         

@@ -26,8 +26,8 @@
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
                                 <div class="d-flex gap-3">
                                     <button class="btn btn-primary btn-pill active-tab fw-semibold">All</button>
-                                    <button class="btn btn-outline-secondary btn-pill other-btn">Open</button>
-                                    <button class="btn btn-outline-secondary btn-pill other-btn">Closed</button>
+                                    <button class="btn btn-danger btn-pill other-btn">Open</button>
+                                    <button class="btn btn-success btn-pill other-btn">Closed</button>
                                 </div>
                                 <div>
                                     <router-link to="/createnewticket">
@@ -38,8 +38,7 @@
                             </div>
                         </div>
                         <div class="row mt-5">
-                            <!-- Raised Today -->
-                            <h6 class="fw-semibold mb-3">Raised today</h6>
+                            
                             <div class="table-responsive">
                                 <table class="table align-middle table-borderless">
                                     <thead class="raised-table">
@@ -102,64 +101,7 @@
                                 </table>
                             </div>
 
-                            <!-- Raised Earlier This Week -->
-                            <h6 class="fw-semibold mb-3 mt-5">Raised earlier this week</h6>
-                            <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
-                                        <tr>
-                                            <th scope="col">Subject</th>
-                                            <th scope="col">Asset</th>
-                                            <th scope="col">Description</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Date requested</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="raised-tbody">
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
-                                            <td>Bug</td>
-                                            <td>23/06/2025</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
-                                            <td>Help</td>
-                                            <td>23/06/2025</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
-                                            <td>Feature request</td>
-                                            <td>23/06/2025</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
-                                            <td>Feature request</td>
-                                            <td>23/06/2025</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
-                                            <td>Feature request</td>
-                                            <td>23/06/2025</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
+                           
                         </div>
 
                     </div>
@@ -209,15 +151,15 @@ export default {
 }
 
 .other-btn {
-    color: rgba(0, 0, 0, 0.6);
+    /* color: rgba(0, 0, 0, 0.6); */
     border: 1px solid rgba(0, 0, 0, 0.16);
 }
 
-.other-btn:hover {
+/* .other-btn:hover {
     color: rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(0, 0, 0, 0.16);
     background-color: white;
-}
+} */
 .btn-ticket {
     background-color: rgba(49, 33, 177, 1);
     color: #fff;
