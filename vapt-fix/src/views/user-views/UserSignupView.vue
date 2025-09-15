@@ -9,13 +9,20 @@
         <h1 class="form-heading mb-2">Get started now</h1>
         <p class="form-subheading mb-4">You’re invited to join VAPTfix by Amit Gopal.</p>
 
-        <div class="mb-3 d-lg-flex d-md-flex gap-2">
+        <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
+
+        <!-- <div class="mb-3 d-lg-flex d-md-flex gap-2">
           <button class="btn btn-google mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
           <button class="btn btn-microsoft w-100"><img src="@/assets/images/microsoft-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Microsoft</button>
-        </div>
+        </div> -->
+        <div class="d-flex align-items-center mt-3">
+                      <hr class="flex-grow-1">
+                      <span class="mx-2 text-muted">or</span>
+                      <hr class="flex-grow-1">
+                    </div>
 
-        <form class="mt-5">
-          <div class="mb-4 mt-4">
+        <form class="">
+          <div class="mb-4 mt-2">
             <label class="form-label">Email</label>
             <input type="email" class="form-control" placeholder="Enter your email">
           </div>

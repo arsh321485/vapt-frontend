@@ -260,11 +260,22 @@
                                             </div>
                                             </div>
                                             <div class="row mb-3">
-                                            <div class="d-flex justify-content-start">
+                                            <div class="modal-header mb-4">
+                                            <h5 class="modal-title w-100">
+                                            <div class="d-flex justify-content-center">
+                                            <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                                            <i class="bi bi-person-fill fs-5"></i>
+                                            </div>
+                                            <h5 class="fw-semibold ms-2 mt-2">Add users</h5>
+                                            </div>
+                                            </h5>
+                                        
+                                            </div>
+                                            <!-- <div class="d-flex justify-content-start">
                       <div class="col-1 d-flex justify-content-center align-items-center location-icon me-2 mb-3">
                       <i class="bi bi-person-fill fs-5"></i>
                     </div>
-                                            <h5 class="fw-semibold mt-2 ">Add users</h5></div>
+                                            <h5 class="fw-semibold mt-2 ">Add users</h5></div> -->
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">User Type</label>
                                                 <select class="form-select rounded-0 uniform-input">

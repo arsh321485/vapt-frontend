@@ -16,7 +16,7 @@
                                 <router-link to="/userdashboard" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
                                 <i class="bi bi-arrow-left"></i> Back to home
                                 </router-link>
-                                <h2 class="ticket-head mt-3">Pending mitigation</h2>
+                                <h2 class="ticket-head mt-3">Pending mitigations</h2>
                             </div>
                             <div class="dropdown mt-2">
                             <div class="dropdown-btn"> Select location</div>
@@ -64,13 +64,60 @@
                                             <td>Windows 10</td>
                                             <td class="text-danger">High</td>
                                             <td>23/06/2025</td>
-                                            <td><input
-                                              class="border-0"
-                                                type="date"
-                                                ref="dateInput"
-                                                v-model="selectedDate"
-                                                @click="openCalendar"
-                                              /></td>
+                                            <td><div class="d-flex align-items-center gap-2">
+                                        <span>20/07/2025</span>
+                                        <!-- Calendar Button -->
+                                        <button class="btn border-0" @click="toggleCalendar">
+                                          <i class="bi bi-calendar3 fs-6"></i>
+                                        </button>
+                                        <!-- Calendar -->
+                                        <div
+                                          v-if="showCalendar"
+                                          ref="calendar"
+                                          class="calendar border rounded p-3 shadow"
+                                          style="width: 320px; position: absolute; background: #fff; z-index: 1000;"
+                                        >
+                                          <!-- Header with close button -->
+                                          <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <button class="btn btn-sm btn-light" @click="prevMonth">&lt;</button>
+                                            <h6 class="mb-0">{{ monthYear }}</h6>
+                                            <div class="d-flex align-items-center">
+                                              <button class="btn btn-sm btn-light me-2" @click="nextMonth">&gt;</button>
+                                              <!-- Cross Button -->
+                                              <button class="btn btn-sm border-0" @click="closeCalendar">
+                                                <i class="bi bi-x fs-3"></i>
+                                              </button>
+                                            </div>
+                                          </div>
+
+                                          <!-- Week Days -->
+                                          <div
+                                            class="d-grid text-center fw-bold"
+                                            style="grid-template-columns: repeat(7, 1fr);"
+                                          >
+                                            <div v-for="day in weekDays" :key="day">{{ day }}</div>
+                                          </div>
+
+                                          <!-- Dates -->
+                                          <div
+                                            class="d-grid text-center"
+                                            style="grid-template-columns: repeat(7, 1fr); gap: 3px;"
+                                          >
+                                            <div v-for="n in firstDayOfMonth" :key="'empty-' + n"></div>
+                                            <div
+                                              v-for="date in daysInMonth"
+                                              :key="date"
+                                              class="p-2 border rounded"
+                                              :class="getSeverityClass(date)"
+                                              style="cursor: pointer;"
+                                              @click="handleDateClick(date)"
+                                            >
+                                              {{ date }}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      </td>
                                             <td>Delay by 3 days</td>
                                             <router-link to="/pendingvulnerabilitycard" class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1); text-decoration: none;">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></router-link>
                                         </tr>
@@ -203,6 +250,15 @@ export default {
     data() {
     return {
       selectedDate: "2025-06-23",
+      showCalendar: false,
+      currentDate: new Date(),
+      weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      vulnerabilities: {
+        12: "critical",
+        15: "high",
+        20: "medium",
+        23: "low",
+      },
     };
   },
   computed: {
@@ -211,10 +267,58 @@ export default {
       const [year, month, day] = this.selectedDate.split("-");
       return `${day}/${month}/${year}`; 
     },
+    daysInMonth() {
+      const year = this.currentDate.getFullYear();
+      const month = this.currentDate.getMonth();
+      return new Date(year, month + 1, 0).getDate();
+    },
+    firstDayOfMonth() {
+      const year = this.currentDate.getFullYear();
+      const month = this.currentDate.getMonth();
+      return new Date(year, month, 1).getDay();
+    },
+    monthYear() {
+      return this.currentDate.toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+    
+    },
   },
   methods: {
-    openCalendar() {
-      this.$refs.dateInput.click();
+    toggleCalendar() {
+      this.showCalendar = !this.showCalendar;
+    },
+     closeCalendar() {
+    this.showCalendar = false;
+  },
+    prevMonth() {
+      this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+      this.currentDate = new Date(this.currentDate); 
+    },
+    nextMonth() {
+      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      this.currentDate = new Date(this.currentDate);
+    },
+    getSeverityClass(date) {
+      const severity = this.vulnerabilities[date];
+      switch (severity) {
+        case "critical":
+          return "bg-maroon text-white";
+        case "high":
+          return "bg-red text-white";
+        case "medium":
+          return "bg-warning text-dark";
+        case "low":
+          return "bg-success text-white";
+        default:
+          return "";
+      }
+    },
+    handleDateClick(date) {
+      if (this.vulnerabilities[date]) {
+        this.$router.push("/userassets");
+      }
     },
   },
     mounted() {
@@ -242,11 +346,21 @@ export default {
         dropdown.classList.remove('show');
       }
     });
-  },  
+    document.addEventListener("click", this.handleClickOutside);
+  },
+  beforeUnmount() {
+  document.removeEventListener("click", this.handleClickOutside);
+},  
 };
 </script>
 
 <style scoped>
+.bg-maroon {
+  background-color: maroon !important;
+}
+.bg-red {
+  background-color: red !important;
+}
 .ticket-head {
     color: rgba(0, 0, 0, 1);
     font-weight: 500;

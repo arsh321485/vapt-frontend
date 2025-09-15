@@ -2,58 +2,13 @@
     <main>
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
-      <div class="col-lg-7 col-md-12 px-5 pt-4 pb-4 form-section">
+      <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
         <img src="@/assets/images/logo2.png" alt="" class="mb-4">
         <h1 class="form-heading mb-2">Get started now</h1>
         <p class="form-subheading mb-4">Join vaptfix, fix your vulnerabilities now</p>
 
-                     <div class="d-flex justify-content-center align-items-center gap-3 px-3">
-
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/google-icon.png" alt="google" />
-
-                        </button>
-
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/teams.png" alt="microsoftteams" />
-
-                        </button>
-
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/slack.png" alt="slack" />
-
-                        </button>
-
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/jira.png" alt="jira" />
-
-                        </button>
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/confluence.png" alt="Confluence " />
-
-                        </button>
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/asana.png" alt="asana" />
-
-                        </button>
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/monday.png" alt="monday.com" />
-
-                        </button>
-                        <button class="social-icon-btn">
-
-                            <img src="@/assets/images/notion.png" alt="notion" />
-
-                        </button>
-
-                    </div> 
+        <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
+                     
                     <div class="d-flex align-items-center mt-3">
                       <hr class="flex-grow-1">
                       <span class="mx-2 text-muted">or</span>
@@ -104,7 +59,7 @@
             <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" 
                 alt="recaptcha" style="height:30px;">
           </div>
-          <router-link to="/">
+          <router-link to="/home">
             <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3">Signup for vaptfix <i class="bi bi-arrow-right-circle-fill"></i></button>
           </router-link>
         </form>
@@ -112,7 +67,7 @@
       </div>
 
       <!-- Right Image Section -->
-      <div class="col-lg-5 image-section d-none d-lg-block pt-5">
+      <div class="col-lg-6 image-section d-none d-lg-block pt-5">
         <img src="@/assets/images/signup.jpg" alt="" style="width: 455px;height: 700px;border-radius: 15px;">
       </div>
     </div>
@@ -133,46 +88,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.social-icon-btn {
-
-    width: 50px;
-
-    height: 50px;
-
-    border-radius: 50%;
-
-    border: 1px solid #ddd;
-
-    background-color: #fff;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    transition: 0.3s;
-
-}
-
-.social-icon-btn img {
-
-    height: 22px;
-
-    width: auto;
-
-}
-
-.social-icon-btn:hover {
-
-    background-color: #f8f8f8;
-
-    border-color: #aaa;
-
-    transform: scale(1.05);
-
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-}
-</style>

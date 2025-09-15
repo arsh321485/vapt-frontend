@@ -16,7 +16,7 @@
                             <div class="d-flex flex-row gap-3 mt-4">
                                 
                                 <button type="button" class="btn pending-approval-btn rounded-pill">
-                                Go premium and get exclusive Compensatory control support from us
+                                Go premium and get exclusive support control request from us
                                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
                                 </button>
                                 <div class="dropdown">
@@ -51,7 +51,7 @@
                                             <th scope="col">Description</th>
                                             <th scope="col">Requested by</th>
                                             <th scope="col">Date requested</th>
-                                            
+                                            <th scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
@@ -64,7 +64,9 @@
                                              </span></td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -73,7 +75,9 @@
                                             <td>Request denied due to weak reasoning.</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -82,7 +86,9 @@
                                             <td>Reviewed, more justification required.</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -91,7 +97,9 @@
                                             <td>Request denied due to weak reasoning.</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                           
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -100,7 +108,9 @@
                                             <td>Reviewed, more justification required.</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                           
+                                           <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -109,7 +119,9 @@
                                             <td>Request denied due to weak reasoning.</td>
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                     </tbody>
                                 </table>

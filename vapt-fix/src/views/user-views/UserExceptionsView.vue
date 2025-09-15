@@ -49,9 +49,9 @@
                                         <tr>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
-                                            <th scope="col">Comment by admin</th>
+                                            <th scope="col">Description</th>
                                             <th scope="col">Date requested</th>
-                                            <th scope="col">Status</th>
+                                            <th scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
@@ -62,7 +62,9 @@
                                             <td>This issue is low risk in our environment</td>
                                             
                                             <td>23/06/25</td>
-                                            <td><p style="color: rgba(179, 122, 0, 1);">Pending action</p></td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -71,15 +73,9 @@
                                             <td>Existing controls already mitigate the risk.</td>
                                             
                                             <td>23/06/25</td>
-                                            <td>
-                                            <div style="color: rgba(170, 0, 0, 1); display: flex; align-items: center;">
-                                            <span>Declined</span>
-                                            <div class="info-icon ms-2" style="position: relative; display: inline-block;">
-                                            <i class="bi bi-info-circle text-danger" style="font-size: 13px; font-weight: 600;"></i>
-                                            <span class="tooltip-text">Extended Support</span>
-                                            </div>
-                                            </div>
-                                            </td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
 
                                         </tr>
                                         <tr>
@@ -89,7 +85,9 @@
                                             <td>Windows 10</td>
                                             
                                             <td>23/06/25</td>
-                                            <td><p style="color: rgba(0, 170, 14, 1);">Approved</p></td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -98,7 +96,9 @@
                                             <td>Windows 10</td>
                                            
                                             <td>23/06/25</td>
-                                           <td><p style="color: rgba(170, 0, 0, 1)">Declined <i class="bi bi-info-circle"></i></p></td>
+                                           <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -107,7 +107,9 @@
                                             <td>Windows 10</td>
                                           
                                             <td>23/06/25</td>
-                                            <td><p style="color: rgba(0, 170, 14, 1);">Approved</p></td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -116,7 +118,9 @@
                                             <td>Windows 10</td>
                                            
                                             <td>23/06/25</td>
-                                            <td><p style="color: rgba(0, 170, 14, 1);">Approved</p></td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -246,47 +250,5 @@ export default {
     display: block;
 }
 
-.info-icon {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-}
 
-/* Tooltip text */
-.info-icon .tooltip-text {
-  visibility: hidden;
-  width: 150px;  /* adjust size as needed */
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 8px;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%; /* position above the icon */
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  font-size: 12px;
-  white-space: normal;
-}
-
-/* Arrow */
-.info-icon .tooltip-text::after {
-  content: "";
-  position: absolute;
-  top: 100%; /* arrow points down */
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #333 transparent transparent transparent;
-}
-
-/* Show tooltip on hover */
-.info-icon:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
 </style>

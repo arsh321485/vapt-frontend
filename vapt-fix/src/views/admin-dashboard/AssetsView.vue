@@ -47,7 +47,7 @@
                       <div class="mb-3">
                         <label class="form-label fw-bold">Severity</label>
                         <select class="form-select" v-model="selectedSeverity">
-                          <option value="">All</option>
+                          <option value="all">All</option>
                           <option value="critical">Critical</option>
                           <option value="high">High</option>
                           <option value="medium">Medium</option>
@@ -62,6 +62,7 @@
                           class="form-control"
                           placeholder="Enter IP address"
                           v-model="ipAddress"
+                          @keypress="validateIPInput"
                         />
                       </div>
                       <!-- Apply Button -->
@@ -75,16 +76,10 @@
                 </div>
 
                 <div class="mb-4 pe-3">
-                  <div class="position-relative">
-                    <input 
-                      class="form-control form-control-sm" 
-                      style="padding-top: 7px; padding-bottom: 7px; border-radius: 20px;" 
-                      type="search" 
-                      placeholder="Search vul. by name" 
-                      aria-label="Search"
-                    >
-                    <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"></i>
-                </div>
+                  <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" style="padding-top: 6px;padding-bottom: 6px;">
+                    <button class="btn btn-sm btn-secondary" type="submit">Search</button>
+                  </form>
                 </div>
 
                  <!-- Asset List -->
@@ -367,10 +362,12 @@
                               <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">CVE-2024-22259 - org.springframework:spring-web</p>
                               <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                               <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                              <span>High</span>
-                                                          
+                              <span>High</span>                           
                               </span>
-                                                      
+                              <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
+                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                              <span>Open</span>
+                              </span>                      
                               </div> 
                              </button>
                               </h2>
@@ -399,17 +396,21 @@
                             </div>
                             </div>
                             </div>
-                                              <div class="accordion-item border-0 border-bottom">
-                                                  <h2 class="accordion-header" id="headingTwo">
-                                                  <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                                    <div class="d-flex justify-content-start align-items-center gap-4">
-                                                      <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">2</p>
-                                                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                                      <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                                          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                                          <span>High</span>
-                                                      </span>
-                                                    </div> 
+                            <div class="accordion-item border-0 border-bottom">
+                              <h2 class="accordion-header" id="headingTwo">
+                              <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                              <div class="d-flex justify-content-start align-items-center gap-3">
+                               <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">2</p>
+                                <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+                                <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
+                                <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+                                <span>High</span>
+                                </span>
+                                <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
+                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                              <span>Open</span>
+                              </span>
+                                </div> 
                                                   </button>
                                                   </h2>
                                                   <div id="collapseTwo" class="accordion-collapse collapse border-top-0" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
@@ -434,17 +435,21 @@
                                                       </div>
                                                   </div>
                                                   </div>
-                                              </div>
+                            </div>
                                               <div class="accordion-item border-0 border-bottom">
                                                   <h2 class="accordion-header" id="headingThree">
                                                   <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
-                                                    <div class="d-flex justify-content-start align-items-center gap-4">
+                                                    <div class="d-flex justify-content-start align-items-center gap-3">
                                                       <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">3</p>
                                                       <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
                                                       <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                                                           <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                                                           <span>High</span>
                                                       </span>
+                                                      <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
+                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                              <span>Open</span>
+                              </span>
                                                     </div> 
                                                   </button>
                                                   </h2>
@@ -474,13 +479,17 @@
                                               <div class="accordion-item border-0 border-bottom">
                                                   <h2 class="accordion-header" id="headingFour">
                                                   <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
-                                                    <div class="d-flex justify-content-start align-items-center gap-4">
+                                                    <div class="d-flex justify-content-start align-items-center gap-3">
                                                       <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">4</p>
                                                       <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
                                                       <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                                                           <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                                                           <span>High</span>
                                                       </span>
+                                                      <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
+                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                              <span>Open</span>
+                              </span>
                                                     </div> 
                                                   </button>
                                                   </h2>
@@ -569,11 +578,14 @@
                             
                             <!-- Modal Body -->
                             <div class="modal-body">
-                              <ul>
-                                <li>Server downtime during patching</li>
-                                <li>Dependency conflict with existing apps</li>
-                                <li>Vendor patch not yet released</li>
-                              </ul>
+                              <div class="row g-2" style="max-width: 400px;">
+                                <div class="col-4">
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 14px;">Step:2</span>
+                                </div>
+                                <div class="col-4">
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 14px;">Step:4</span>    
+                                </div>
+                              </div>
 
                               <h6 class="mt-3 fw-semibold">Description</h6>
                               <textarea class="form-control rounded-0" rows="4" readonly>The issue has been reviewed, but the current explanation is not sufficient. Please provide additional justification to proceed further.
@@ -771,6 +783,14 @@ export default {
         ip: this.ipAddress,
       });
     },
+     validateIPInput(event) {
+    const char = String.fromCharCode(event.which);
+    // Allow only digits and dots
+    if (!/[0-9.]/.test(char)) {
+      event.preventDefault();
+      alert("Only numbers and dots are allowed!");
+    }
+  },
     handleDeleteClick() {
     if (!this.showCheckboxes) {
       this.showCheckboxes = true;

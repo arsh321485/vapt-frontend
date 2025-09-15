@@ -60,10 +60,14 @@
               <div class="row mt-5">
                 <div class="col-lg-9 location-card py-4 px-4">
                   <div class="row">
+                    <router-link to="/location" class="mb-3" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
+                                <i class="bi bi-arrow-left"></i> Back
+                                </router-link>
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-exclamation-triangle-fill fs-4"></i>
                     </div>
                     <div class="col-lg-7">
+                      
                       <h3 class="fw-semibold">Risk Criteria</h3>
                       <p class="text-muted" style="font-size: 15px;">Set timelines for vulnerability criticaity</p>
                       

@@ -49,6 +49,7 @@
                                             <th scope="col">Category</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Date requested</th>
+                                            <th scop="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
@@ -60,6 +61,9 @@
                                             <td>Bug</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -69,6 +73,9 @@
                                             <td>Help</td>
                                             <td>Close</td>
                                             <td>23/06/2025</td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -78,6 +85,9 @@
                                             <td>Feature request</td>
                                             <td>Close</td>
                                             <td>23/06/2025</td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -87,6 +97,9 @@
                                             <td>Feature request</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -96,6 +109,9 @@
                                             <td>Feature request</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
                                         </tr>
                                     </tbody>
                                 </table>

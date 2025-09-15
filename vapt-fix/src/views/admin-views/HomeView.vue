@@ -36,7 +36,7 @@
      
     <!-- Why post VAPT Remidiation is broken -->
     <section class="remidiation-section fluid-padding">
-      <div class="container-fluid">
+      <div class="container-fluid gx-0">
         <div class="row mb-5">
         <div class="scroll-banner">
         <div class="scroll-track">
@@ -130,14 +130,14 @@
 
     <!-- Our Approach to Quick Remediation -->
     <section class="our-approach">
-      <div class="container-fluid g-0">
-        <div class="row gx-0">
+      <div class="container-fluid gx-0">
+        <div class="row">
           <div class="col-lg-12 our-approach-top">
           </div>
         </div>
       </div>
 
-      <div class="container-fluid our-approach-box py-3">
+      <div class="container-fluid our-approach-box py-3 gx-0">
         <div class="text-center">
               <p><i class="bi bi-puzzle-fill"></i> Our solution</p>
               <h1>Our Approach to Quick<br> Remediation</h1>

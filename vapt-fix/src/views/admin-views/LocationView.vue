@@ -23,6 +23,110 @@
                   </div>
                 </div>
               </div>
+
+              <div class="row mt-3 mb-4" v-if="showPlatforms">
+              <div class="col-9 location-card py-4 px-4 ms-3">
+                <div class="row">
+                    <div class="d-flex justify-content-start">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                      <i class="bi bi-ui-checks-grid fs-5"></i>
+                    </div>
+                    <h5 class="fw-semibold ms-2 mt-2">Choose your communication platform</h5>
+                    </div>
+                </div>
+                <div class="card ps-2 py-4 border-0"> 
+                    <!-- First row: 4 cards -->
+                    <div class="row g-4">
+                      <!-- Teams -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div>
+                            <img src="@/assets/images/teams.png" alt="Teams" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Teams</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Slack -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div>
+                            <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Slack</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Jira -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div>
+                            <img src="@/assets/images/jira.png" alt="Jira" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Jira</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Confluence -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div class="d-flex flex-column align-items-center justify-content-center text-center">
+                            <img src="@/assets/images/confluence.png" alt="Confluence" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Confluence</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Asana -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div>
+                            <img src="@/assets/images/asana.png" alt="Asana" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Asana</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Second row: 3 cards -->
+                    <div class="row g-4 mt-2">
+                      <!-- Monday.com -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div class="d-flex flex-column align-items-center justify-content-center text-center">
+                            <img src="@/assets/images/monday.png" alt="Monday.com" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Monday.com</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Notion -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div>
+                            <img src="@/assets/images/notion.png" alt="Notion" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Notion</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-5 mt-5">
+                        <button class="btn text-light rounded-pill mt-3" @click="showPlatforms = false" style="background-color: rgba(90, 68, 255, 1);">I'm not using any platform.</button>
+                      </div>
+
+                    </div>
+
+                </div>
+              </div>
+              </div>
+
               <div class="row">
                 <div class="col-lg-9 location-card py-4 px-4 ms-3">
                   <div class="row">
@@ -244,6 +348,7 @@ export default {
     },
     data() {
     return {
+      showPlatforms: true,
       locations: {
         germany: "Germany",
         delhi: "Delhi",

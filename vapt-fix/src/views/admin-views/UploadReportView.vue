@@ -58,8 +58,11 @@
               </div>
 
               <div class="row ps-5">
-                <div class="col-lg-8 location-card p-5 mb-5">
+                <div class="col-lg-8 location-card px-5 pb-5 pt-4 mb-5">
                   <div class="row">
+                    <router-link to="/riskcriteria" class="mb-3" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
+                                <i class="bi bi-arrow-left"></i> Back
+                                </router-link>
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-geo-alt-fill fs-4"></i>
                     </div>
