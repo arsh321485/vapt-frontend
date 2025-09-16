@@ -166,6 +166,7 @@
                                 <a href="#">Bahrain</a>
                             </div>
                   </div>
+                   <NotificationPanel />
                 </div>
 
                 </div>
@@ -863,18 +864,21 @@
 <script>
 import DashboardMenu from "@/components/admin-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/admin-component/DashboardHeader.vue";
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
   name: "MitigationStrategyView",
   components: {
     DashboardMenu,
     DashboardHeader,
+    NotificationPanel
   },
   data() {
     return {
       showPopup: false,
     };
   },
+ 
   mounted() {
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');

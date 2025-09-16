@@ -875,8 +875,16 @@ html, body {
   background-color: goldenrod;
 }
 
+.bar.dark-yellow {
+  background-color: yellow;
+}
+
 .bar.green {
   background-color: green;
+}
+
+.bar.light-green {
+  background-color: rgb(71, 199, 71);
 }
 
 .bar.blue {
@@ -1180,4 +1188,29 @@ html, body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
+}
+
+
+.notification-panel {
+  position: fixed;
+  top: 0;
+  right: -520px;
+  width: 500px;
+  height: 100%;
+  background: #fff;
+  border-left: 1px solid #ddd;
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease-in-out;
+  z-index: 1050;
+}
+
+.notification-panel.open {
+  right: 0;
+}
+
+.notification-panel.fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  right: 0;
+  top: 0;
 }

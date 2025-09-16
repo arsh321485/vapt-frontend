@@ -38,6 +38,14 @@
           </router-link>
         </div>
 
+         <div>
+          <router-link to="/pending">
+          <button class="btn border-0" :class="{ activeBtn: isActive('/pending') }">
+          <i class="bi bi-dash-circle-dotted fs-5 nav-menu"></i>
+          <p class="menu-heading">Pending</p></button>
+          </router-link>
+        </div>
+
         <div>
           <router-link to="/mitigationstrategy">
           <button class="btn border-0" :class="{ activeBtn: isActive('/mitigationstrategy') }">
@@ -68,13 +76,12 @@
       <!-- Bottom Profile Circle -->
       <div class="mt-auto d-flex flex-column align-items-center">
         <div class="circle-bottom mb-2">A</div>
+        <button class="btn border-0" @click="confirmLogout">
+          <i class="bi bi-box-arrow-right fs-5 nav-menu"></i><p class="menu-heading">Logout</p>
+        </button>
       </div>
+    </div>  
     </div>
-
-    
-    </div>
-
-   
 
   </main>
 </template>
@@ -89,5 +96,23 @@ export default {
 
     return { route, isActive };
   },
+  methods: {
+    confirmLogout() {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You want to logout!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, logout",
+        cancelButtonText: "No, stay"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$router.push("/home"); 
+        }
+      });
+    }
+  }
 };
 </script>

@@ -15,13 +15,16 @@
                             <div>
                                 <h2 class="ticket-head">Support Requests</h2>
                             </div>
-                            <div class="dropdown">
-                            <div class="dropdown-btn"> Select location</div>
-                            <div class="dropdown-content">
-                              <a href="#">Greece</a>
-                              <a href="#">Germany</a>
-                              <a href="#">Bahrain</a>
-                            </div>
+                            <div class="d-flex flex-row">
+                                <div class="dropdown">
+                                <div class="dropdown-btn"> Select location</div>
+                                <div class="dropdown-content">
+                                <a href="#">Greece</a>
+                                <a href="#">Germany</a>
+                                <a href="#">Bahrain</a>
+                                </div>
+                                </div>
+                                <NotificationPanel />
                             </div>
                         </div>
 
@@ -31,13 +34,7 @@
                                 
                                 <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
                                 <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button>
-                                <!-- <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                </select></div> -->
+                                
                             </div>
                         </div>
                         
@@ -137,12 +134,14 @@
 <script>
 import DashboardMenu from '@/components/user-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/user-component/DashboardHeader.vue';
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
     name: 'UserExceptionsView',
     components: {
         DashboardMenu,
-        DashboardHeader
+        DashboardHeader,
+        NotificationPanel
     },
     mounted() {
     const dropdown = document.querySelector('.dropdown');

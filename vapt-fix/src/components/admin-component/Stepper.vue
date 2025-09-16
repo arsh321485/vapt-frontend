@@ -3,9 +3,8 @@
     <section class="bg-light">
     <div class="container-fluid">
     <div class="row">
-        <div class="d-flex justify-content-center py-2">
+        <!-- <div class="d-flex justify-content-center py-2">
             <div class="stepper mt-3">
-                <!-- <a class="navbar-brand fs-3 fw-semibold" href="#">vaptfix</a> -->
               <img src="@/assets/images/logo2.png" alt="">
 
             <div class="step active">
@@ -29,22 +28,58 @@
                 <div class="label">Vulnerability report</div>
             </div>
 
-             <!-- <div class="line"></div> -->
-
-            
-            <!-- <div class="step">
-                <div class="step-circle">3</div>
-                <div class="label">All done</div>
-            </div> -->
-            <!-- <button type="button" class="btn stepper-btn mt-5">Next <i class="bi bi-arrow-right-circle-fill ms-1"></i></button> -->
-             <router-link to="/riskcriteria" class="btn stepper-btn mt-5" tag="button">
-  Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-</router-link>
+            <router-link to="/riskcriteria" class="btn stepper-btn mt-5" tag="button">Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+            </router-link>
 
             </div>
             
-        </div>
+        </div> -->
+    
+        <div class="d-flex justify-content-center py-2">
+    <div class="stepper mt-3">
+      <img src="@/assets/images/logo2.png" alt="" />
+
+      <!-- Step 1 -->
+      <router-link
+        to="/location"
+        class="step text-decoration-none"
+        :class="{ active: isCompletedOrActive(1) }"
+      >
+        <div class="step-circle">1</div>
+        <div class="label">Add location and users</div>
+      </router-link>
+
+      <div class="line" :class="{ active: currentStep >= 2 }"></div>
+
+      <!-- Step 2 -->
+      <router-link
+        to="/riskcriteria"
+        class="step text-decoration-none"
+        :class="{ active: isCompletedOrActive(2) }"
+      >
+        <div class="step-circle">2</div>
+        <div class="label">Risk Criteria</div>
+      </router-link>
+
+      <div class="line" :class="{ active: currentStep >= 3 }"></div>
+
+      <!-- Step 3 -->
+      <router-link
+        to="/uploadreport"
+        class="step text-decoration-none"
+        :class="{ active: isCompletedOrActive(3) }"
+      >
+        <div class="step-circle">3</div>
+        <div class="label">Vulnerability report</div>
+      </router-link>
+
+      <!-- Next Button -->
+      <button class="btn stepper-btn mt-5" @click="goNext">
+        Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+      </button>
     </div>
+  </div>
+      </div>
     </div>
     </section>
     </main>
@@ -52,7 +87,33 @@
 
 <script>
 export default {
-  name: 'Stepper'
+  name: 'Stepper',
+   data() {
+    return {
+      steps: ["/location", "/riskcriteria", "/uploadreport"],
+    };
+  },
+  computed: {
+    currentStep() {
+      return this.steps.indexOf(this.$route.path) + 1;
+    },
+  },
+  methods: {
+    isCompletedOrActive(step) {
+      return step <= this.currentStep;
+    },
+    goNext() {
+       // special case for riskcriteria
+      if (this.$route.path === "/uploadreport") {
+        this.$router.push("/admindashboardonboarding");
+        return;
+      }
+      const currentIndex = this.steps.indexOf(this.$route.path);
+      if (currentIndex < this.steps.length - 1) {
+        this.$router.push(this.steps[currentIndex + 1]);
+      }
+    },
+  },
   }
 </script>
 

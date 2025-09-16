@@ -13,7 +13,7 @@
                     <div class="col-11 pt-2 pb-3 px-4">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h2 class="ticket-head mt-3">Support tickets</h2>
+                                <h2 class="ticket-head mt-3">Pending</h2>
                             </div>
                             <div class="d-flex flex-row mt-4">
                                 <div>
@@ -21,23 +21,20 @@
                                 Choose premium and ask vaptfix for support 
                                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
                                 </button>
-                            </div>
-                            <NotificationPanel />
+                                </div>
+                                <NotificationPanel />
                             </div>
                         </div>
                         <div class="row">
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
-                                <div class="d-flex gap-3">
-                                    <button class="btn btn-primary btn-pill active-tab fw-semibold">All</button>
-                                    <button class="btn btn-danger btn-pill other-btn">Open</button>
-                                    <button class="btn btn-success btn-pill other-btn">Closed</button>
-                                </div>
+                                <button class="btn btn-danger btn-pill other-btn">Open</button>
                                 <div>
                                     <router-link to="/createnewticket">
-                                        <button type="submit" class="btn btn-ticket py-2 px-5"><i class="bi bi-plus-lg"></i>
+                                        <button type="submit" class="btn btn-ticket py-2 px-5 me-5"><i class="bi bi-plus-lg"></i>
                                         Create a new ticket</button>
                                     </router-link>
                                 </div>
+                                
                             </div>
                         </div>
                         <div class="row mt-5">
@@ -60,7 +57,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Bug</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
@@ -72,9 +69,9 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Help</td>
-                                            <td>Close</td>
+                                            <td>Open</td>
                                             <td>23/06/2025</td>
                                             <td><router-link to="" style="text-decoration: none;">
                                               <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
@@ -84,19 +81,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
-                                            <td>Feature request</td>
-                                            <td>Close</td>
-                                            <td>23/06/2025</td>
-                                            <td><router-link to="" style="text-decoration: none;">
-                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Feature request</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
@@ -108,7 +93,19 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
+                                            <td>Feature request</td>
+                                            <td>Open</td>
+                                            <td>23/06/2025</td>
+                                            <td><router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
+                                                Sandbox Escape...</td>
+                                            <td>192.68.1.42</td>
+                                            <td>This is the description.</td>
                                             <td>Feature request</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
@@ -137,7 +134,7 @@ import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
-    name: 'SupportTicketView',
+    name: 'PendingView',
     components: {
         DashboardMenu,
         DashboardHeader,

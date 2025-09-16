@@ -4,46 +4,7 @@
     <div class="container-fluid">
     <div class="row">
         <div class="col-lg-2">
-            <!-- <Stepper /> -->
-            <section class="bg-light">
-              <div class="container-fluid">
-              <div class="row">
-                  <div class="d-flex justify-content-center py-2">
-                      <div class="stepper mt-3">
-                          <!-- <a class="navbar-brand fs-3 fw-semibold" href="#">vaptfix</a> -->
-                        <img src="@/assets/images/logo2.png" alt="">
-
-                      <div class="step active">
-                          <div class="step-circle">1</div>
-                          <div class="label">Add location and users</div>
-                      </div>
-
-                      <div class="line active"></div>
-
-
-                      <div class="step">
-                          <div class="step-circle">2</div>
-                          <div class="label">Risk Criteria</div>
-                      </div> 
-
-                      <div class="line"></div>
-
-                      
-                      <div class="step">
-                          <div class="step-circle">3</div>
-                          <div class="label">Vulnerability report</div>
-                      </div>
-
-                      <router-link to="/admindashboardonboarding" class="btn stepper-btn mt-5" tag="button">
-            Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-          </router-link>
-
-                      </div>
-                      
-                  </div>
-              </div>
-              </div>
-            </section>
+            <Stepper />
         </div>
         <div class="col-lg-10 my-3">
             <div class="container-fluid welcome-bg py-5 px-5">
@@ -58,11 +19,11 @@
               </div>
 
               <div class="row ps-5">
-                <div class="col-lg-8 location-card px-5 pb-5 pt-4 mb-5">
+                <div class="col-lg-8 location-card p-5 mb-5">
                   <div class="row">
-                    <router-link to="/riskcriteria" class="mb-3" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
+                    <!-- <router-link to="/riskcriteria" class="mb-3" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
                                 <i class="bi bi-arrow-left"></i> Back
-                                </router-link>
+                                </router-link> -->
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-geo-alt-fill fs-4"></i>
                     </div>

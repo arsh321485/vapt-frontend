@@ -66,6 +66,7 @@
                               <a href="#">Bahrain</a>
                           </div>
                   </div>
+                  <NotificationPanel />
                 </div>
                 <button type="button" class="btn pending-approval-btn rounded-pill">
                 11 Support requests raised
@@ -873,12 +874,14 @@
 <script>
 import DashboardMenu from '@/components/user-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/user-component/DashboardHeader.vue';
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
   name: 'UserDashboard1View',
   components: {
     DashboardMenu,
-    DashboardHeader
+    DashboardHeader,
+    NotificationPanel
   },
   data() {
     return {

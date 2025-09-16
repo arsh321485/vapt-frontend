@@ -62,6 +62,7 @@
                           class="form-control"
                           placeholder="Enter IP address"
                           v-model="ipAddress"
+                          @input="formatIP"
                           @keypress="validateIPInput"
                         />
                       </div>
@@ -253,25 +254,26 @@
                 </nav>
 
                 <!-- Held Vulnerabilities List -->
-    <div v-if="heldAssets.length" class="mt-4">
-      <h5 class="mb-3">Hold Vulnerabilities</h5>
-      <ul class="list-group me-3">
-        <li
-          v-for="(held, i) in heldAssets"
-          :key="i"
-          class="list-group-item text-muted"
-        >
-          {{ held.ip }}
-        </li>
-      </ul>
-    </div>
-  <!-- </div> -->
-
+                <div v-if="heldAssets.length" class="mt-4">
+                  <h5 class="mb-3">Hold Vulnerabilities</h5>
+                  <ul class="list-group me-3">
+                    <li
+                      v-for="(held, i) in heldAssets"
+                      :key="i"
+                      class="list-group-item text-muted"
+                    >
+                      {{ held.ip }}
+                    </li>
+                  </ul>
+                </div>
                 </div>
 
                 <div class="col-8">
-                    <div class="row py-4 px-3">
-                        <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
+                    <div class="row py-3 px-3">
+                        <div class="d-flex justify-content-between">
+                          <p class="mt-3" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
+                          <NotificationPanel />
+                        </div>
                         <div class="d-flex justify-content-between">
                             <div class="d-flex justify-content-start gap-3">
                             <p class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 18px;">fra-sto-shr-uat-lda-evt-mgr-dbmigration</p>
@@ -578,12 +580,12 @@
                             
                             <!-- Modal Body -->
                             <div class="modal-body">
-                              <div class="row g-2" style="max-width: 400px;">
+                              <div class="row g-2">
                                 <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 14px;">Step:2</span>
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 2: Code review</span>
                                 </div>
                                 <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 14px;">Step:4</span>    
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 4: Code review</span>    
                                 </div>
                               </div>
 
@@ -729,12 +731,14 @@
 <script>
 import DashboardMenu from "@/components/admin-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/admin-component/DashboardHeader.vue";
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
   name: "AssetsView",
   components: {
     DashboardMenu,
     DashboardHeader,
+    NotificationPanel
   },
    data() {
     return {
@@ -761,7 +765,6 @@ export default {
       ],
       heldAssets: [],
       showHoldCheckboxes: false,
-      // activeIndex: 0,
     };
   },
   computed: {
@@ -773,7 +776,7 @@ export default {
       } else if (this.ipAddress) {
         return `Filter: ${this.ipAddress}`;
       }
-      return "Filter"; // default text
+      return "Filter";
     },
   },
   methods: {
@@ -790,6 +793,18 @@ export default {
       event.preventDefault();
       alert("Only numbers and dots are allowed!");
     }
+  },
+  formatIP() {
+    // Remove all non-digit characters first
+    let digits = this.ipAddress.replace(/\D/g, "");
+
+    // Insert a dot after every group of up to 3 digits
+    let formatted = digits.match(/.{1,3}/g)?.join(".") || "";
+
+    // Limit to 4 groups (IPv4 style)
+    let parts = formatted.split(".").slice(0, 4);
+
+    this.ipAddress = parts.join(".");
   },
     handleDeleteClick() {
     if (!this.showCheckboxes) {
@@ -845,7 +860,7 @@ export default {
       this.assets = this.assets.map(a => ({ ...a, selected: false }));
       this.showHoldCheckboxes = false;
     },
-  // },
+    
   },
    mounted() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');

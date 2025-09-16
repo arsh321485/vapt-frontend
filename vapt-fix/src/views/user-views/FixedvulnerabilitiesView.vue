@@ -18,13 +18,16 @@
                                 </router-link>
                                 <h2 class="ticket-head mt-3">Fixed vulnerabilities</h2>
                             </div>
-                            <div class="dropdown mt-2">
-                            <div class="dropdown-btn"> Select location</div>
-                            <div class="dropdown-content">
-                              <a href="#">Greece</a>
-                              <a href="#">Germany</a>
-                              <a href="#">Bahrain</a>
-                            </div>
+                            <div class="d-flex flex-row mt-2">
+                                <div class="dropdown">
+                                <div class="dropdown-btn"> Select location</div>
+                                <div class="dropdown-content">
+                                <a href="#">Greece</a>
+                                <a href="#">Germany</a>
+                                <a href="#">Bahrain</a>
+                                </div>
+                                </div>
+                                <NotificationPanel />
                             </div>
                         </div>
 
@@ -149,12 +152,14 @@
 <script>
 import DashboardMenu from '@/components/user-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/user-component/DashboardHeader.vue';
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
     name: 'FixedvulnerabilitiesView',
     components: {
         DashboardMenu,
-        DashboardHeader
+        DashboardHeader,
+        NotificationPanel
     },
     mounted() {
     const dropdown = document.querySelector('.dropdown');

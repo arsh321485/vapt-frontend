@@ -10,6 +10,7 @@ import SignInView from '../views/admin-views/SignInView.vue'
 import ForgotPasswordView from '../views/admin-views/ForgotPasswordView.vue'
 import CreateNewTicketView from '../views/admin-dashboard/CreateNewTicketView.vue'
 import SupportTicketView from '../views/admin-dashboard/SupportTicketView.vue'
+import PendingView from '../views/admin-dashboard/PendingView.vue'
 import FixesView from '../views/admin-dashboard/FixesView.vue'
 import ExceptionsView from '../views/admin-dashboard/ExceptionsView.vue'
 import VulnerabilityRegisterView from '../views/admin-dashboard/VulnerabilityRegisterView.vue'
@@ -26,6 +27,7 @@ import RiskCriteriaView from '../views/admin-views/RiskCriteriaView.vue'
 import HowitWork from '../components/admin-component/HowitWork.vue'
 import Profile from '../components/admin-component/Profile.vue'
 import ChangePasswordView from '../views/admin-views/ChangePasswordView.vue'
+import NotificationPanel from '../components/admin-component/NotificationPanel.vue'
 
 // user import
 import UserAssetsView from '../views/user-views/UserAssetsView.vue'
@@ -135,6 +137,11 @@ const router = createRouter({
       component: SupportTicketView,
     },
     {
+      path: '/pending',
+      name: 'pending',
+      component: PendingView,
+    },
+    {
       path: '/fixes',
       name: 'fixes',
       component: FixesView,
@@ -173,6 +180,11 @@ const router = createRouter({
       path: '/changepassword',
       name: 'changepassword',
       component: ChangePasswordView,
+    },
+    {
+      path: '/notification',
+      name: 'notification',
+      component: NotificationPanel,
     },
 
     // user path

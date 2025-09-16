@@ -13,7 +13,13 @@
           <div class="col-11 pt-2 pb-3 pe-5">
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
-                <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 32px;">Assigned Assets (210)</h5>
+                  <div class="d-flex justify-content-between">
+                    <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 28px;">Assigned Assets (210)</h5>
+                    <div class="d-flex flex-row gap-3 me-3 mt-1">
+                      <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" @click="handleDeleteClick" title="Remove an asset"></i>
+                      <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" @click="toggleHoldMode" title="Hold mitigation"></i>
+                    </div>
+                  </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex gap-2 my-3">
                     <form>
@@ -55,6 +61,7 @@
                           class="form-control"
                           placeholder="Enter IP address"
                           v-model="ipAddress"
+                          @input="formatIP"
                           @keypress="validateIPInput"
                         />
                       </div>
@@ -64,8 +71,8 @@
                       </button>
                     </div>
                     </div> 
-
                     </div>
+                    
                 </div>
                 <div class="mb-4 pe-3">
                   <form class="d-flex">
@@ -74,221 +81,162 @@
                   </form>
                 </div>
                 <!-- Asset List -->
-                <div class="d-flex flex-column gap-3">
-                    <!-- Active Asset Item -->
-                    <div class="asset-item active border-bottom" style="background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);">
+                <div class="d-flex flex-column gap-3 mt-3">
+                  <div
+                    v-for="(asset, index) in assets"
+                    :key="index"
+                    class="asset-item border-bottom"
+                    :class="{ active: activeIndex === index }"
+                    :style="activeIndex === index ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);' : ''"
+                    @click="setActive(index)"
+                    >
                     <div class="d-flex justify-content-between">
-                        <div class="d-flex justify-content-start gap-3">
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.42</div>
-                        <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
-                        </span>
+                      <div class="d-flex justify-content-start gap-3">
+                        <!-- Checkbox (only when showCheckboxes = true) -->
+                        <input
+                          v-if="showCheckboxes"
+                          type="checkbox"
+                          v-model="asset.selected"
+                          class="form-check-input me-2"
+                        />
+
+                        <!-- Checkbox only when holdMode is true -->
+      <input
+        v-if="showHoldCheckboxes"
+        type="checkbox"
+        v-model="asset.selected"
+        class="form-check-input me-2"
+      />
+      <span :class="{ 'text-muted': asset.held }">{{ asset.name }}</span>
+
+                        <!-- Asset Title -->
+                        <div
+                          class="fw-semibold"
+                          style="color: rgba(0, 0, 0, 0.87); font-size: 22px;"
+                        >
+                          {{ asset.ip }}
                         </div>
-                    <div class="align-items-end gap-2">
-                        <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6);font-size: 20px;vertical-align:-2px"></i>
-                        <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
-                    </div>
-                    </div>
-                    <div class="d-flex justify-content-start gap-2 my-3">
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1);"></span>
-                            <span style="color:rgba(173, 0, 0, 1) ;">Critical 4</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(239, 11, 11, 1)"></span>
-                            <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
-                            <span class="text-warning">Medium 5</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
-                            <span style="color:rgba(0, 105, 0, 1);">Low 2</span>
-                        </span></div>
-                        
-                    </div>
-                    
-                    </div>
-
-                    <!-- Other Items -->
-                    <div class="asset-item border-bottom">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex justify-content-start gap-3">
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.43</div>
                         <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
+                          <span
+                            class="rounded-circle me-1"
+                            style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"
+                          ></span>
+                          <span>Critical</span>
                         </span>
-                    </div>
-                    <div class="align-items-end gap-2">
-                        <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6);font-size: 20px;vertical-align:-2px"></i>
-                        <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
-                    </div>
-                    </div>
-                     <div class="d-flex justify-content-start gap-2 my-3">
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1);"></span>
-                            <span style="color:rgba(173, 0, 0, 1) ;">Critical 4</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(239, 11, 11, 1)"></span>
-                            <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
-                            <span class="text-warning">Medium 5</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
-                            <span style="color:rgba(0, 105, 0, 1);">Low 2</span>
-                        </span></div>
-                        
-                    </div>
-                    </div>
+                      </div>
 
-                    <div class="asset-item border-bottom">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex justify-content-start gap-3">
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.44</div>
-                        <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
-                        </span>
+                      <div class="align-items-end gap-2">
+                        <i
+                          class="bi bi-link-45deg me-1"
+                          style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"
+                        ></i>
+                        <span
+                          style="color: rgba(0, 0, 0, 0.87); font-size: 15px; font-weight: 500;"
+                          >Internal</span
+                        >
+                      </div>
                     </div>
-                    <div class="align-items-end gap-2">
-                        <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6);font-size: 20px;vertical-align:-2px"></i>
-                        <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
+                    <!-- Status Row (unchanged design) -->
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #b31c1c"
+                        ></span>
+                        <span class="text-danger fw-bold">11</span>
+                      </span>
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #f44336"
+                        ></span>
+                        <span class="text-danger fw-bold">4</span>
+                      </span>
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #f6b100"
+                        ></span>
+                        <span class="text-warning fw-bold">8</span>
+                      </span>
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #4caf50"
+                        ></span>
+                        <span class="text-success fw-bold">0</span>
+                      </span>
                     </div>
-                    </div>
-                     <div class="d-flex justify-content-start gap-2 my-3">
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1);"></span>
-                            <span style="color:rgba(173, 0, 0, 1) ;">Critical 4</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(239, 11, 11, 1)"></span>
-                            <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
-                            <span class="text-warning">Medium 5</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
-                            <span style="color:rgba(0, 105, 0, 1);">Low 2</span>
-                        </span></div>
-                        
-                    </div>
-                    </div>
-
-                    <div class="asset-item border-bottom">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex justify-content-start gap-3">
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.45</div>
-                        <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
-                        </span>
-                    </div>
-                    <div class="align-items-end gap-2">
-                        <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6);font-size: 20px;vertical-align:-2px"></i>
-                        <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
-                    </div>
-                    </div>
-                     <div class="d-flex justify-content-start gap-2 my-3">
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1);"></span>
-                            <span style="color:rgba(173, 0, 0, 1) ;">Critical 4</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(239, 11, 11, 1)"></span>
-                            <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
-                            <span class="text-warning">Medium 5</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
-                            <span style="color:rgba(0, 105, 0, 1);">Low 2</span>
-                        </span></div>
-                        
-                    </div>
-                    </div>
-
-                    <div class="asset-item border-bottom">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex justify-content-start gap-3">
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.46</div>
-                        <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
-                        </span>
-                    </div>
-                    <div class="align-items-end gap-2">
-                        <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6);font-size: 20px;vertical-align:-2px"></i>
-                        <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
-                    </div>
-                    </div>
-                     <div class="d-flex justify-content-start gap-2 my-3">
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1);"></span>
-                            <span style="color:rgba(173, 0, 0, 1) ;">Critical 4</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(239, 11, 11, 1)"></span>
-                            <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
-                            <span class="text-warning">Medium 5</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
-                            <span style="color:rgba(0, 105, 0, 1);">Low 2</span>
-                        </span></div>
-                        
-                    </div>
-                    </div>
-
-                    <div class="asset-item border-bottom">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex justify-content-start gap-3">
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.47</div>
-                        <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
-                        </span>
-                    </div>
-                    <div class="align-items-end gap-2">
-                        <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6);font-size: 20px;vertical-align:-2px"></i>
-                        <span style="color: rgba(0, 0, 0, 0.87);font-size: 15px;font-weight: 500;">Internal</span>
-                    </div>
-                    </div>
-                     <div class="d-flex justify-content-start gap-2 my-3">
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1);"></span>
-                            <span style="color:rgba(173, 0, 0, 1) ;">Critical 4</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(239, 11, 11, 1)"></span>
-                            <span style="color:rgba(239, 11, 11, 1) ;">High 3</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1 bg-warning" style="width: 6px; height: 6px;"></span>
-                            <span class="text-warning">Medium 5</span>
-                        </span></div>
-                        <div style="font-size: 12px;"><span class="d-flex align-items-center">
-                            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(0, 105, 0, 1)"></span>
-                            <span style="color:rgba(0, 105, 0, 1);">Low 2</span>
-                        </span></div>
-                        
-                    </div>
-                    </div>
-
+                  </div>
                 </div>
+
+                <!-- Bootstrap Modal -->
+                <div
+                  class="modal fade"
+                  id="deleteModal"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Confirm Delete</h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div class="modal-body">
+                        Are you sure you want to delete the selected assets?  
+                        
+                      </div>
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal" @click="cancelDelete"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          @click="confirmDelete"
+                          data-bs-dismiss="modal"
+                        >
+                          OK
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Confirmation Popup for hold mitigation -->
+    <div
+      class="modal fade"
+      id="holdConfirmModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <p>Do you want to hold to mitigation?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelHold">
+              No
+            </button>
+            <button class="btn btn-primary" data-bs-dismiss="modal" @click="confirmHold">
+              Yes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
                 <!-- Pagination -->
                 <nav class="mt-4 position-relative custom-pagination-wrapper">
   <ul class="pagination pagination-sm mb-0 custom-pagination">
@@ -300,11 +248,29 @@
     <li class="page-item"><a class="page-link" href="#">6</a></li>
   </ul>
                 </nav>
+
+                 <!-- Held Vulnerabilities List -->
+    <div v-if="heldAssets.length" class="mt-4">
+      <h5 class="mb-3">Hold Vulnerabilities</h5>
+      <ul class="list-group me-3">
+        <li
+          v-for="(held, i) in heldAssets"
+          :key="i"
+          class="list-group-item text-muted"
+        >
+          {{ held.ip }}
+        </li>
+      </ul>
+    </div>
+
                 </div>
 
                 <div class="col-8">
-                    <div class="row py-4 px-3">
-                        <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
+                    <div class="row py-3 px-3">
+                        <div class="d-flex justify-content-between">
+                          <p class="mt-3" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
+                          <NotificationPanel />
+                        </div>
                         <div class="d-flex justify-content-between">
                             <div class="d-flex justify-content-start gap-3">
                             <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.42</div>
@@ -586,12 +552,12 @@
                             
                             <!-- Modal Body -->
                             <div class="modal-body">
-                              <div class="row g-2" style="max-width: 400px;">
+                              <div class="row g-2">
                                 <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 14px;">Step:2</span>
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 2: Code review</span>
                                 </div>
                                 <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 14px;">Step:4</span>    
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 4:Code review</span>    
                                 </div>
                               </div>
 
@@ -727,18 +693,40 @@
 <script>
 import DashboardMenu from "@/components/user-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/user-component/DashboardHeader.vue";
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
   name: "UserAssetsView",
   components: {
     DashboardMenu,
     DashboardHeader,
+    NotificationPanel
   },
    data() {
     return {
       selectedSeverity: "",
       ipAddress: "",
       activeTab: "vulnerabilities",
+      showCheckboxes: false,
+       assets: [
+        { ip: "192.168.1.42" },
+        { ip: "192.168.1.43" },
+        { ip: "192.168.1.44" },
+        { ip: "192.168.1.45" },
+        { ip: "192.168.1.46" },
+        { ip: "192.168.1.47" },
+      ],
+      activeIndex: 0,
+       assets: [
+        { ip: "192.168.1.42", selected: false, held: false },
+        { ip: "192.168.1.43", selected: false, held: false },
+        { ip: "192.168.1.44", selected: false, held: false },
+        { ip: "192.168.1.45", selected: false, held: false },
+        { ip: "192.168.1.46", selected: false, held: false },
+        { ip: "192.168.1.47", selected: false, held: false },
+      ],
+      heldAssets: [],
+      showHoldCheckboxes: false,
     };
   },
   computed: {
@@ -768,8 +756,77 @@ export default {
       alert("Only numbers and dots are allowed!");
     }
   },
+  formatIP() {
+    // Remove all non-digit characters first
+    let digits = this.ipAddress.replace(/\D/g, "");
+
+    // Insert a dot after every group of up to 3 digits
+    let formatted = digits.match(/.{1,3}/g)?.join(".") || "";
+
+    // Limit to 4 groups (IPv4 style)
+    let parts = formatted.split(".").slice(0, 4);
+
+    this.ipAddress = parts.join(".");
+  },
+  handleDeleteClick() {
+    if (!this.showCheckboxes) {
+      this.showCheckboxes = true;
+    } else {
+      const selectedAssets = this.assets.filter((a) => a.selected);
+      if (selectedAssets.length > 0) {
+        // Show modal
+        const modal = new bootstrap.Modal(
+          document.getElementById("deleteModal")
+        );
+        modal.show();
+      } else {
+        this.showCheckboxes = false;
+      }
+    }
+  },
+  confirmDelete() {
+      this.assets.forEach((a) => (a.selected = false));
+      this.showCheckboxes = false;
+    },
+    cancelDelete() {
+    this.assets.forEach((a) => (a.selected = false));
+    this.showCheckboxes = false;
+  },
+  setActive(index) {
+      this.activeIndex = index;
+    },
+    toggleHoldMode() {
+      if (this.showHoldCheckboxes) {
+        // Already showing checkboxes → open confirmation popup
+        let modal = new bootstrap.Modal(document.getElementById("holdConfirmModal"));
+        modal.show();
+      } else {
+        // First click → show checkboxes
+        this.showHoldCheckboxes = true;
+      }
+    },
+    cancelHold() {
+      // Hide checkboxes without moving anything
+      this.showHoldCheckboxes = false;
+      this.assets.forEach(a => (a.selected = false));
+    },
+    confirmHold() {
+      // Move selected items to held list
+      let selected = this.assets.filter(a => a.selected);
+      selected.forEach(a => {
+        a.held = true;
+        this.heldAssets.push({ ...a });
+      });
+
+      // Clear selection & hide checkboxes
+      this.assets = this.assets.map(a => ({ ...a, selected: false }));
+      this.showHoldCheckboxes = false;
+    },
   },
   mounted() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));  
+
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');
     const options = dropdown.querySelectorAll('.dropdown-content a');

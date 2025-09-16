@@ -11,7 +11,10 @@
                     </div>
 
                     <div class="col-11 pt-2 pb-3 px-4 pe-5">
-                        <h2 class="ticket-head mt-4" style="font-size: 36px;">Your Teams</h2>
+                        <div class="d-flex justify-content-between mt-4">
+                            <h2 class="ticket-head " style="font-size: 36px;">Your Teams</h2>
+                            <NotificationPanel />
+                        </div>
                         <div class="row my-4">
                             <div class="col-10">
                             <div class="d-flex justify-content-between tab-wrapper position-relative">
@@ -501,12 +504,14 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
     name: 'YourTeamView',
     components: {
         DashboardMenu,
-        DashboardHeader
+        DashboardHeader,
+        NotificationPanel
     },
     data() {
     return {

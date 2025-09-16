@@ -40,12 +40,15 @@
                       <!-- Teams -->
                       <div class="col-2">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
+                        style="aspect-ratio:1/1; cursor:pointer;">
+                          <button class="btn border-0" @click="toggleTeams">
                           <div>
                             <img src="@/assets/images/teams.png" alt="Teams" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Teams</p>
                           </div>
+                          </button>
                         </div>
+                       
                       </div>
 
                       <!-- Slack -->
@@ -117,8 +120,13 @@
                         </div>
                       </div>
 
-                      <div class="col-5 mt-5">
-                        <button class="btn text-light rounded-pill mt-3" @click="showPlatforms = false" style="background-color: rgba(90, 68, 255, 1);">I'm not using any platform.</button>
+                      <div class="col-6">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
+                          <div>
+                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="showPlatforms = false">I'm not using any platform.</button>
+                          </div>
+                        </div>
+                        
                       </div>
 
                     </div>
@@ -210,8 +218,8 @@
                           </select>
                         </td>
                         <td>
-                              <div class="multi-select-dropdown" ref="roleDropdown1">
-                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown1')">
+                        <div class="multi-select-dropdown" ref="roleDropdown1">
+                          <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown1')">
                                   <span>{{ selectedRoleText1 }}</span>
                                   <span><i class="bi bi-chevron-down"></i></span>
                                 </div>
@@ -225,7 +233,7 @@
                                     {{ option.full }}
                                   </label>
                                 </div>
-                              </div>
+                        </div>
                         </td>
                       </tr>
                       </tbody>
@@ -238,11 +246,97 @@
                       </div>
                     </div>
                   </form>
-                </div>
-              </div>
-              
-             
 
+                  <div class="row pb-4 pt-2 px-2" v-if="showTeams">
+                  <div class="d-flex justify-content-start mb-3">
+                    <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                      <i class="bi bi-microsoft-teams fs-5"></i>
+                    </div>
+                    <h5 class="fw-semibold ms-2 mt-2">Teams</h5></div>
+                      <div class="card border-0">
+                        <table class="table table-striped table-hover align-middle">
+                          <thead class="table-light">
+                            <tr>
+                              <th scope="col">S.No.</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Role</th>
+                              <th scope="col">Location</th>
+                              <th scope="col">Email</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>1</td>
+                              <td>
+                                <img src="https://randomuser.me/api/portraits/men/11.jpg" class="rounded-circle me-2" width="40" height="40" />
+                                Cameron Williamson
+                              </td>
+                              <td>Patch Management</td>
+                              <td>Andorra</td>
+                              <td>curtis@example.com</td>
+                              <td>
+                                <button class="btn btn-sm btn-primary">Assign</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>2</td>
+                              <td>
+                                <img src="https://randomuser.me/api/portraits/men/22.jpg" class="rounded-circle me-2" width="40" height="40" />
+                                Wade Warren
+                              </td>
+                              <td>Configuration Management</td>
+                              <td>UAE</td>
+                              <td>wade@example.com</td>
+                              <td>
+                                <button class="btn btn-sm btn-primary">Assign</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>3</td>
+                              <td>
+                                <img src="https://randomuser.me/api/portraits/women/33.jpg" class="rounded-circle me-2" width="40" height="40" />
+                                Marvin McKinney
+                              </td>
+                              <td>Network Security</td>
+                              <td>Afghanistan</td>
+                              <td>marvin@example.com</td>
+                              <td>
+                                <button class="btn btn-sm btn-primary">Assign</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>4</td>
+                              <td>
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-2" width="40" height="40" />
+                                Brooklyn Simmons
+                              </td>
+                              <td>Architectural Flaws</td>
+                              <td>Antigua</td>
+                              <td>brooklyn@example.com</td>
+                              <td>
+                                <button class="btn btn-sm btn-primary">Assign</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>5</td>
+                              <td>
+                                <img src="https://randomuser.me/api/portraits/men/55.jpg" class="rounded-circle me-2" width="40" height="40" />
+                                Leslie Alexander
+                              </td>
+                              <td>Network Security</td>
+                              <td>Albania</td>
+                              <td>leslie@example.com</td>
+                              <td>
+                                <button class="btn btn-sm btn-primary">Assign</button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      </div>
+                    </div>
+                    </div>
 
               <div class="row mt-4">
                 <div class="col-lg-12 add-users py-4 px-4 ms-3">
@@ -365,7 +459,8 @@ export default {
         { short: 'CM', full: 'Configuration Management' },
         { short: 'NS', full: 'Network Security' },
         { short: 'AF', full: 'Architectural Flaws' }
-      ]
+      ],
+      showTeams: false,
     };
   },
   computed: {
@@ -414,7 +509,9 @@ export default {
         popup.style.display = "none";
       }, 2000);
     },
-    
+    toggleTeams() {
+      this.showTeams = !this.showTeams;
+    },
   },
   mounted() {
     this.initTooltips();
