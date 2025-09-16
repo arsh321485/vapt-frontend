@@ -60,7 +60,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Bug</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
@@ -72,7 +72,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Help</td>
                                             <td>Close</td>
                                             <td>23/06/2025</td>
@@ -84,7 +84,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Feature request</td>
                                             <td>Close</td>
                                             <td>23/06/2025</td>
@@ -96,7 +96,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Feature request</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
@@ -108,7 +108,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This is the description. This is the description.</td>
+                                            <td>This is the description.</td>
                                             <td>Feature request</td>
                                             <td>Open</td>
                                             <td>23/06/2025</td>
