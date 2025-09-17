@@ -64,7 +64,7 @@
                                             <td><router-link to="" style="text-decoration: none;">
                                               <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
                                             </router-link></td>
-                                        </tr>
+                                        </tr>                               
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>

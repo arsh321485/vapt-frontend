@@ -55,8 +55,9 @@
                                             <th scope="col">OS</th>
                                             <th scope="col">Severity</th>
                                             <th scope="col">Assigned on</th>
-                                            <th scope="col">Fixed on</th> 
-                                            <th scope="col">Delayed</th>  
+                                            <!-- <th scope="col">Fixed on</th>  -->
+                                            <th scope="col">Delayed by</th> 
+                                            <th scope="col"></th> 
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
@@ -67,33 +68,33 @@
                                             <td>Windows 10</td>
                                             <td class="text-danger">High</td>
                                             <td>23/06/2025</td>
-                                            <td><div class="d-flex align-items-center gap-2">
-                                        <span>20/07/2025</span>
-                                        <!-- Calendar Button -->
-                                        <button class="btn border-0" @click="toggleCalendar">
+                                            <!-- <td><div class="d-flex align-items-center gap-2">
+                                        <span>20/07/2025</span> -->
+                                       
+                                        <!-- <button class="btn border-0" @click="toggleCalendar">
                                           <i class="bi bi-calendar3 fs-6"></i>
                                         </button>
-                                        <!-- Calendar -->
+                                      
                                         <div
                                           v-if="showCalendar"
                                           ref="calendar"
                                           class="calendar border rounded p-3 shadow"
                                           style="width: 320px; position: absolute; background: #fff; z-index: 1000;"
                                         >
-                                          <!-- Header with close button -->
+                                       
                                           <div class="d-flex justify-content-between align-items-center mb-2">
                                             <button class="btn btn-sm btn-light" @click="prevMonth">&lt;</button>
                                             <h6 class="mb-0">{{ monthYear }}</h6>
                                             <div class="d-flex align-items-center">
                                               <button class="btn btn-sm btn-light me-2" @click="nextMonth">&gt;</button>
-                                              <!-- Cross Button -->
+                                            
                                               <button class="btn btn-sm border-0" @click="closeCalendar">
                                                 <i class="bi bi-x fs-3"></i>
                                               </button>
                                             </div>
                                           </div>
 
-                                          <!-- Week Days -->
+                                          
                                           <div
                                             class="d-grid text-center fw-bold"
                                             style="grid-template-columns: repeat(7, 1fr);"
@@ -101,7 +102,7 @@
                                             <div v-for="day in weekDays" :key="day">{{ day }}</div>
                                           </div>
 
-                                          <!-- Dates -->
+                                   
                                           <div
                                             class="d-grid text-center"
                                             style="grid-template-columns: repeat(7, 1fr); gap: 3px;"
@@ -118,11 +119,18 @@
                                               {{ date }}
                                             </div>
                                           </div>
-                                        </div>
-                                      </div>
-                                      </td>
-                                            <td>Delay by 3 days</td>
-                                            <router-link to="/pendingvulnerabilitycard" class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1); text-decoration: none;">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></router-link>
+                                        </div> -->
+                                      <!-- </div>
+                                      </td> -->
+                                            <td>3 days</td>
+                                            <td>
+                                              <div class="d-flex flex-row">
+                                                <router-link to="/pendingvulnerabilitycard" class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1); text-decoration: none;">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></router-link>
+                                              <router-link to="" style="text-decoration: none;">
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </router-link>
+                                              </div>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -131,14 +139,14 @@
                                             <td>Windows 10</td>
                                             <td class="text-warning">Medium</td>
                                             <td>23/06/2025</td>
-                                            <td><input
+                                            <!-- <td><input
                                               class="border-0"
                                                 type="date"
                                                 ref="dateInput"
                                                 v-model="selectedDate"
                                                 @click="openCalendar"
-                                              /></td>
-                                            <td>Delay by 3 days</td>
+                                              /></td> -->
+                                            <td>3 days</td>
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
@@ -148,14 +156,14 @@
                                             <td>Windows 10</td>
                                             <td class="text-success">Low</td>
                                             <td>23/06/2025</td>
-                                            <td><input
+                                            <!-- <td><input
                                               class="border-0"
                                                 type="date"
                                                 ref="dateInput"
                                                 v-model="selectedDate"
                                                 @click="openCalendar"
-                                              /></td>
-                                            <td>Delay by 3 days</td>
+                                              /></td> -->
+                                            <td>3 days</td>
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
@@ -165,14 +173,14 @@
                                             <td>Windows 10</td>
                                             <td style="color: maroon;">Critical</td>
                                             <td>23/06/2025</td>
-                                            <td><input
+                                            <!-- <td><input
                                               class="border-0"
                                                 type="date"
                                                 ref="dateInput"
                                                 v-model="selectedDate"
                                                 @click="openCalendar"
-                                              /></td>
-                                            <td>Delay by 3 days</td>
+                                              /></td> -->
+                                            <td>3 days</td>
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
@@ -182,14 +190,14 @@
                                             <td>Windows 10</td>
                                             <td class="text-danger">High</td>
                                             <td>23/06/2025</td>
-                                            <td><input
+                                            <!-- <td><input
                                               class="border-0"
                                                 type="date"
                                                 ref="dateInput"
                                                 v-model="selectedDate"
                                                 @click="openCalendar"
-                                              /></td>
-                                            <td>Delay by 3 days</td>
+                                              /></td> -->
+                                            <td>3 days</td>
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
@@ -199,14 +207,14 @@
                                             <td>Windows 10</td>
                                             <td class="text-warning">Medium</td>
                                             <td>23/06/2025</td>
-                                            <td><input
+                                            <!-- <td><input
                                               class="border-0"
                                                 type="date"
                                                 ref="dateInput"
                                                 v-model="selectedDate"
                                                 @click="openCalendar"
-                                              /></td>
-                                            <td>Delay by 3 days</td>
+                                              /></td> -->
+                                            <td>3 days</td>
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
@@ -216,14 +224,14 @@
                                             <td>Windows 10</td>
                                             <td class="text-danger">High</td>
                                             <td>23/06/2025</td>
-                                            <td><input
+                                            <!-- <td><input
                                               class="border-0"
                                                 type="date"
                                                 ref="dateInput"
                                                 v-model="selectedDate"
                                                 @click="openCalendar"
-                                              /></td>
-                                            <td>Delay by 3 days</td>
+                                              /></td> -->
+                                            <td>3 days</td>
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         

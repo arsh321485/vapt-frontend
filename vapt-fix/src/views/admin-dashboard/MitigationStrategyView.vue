@@ -196,55 +196,25 @@
                 <span style="color: rgba(0, 0, 0, 0.87);">Assigned to Patch Management team </span> 
               </div>
               <div class="d-flex gap-4 my-3">
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
+                      <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
-                        
-                        </div>
-                        <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      10 Days 
-                      <!-- <i class="bi bi-plus-circle text-danger"  style="cursor:pointer;" id="plusIcon"></i> -->
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
                         </button>
-
-                    
-
-
                       </div>
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
-                      <button class="btn btn-outline-secondary rounded-pill text-danger d-flex align-items-center justify-content-center w-100">High</button>
-                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
-                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
-                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                        </div>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-danger">High</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
                       </div>
-                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-warning">Medium</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
                       </div>
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
-                      <button class="btn btn-outline-secondary rounded-pill text-warning d-flex align-items-center justify-content-center w-100">Medium</button>
-                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
-                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
-                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                        </div>
-                      </div>
-                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
-                      </div>
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
-                      <button class="btn btn-outline-secondary rounded-pill text-success d-flex align-items-center justify-content-center w-100">Low</button>
-                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
-                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
-                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                        </div>
-                      </div>
-                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-success">Low</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
                       </div>
               </div>
             </div>

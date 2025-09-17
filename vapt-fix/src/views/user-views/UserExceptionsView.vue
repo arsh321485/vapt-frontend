@@ -56,7 +56,8 @@
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
-                                            <td>This issue is low risk in our environment</td>
+                                            <td style="cursor: pointer;" 
+                                                data-bs-toggle="modal" data-bs-target="#viewRequestsModal">This issue is low risk in our environment</td>
                                             
                                             <td>23/06/25</td>
                                             <td><router-link to="" style="text-decoration: none;">
@@ -121,6 +122,41 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                 <!-- view Requests Modal -->
+                      <div class="modal fade" id="viewRequestsModal" tabindex="-1" aria-labelledby="viewRequestsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="viewRequestsModalLabel">Issues Raised for Support</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                              <div class="row g-2">
+                                <div class="col-4">
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 2: Code review</span>
+                                </div>
+                                <div class="col-4">
+                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 4: Code review</span>    
+                                </div>
+                              </div>
+
+                              <h6 class="mt-3 fw-semibold">Description</h6>
+                              <textarea class="form-control rounded-0" rows="4" readonly>The issue has been reviewed, but the current explanation is not sufficient. Please provide additional justification to proceed further.
+                              </textarea>
+                            </div>
+                            
+                            <!-- Modal Footer -->
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+
+                          </div>  
+                        </div>
+                      </div>
                             </div>
                         </div>
                     </div>

@@ -21,9 +21,6 @@
               <div class="row ps-5">
                 <div class="col-lg-8 location-card p-5 mb-5">
                   <div class="row">
-                    <!-- <router-link to="/riskcriteria" class="mb-3" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
-                                <i class="bi bi-arrow-left"></i> Back
-                                </router-link> -->
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-geo-alt-fill fs-4"></i>
                     </div>
@@ -37,8 +34,15 @@
                           <select v-model="selectedLocation" class="form-select" @change="checkLocation">
                             <option selected disabled value="">Select Location</option>
                             
-                            <option v-for="loc in locations" :key="loc" :value="loc" :disabled="isAlreadyUploaded(loc)">
+                            <option v-for="loc in locations" :key="loc" :value="loc" :disabled="isAlreadyUploaded(loc, selectedType)">
                              {{ loc }}</option>
+                          </select>
+                      </div>
+                      <div>
+                          <select v-model="selectedType" class="form-select">
+                            <option selected disabled value="">Select type</option>
+                            <option value="internal">Internal</option>
+                            <option value="external">External</option>
                           </select>
                       </div>
                   </div>
@@ -58,7 +62,7 @@
                     @change="handleFileUpload"
                     style="display: none"
                   />
-                  <button class="btn upload-report-btn" @click="triggerFileInput" :disabled="!selectedLocation">
+                  <button class="btn upload-report-btn" @click="triggerFileInput" :disabled="!selectedLocation || !selectedType">
                     <i class="bi bi-arrow-up-circle fs-5"></i>
                   </button>
                   <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
@@ -92,7 +96,7 @@
                   </div>
                 </div>
               </div>
-               </div>
+              </div>
                 
               <div class="col-lg-6">
                 <div v-if="uploadedFiles.length > 0" class="card border-0 shadow-sm py-3 px-3" style="border-radius: 18px;">
@@ -107,7 +111,8 @@
                   </thead>
                   <tbody>
                     <tr v-for="(file, index) in uploadedFiles" :key="index">
-                      <td><strong>{{ file.fileName }}</strong></td>
+                      <td><strong>{{ file.fileName }}</strong><br>
+            <small class="text-muted">({{ file.type }})</small></td>
                       <td>{{ file.location }}</td>
                       <!-- <td>
                         <div class="d-flex gap-2">
@@ -150,6 +155,7 @@ export default {
   data() {
     return {
       selectedLocation: "",
+      selectedType: "",
       locations: ["Apply for all locations", "Greece", "Germany", "Bahrain", "Delhi"],
     uploadedFiles: [],
       uploadingStarted: false,
@@ -161,12 +167,12 @@ export default {
     };
   },
  methods: {
-  isAlreadyUploaded(location) {
-    return this.uploadedFiles.some(file => file.location === location);
+  isAlreadyUploaded(location, type) {
+    return this.uploadedFiles.some(file => file.location === location && file.type === type);
   },
   checkLocation() {
-  if (this.isAlreadyUploaded(this.selectedLocation)) {
-    alert(`File is already uploaded for "${this.selectedLocation}"`);
+  if (this.isAlreadyUploaded(this.selectedLocation, this.selectedType)) {
+    alert(`File is already uploaded for "${this.selectedLocation}" (${this.selectedType})`);
     this.selectedLocation = ""; // reset dropdown
   } else {
     // ✅ Reset upload state when user selects new location
@@ -176,15 +182,15 @@ export default {
     this.uploadedFileSize = "";
     this.$refs.pdfFileInput.value = "";
   }
-},
-  
-    triggerFileInput() {
-    this.$refs.pdfFileInput.click();
   },
-  
+  triggerFileInput() {
+    if (this.selectedLocation && this.selectedType) {
+        this.$refs.pdfFileInput.click();
+      }
+  },  
   handleFileUpload(event) {
   const file = event.target.files[0];
-  if (file && this.selectedLocation) {
+  if (file && this.selectedLocation && this.selectedType) {
     this.uploadingStarted = true;
     this.uploadedFileName = file.name;
     this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
@@ -200,22 +206,19 @@ export default {
 
         this.uploadedFiles.push({
           location: this.selectedLocation,
+          type: this.selectedType,
           fileName: this.uploadedFileName,
           fileURL: fileURL   
         });
 
-        this.showToast(`File "${this.uploadedFileName}" uploaded for ${this.selectedLocation} ✅`);
-
-        // ❌ Don't reset here
-        // Keep showing uploaded file in the progress card
+        this.showToast(`File "${this.uploadedFileName}" uploaded for ${this.selectedLocation}  (${this.selectedType}) ✅`);
       } else {
         progress += 20;
         this.uploadProgress = progress;
       }
     }, 500);
   }
-},
-
+  },
   viewFile(file) {
     // ✅ Open the uploaded file in a new tab
     window.open(file.fileURL, "_blank");

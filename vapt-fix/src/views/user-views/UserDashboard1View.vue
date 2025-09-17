@@ -11,8 +11,8 @@
           </div>
 
           <div class="col-11 pt-2 pb-3 pe-5">
-            <div class="d-flex flex-row align-items-center justify-content-between py-3">
-              <div class="d-flex justify-content-start gap-2">
+            <div class="d-flex justify-content-between py-3">
+              <div class="d-flex flex-row gap-2">
                 <div>
                   <h2>Vulnerability Management Program</h2>
                   <p style="color: rgba(0, 0, 0, 0.6);font-size:16px;font-weight: 500;">Patch management team</p>
@@ -53,27 +53,118 @@
                         </div>
                       </div>
                     </div>
-                </div>
+                </div> 
               </div>
+              <div class="d-flex flex-row gap-3">
+                <div><button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-download me-2"></i> Download Report</button></div>
 
-              <div class="d-flex flex-column gap-3">
-                <div class="d-flex justify-content-end">
-                  <div class="dropdown">
+                <!-- Overlay Popup -->
+                  <div v-if="showReport" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                  style="background-color: rgba(0, 0, 0, 0.6); z-index: 1050;">
+                  <div class="bg-white p-4 rounded shadow" style="width: 600px; max-height: 90vh; overflow-y: auto; position: relative;">
+                  <!-- Close Button -->
+                  <button @click="showReport = false"
+                  class="btn-close position-absolute top-0 end-0 m-3"
+                  aria-label="Close"></button>
+                  <h2 class="mb-2 text-center">Download Report</h2>
+                    <p class="mb-2 text-center" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Download report</p>
+                    <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3"> June 1 - June 30 <i class="bi bi-calendar-minus"></i>
+                    </button>
+
+                    <!-- Accordion -->
+                    <div class="accordion" id="globalReportAccordion">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                        <button
+                          class="accordion-button"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#collapseOne"
+                          aria-expanded="true"
+                          aria-controls="collapseOne"
+                        >Assets(11) <span class="text-primary ms-2">4 selected</span>
+                        </button>
+                        </h2>
+                        <div id="collapseOne"
+                        class="accordion-collapse collapse show"
+                        aria-labelledby="headingOne"
+                        data-bs-parent="#globalReportAccordion">
+                        <div class="accordion-body">
+                         Assets
+                        </div>
+                        </div>
+                        </div>
+
+                                    <div class="accordion-item">
+                                      <h2 class="accordion-header" id="headingTwo">
+                                        <button
+                                          class="accordion-button collapsed"
+                                          type="button"
+                                          data-bs-toggle="collapse"
+                                          data-bs-target="#collapseTwo"
+                                          aria-expanded="false"
+                                          aria-controls="collapseTwo"
+                                        >
+                                          Vulnerabilities
+                                        </button>
+                                      </h2>
+                                      <div
+                                        id="collapseTwo"
+                                        class="accordion-collapse collapse"
+                                        aria-labelledby="headingTwo"
+                                        data-bs-parent="#globalReportAccordion"
+                                      >
+                                        <div class="accordion-body">
+                                          Vulnerabilities
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div class="accordion-item">
+                                      <h2 class="accordion-header" id="headingThree">
+                                        <button
+                                          class="accordion-button collapsed"
+                                          type="button"
+                                          data-bs-toggle="collapse"
+                                          data-bs-target="#collapseThree"
+                                          aria-expanded="false"
+                                          aria-controls="collapseThree"
+                                        >
+                                          Team Role
+                                        </button>
+                                      </h2>
+                                      <div
+                                        id="collapseThree"
+                                        class="accordion-collapse collapse"
+                                        aria-labelledby="headingThree"
+                                        data-bs-parent="#globalReportAccordion"
+                                      >
+                                        <div class="accordion-body">
+                                          Team Roles
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    
+                    </div>
+
+                    <button class="btn download-btn btn-sm ms-3 mt-4"><i class="bi bi-download me-2"></i> Download report</button>
+
+                    </div>
+                    </div>
+
+                <div class="dropdown">
                           <div class="dropdown-btn"> Select location</div>
                           <div class="dropdown-content">
                               <a href="#">Greece</a>
                               <a href="#">Germany</a>
                               <a href="#">Bahrain</a>
                           </div>
-                  </div>
-                  <NotificationPanel />
                 </div>
-                <button type="button" class="btn pending-approval-btn rounded-pill">
-                11 Support requests raised
-                <i class="bi bi-arrow-right ms-1 fs-5"></i>
-              </button>
+                <NotificationPanel />
               </div>
             </div>
+            
 
             <div class="row">
               <div class="col-3">
@@ -204,7 +295,7 @@
                     </div>
                     <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
-                  <div class="d-flex flex-row justify-content-start gap-2 py-3">
+                  <div class="d-flex flex-row justify-content-center gap-2 py-3">
                     <h1 class="text-78">2d 11 hrs</h1>
                   </div>
                 </div>
@@ -221,13 +312,13 @@
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
                         <div id="highAge" class="fs-5 fw-semibold">14</div>
-                        <div class="bar red vul-bar mt-1"></div>
-                        <small class="mt-1 d-block" style="color: red;">● Pending</small>
+                        <div class="bar dark-yellow vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: yellow;">● Pending</small>
                       </div>
                       <div class="text-center">
                         <div id="highAge" class="fs-5 fw-semibold">18</div>
-                        <div class="bar blue vul-bar mt-1" style="color: blue;"></div>
-                        <small class="mt-1 d-block" style="color: blue;">● Approved</small>
+                        <div class="bar light-green vul-bar mt-1" style="color: blue;"></div>
+                        <small class="mt-1 d-block" style="color: rgb(71, 199, 71);">● Closed</small>
                       </div> 
                     </div>
                   </div>
@@ -237,7 +328,13 @@
             </div>
 
             <div class="row mt-4">
-              <h4>Patch Management</h4>
+              <div class="d-flex justify-content-between">
+                <h4>Patch Management</h4>
+                <button type="button" class="btn pending-approval-btn rounded-pill">
+                11 Support requests ongoing
+                <i class="bi bi-arrow-right ms-1 fs-5"></i>
+              </button>
+              </div>
               <div class="d-flex gap-4 my-3">
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>

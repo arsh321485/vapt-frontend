@@ -13,7 +13,14 @@
                     <div class="col-11 pt-2 pb-3 px-4 pe-5">
                         <div class="d-flex justify-content-between mt-4">
                             <h2 class="ticket-head " style="font-size: 36px;">Your Teams</h2>
-                            <NotificationPanel />
+                            <div class="d-flex flex-row gap-3">
+                                <div>
+                                    <button class="btn d-flex align-items-center px-3 py-2 text-light" style="font-size: 14px;background-color: rgba(49, 33, 177, 1);border-radius: 20px;" @click="showPopup = true">
+                                <i class="bi bi-person-plus me-2"></i> Add a team member
+                                </button>
+                                </div>
+                                <NotificationPanel />
+                            </div>
                         </div>
                         <div class="row my-4">
                             <div class="col-10">
@@ -170,11 +177,9 @@
                                 </a>
                             </div>
                             <hr class="my-2">
-                        <!-- Add Team Member Button -->
-                            <div class="mt-5">
-                                <button class="btn d-flex align-items-center px-3 py-2 text-light" style="font-size: 14px;background-color: rgba(49, 33, 177, 1);border-radius: 20px;" @click="showPopup = true">
-                                <i class="bi bi-person-plus me-2"></i> Add a team member
-                                </button>
+                        <!-- Add Team Member modal -->
+                            <div class="">
+                                
 
                                 <!-- Modal -->
                                 <div
@@ -482,12 +487,7 @@
                                 </a>
                             </div>
                             <hr class="my-2">
-                        <!-- Add Team Member Button -->
-                            <div class="mt-5">
-                                <button class="btn d-flex align-items-center px-3 py-2 text-light" style="font-size: 14px;background-color: rgba(49, 33, 177, 1);border-radius: 20px;">
-                                <i class="bi bi-person-plus me-2"></i> Add a team member
-                                </button>
-                            </div>
+                        
 
                             </div>
                         </div>

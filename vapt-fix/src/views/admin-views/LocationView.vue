@@ -62,8 +62,17 @@
                         </div>
                       </div>
 
+                      <div class="col-6">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
+                          <div>
+                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="showPlatforms = false">I'm not using any platform.</button>
+                          </div>
+                        </div>
+                        
+                      </div>
+
                       <!-- Jira -->
-                      <div class="col-2">
+                      <!-- <div class="col-2">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
                             style="aspect-ratio:1/1; cursor:pointer;">
                           <div>
@@ -71,15 +80,46 @@
                             <p class="mt-2 fw-semibold mb-0">Jira</p>
                           </div>
                         </div>
-                      </div>
+                      </div> -->
 
                       <!-- Confluence -->
-                      <div class="col-2">
+                      <!-- <div class="col-2">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
                             style="aspect-ratio:1/1; cursor:pointer;">
                           <div class="d-flex flex-column align-items-center justify-content-center text-center">
                             <img src="@/assets/images/confluence.png" alt="Confluence" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Confluence</p>
+                          </div>
+                        </div>
+                      </div> -->
+
+                      <!-- Asana -->
+                      <!-- <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div>
+                            <img src="@/assets/images/asana.png" alt="Asana" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Asana</p>
+                          </div>
+                        </div>
+                      </div> -->
+                    </div>
+
+                    <!-- Second row: 3 cards -->
+                    <div class="row g-4 mt-2">
+                      <div class="d-flex justify-content-start">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                      <i class="bi bi-ui-checks-grid fs-5"></i>
+                    </div>
+                    <h5 class="fw-semibold ms-2 mt-2">Choose your Project Management platform</h5>
+                    </div>
+                      <!-- Jira -->
+                      <div class="col-2">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                          <div>
+                            <img src="@/assets/images/jira.png" alt="Jira" style="width:40px; height:40px;">
+                            <p class="mt-2 fw-semibold mb-0">Jira</p>
                           </div>
                         </div>
                       </div>
@@ -94,36 +134,11 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    <!-- Second row: 3 cards -->
-                    <div class="row g-4 mt-2">
-                      <!-- Monday.com -->
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
-                          <div class="d-flex flex-column align-items-center justify-content-center text-center">
-                            <img src="@/assets/images/monday.png" alt="Monday.com" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Monday.com</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Notion -->
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
-                          <div>
-                            <img src="@/assets/images/notion.png" alt="Notion" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Notion</p>
-                          </div>
-                        </div>
-                      </div>
 
                       <div class="col-6">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
                           <div>
-                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="showPlatforms = false">I'm not using any platform.</button>
+                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="showPlatforms = false">Not in use</button>
                           </div>
                         </div>
                         
@@ -252,16 +267,18 @@
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-microsoft-teams fs-5"></i>
                     </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Teams</h5></div>
+                    <h5 class="fw-semibold ms-2 mt-2">Teams</h5>
+                    <p class="ms-3 fw-semibold" style="font-size: 13px;margin-top: 12px;">(Add Internal Users)</p>
+                  </div>
                       <div class="card border-0">
                         <table class="table table-striped table-hover align-middle">
                           <thead class="table-light">
                             <tr>
                               <th scope="col">S.No.</th>
                               <th scope="col">Name</th>
+                              <th scope="col">Email</th>
                               <th scope="col">Role</th>
                               <th scope="col">Location</th>
-                              <th scope="col">Email</th>
                               <th scope="col">Action</th>
                             </tr>
                           </thead>
@@ -272,9 +289,35 @@
                                 <img src="https://randomuser.me/api/portraits/men/11.jpg" class="rounded-circle me-2" width="40" height="40" />
                                 Cameron Williamson
                               </td>
-                              <td>Patch Management</td>
-                              <td>Andorra</td>
                               <td>curtis@example.com</td>
+                              <!-- <td>Patch Management</td> -->
+                               <td>
+                                <div class="multi-select-dropdown" ref="roleDropdown3">
+                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown3')">
+                                  <span>{{ selectedRoleText3 }}</span>
+                                  <span><i class="bi bi-chevron-down"></i></span>
+                                </div>
+                                <div class="dropdown-list" v-show="isOpen.dropdown3">
+                                  <label v-for="option in roleOptions" :key="option.short">
+                                    <input
+                                      type="checkbox"
+                                      :value="option.short"
+                                      v-model="selectedRoles3"
+                                    />
+                                    {{ option.full }}
+                                  </label>
+                                </div>
+                                </div>
+                               </td>
+                              <td>
+                                <select class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                                  <option selected disabled value="">location</option>
+                                  <option value="">Germany</option>
+                                  <option value="">Delhi</option>
+                                  <option value="">Bahrain</option>
+                                </select>
+                              </td>
+                              
                               <td>
                                 <button class="btn btn-sm btn-primary">Assign</button>
                               </td>
@@ -285,9 +328,10 @@
                                 <img src="https://randomuser.me/api/portraits/men/22.jpg" class="rounded-circle me-2" width="40" height="40" />
                                 Wade Warren
                               </td>
-                              <td>Configuration Management</td>
-                              <td>UAE</td>
                               <td>wade@example.com</td>
+                              <td>Patch Management</td>
+                              <td>UAE</td>
+                              
                               <td>
                                 <button class="btn btn-sm btn-primary">Assign</button>
                               </td>
@@ -298,9 +342,10 @@
                                 <img src="https://randomuser.me/api/portraits/women/33.jpg" class="rounded-circle me-2" width="40" height="40" />
                                 Marvin McKinney
                               </td>
+                              <td>marvin@example.com</td>
                               <td>Network Security</td>
                               <td>Afghanistan</td>
-                              <td>marvin@example.com</td>
+                              
                               <td>
                                 <button class="btn btn-sm btn-primary">Assign</button>
                               </td>
@@ -311,9 +356,10 @@
                                 <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-2" width="40" height="40" />
                                 Brooklyn Simmons
                               </td>
+                              <td>brooklyn@example.com</td>
                               <td>Architectural Flaws</td>
                               <td>Antigua</td>
-                              <td>brooklyn@example.com</td>
+                              
                               <td>
                                 <button class="btn btn-sm btn-primary">Assign</button>
                               </td>
@@ -324,9 +370,10 @@
                                 <img src="https://randomuser.me/api/portraits/men/55.jpg" class="rounded-circle me-2" width="40" height="40" />
                                 Leslie Alexander
                               </td>
+                              <td>leslie@example.com</td>
                               <td>Network Security</td>
                               <td>Albania</td>
-                              <td>leslie@example.com</td>
+                              
                               <td>
                                 <button class="btn btn-sm btn-primary">Assign</button>
                               </td>
@@ -451,9 +498,11 @@ export default {
       isOpen: {
         dropdown1: false,
         dropdown2: false,
+        dropdown3: false,
       },
       selectedRoles1: [],
       selectedRoles2: [],
+      selectedRoles3: [],
       roleOptions: [
         { short: 'PM', full: 'Patch Management' },
         { short: 'CM', full: 'Configuration Management' },
@@ -469,6 +518,9 @@ export default {
     },
     selectedRoleText2() {
       return this.selectedRoles2.length > 0 ? this.selectedRoles2.join(', ') : 'Select roles';
+    },
+    selectedRoleText3() {
+      return this.selectedRoles3.length > 0 ? this.selectedRoles3.join(', ') : 'Select roles';
     },
   },
   methods: {
@@ -489,11 +541,15 @@ export default {
     onClickOutside(event) {
       const isClickInsideDropdown1 = this.$refs.roleDropdown1.contains(event.target);
       const isClickInsideDropdown2 = this.$refs.roleDropdown2.contains(event.target);
+      const isClickInsideDropdown3 = this.$refs.roleDropdown3.contains(event.target);
       if (!isClickInsideDropdown1) {
         this.isOpen.dropdown1 = false;
       }
       if (!isClickInsideDropdown2) {
         this.isOpen.dropdown2 = false;
+      }
+      if (!isClickInsideDropdown3) {
+        this.isOpen.dropdown3 = false;
       }
     },
     copyLink() {

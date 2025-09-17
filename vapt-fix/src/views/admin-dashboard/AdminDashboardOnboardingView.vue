@@ -298,7 +298,7 @@
                     </div>
                     <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
-                  <div class="d-flex flex-row justify-content-start gap-2 py-3">
+                  <div class="d-flex flex-row justify-content-center gap-2 py-3">
                     <h1 class="text-78">2d 11 hrs</h1>
                   </div>
                 </div>
@@ -322,7 +322,7 @@
                       <div class="text-center">
                         <div id="highAge" class="fs-5 fw-semibold">18</div>
                         <div class="bar light-green vul-bar mt-1" style="color: blue;"></div>
-                        <small class="mt-1 d-block" style="color: rgb(71, 199, 71);">● Close</small>
+                        <small class="mt-1 d-block" style="color: rgb(71, 199, 71);">● Closed</small>
                       </div> 
                     </div>
                   </div>
@@ -380,82 +380,27 @@
                     </div>
 
                     <div class="d-flex gap-4 my-3">
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
-                          <button class="btn btn-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
-                        
-                        </div>
-                        <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      10 Days 
-                      
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
                         </button>
-
-                        <!-- Inline Input (hidden by default) -->
-<div id="inlineInput" class="mt-2" style="display: none;">
-  <input type="text" class="form-control d-inline w-50" id="userInput" placeholder="Enter something...">
-  <button class="btn btn-primary ms-2" id="saveBtn">Save</button>
-</div>
-
-                    <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h6 class="modal-title" id="exampleModalLabel">Reason for changing mitigation deadline to <span id="modalText"></span></h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <div class="modal-body">
-        <textarea class="form-control" style="border-radius: 8px;" id="exampleFormControlTextarea1" rows="3"></textarea>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
-      </div>
-      
-    </div>
-  </div>
-</div>
-                   
                       </div>
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
-                      <button class="btn btn-outline-secondary btn-pill text-danger d-flex align-items-center justify-content-center w-100">High</button>
-                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
-                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
-                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                        </div>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-danger">High</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
                       </div>
-                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-warning">Medium</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
                       </div>
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
-                      <button class="btn btn-outline-secondary btn-pill text-warning d-flex align-items-center justify-content-center w-100">Medium</button>
-                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
-                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
-                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                        </div>
+                      <div class="d-flex flex-column gap-2">
+                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-success">Low</button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
+                        </button>
                       </div>
-                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                      </button>
-                      </div>
-                      <div class="d-flex flex-column gap-3">
-                        <div class="d-flex justify-content-between">
-                      <button class="btn btn-outline-secondary btn-pill text-success d-flex align-items-center justify-content-center w-100">Low</button>
-                      <div class="info-icon mt-1" style="position:  relative; display: inline-block;">
-                          <i class="bi bi-question-circle ms-2 text-danger" style="font-size: 13px;font-weight: 600;"></i>
-                          <span class="tooltip-text">Reason for changing mitigation timeline or deadline</span>
-                      </div>
-                      </div>
-                      <button type="button" class="btn patch-btn rounded-pill text-nowrap">
-                      June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
-                      </div>
-                    </div>
+              </div>
                   </div>
 
                   <div class="row mb-5">

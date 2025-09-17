@@ -80,8 +80,8 @@
           <img src="@/assets/images/clients/client-6.png" alt="">
           <img src="@/assets/images/clients/client-7.png" alt="">
           <img src="@/assets/images/clients/client-8.png" alt="">
-          <img src="@/assets/images/clients/client-9.png" alt="">
-          <img src="@/assets/images/clients/client-10.png" alt="">
+          <!-- <img src="@/assets/images/clients/client-9.png" alt="">
+          <img src="@/assets/images/clients/client-10.png" alt=""> -->
           <img src="@/assets/images/clients/client-11.png" alt="">
           <img src="@/assets/images/clients/client-12.png" alt="">
           <img src="@/assets/images/clients/client-13.png" alt="">
@@ -95,8 +95,8 @@
           <img src="@/assets/images/clients/client-6.png" alt="">
           <img src="@/assets/images/clients/client-7.png" alt="">
           <img src="@/assets/images/clients/client-8.png" alt="">
-          <img src="@/assets/images/clients/client-9.png" alt="">
-          <img src="@/assets/images/clients/client-10.png" alt="">
+          <!-- <img src="@/assets/images/clients/client-9.png" alt="">
+          <img src="@/assets/images/clients/client-10.png" alt=""> -->
           <img src="@/assets/images/clients/client-11.png" alt="">
           <img src="@/assets/images/clients/client-12.png" alt="">
           <img src="@/assets/images/clients/client-13.png" alt="">
