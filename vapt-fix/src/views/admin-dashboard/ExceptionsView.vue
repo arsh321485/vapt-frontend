@@ -67,10 +67,10 @@
                                              
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <!-- <td><router-link to="" style="text-decoration: none;">
+                                            <td><router-link to="" style="text-decoration: none;">
                                               <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td> -->
-                                            <td>
+                                            </router-link></td>
+                                            <!-- <td>
       <router-link to="" style="text-decoration: none;">
         <button
           class="btn fw-semibold border-0"
@@ -80,7 +80,7 @@
           Chat with us <i class="bi bi-chat-dots ms-2"></i>
         </button>
       </router-link>
-    </td>
+    </td> -->
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
