@@ -39,7 +39,7 @@
                         </div>
                         
                         <div class="row mt-4">
-                            <h6 class="fw-semibold mb-3">Requested earlier this week</h6>
+                            <!-- <h6 class="fw-semibold mb-3">Requested earlier this week</h6> -->
                             <div class="table-responsive">
                                 <table class="table align-middle table-borderless">
                                     <thead class="raised-table">

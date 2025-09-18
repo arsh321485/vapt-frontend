@@ -67,9 +67,20 @@
                                              
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td><router-link to="" style="text-decoration: none;">
+                                            <!-- <td><router-link to="" style="text-decoration: none;">
                                               <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
+                                            </router-link></td> -->
+                                            <td>
+      <router-link to="" style="text-decoration: none;">
+        <button
+          class="btn fw-semibold border-0"
+          style="color: rgba(49, 33, 177, 1);"
+          @click="toggleChat"
+        >
+          Chat with us <i class="bi bi-chat-dots ms-2"></i>
+        </button>
+      </router-link>
+    </td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -164,6 +175,81 @@
                         </div>
                       </div>
                             </div>
+
+                             <!-- Chat Box -->
+    <div
+      v-if="showChat"
+      class="chat-box shadow rounded"
+      style="position: fixed; bottom: 20px; right: 20px; width: 900px; height: 600px; background: #fff; border: 1px solid #ddd; display: flex;"
+    >
+      <!-- Left Column -->
+      <div class="col-7 border-end d-flex flex-column">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+          <h6 class="mb-0">
+            CVE-2024-22259 - org.springframework:spring-web
+          </h6>
+          <div>
+            <button class="btn btn-sm" @click="minimizeChat"><i class="bi bi-dash-lg"></i></button>
+            <button class="btn btn-sm text-danger" @click="closeChat"><i class="bi bi-x-lg"></i></button>
+          </div>
+        </div>
+
+        <!-- Fake Messages -->
+        <div class="flex-grow-1 p-3 overflow-auto">
+          <div v-for="(msg, index) in messages" :key="index" class="mb-2">
+            <div
+              class="p-2 rounded"
+              :class="msg.sender === 'user' ? 'bg-primary text-white text-end' : 'bg-light'"
+            >
+              {{ msg.text }}
+            </div>
+            <button
+              v-if="msg.deletable"
+              class="btn btn-sm text-danger mt-1"
+              @click="deleteMessage(index)"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-2 border-top">
+          <div class="d-flex align-items-center gap-2">
+            <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" />
+            <button class="btn btn-light" @click="$refs.fileInput.click()">
+              <i class="bi bi-paperclip"></i>
+            </button>
+            <input
+              v-model="newMessage"
+              type="text"
+              class="form-control"
+              placeholder="Type a message..."
+            />
+            <button class="btn btn-primary" @click="sendMessage">
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-5 p-3">
+        <div class="text-center">
+          <img
+            src="@/assets/images/smaller-logo.png"
+            alt="Logo"
+            class="rounded-circle mb-3"
+            style="width: 80px; height: 80px;"
+          />
+        </div>
+        <p><strong>Asset:</strong> 192.168.1.42</p>
+        <p><strong>Category:</strong> Bug</p>
+        <p><strong>Criticality:</strong> High</p>
+      </div>
+    </div>
+
                         </div>
                         
                     </div>
@@ -188,66 +274,45 @@ export default {
     },
     data() {
     return {
-      showNotifications: false,
-      isFullscreen: false,
-      filterType: "",
-    showAll: false,
-      notifications: [
-        { type: "report", icon: "bi bi-file-text", color: "text-info", message: "A <b>new report</b> was added for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> from Patch Management.", time: "2 min ago"  },
-        { type: "fixed", icon: "bi bi-check-circle", color: "text-success", message: "Vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> has been <span class='fw-semibold'>fixed</span> from Configuration Management.", time: "10 min ago" },
-        { type: "assigned", icon: "bi bi-person-check", color: "text-primary", message: "A new vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> was <span class='fw-semibold'>assigned</span> to you from Network Security.", time: "15 min ago" },
-        { type: "exception", icon: "bi bi-exclamation-triangle", color: "text-warning", message: "An <span class='fw-semibold'>exception</span> was raised for vulnerability <b>VMware ESXi 7.0/8.0 Sandbox Escape</b> from Architectural Flaws.", time: "30 min ago" },
-        { type: "download", icon: "bi bi-download", color: "text-primary", message: "Your report has been downloaded successfully.", time: "10 min ago" },
-        
-  { type: "mitigated", icon: "bi bi-shield-check", color: "text-success", message: "Vulnerability <b>Apache Struts RCE</b> has been successfully <span class='fw-semibold'>mitigated</span> by Security Team.", time: "5 min ago" },
-
-  { type: "deadline", icon: "bi bi-clock-history", color: "text-warning", message: "The <span class='fw-semibold'>deadline</span> for vulnerability <b>OpenSSL Buffer Overflow</b> has been <span class='fw-semibold'>extended</span> by Admin.", time: "12 min ago" },
-
-  { type: "exception-request", icon: "bi bi-journal-text", color: "text-primary", message: "An <span class='fw-semibold'>exception request</span> was submitted for <b>Windows SMBv1 Remote Exploit</b>.", time: "20 min ago" },
-
-  { type: "exception-approved", icon: "bi bi-check-circle", color: "text-success", message: "Exception request for <b>Oracle WebLogic RCE</b> has been <span class='fw-semibold'>approved</span>.", time: "45 min ago" },
-
-  { type: "exception-denied", icon: "bi bi-x-circle", color: "text-danger", message: "Exception request for <b>Apache Log4j JNDI Exploit</b> has been <span class='fw-semibold'>denied</span>.", time: "1 hour ago" },
-
-  { type: "ticket", icon: "bi bi-ticket-detailed", color: "text-info", message: "A new <b>ticket</b> was raised for vulnerability <b>MySQL Privilege Escalation</b>.", time: "2 hours ago" },
-
-  { type: "user-added", icon: "bi bi-person-plus", color: "text-success", message: "A <b>new user</b> was <span class='fw-semibold'>added</span> to the <b>Incident Response Team</b>.", time: "3 hours ago" },
-
-  { type: "user-deleted", icon: "bi bi-person-dash", color: "text-danger", message: "User <b>John Doe</b> was <span class='fw-semibold'>removed</span> from the <b>Patch Management Team</b>.", time: "5 hours ago" },
-
-  { type: "user-team-change", icon: "bi bi-people", color: "text-primary", message: "User <b>Alice Smith</b> was <span class='fw-semibold'>moved</span> to <b>Configuration Management</b>.", time: "6 hours ago" },
-
-  { type: "control-request", icon: "bi bi-shield-plus", color: "text-warning", message: "A <span class='fw-semibold'>compensatory control</span> request was raised for <b>Linux Kernel Privilege Escalation</b>.", time: "8 hours ago" },
-
-  { type: "asset-removed", icon: "bi bi-dash-circle", color: "text-secondary", message: "Asset <b>Legacy Server 192.168.1.25</b> was <span class='fw-semibold'>removed</span> from the vulnerability list.", time: "10 hours ago" }
-
+      showChat: false,
+      minimized: false,
+      messages: [
+        { text: "Hi, can you explain the vulnerability?", sender: "user", deletable: true },
+        { text: "Sure, this is related to Spring framework.", sender: "bot", deletable: false },
       ],
+      newMessage: "",
     };
 },
-computed: {
-    filteredNotifications() {
-    let list = this.filterType
-      ? this.notifications.filter(n => n.type === this.filterType)
-      : this.notifications;
-
-    // If not showing all, limit to visibleCount
-    return this.showAll ? list : list.slice(0, 4);
-  }
-},
-methods: {
-    toggleNotificationPanel() {
-    this.showNotifications = !this.showNotifications;
+ methods: {
+    toggleChat() {
+      this.showChat = true;
+    },
+    closeChat() {
+      this.showChat = false;
+    },
+    minimizeChat() {
+      this.minimized = !this.minimized;
+    },
+    sendMessage() {
+      if (this.newMessage.trim() !== "") {
+        this.messages.push({ text: this.newMessage, sender: "user", deletable: true });
+        this.newMessage = "";
+      }
+    },
+    deleteMessage(index) {
+      this.messages.splice(index, 1);
+    },
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.messages.push({
+          text: `Uploaded: ${file.name}`,
+          sender: "user",
+          deletable: true,
+        });
+      }
+    },
   },
-  toggleFullscreen() {
-    this.isFullscreen = !this.isFullscreen;
-  },
-  markAllAsRead() {
-    this.notifications.forEach(n => n.read = true);
-  },
-  toggleShowAll() {
-    this.showAll = !this.showAll;
-  }
-},
    mounted() {
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');

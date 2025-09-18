@@ -361,7 +361,7 @@
                     </div>
                   </div>
 
-                  <div class="row mx-2 my-4">
+                  <div class="row  my-4">
                     <div class="d-flex justify-content-between">
                         <div class="mt-2 d-flex align-items-center">
                           <span style="color: rgba(0, 0, 0, 0.87);">
@@ -400,167 +400,105 @@
                           <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
                         </button>
                       </div>
-              </div>
+                    </div>
                   </div>
 
                   <div class="row mb-5">
-                    <div class="col-11">
-                      <div class="row">
+                    <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                      <p style="font-weight: 
+                      600;">Missing security updates</p>
+                      <!-- <p style="cursor: pointer;color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View all</p>   -->
+                    </div>
+                    <div class="row">
                         <div class="col-3">
-                          <div class="card p-4 h-100" style="border-radius: 12px">
-                            <p class="estimated-text">Missing security updates</p>
-                            <div class="d-flex justify-content-end">
-                              <h1 class="text-212 mt-auto">212</h1>
-                              <router-link :to="{ path: '/mitigationstrategy', hash: '#details' }" class="text-decoration-none ms-2" style="color: rgba(49, 33, 177, 1);margin-top: 37px;">
-                                View details
-                              </router-link>
-                            </div>
-                            <!-- <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"
-                                ></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"
-                                ></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"
-                                ></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"
-                                ></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                            </div> -->
+                          <div class="card py-4 px-3" style="border-radius: 12px;">
+                                <div class="d-flex justify-content-between">
+                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
+                                    
+                                </div>
+                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
+                                  VMware ESXi 7.0/8.0 Sandbox Escape...
+                                </h4>
+                                <div class="d-flex justify-content-start mt-2">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                     
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                 <div class="text-end">
+                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                      Details <i class="bi bi-arrow-right"></i>
+                                    </router-link>
+                                 </div>
                           </div>
                         </div>
                         <div class="col-3">
-                          <div class="card p-4 h-100" style="border-radius: 12px">
-                            <p class="estimated-text">OS vulns. by version</p>
-                            <h1 class="text-212 mt-auto">212</h1>
-                            <!-- <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"
-                                ></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"
-                                ></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"
-                                ></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"
-                                ></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                            </div> -->
+                          <div class="card py-4 px-3" style="border-radius: 12px;">
+                                <div class="d-flex justify-content-between">
+                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
+                                    
+                                </div>
+                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
+                                  VMware ESXi 7.0/8.0 Sandbox Escape...
+                                </h4>
+                                <div class="d-flex justify-content-start mt-2">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                     
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                 <div class="text-end">
+                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                      Details <i class="bi bi-arrow-right"></i>
+                                    </router-link>
+                                 </div>
                           </div>
                         </div>
                         <div class="col-3">
-                          <div class="card p-4 h-100" style="border-radius: 12px">
-                            <p class="estimated-text">App vulns. by software packages</p>
-                            <h1 class="text-212 mt-auto">212</h1>
-                            <!-- <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"
-                                ></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"
-                                ></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"
-                                ></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"
-                                ></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                            </div> -->
+                          <div class="card py-4 px-3" style="border-radius: 12px;">
+                                <div class="d-flex justify-content-between">
+                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
+                                    
+                                </div>
+                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
+                                  VMware ESXi 7.0/8.0 Sandbox Escape...
+                                </h4>
+                                <div class="d-flex justify-content-start mt-2">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                     
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                 <div class="text-end">
+                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                      Details <i class="bi bi-arrow-right"></i>
+                                    </router-link>
+                                 </div>
                           </div>
                         </div>
-                        <div class="col-3 me-auto">
-                          <div class="card p-4 h-100" style="border-radius: 12px">
-                            <p class="estimated-text">End of life systems</p>
-                            <h1 class="text-212 mt-auto">212</h1>
-                            <!-- <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"
-                                ></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"
-                                ></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"
-                                ></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span
-                                  class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"
-                                ></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                            </div> -->
+                        <div class="col-3">
+                          <div class="card py-4 px-3" style="border-radius: 12px;">
+                                <div class="d-flex justify-content-between">
+                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
+                                    
+                                </div>
+                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
+                                  VMware ESXi 7.0/8.0 Sandbox Escape...
+                                </h4>
+                                <div class="d-flex justify-content-start mt-2">
+                                    <i class="bi bi-microsoft me-2"></i>
+                                     
+                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
+                                </div>
+                                 <div class="text-end">
+                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                      Details <i class="bi bi-arrow-right"></i>
+                                    </router-link>
+                                 </div>
                           </div>
                         </div>
-                      </div>
+                    </div>
                     </div>
 
-                    <div class="col-1">
-                      <!-- blank -->
-                    </div>
+                    
                   </div>
                 </div>
                 </div>

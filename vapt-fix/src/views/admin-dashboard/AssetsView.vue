@@ -272,7 +272,7 @@
     >
       Unhide
     </button>
-  </div>
+                    </div>
                   <ul class="list-group me-3">
                     <li
                       v-for="(held, i) in heldAssets"
@@ -314,7 +314,8 @@
                     </li>   
                   </ul>
                   
-                </div>
+                  </div>
+                  
                 </div>
 
                 <div class="col-8">

@@ -652,7 +652,7 @@
                 </div>
             </div>
 
-            <div class="row my-5">
+            <div class="row">
                 <div class="">
                     <div class="d-flex justify-content-between">
                       <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">Application vulnerabilities by software packages</p>

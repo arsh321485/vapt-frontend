@@ -16,8 +16,8 @@
                   <div class="d-flex justify-content-between">
                     <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 28px;">Assigned Assets (210)</h5>
                     <div class="d-flex flex-row gap-3 me-3 mt-1">
-                      <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" @click="handleDeleteClick" title="Remove an asset"></i>
-                      <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" @click="toggleHoldMode" title="Hold mitigation"></i>
+                      <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip"  :class="{ 'text-muted': activeAction !== '' && activeAction !== 'delete' }" @click="handleDeleteClick" title="Remove an asset"></i>
+                      <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" :class="{ 'text-muted': activeAction !== '' && activeAction !== 'hold' }"  @click="toggleHoldMode" title="Hold mitigation"></i>
                     </div>
                   </div>
                 <div class="d-flex justify-content-between align-items-center">
@@ -80,6 +80,7 @@
                     <button class="btn btn-sm btn-secondary" type="submit">Search</button>
                   </form>
                 </div>
+
                 <!-- Asset List -->
                 <div class="d-flex flex-column gap-3 mt-3">
                   <div
@@ -87,9 +88,9 @@
                     :key="index"
                     class="asset-item border-bottom"
                     :class="{ active: activeIndex === index }"
-                    :style="activeIndex === index ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);' : ''"
-                    @click="setActive(index)"
-                    >
+              :style="activeIndex === index ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);' : ''"
+              @click="setActive(index)"
+                  >
                     <div class="d-flex justify-content-between">
                       <div class="d-flex justify-content-start gap-3">
                         <!-- Checkbox (only when showCheckboxes = true) -->
@@ -116,26 +117,36 @@
                         >
                           {{ asset.ip }}
                         </div>
-                        <span class="d-flex align-items-center badge-critical">
+                        <div>
+                          <span class="d-flex align-items-center badge-critical">
                           <span
                             class="rounded-circle me-1"
                             style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"
                           ></span>
                           <span>Critical</span>
                         </span>
+                        </div>
                       </div>
 
                       <div class="align-items-end gap-2">
-                        <i
+                        <div class="d-flex flex-row">
+                          <div>
+                          <i
                           class="bi bi-link-45deg me-1"
                           style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"
                         ></i>
-                        <span
-                          style="color: rgba(0, 0, 0, 0.87); font-size: 15px; font-weight: 500;"
-                          >Internal</span
-                        >
+                          </div>
+                          <div>
+                            <select class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                              <option selected disabled>type</option>
+                              <option value="internal">Internal</option>
+                              <option value="external">External</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
+
                     <!-- Status Row (unchanged design) -->
                     <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
                       <span class="d-flex align-items-center">
@@ -170,7 +181,7 @@
                   </div>
                 </div>
 
-                <!-- Bootstrap Modal -->
+                <!-- delete Modal -->
                 <div
                   class="modal fade"
                   id="deleteModal"
@@ -213,7 +224,7 @@
                   </div>
                 </div>
 
-                <!-- Confirmation Popup for hold mitigation -->
+                <!-- hold mitigation -->
     <div
       class="modal fade"
       id="holdConfirmModal"
@@ -250,18 +261,58 @@
                 </nav>
 
                  <!-- Held Vulnerabilities List -->
-    <div v-if="heldAssets.length" class="mt-4">
-      <h5 class="mb-3">Hold Vulnerabilities</h5>
-      <ul class="list-group me-3">
-        <li
-          v-for="(held, i) in heldAssets"
-          :key="i"
-          class="list-group-item text-muted"
-        >
-          {{ held.ip }}
-        </li>
-      </ul>
-    </div>
+                <div v-if="showHeld && heldAssets.length" class="mt-4">
+                   <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Mitigation on hold</h5>
+    <button 
+      class="btn btn-sm text-dark btn-outline-secondary me-4"
+      @click="showHeld = false"
+    >
+      Unhide
+    </button>
+                    </div>
+                  <ul class="list-group me-3">
+                    <li
+                      v-for="(held, i) in heldAssets"
+                      :key="i"
+                      class="list-group-item text-muted"
+                    >
+                      {{ held.ip }}
+                      <!-- Status Row (unchanged design) -->
+                    <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #b31c1c"
+                        ></span>
+                        <span class="text-danger fw-bold">11</span>
+                      </span>
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #f44336"
+                        ></span>
+                        <span class="text-danger fw-bold">4</span>
+                      </span>
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #f6b100"
+                        ></span>
+                        <span class="text-warning fw-bold">8</span>
+                      </span>
+                      <span class="d-flex align-items-center">
+                        <span
+                          class="rounded-circle me-1"
+                          style="width: 6px; height: 6px; background-color: #4caf50"
+                        ></span>
+                        <span class="text-success fw-bold">0</span>
+                      </span>
+                    </div>
+                    </li>   
+                  </ul>
+                  
+                  </div>
 
                 </div>
 
@@ -522,7 +573,38 @@
                                 </div>
                             </div>
         </div>
-        
+        <div class="row mt-3 pt-3 px-3">
+                            <div class="card p-2 my-3">
+                              <h4>Fixed</h4>
+                              <div class="d-flex justify-content-start align-items-center gap-2 mt-2">
+                                  <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
+                                  <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+                                  <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
+                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+                                  <span>High</span>
+                                  </span>
+                                  <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
+                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                                  <span>Close</span>
+                                  </span>
+                                  <router-link to="/pendingvulnerabilitycard" class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3" style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
+                                </div> 
+                                
+                                <div class="d-flex justify-content-start align-items-center gap-2">
+                                  <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">5</p>
+                                  <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
+                                  <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
+                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
+                                  <span>High</span>
+                                  </span>
+                                  <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
+                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                                  <span>Close</span>
+                                  </span>
+                                  <router-link to="/pendingvulnerabilitycard" class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3" style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
+                                </div>
+                            </div>
+                          </div>
         </div>
 
       <!-- Exception Requests -->
@@ -708,14 +790,14 @@ export default {
       ipAddress: "",
       activeTab: "vulnerabilities",
       showCheckboxes: false,
-       assets: [
-        { ip: "192.168.1.42" },
-        { ip: "192.168.1.43" },
-        { ip: "192.168.1.44" },
-        { ip: "192.168.1.45" },
-        { ip: "192.168.1.46" },
-        { ip: "192.168.1.47" },
-      ],
+      //  assets: [
+      //   { ip: "192.168.1.42" },
+      //   { ip: "192.168.1.43" },
+      //   { ip: "192.168.1.44" },
+      //   { ip: "192.168.1.45" },
+      //   { ip: "192.168.1.46" },
+      //   { ip: "192.168.1.47" },
+      // ],
       activeIndex: 0,
        assets: [
         { ip: "192.168.1.42", selected: false, held: false },
@@ -727,6 +809,8 @@ export default {
       ],
       heldAssets: [],
       showHoldCheckboxes: false,
+      activeAction: "",
+      showHeld: true,
     };
   },
   computed: {
@@ -768,47 +852,83 @@ export default {
 
     this.ipAddress = parts.join(".");
   },
-  handleDeleteClick() {
+   handleDeleteClick() {
+    // ❌ Prevent if hold is already active
+    if (this.activeAction === "hold") {
+      return;
+    }
+
+    // Mark delete as active
+    this.activeAction = "delete";
+
     if (!this.showCheckboxes) {
       this.showCheckboxes = true;
     } else {
       const selectedAssets = this.assets.filter((a) => a.selected);
       if (selectedAssets.length > 0) {
-        // Show modal
+        // Show delete confirmation modal
         const modal = new bootstrap.Modal(
           document.getElementById("deleteModal")
         );
         modal.show();
       } else {
         this.showCheckboxes = false;
+        this.activeAction = ""; // reset if cancelled
       }
     }
   },
-  confirmDelete() {
+    confirmDelete() {
       this.assets.forEach((a) => (a.selected = false));
       this.showCheckboxes = false;
+      // console.log("Deleting selected assets...");
+      this.resetActions(); 
     },
     cancelDelete() {
     this.assets.forEach((a) => (a.selected = false));
     this.showCheckboxes = false;
+    this.resetActions();
   },
   setActive(index) {
       this.activeIndex = index;
     },
     toggleHoldMode() {
-      if (this.showHoldCheckboxes) {
-        // Already showing checkboxes → open confirmation popup
-        let modal = new bootstrap.Modal(document.getElementById("holdConfirmModal"));
-        modal.show();
-      } else {
-        // First click → show checkboxes
-        this.showHoldCheckboxes = true;
-      }
-    },
+  // ❌ Prevent if delete is already active
+  if (this.activeAction === "delete") {
+    return;
+  }
+
+  // Mark hold as active
+  this.activeAction = "hold";
+
+  if (this.showHoldCheckboxes) {
+    const selectedAssets = this.assets.filter(a => a.selected);
+
+    if (selectedAssets.length > 0) {
+      // ✅ Show confirmation only if something is selected
+      let modal = new bootstrap.Modal(
+        document.getElementById("holdConfirmModal")
+      );
+      modal.show();
+    } else {
+      // ❌ No selection → just reset
+      this.resetActions();
+    }
+  } else {
+    // First click → show checkboxes
+    this.showHoldCheckboxes = true;
+  }
+},
+  resetActions() {
+  this.showCheckboxes = false;
+  this.showHoldCheckboxes = false;
+  this.activeAction = "";
+  this.assets.forEach(a => (a.selected = false));
+},
     cancelHold() {
       // Hide checkboxes without moving anything
       this.showHoldCheckboxes = false;
       this.assets.forEach(a => (a.selected = false));
+      this.resetActions();
     },
     confirmHold() {
       // Move selected items to held list
@@ -821,6 +941,7 @@ export default {
       // Clear selection & hide checkboxes
       this.assets = this.assets.map(a => ({ ...a, selected: false }));
       this.showHoldCheckboxes = false;
+      this.resetActions();
     },
   },
   mounted() {
@@ -883,6 +1004,15 @@ export default {
 
   .badge-open {
     background-color: rgb(194, 60, 60);
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+
+  .badge-close {
+    background-color:green;
     color: white;
     font-weight: 600;
     font-size: 0.75rem;
