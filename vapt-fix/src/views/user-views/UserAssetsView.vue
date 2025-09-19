@@ -137,11 +137,9 @@
                         ></i>
                           </div>
                           <div>
-                            <select class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
-                              <option selected disabled>type</option>
-                              <option value="internal">Internal</option>
-                              <option value="external">External</option>
-                            </select>
+                            <p @click="toggleText" style="cursor: pointer;">
+    {{ isInternal ? 'Internal' : 'External' }}
+  </p>
                           </div>
                         </div>
                       </div>
@@ -261,24 +259,34 @@
                 </nav>
 
                  <!-- Held Vulnerabilities List -->
-                <div v-if="showHeld && heldAssets.length" class="mt-4">
-                   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Mitigation on hold</h5>
-    <button 
-      class="btn btn-sm text-dark btn-outline-secondary me-4"
-      @click="showHeld = false"
-    >
-      Unhide
-    </button>
+                <div v-if="showHeld && heldAssets.length" class="card py-2 px-3 mt-4">
+                   <div class="d-flex justify-content-between align-items-center mb-3 ">
+                    <h5 class="mb-0">Mitigation on hold</h5>
+                    
+                     <i
+      class="bi bi-eye fs-5" 
+      @click="toggleUnholdMode"
+      title="Unhold"
+      style="cursor: pointer;"
+    ></i>
                     </div>
-                  <ul class="list-group me-3">
+                  <ul class="me-3">
                     <li
                       v-for="(held, i) in heldAssets"
                       :key="i"
-                      class="list-group-item text-muted"
+                      class="list-group-item text-muted d-flex align-items-center"
                     >
+                    <!-- Checkbox only visible in unhold mode -->
+      <input
+        v-if="showUnholdCheckboxes"
+        type="checkbox"
+        v-model="held.selected"
+        class="form-check-input me-2"
+      />
                       {{ held.ip }}
-                      <!-- Status Row (unchanged design) -->
+                      
+                    
+                    <!-- Status Row (unchanged design) -->
                     <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
                       <span class="d-flex align-items-center">
                         <span
@@ -308,11 +316,11 @@
                         ></span>
                         <span class="text-success fw-bold">0</span>
                       </span>
-                    </div>
-                    </li>   
+                    </div> 
+                    </li>  
                   </ul>
                   
-                  </div>
+                </div>
 
                 </div>
 
@@ -811,6 +819,8 @@ export default {
       showHoldCheckboxes: false,
       activeAction: "",
       showHeld: true,
+      isInternal: true,
+      showUnholdCheckboxes: false,
     };
   },
   computed: {
@@ -918,12 +928,35 @@ export default {
     this.showHoldCheckboxes = true;
   }
 },
+   toggleUnholdMode() {
+  if (this.activeAction === "hold" || this.activeAction === "delete") return;
+
+  this.activeAction = "unhold";
+
+  if (!this.showUnholdCheckboxes) {
+    // First click → show checkboxes
+    this.showUnholdCheckboxes = true;
+    return;
+  }
+
+  // Second click → perform unhold
+  const selected = this.heldAssets.filter(a => a.selected);
+
+  if (selected.length > 0) {
+    // ✅ Remove selected assets from held list
+    this.heldAssets = this.heldAssets.filter(a => !a.selected);
+  }
+
+  // Reset after action
+  this.resetActions();
+},
   resetActions() {
   this.showCheckboxes = false;
   this.showHoldCheckboxes = false;
   this.activeAction = "";
   this.assets.forEach(a => (a.selected = false));
-},
+  this.heldAssets.forEach(a => (a.selected = false));
+  },
     cancelHold() {
       // Hide checkboxes without moving anything
       this.showHoldCheckboxes = false;
@@ -942,6 +975,9 @@ export default {
       this.assets = this.assets.map(a => ({ ...a, selected: false }));
       this.showHoldCheckboxes = false;
       this.resetActions();
+    },
+    toggleText() {
+      this.isInternal = !this.isInternal;
     },
   },
   mounted() {

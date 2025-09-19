@@ -27,12 +27,12 @@
               <div class="row mt-3 mb-4" v-if="showPlatforms">
               <div class="col-9 location-card py-4 px-4 ms-3">
                 <div class="row">
-                    <div class="d-flex justify-content-start">
+                  <div class="d-flex justify-content-start">
                       <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-ui-checks-grid fs-5"></i>
                     </div>
                     <h5 class="fw-semibold ms-2 mt-2">Choose your communication platform</h5>
-                    </div>
+                  </div>
                 </div>
                 <div class="card ps-2 py-4 border-0"> 
                     <!-- First row: 4 cards -->
@@ -40,32 +40,38 @@
                       <!-- Teams -->
                       <div class="col-2">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                         :style="{
+        backgroundColor: notUsingPlatform 
+          ? '#d3d3d3' 
+          : (activePlatform === 'teams' ? 'aquamarine' : '')}"
                         style="aspect-ratio:1/1; cursor:pointer;">
-                          <button class="btn border-0" @click="toggleTeams">
+                          <button class="btn border-0" @click="activatePlatform('teams')" :disabled="notUsingPlatform">
                           <div>
                             <img src="@/assets/images/teams.png" alt="Teams" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Teams</p>
                           </div>
                           </button>
                         </div>
-                       
                       </div>
 
                       <!-- Slack -->
                       <div class="col-2">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                        :style="{ backgroundColor: notUsingPlatform ? '#d3d3d3' : (activePlatform === 'slack' ? 'aquamarine' : '')}"
                             style="aspect-ratio:1/1; cursor:pointer;">
-                          <div>
+                          <button class="btn border-0"  @click="activatePlatform('slack')" :disabled="notUsingPlatform">
+                            <div >
                             <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Slack</p>
                           </div>
+                          </button>
                         </div>
                       </div>
 
                       <div class="col-6">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
                           <div>
-                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="showPlatforms = false">I'm not using any platform.</button>
+                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="togglePlatformStatus"> {{ notUsingPlatform ? "I am using a platform" : "I'm not using any platform." }}</button>
                           </div>
                         </div>
                         
@@ -115,8 +121,11 @@
                     </div>
                       <!-- Jira -->
                       <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"  :class="{
+          'bg-aqua text-dark': selectedJiraAsana === 'jira' && !notUsingJiraAsana,
+          'bg-grey': notUsingJiraAsana
+        }"
+                            style="aspect-ratio:1/1; cursor:pointer;" @click="handleJiraAsanaClick('jira')">
                           <div>
                             <img src="@/assets/images/jira.png" alt="Jira" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Jira</p>
@@ -126,8 +135,11 @@
 
                       <!-- Asana -->
                       <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"  :class="{
+          'bg-aqua text-dark': selectedJiraAsana === 'asana' && !notUsingJiraAsana,
+          'bg-grey': notUsingJiraAsana
+        }"
+                            style="aspect-ratio:1/1; cursor:pointer;" @click="handleJiraAsanaClick('asana')">
                           <div>
                             <img src="@/assets/images/asana.png" alt="Asana" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Asana</p>
@@ -138,7 +150,9 @@
                       <div class="col-6">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
                           <div>
-                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="showPlatforms = false">Not in use</button>
+                             <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="toggleJiraAsanaUsage">
+            {{ notUsingJiraAsana ? 'Use platform' : 'Not in use' }}
+          </button>
                           </div>
                         </div>
                         
@@ -262,7 +276,7 @@
                     </div>
                   </form>
 
-                  <div class="row pb-4 pt-2 px-2" v-if="showTeams">
+                  <div class="row pb-4 pt-2 px-2" v-if="showData">
                   <div class="d-flex justify-content-start mb-3">
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-microsoft-teams fs-5"></i>
@@ -381,9 +395,9 @@
                           </tbody>
                         </table>
                       </div>
-                      </div>
-                    </div>
-                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div class="row mt-4">
                 <div class="col-lg-12 add-users py-4 px-4 ms-3">
@@ -509,7 +523,14 @@ export default {
         { short: 'NS', full: 'Network Security' },
         { short: 'AF', full: 'Architectural Flaws' }
       ],
-      showTeams: false,
+      showData: false,
+      isTeamsActive: false,
+      notUsingPlatform: false,
+      isSlackActive: false,
+      showSlack: false,
+      activePlatform: null,
+      selectedJiraAsana: null, // 'jira' or 'asana'
+      notUsingJiraAsana: false// 'jira' or 'asana'
     };
   },
   computed: {
@@ -565,8 +586,124 @@ export default {
         popup.style.display = "none";
       }, 2000);
     },
+     togglePlatformStatus() {
+      this.notUsingPlatform = !this.notUsingPlatform;
+      if (this.notUsingPlatform) {
+        this.activePlatform = null;
+        this.showData = false;
+      }
+    },
     toggleTeams() {
-      this.showTeams = !this.showTeams;
+      if (this.notUsingPlatform) return;
+      this.showTeams = true;       
+      this.isTeamsActive = true;
+    },
+     activateTeams() {
+      if (this.notUsingPlatform) return;
+      this.isTeamsActive = true;
+      this.isSlackActive = false;
+      this.showTeams = true;
+      this.showSlack = false;
+    },
+    activateSlack() {
+      if (this.notUsingPlatform) return;
+
+      if (this.isTeamsActive) {
+        // Show SweetAlert confirmation
+        Swal.fire({
+          title: "Switch Platform?",
+          text: "Do you want to switch to Slack?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.isTeamsActive = false;
+            this.showTeams = false;
+            this.isSlackActive = true;
+            this.showSlack = true;
+
+            Swal.fire({
+              title: "Switched!",
+              text: "You are now using Slack.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        });
+      } else {
+        // Normal case → activate Slack directly
+        this.isSlackActive = true;
+        this.showSlack = true;
+      }
+    },
+    activatePlatform(platform) {
+      if (this.notUsingPlatform) return;
+
+      // If nothing selected yet → directly activate
+      if (!this.activePlatform) {
+        this.activePlatform = platform;
+        this.showData = true;
+        return;
+      }
+
+      // If same platform clicked again → do nothing
+      if (this.activePlatform === platform) return;
+
+      // If switching → ask confirmation
+      Swal.fire({
+        title: "Switch Platform?",
+        text: `Do you want to switch to ${platform === "teams" ? "Teams" : "Slack"}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.activePlatform = platform;
+          this.showData = true;
+
+          Swal.fire({
+            title: "Switched!",
+            text: `You are now using ${platform === "teams" ? "Teams" : "Slack"}.`,
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      });
+    },
+    async handleJiraAsanaClick(platform) {
+      if (this.notUsingJiraAsana) return;
+
+      if (!this.selectedJiraAsana) {
+        this.selectedJiraAsana = platform;
+      } else if (this.selectedJiraAsana === platform) {
+        return; // already selected
+      } else {
+        const result = await Swal.fire({
+          title: `Do you want to switch to ${platform === "jira" ? "Jira" : "Asana"}?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes",
+          cancelButtonText: "No"
+        });
+
+        if (result.isConfirmed) {
+          this.selectedJiraAsana = platform;
+        }
+      }
+    },
+    toggleJiraAsanaUsage() {
+      this.notUsingJiraAsana = !this.notUsingJiraAsana;
+
+      if (this.notUsingJiraAsana) {
+        this.selectedJiraAsana = null; // reset selection when disabled
+      }
     },
   },
   mounted() {
@@ -636,5 +773,14 @@ export default {
   line-height: 32px;
   padding: 0 8px; 
    
+}
+
+.bg-aqua {
+  background-color: aquamarine !important;
+}
+.bg-grey {
+  background-color: #e0e0e0 !important;
+  pointer-events: none;
+  opacity: 0.7;
 }
 </style>

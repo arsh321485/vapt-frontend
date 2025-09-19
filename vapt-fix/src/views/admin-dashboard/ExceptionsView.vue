@@ -67,20 +67,9 @@
                                              
                                             <td>Developer name</td>
                                             <td>23/06/25</td>
-                                            <td><router-link to="" style="text-decoration: none;">
-                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
-                                            <!-- <td>
-      <router-link to="" style="text-decoration: none;">
-        <button
-          class="btn fw-semibold border-0"
-          style="color: rgba(49, 33, 177, 1);"
-          @click="toggleChat"
-        >
-          Chat with us <i class="bi bi-chat-dots ms-2"></i>
-        </button>
-      </router-link>
-    </td> -->
+                                            <td>
+                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);" @click="toggleChat">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
@@ -176,77 +165,79 @@
                       </div>
                             </div>
 
-                             <!-- Chat Box -->
+                              <!-- Chat Box -->
     <div
       v-if="showChat"
-      class="chat-box shadow rounded"
-      style="position: fixed; bottom: 20px; right: 20px; width: 900px; height: 600px; background: #fff; border: 1px solid #ddd; display: flex;"
+      class="chat-box"
     >
       <!-- Left Column -->
-      <div class="col-7 border-end d-flex flex-column">
+      <div class="chat-left">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-          <h6 class="mb-0">
+        <div class="chat-header d-flex justify-content-between align-items-center px-3 py-3">
+          <h6 class="mb-0 fw-semibold">
             CVE-2024-22259 - org.springframework:spring-web
           </h6>
-          <div>
-            <button class="btn btn-sm" @click="minimizeChat"><i class="bi bi-dash-lg"></i></button>
-            <button class="btn btn-sm text-danger" @click="closeChat"><i class="bi bi-x-lg"></i></button>
+          <div class="d-flex flex-row gap-2">
+            <!-- <button class="btn btn-sm text-secondary" @click="minimizeChat"><i class="bi bi-dash-lg"></i></button> -->
+            <button class="btn btn-sm text-dark border-0" @click="closeChat"><i class="bi bi-x-lg fs-5"></i></button>
           </div>
         </div>
 
-        <!-- Fake Messages -->
-        <div class="flex-grow-1 p-3 overflow-auto">
-          <div v-for="(msg, index) in messages" :key="index" class="mb-2">
-            <div
-              class="p-2 rounded"
-              :class="msg.sender === 'user' ? 'bg-primary text-white text-end' : 'bg-light'"
-            >
-              {{ msg.text }}
-            </div>
+        <!-- Messages -->
+        <div class="chat-messages flex-grow-1 p-3">
+          <div
+            v-for="(msg, index) in messages"
+            :key="index"
+            :class="['chat-bubble', msg.sender === 'user' ? 'user-bubble ms-auto' : 'bot-bubble']"
+          >
+            <span>{{ msg.text }}</span>
+  <div class="chat-time">
+    {{ msg.time }}
+  </div>
             <button
               v-if="msg.deletable"
-              class="btn btn-sm text-danger mt-1"
+              class="btn btn-sm text-danger delete-btn"
               @click="deleteMessage(index)"
             >
-              Delete
+              <i class="bi bi-trash"></i>
             </button>
           </div>
         </div>
 
-        <!-- Input Area -->
-        <div class="p-2 border-top">
-          <div class="d-flex align-items-center gap-2">
-            <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" />
-            <button class="btn btn-light" @click="$refs.fileInput.click()">
-              <i class="bi bi-paperclip"></i>
-            </button>
-            <input
-              v-model="newMessage"
-              type="text"
-              class="form-control"
-              placeholder="Type a message..."
-            />
-            <button class="btn btn-primary" @click="sendMessage">
-              Send
-            </button>
-          </div>
+        <!-- Input -->
+        <div class="chat-input d-flex align-items-center gap-2 p-2">
+          <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" />
+          <button class="btn btn-light" @click="$refs.fileInput.click()">
+            <i class="bi bi-paperclip"></i>
+          </button>
+          <input
+            v-model="newMessage"
+            type="text"
+            class="form-control rounded-pill"
+            placeholder="Type a message..."
+            @keydown.enter.exact.prevent="sendMessage"
+            @keydown.shift.enter.stop
+          />
+          <button class="btn btn-success rounded-circle" @click="sendMessage">
+            <i class="bi bi-send"></i>
+          </button>
         </div>
       </div>
 
       <!-- Right Column -->
-      <div class="col-5 p-3">
-        <div class="text-center">
+      <div class="chat-right p-4">
+        <div class="text-center mb-3">
           <img
             src="@/assets/images/smaller-logo.png"
             alt="Logo"
-            class="rounded-circle mb-3"
-            style="width: 80px; height: 80px;"
-          />
+            class="mt-2"/>
         </div>
-        <p><strong>Asset:</strong> 192.168.1.42</p>
-        <p><strong>Category:</strong> Bug</p>
-        <p><strong>Criticality:</strong> High</p>
+        <div class="details-card p-3 text-center">
+          <p><strong>Asset:</strong> 192.168.1.42</p>
+          <p><strong>Category:</strong> Bug</p>
+          <p><strong>Severity:</strong> <span class="text-danger fw-bold">High</span></p>
+          <p><strong>Description:</strong> <br>Applications that use UriComponentsBuilder in Spring FrameworkÂ to parse an externally provided URL (e.g. through a query parameter) ANDÂ perform validation checks on the host of the parsed URL may be vulnerable to a open redirect <a href="https://cwe.mitre.org/data/definitions/601.html">https://cwe.mitre.org/data/definitions/601.html</a></p>
+        </div>
       </div>
     </div>
 
@@ -277,9 +268,10 @@ export default {
       showChat: false,
       minimized: false,
       messages: [
-        { text: "Hi, can you explain the vulnerability?", sender: "user", deletable: true },
-        { text: "Sure, this is related to Spring framework.", sender: "bot", deletable: false },
-      ],
+  { text: "Hi, can you explain the vulnerability?", sender: "user", deletable: true, time: "10:30 AM" },
+  { text: "Sure, this is related to Spring framework.", sender: "bot", deletable: false, time: "10:31 AM" },
+],
+
       newMessage: "",
     };
 },
@@ -294,11 +286,16 @@ export default {
       this.minimized = !this.minimized;
     },
     sendMessage() {
-      if (this.newMessage.trim() !== "") {
-        this.messages.push({ text: this.newMessage, sender: "user", deletable: true });
-        this.newMessage = "";
-      }
-    },
+  if (this.newMessage.trim() !== "") {
+    this.messages.push({
+      text: this.newMessage,
+      sender: "user",
+      deletable: true,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+    this.newMessage = "";
+  }
+},
     deleteMessage(index) {
       this.messages.splice(index, 1);
     },
@@ -306,7 +303,7 @@ export default {
       const file = event.target.files[0];
       if (file) {
         this.messages.push({
-          text: `Uploaded: ${file.name}`,
+          text: `📎 ${file.name}`,
           sender: "user",
           deletable: true,
         });
@@ -343,6 +340,96 @@ export default {
 </script>
 
 <style scoped>
+.chat-time {
+  font-size: 11px;
+  color: gray;
+  text-align: right;
+}
+.chat-box {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 900px;
+  height: 550px;
+  /* background: transparent; */
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  top: 50px;    
+  bottom: auto;
+}
+
+.chat-left {
+  flex: 7;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #ddd;
+   /* background: #e5ddd5;   */
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  overflow: hidden;
+}
+
+.chat-header {
+  background: #f0f2f5;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 12px;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  background: #e5ddd5;
+  overflow-y: auto;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: 5px 13px;
+  border-radius: 18px;
+  position: relative;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+}
+
+.user-bubble {
+  background: #d9fdd3;
+  text-align: right;
+}
+
+.bot-bubble {
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.delete-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 12px;
+  background: white;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.chat-input {
+  background: #f0f2f5;
+  border-bottom-left-radius: 12px;
+}
+
+.chat-right {
+  flex: 5;
+  background: #fafafa;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.details-card p {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+.details-card {
+  background: #fff;
+}
+
 .ticket-head {
     color: rgba(0, 0, 0, 1);
     font-weight: 500;
