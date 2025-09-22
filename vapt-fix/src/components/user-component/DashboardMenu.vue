@@ -1,7 +1,7 @@
 <template>
   <main>
     <div class=" d-flex">
-    <div class="sidebar d-flex flex-column align-items-center pt-5 ps-2 my-2">
+    <div class="sidebar d-flex flex-column align-items-center pt-3 ps-2 my-2">
       <!-- <div class="mb-4 mt-3 d-flex flex-column align-items-center">
         <img src="@/assets/images/smaller-logo.png" alt="">
       </div> -->
