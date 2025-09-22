@@ -1,13 +1,13 @@
 <template>
   <main>
     <div class="d-flex">
-    <div class="sidebar d-flex flex-column align-items-center  ps-2">
+    <div class="sidebar d-flex flex-column align-items-center ps-2">
       <!-- <div class=" d-flex flex-column align-items-center">
         <img src="@/assets/images/smaller-logo.png" alt="">
       </div> -->
 
       <!-- Navigation Icons -->
-      <div class="flex-grow-1 d-flex flex-column align-items-center  text-center pt-5">
+      <div class="flex-grow-1 d-flex flex-column align-items-center  text-center pt-4">
          <div>
           <router-link to="/admindashboardonboarding">
           <button class="btn border-0" :class="{ activeBtn: isActive('/admindashboardonboarding') }"><i class="bi bi-house-door fs-5 nav-menu"></i>

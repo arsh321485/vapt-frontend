@@ -1,12 +1,12 @@
 <template>
   <main>
     <div class=" d-flex">
-    <div class="sidebar d-flex flex-column align-items-center pt-3 ps-2 my-2">
+    <div class="sidebar d-flex flex-column align-items-center ps-2">
       <!-- <div class="mb-4 mt-3 d-flex flex-column align-items-center">
         <img src="@/assets/images/smaller-logo.png" alt="">
       </div> -->
 
-      <div class="flex-grow-1 d-flex flex-column align-items-center text-center">
+      <div class="flex-grow-1 d-flex flex-column align-items-center text-center pt-5">
          <div>
           <router-link to="/userdashboard">
           <button class="btn border-0" :class="{ activeBtn: isActive('/userdashboard') }"><i class="bi bi-house-door fs-5 nav-menu"></i>
