@@ -10,7 +10,7 @@
                         <DashboardMenu />
                     </div>
 
-                    <div class="col-11 pt-2 pb-3 px-4 pe-5">
+                    <div class="col-11 pt-5 pb-3 px-4 pe-5">
                         <div class="d-flex justify-content-between mt-4">
                             <div>
                                 <h2 class="ticket-head">Support Requests</h2>

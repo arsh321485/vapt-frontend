@@ -1,13 +1,13 @@
 <template>
   <main>
     <div class="d-flex">
-    <div class="sidebar d-flex flex-column align-items-center pt-3 ps-2">
-      <div class="mb-4 mt-3 d-flex flex-column align-items-center">
+    <div class="sidebar d-flex flex-column align-items-center  ps-2">
+      <!-- <div class=" d-flex flex-column align-items-center">
         <img src="@/assets/images/smaller-logo.png" alt="">
-      </div>
+      </div> -->
 
       <!-- Navigation Icons -->
-      <div class="flex-grow-1 d-flex flex-column align-items-center gap-1 text-center">
+      <div class="flex-grow-1 d-flex flex-column align-items-center  text-center pt-5 mt-2">
          <div>
           <router-link to="/admindashboardonboarding">
           <button class="btn border-0" :class="{ activeBtn: isActive('/admindashboardonboarding') }"><i class="bi bi-house-door fs-5 nav-menu"></i>
@@ -70,16 +70,17 @@
           <p class="menu-heading">Teams</p></button>
           </router-link>
         </div>
-      </div>
-
-
-      <!-- Bottom Profile Circle -->
-      <div class="mt-auto d-flex flex-column align-items-center">
-        <div class="circle-bottom mb-2">A</div>
+        <div class=" d-flex flex-column align-items-center">
+        <div class="circle-bottom ">A</div>
         <button class="btn border-0" @click="confirmLogout">
           <i class="bi bi-box-arrow-right fs-5 nav-menu"></i><p class="menu-heading">Logout</p>
         </button>
       </div>
+      </div>
+
+
+      <!-- Bottom Profile Circle -->
+      
     </div>  
     </div>
 

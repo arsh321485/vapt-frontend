@@ -10,7 +10,7 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-2 pb-3 pe-5">
+          <div class="col-11 pt-5 pb-3 pe-5">
             <div class="row">
                 <div class="col-12">
                 <div class="d-flex justify-content-between my-4">

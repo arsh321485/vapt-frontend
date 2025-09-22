@@ -10,7 +10,7 @@
                         <DashboardMenu />
                     </div>
 
-                    <div class="col-11 pt-2 pb-3 px-4 pe-5">
+                    <div class="col-11 pt-5 pb-3 px-4 pe-5">
                         <div class="d-flex justify-content-between">
                             <div><h2 class="ticket-head mt-4">Support Requests</h2></div>
                             <div class="d-flex flex-row gap-3 mt-4">
@@ -166,80 +166,61 @@
                             </div>
 
                               <!-- Chat Box -->
-    <div
-      v-if="showChat"
-      class="chat-box"
-    >
-      <!-- Left Column -->
-      <div class="chat-left">
-        <!-- Header -->
-        <div class="chat-header d-flex justify-content-between align-items-center px-3 py-3">
-          <h6 class="mb-0 fw-semibold">
-            CVE-2024-22259 - org.springframework:spring-web
-          </h6>
-          <div class="d-flex flex-row gap-2">
-            <!-- <button class="btn btn-sm text-secondary" @click="minimizeChat"><i class="bi bi-dash-lg"></i></button> -->
-            <button class="btn btn-sm text-dark border-0" @click="closeChat"><i class="bi bi-x-lg fs-5"></i></button>
-          </div>
-        </div>
-
-        <!-- Messages -->
-        <div class="chat-messages flex-grow-1 p-3">
-          <div
-            v-for="(msg, index) in messages"
-            :key="index"
-            :class="['chat-bubble', msg.sender === 'user' ? 'user-bubble ms-auto' : 'bot-bubble']"
-          >
-            <span>{{ msg.text }}</span>
-  <div class="chat-time">
-    {{ msg.time }}
-  </div>
-            <button
-              v-if="msg.deletable"
-              class="btn btn-sm text-danger delete-btn"
-              @click="deleteMessage(index)"
-            >
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Input -->
-        <div class="chat-input d-flex align-items-center gap-2 p-2">
-          <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" />
-          <button class="btn btn-light" @click="$refs.fileInput.click()">
-            <i class="bi bi-paperclip"></i>
-          </button>
-          <input
-            v-model="newMessage"
-            type="text"
-            class="form-control rounded-pill"
-            placeholder="Type a message..."
-            @keydown.enter.exact.prevent="sendMessage"
-            @keydown.shift.enter.stop
-          />
-          <button class="btn btn-success rounded-circle" @click="sendMessage">
-            <i class="bi bi-send"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Right Column -->
-      <div class="chat-right p-4">
-        <div class="text-center mb-3">
-          <img
-            src="@/assets/images/smaller-logo.png"
-            alt="Logo"
-            class="mt-2"/>
-        </div>
-        <div class="details-card p-3 text-center">
-          <p><strong>Asset:</strong> 192.168.1.42</p>
-          <p><strong>Category:</strong> Bug</p>
-          <p><strong>Severity:</strong> <span class="text-danger fw-bold">High</span></p>
-          <p><strong>Description:</strong> <br>Applications that use UriComponentsBuilder in Spring FrameworkÂ to parse an externally provided URL (e.g. through a query parameter) ANDÂ perform validation checks on the host of the parsed URL may be vulnerable to a open redirect <a href="https://cwe.mitre.org/data/definitions/601.html">https://cwe.mitre.org/data/definitions/601.html</a></p>
-        </div>
+  <div v-if="showChat" class="chat-box">
+  <div class="chat-middle">
+    <div class="chat-header d-flex justify-content-between align-items-center px-4 py-3">
+      <h6 class="mb-0 fw-semibold">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</h6>
+      <div class="text-end gap-2">
+        <button class="btn btn-sm text-dark border-0" @click="closeChat"><i class="bi bi-x-lg fs-5"></i></button>
       </div>
     </div>
+    <div class="chat-messages flex-grow-1">
+      <p class="text-center"><small class="text-muted">Today 10:30 AM</small></p>
+      <div
+        v-for="(msg, index) in messages"
+        :key="index"
+        :class="['chat-bubble', msg.sender === 'user' ? 'user-bubble ms-auto' : 'bot-bubble']"
+      >
+        <span>{{ msg.text }}</span>
+        <div class="chat-time">{{ msg.time }}</div>
+      </div>
+    </div>
+    <div class="chat-input d-flex align-items-center gap-2 p-3">
+      <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload" />
+      <button class="btn btn-light rounded-circle" @click="$refs.fileInput.click()">
+        <i class="bi bi-paperclip"></i>
+      </button>
+      <input v-model="newMessage" type="text" class="form-control rounded-pill" placeholder="Type a message" @keydown.enter.exact.prevent="sendMessage" />
+    </div>
+    <div class="text-end me-3 mb-3">
+      <button class="btn text-light" @click="sendMessage" style="background-color:rgba(49, 33, 177, 1);;">
+        <i class="bi bi-send-fill"></i> Send Message
+      </button>
+    </div>
+  </div>
+
+  <div class="chat-right">
+    <div class="text-center mb-4">
+      <img src="@/assets/images/smaller-logo.png" alt="" class="mt-2" />
+    </div>
+    <div class="text-center mt-4">
+      <div class="d-flex justify-content-between small text-dark">
+        <span><strong class="text-secondary">Asset:</strong> 192.68.1.42</span>
+        <span><strong class="text-secondary">Date requested:</strong> 23/06/25</span>
+      </div>
+    </div>
+    <div class="issue text-center mt-5 mb-4">
+      <i class="bi bi-exclamation-circle text-success me-2"></i>
+      <span class="text-success fw-semibold">Issues Raised for Support</span>
+      <button class="btn btn-primary btn-sm rounded-pill my-2">Step 2:Code review</button>
+      <button class="btn btn-primary btn-sm rounded-pill">Step 2:Code review</button>
+    </div>
+    <div class="right-section-item text-center">
+      <h6 class="fw-semibold mb-2">Description</h6>
+      <p class="small text-muted mb-1">The issue has been reviewed, but the current explanation is not sufficient. Please provide additional justification to proceed further.</p>
+    </div>
+  </div>
+</div>
 
                         </div>
                         
@@ -268,8 +249,8 @@ export default {
       showChat: false,
       minimized: false,
       messages: [
-  { text: "Hi, can you explain the vulnerability?", sender: "user", deletable: true, time: "10:30 AM" },
-  { text: "Sure, this is related to Spring framework.", sender: "bot", deletable: false, time: "10:31 AM" },
+  { text: "Hi, can you explain the vulnerability?", sender: "bot", deletable: false, time: "10:30 AM" },
+  { text: "Sure, this is related to Spring framework.", sender: "user", deletable: true, time: "10:35 AM" },
 ],
 
       newMessage: "",
@@ -303,9 +284,10 @@ export default {
       const file = event.target.files[0];
       if (file) {
         this.messages.push({
-          text: `📎 ${file.name}`,
+          text: `${file.name}`,
           sender: "user",
           deletable: true,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
       }
     },
@@ -340,95 +322,160 @@ export default {
 </script>
 
 <style scoped>
-.chat-time {
-  font-size: 11px;
-  color: gray;
-  text-align: right;
-}
+/* Overall Chat Box and Layout */
 .chat-box {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 900px;
-  height: 550px;
-  /* background: transparent; */
+  /* background: #fcfcfd; */
   border-radius: 12px;
-  overflow: hidden;
+  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); */
   display: flex;
-  top: 50px;    
-  bottom: auto;
+  height: 90vh;
+  max-width: 900px; /* Adjusted max-width for two columns */
+  top: 54%;
+  left: 65%;
+  transform: translate(-50%, -50%);
+  position: fixed;
 }
 
-.chat-left {
-  flex: 7;
+/* The left column (chat history) is removed, so chat-middle now takes its place */
+.chat-middle {
+  flex: 3; /* Main chat area takes up more space */
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #ddd;
-   /* background: #e5ddd5;   */
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-  overflow: hidden;
-}
-
-.chat-header {
-  background: #f0f2f5;
-  border-bottom: 1px solid #ddd;
-  border-top-left-radius: 12px;
-}
-
-.chat-messages {
-  flex-grow: 1;
-  background: #e5ddd5;
-  overflow-y: auto;
-}
-
-.chat-bubble {
-  max-width: 70%;
-  padding: 5px 13px;
-  border-radius: 18px;
-  position: relative;
-  margin-bottom: 8px;
-  word-wrap: break-word;
-}
-
-.user-bubble {
-  background: #d9fdd3;
-  text-align: right;
-}
-
-.bot-bubble {
-  background: #fff;
-  border: 1px solid #ddd;
-}
-
-.delete-btn {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  font-size: 12px;
-  background: white;
-  border-radius: 50%;
-  padding: 0;
-}
-
-.chat-input {
-  background: #f0f2f5;
+  background: #f7f7f7;
+  border-top-left-radius: 12px; /* Add radius for the new left edge */
   border-bottom-left-radius: 12px;
 }
 
 .chat-right {
-  flex: 5;
-  background: #fafafa;
+  flex: 1.5; /* Right sidebar remains the same */
+  background: #f7f7f7;
+  border-left: 1px solid #e0e0e0;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
+  padding: 1.5rem;
 }
-.details-card p {
+
+/* Chat Header */
+.chat-header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 12px; /* Apply to the new top-left */
+}
+
+/* Chat Messages */
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background: #f7f7f7;
+}
+
+.chat-bubble {
+  max-width: 70%; /* Increased max-width for bubbles */
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.user-bubble {
+  background: #e9e9f9; /* Light purple for user messages */
+  color: #333;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.bot-bubble {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-time {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+/* Chat Input */
+.chat-input {
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem 1.5rem;
+  border-bottom-left-radius: 12px; /* Apply to the new bottom-left */
+}
+
+.chat-input .form-control {
+  background: #f7f7f7;
+  border-radius: 25px;
+  border: 1px solid #e0e0e0;
+  padding: 0.75rem 1.5rem;
+}
+
+.chat-input .btn-success {
+  background: rgba(49, 33, 177, 1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Right Sidebar */
+.details-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.details-card h6 {
+  color: #8e80e9; /* Purple for heading */
+}
+
+.details-card p strong {
+  color: #555;
+}
+
+.issue{
+  background: #ccebe7;
+  border: 1px solid #97dfd5;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.right-section-item {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.send-btn {
+  background-color: #5c47e2;
+}
+
+/* .details-card p {
   margin-bottom: 12px;
   font-size: 15px;
 }
 .details-card {
   background: #fff;
-}
+} */
 
 .ticket-head {
     color: rgba(0, 0, 0, 1);

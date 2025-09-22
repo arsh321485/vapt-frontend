@@ -764,15 +764,45 @@ html, body {
 }
 
 
-.sidebar {
+/* .sidebar {
   background-color: rgba(246, 246, 248, 1);
   height: 1050px;
+} */
+
+.sidebar {
+  width: 100px;   
+  height: 100vh;              /* full viewport height */
+  position: fixed;            /* fixed on left */
+  top: 20;
+  left: 0;
+  background-color: #fff;     /* or your theme color */
+  border-right: 1px solid #ddd;
+  overflow: hidden;           /* prevent sidebar scroll */
+}
+
+.sidebar .nav-menu {
+  font-size: 12px;            /* smaller icon size */
+}
+
+.sidebar .menu-heading {
+  font-size: 12px;            /* smaller text */
+  margin: 0;
+  line-height:1;
 }
 
 .sidebar-dot {
   width: 25px;
   height: 25px;
   border-radius: 50%;
+}
+
+.fixed-browser-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  background-color: #f8f9fa; /* same as your body background for smoothness */
 }
 
 .btn .menu-heading,

@@ -3,11 +3,12 @@
     <section class="bg-light">
     <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-2">
+        <!-- <div class="col-lg-2">
             <Stepper />
-        </div>
-        <div class="col-lg-10 my-3">
-            <div class="container-fluid welcome-bg py-5 px-5">
+        </div> -->
+        <div class="col-lg-12 welcome-bg">
+        <div class="col-lg-10 offset-lg-2 my-3">
+            <div class="container-fluid  py-5 px-5">
               <div class="row">
                 <div class="col-1 d-flex justify-content-center align-items-center mb-3">
                   <img src="@/assets/images/waving-hand.png" alt="">
@@ -17,6 +18,10 @@
                   <p class="welcome-subhead">Before we fix your information assets, ....</p>
                 </div>
               </div>
+
+        <div class="row">
+          <Stepper />
+        </div>
               
               <div class="row mt-5">
                 <div class="col-lg-9 location-card px-5 pt-5 pb-4">
@@ -172,9 +177,19 @@
                         </div>
                     </div>
                   </div>
+
+                  
                 </div>
               </div>
+
+              <div class="text-end">
+                <router-link to="/uploadreport" class="btn stepper-btn mt-5">
+                Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+                </router-link>
+              </div>
+
             </div>
+        </div>
         </div>
 
     </div>

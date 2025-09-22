@@ -10,17 +10,17 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-2 pb-3 pe-5">
+          <div class="col-11 pt-5 mt-2 pb-3 pe-5">
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
-                  <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between ms-3">
                     <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 28px;">Assigned Assets (210)</h5>
                     <div class="d-flex flex-row gap-3 me-3 mt-1">
                       <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip"  :class="{ 'text-muted': activeAction !== '' && activeAction !== 'delete' }" @click="handleDeleteClick" title="Remove an asset"></i>
                       <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" :class="{ 'text-muted': activeAction !== '' && activeAction !== 'hold' }"  @click="toggleHoldMode" title="Hold mitigation"></i>
                     </div>
                   </div>
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center ms-3">
                     <div class="d-flex gap-2 my-3">
                     <form>
                       <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
@@ -74,7 +74,7 @@
                     </div>
                     
                 </div>
-                <div class="mb-4 pe-3">
+                <div class="mb-4 pe-3 ms-3">
                   <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" style="padding-top: 6px;padding-bottom: 6px;">
                     <button class="btn btn-sm btn-secondary" type="submit">Search</button>

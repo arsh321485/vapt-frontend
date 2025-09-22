@@ -3,12 +3,13 @@
     <section class="bg-light">
     <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-2">
+        <!-- <div class="col-lg-2">
             <Stepper />
-        </div>
-        <div class="col-lg-10 my-3">
-            <div class="container-fluid welcome-bg py-5 px-5">
-              <div class="row ps-4">
+        </div> -->
+        <div class="col-lg-12  welcome-bg">
+        <div class="col-lg-10 offset-lg-2 my-3">
+            <div class="container-fluid py-5 px-5">
+              <div class="row">
                 <div class="col-1 d-flex justify-content-center align-items-center mb-3">
                   <img src="@/assets/images/waving-hand.png" alt="">
                 </div>
@@ -18,8 +19,12 @@
                 </div>
               </div>
 
-              <div class="row ps-5">
-                <div class="col-lg-8 location-card p-5 mb-5">
+              <div class="row">
+                <Stepper />
+              </div>
+
+              <div class="row mt-5">
+                <div class="col-lg-8 location-card py-5 px-4 mb-5">
                   <div class="row">
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-geo-alt-fill fs-4"></i>
@@ -49,7 +54,7 @@
                 </div>
               </div>
               
-              <div class="row ps-5">
+              <div class="row">
               <div class="col-lg-6 location-card text-center py-5">
                  <!-- Upload box -->
               <div class="text-center py-5">
@@ -105,14 +110,15 @@
                   <thead class="table-light">
                     <tr>
                       <th>File Name</th>
+                      <th>Type</th>
                       <th>Location</th>
                       <!-- <th>Actions</th> -->
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(file, index) in uploadedFiles" :key="index">
-                      <td><strong>{{ file.fileName }}</strong><br>
-            <small class="text-muted">({{ file.type }})</small></td>
+                      <td><strong>{{ file.fileName }}</strong></td>
+                      <td>{{ file.type }}</td>
                       <td>{{ file.location }}</td>
                       <!-- <td>
                         <div class="d-flex gap-2">
@@ -131,7 +137,15 @@
                 class="toast-message"> {{ toastMessage }}</div>
               </div>
               
+
+              <div class="text-end">
+                <router-link to="/admindashboardonboarding" class="btn stepper-btn mt-5">
+                Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+                </router-link>
+              </div>
+
             </div>
+        </div>
         </div>
 
     </div>
@@ -167,95 +181,129 @@ export default {
     };
   },
  methods: {
+  // ✅ Check if location+type already has file
   isAlreadyUploaded(location, type) {
     return this.uploadedFiles.some(file => file.location === location && file.type === type);
   },
+
   checkLocation() {
-  if (this.isAlreadyUploaded(this.selectedLocation, this.selectedType)) {
-    alert(`File is already uploaded for "${this.selectedLocation}" (${this.selectedType})`);
-    this.selectedLocation = ""; // reset dropdown
-  } else {
-    // ✅ Reset upload state when user selects new location
-    this.uploadingStarted = false;
-    this.uploadProgress = 0;
-    this.uploadedFileName = "";
-    this.uploadedFileSize = "";
-    this.$refs.pdfFileInput.value = "";
-  }
-  },
-  triggerFileInput() {
-    if (this.selectedLocation && this.selectedType) {
-        this.$refs.pdfFileInput.click();
-      }
-  },  
-  handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (file && this.selectedLocation && this.selectedType) {
-    this.uploadingStarted = true;
-    this.uploadedFileName = file.name;
-    this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
-    this.uploadProgress = 0;
-
-    let progress = 0;
-    const interval = setInterval(() => {
-      if (progress >= 100) {
-        clearInterval(interval);
-
-        // ✅ Create URL for viewing
-        const fileURL = URL.createObjectURL(file);
-
-        this.uploadedFiles.push({
-          location: this.selectedLocation,
-          type: this.selectedType,
-          fileName: this.uploadedFileName,
-          fileURL: fileURL   
-        });
-
-        this.showToast(`File "${this.uploadedFileName}" uploaded for ${this.selectedLocation}  (${this.selectedType}) ✅`);
-      } else {
-        progress += 20;
-        this.uploadProgress = progress;
-      }
-    }, 500);
-  }
-  },
-  viewFile(file) {
-    // ✅ Open the uploaded file in a new tab
-    window.open(file.fileURL, "_blank");
-  },
-  deleteProgressFile(index) {
-  Swal.fire({
-    title: "Are you sure?",
-    text: "This file will be permanently deleted!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-    cancelButtonText: "No, cancel"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Remove file from list
-      this.uploadedFiles.splice(index, 1);
-
-      // ✅ Reset upload bar + file info
+    if (this.isAlreadyUploaded(this.selectedLocation, this.selectedType)) {
+      this.selectedLocation = ""; // reset dropdown
+    } else {
+      // ✅ Reset upload state when user selects new location
       this.uploadingStarted = false;
       this.uploadProgress = 0;
       this.uploadedFileName = "";
       this.uploadedFileSize = "";
       this.$refs.pdfFileInput.value = "";
-
-      Swal.fire("Deleted!", "Your file has been deleted.", "success");
     }
-  });
-},
+  },
+
+  triggerFileInput() {
+    if (this.selectedLocation && this.selectedType) {
+      this.$refs.pdfFileInput.click();
+    }
+  },
+
+  // ✅ Generate SHA-256 hash for file content
+  async getFileHash(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  },
+
+  async handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file && this.selectedLocation && this.selectedType) {
+      // ✅ Generate hash for file content
+      const fileHash = await this.getFileHash(file);
+
+      // 🔍 Check for duplicate file by hash
+      const duplicate = this.uploadedFiles.some(f => f.hash === fileHash);
+      if (duplicate) {
+        Swal.fire({
+          icon: "error",
+          title: "Duplicate File",
+          text: "This file has already been uploaded (same content)!",
+        });
+        this.$refs.pdfFileInput.value = ""; // reset
+        return;
+      }
+
+      this.uploadingStarted = true;
+      this.uploadedFileName = file.name;
+      this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
+      this.uploadProgress = 0;
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(interval);
+
+          // ✅ Create URL for viewing
+          const fileURL = URL.createObjectURL(file);
+
+          // Save file info including hash
+          this.uploadedFiles.push({
+            location: this.selectedLocation,
+            type: this.selectedType,
+            fileName: this.uploadedFileName,
+            fileURL: fileURL,
+            hash: fileHash, // 👈 store hash
+          });
+
+          this.showToast(
+            `File "${this.uploadedFileName}" uploaded for ${this.selectedLocation} (${this.selectedType}) ✅`
+          );
+        } else {
+          progress += 20;
+          this.uploadProgress = progress;
+        }
+      }, 500);
+    }
+  },
+
+  viewFile(file) {
+    // ✅ Open the uploaded file in a new tab
+    window.open(file.fileURL, "_blank");
+  },
+
+  deleteProgressFile(index) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This file will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Remove file from list
+        this.uploadedFiles.splice(index, 1);
+
+        // ✅ Reset upload bar + file info
+        this.uploadingStarted = false;
+        this.uploadProgress = 0;
+        this.uploadedFileName = "";
+        this.uploadedFileSize = "";
+        this.$refs.pdfFileInput.value = "";
+
+        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+      }
+    });
+  },
+
   showToast(message) {
     this.toastMessage = message;
     setTimeout(() => {
       this.toastMessage = "";
     }, 5000);
-  }
-  }
+  },
+}
+
 };
 </script>
 

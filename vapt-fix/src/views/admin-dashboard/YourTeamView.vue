@@ -10,7 +10,7 @@
                         <DashboardMenu />
                     </div>
 
-                    <div class="col-11 pt-2 pb-3 px-4 pe-5">
+                    <div class="col-11 pt-5 pb-3 px-4 pe-5">
                         <div class="d-flex justify-content-between mt-4">
                             <h2 class="ticket-head " style="font-size: 36px;">Your Teams</h2>
                             <div class="d-flex flex-row gap-3">

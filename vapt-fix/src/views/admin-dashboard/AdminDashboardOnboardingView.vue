@@ -10,7 +10,7 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-2 pb-3 pe-4">
+          <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1" style=" overflow-y:auto; height:100vh;">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <div class="d-flex flex-row gap-2">
                 <h2>Vulnerability Management Program</h2>

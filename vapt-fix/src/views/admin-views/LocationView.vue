@@ -3,11 +3,13 @@
     <section class="bg-light">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-lg-2">
-            <Stepper />
-          </div>
-          <div class="col-lg-10 my-3">
-            <div class="container-fluid welcome-bg py-5 px-5">
+          <!-- <div class="col-lg-2 welcome-bg"> -->
+            <!-- <Stepper /> -->
+          <!-- </div> -->
+          <div class="col-lg-12 my-3  welcome-bg">
+            <!-- <div class="col-lg-2 "></div> -->
+            <div class="col-lg-10 offset-lg-2">
+            <div class="container-fluid py-5 px-5">
               <div class="row">
                 <div class="col-1 d-flex justify-content-center align-items-center mb-3">
                   <img src="@/assets/images/waving-hand.png" alt="">
@@ -21,10 +23,17 @@
                     <div>   
                     </div>
                   </div>
+
                 </div>
               </div>
+          
+         
+  <div class="row">
+    <Stepper />
+  </div>
 
-              <div class="row mt-3 mb-4" v-if="showPlatforms">
+  
+              <div class="row mt-5 mb-4" v-if="showPlatforms">
               <div class="col-9 location-card py-4 px-4 ms-3">
                 <div class="row">
                   <div class="d-flex justify-content-start">
@@ -68,10 +77,11 @@
                         </div>
                       </div>
 
-                      <div class="col-6">
+                      <div class="col-2">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
                           <div>
-                            <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="togglePlatformStatus"> {{ notUsingPlatform ? "I am using a platform" : "I'm not using any platform." }}</button>
+                            <!-- <button class="btn mt-2 mb-2 fw-semibold border-0" style="font-size: 12px;" @click="togglePlatformStatus"> {{ notUsingPlatform ? "I am using a platform" : "I'm not using any platform." }}</button> -->
+                             <button class="btn mt-2 mb-2 fw-semibold border-0 fs-5"  @click="togglePlatformStatus"> {{ notUsingPlatform ? "select" : "None" }}</button>
                           </div>
                         </div>
                         
@@ -147,11 +157,11 @@
                         </div>
                       </div>
 
-                      <div class="col-6">
+                      <div class="col-2">
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
                           <div>
                              <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="toggleJiraAsanaUsage">
-            {{ notUsingJiraAsana ? 'Use platform' : 'Not in use' }}
+            {{ notUsingJiraAsana ? 'Select' : 'None' }}
           </button>
                           </div>
                         </div>
@@ -276,7 +286,97 @@
                     </div>
                   </form>
 
-                  <div class="row pb-4 pt-2 px-2" v-if="showData">
+                  
+                </div>
+              </div>
+
+              <div class="row mt-4">
+                <div class="col-lg-12 add-users py-4 px-4 ms-3">
+                    <div class="row mb-3">
+                    <div class="d-flex justify-content-start">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                      <i class="bi bi-link-45deg fs-5"></i>
+                    </div>
+                    <h5 class="fw-semibold ms-2 mt-2">Create invite link</h5>
+                    </div>
+                    </div>
+                    <table class="table align-middle table-borderless">
+                        <thead class="table-light">
+                          <tr>
+                            <th class="col-2 text-center">User Type</th>                   
+                            <th class="col-2 text-center">Select Location</th>
+                            <th class="col-2 text-center">Member Role</th>
+                            <th class="col-6 text-center">Copy Link</th>
+                          </tr>
+                        </thead>    
+                        <tbody>
+                          <tr>
+                            <td class="col-2">
+                              <select class="form-select rounded-0 uniform-input">
+                        <option selected disabled>Select type</option>
+                        <option value="internal">Internal</option>
+                        <option value="external">External</option>
+                      </select>
+                            </td>
+                            <td class="col-2">
+                              <select class="form-select rounded-0 uniform-input">
+                                <option selected disabled>Select location</option>
+                                <option value="">Germany</option>
+                                <option value="">Delhi</option>
+                                <option value="">Bahrain</option>
+                              </select>
+                            </td>
+                            <td class="col-2">
+                             <div class="multi-select-dropdown" ref="roleDropdown2">
+                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
+                                  <span>{{ selectedRoleText2 }}</span>
+                                  <span><i class="bi bi-chevron-down"></i></span>
+                                </div>
+                                <div class="dropdown-list" v-show="isOpen.dropdown2">
+                                  <label v-for="option in roleOptions" :key="option.short">
+                                    <input
+                                      type="checkbox"
+                                      :value="option.short"
+                                      v-model="selectedRoles2"
+                                    />
+                                    {{ option.full }}
+                                  </label>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="col-6">
+                              <div class="position-relative w-100">
+                            <textarea
+                              id="shareLink"
+                              class="form-control form-control-sm border-bottom rounded-0"
+                              rows="2"
+                              readonly
+                              @click="copyLink"
+                              style="resize: none; overflow: hidden;white-space: normal;height: 42px;padding: 0 8px;"
+                            >
+                      https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=e16G1P
+                            </textarea>
+
+                            <!-- Popup message -->
+                            <div
+                              id="copyPopup"
+                              class="position-absolute px-2 py-1 rounded small text-white"
+                              style="background: grey; top: -40px; left: 50px; display: none;"
+                            >
+                              Link Copied!
+                            </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                    </table>
+                    
+                </div>
+              </div>
+
+              <div class="row mt-4" v-if="showData">
+                <div class="col-lg-12 add-users py-4 px-4 ms-3">
+                  <div class="row pb-4 pt-2 px-2" >
                   <div class="d-flex justify-content-start mb-3">
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-microsoft-teams fs-5"></i>
@@ -399,90 +499,14 @@
                 </div>
               </div>
 
-              <div class="row mt-4">
-                <div class="col-lg-12 add-users py-4 px-4 ms-3">
-                    <div class="row mb-3">
-                    <div class="d-flex justify-content-start">
-                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-link-45deg fs-5"></i>
-                    </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Create invite link</h5>
-                    </div>
-                    </div>
-                    <table class="table align-middle table-borderless">
-                        <thead class="table-light">
-                          <tr>
-                            <th class="col-2 text-center">User Type</th>                   
-                            <th class="col-2 text-center">Select Location</th>
-                            <th class="col-2 text-center">Member Role</th>
-                            <th class="col-6 text-center">Copy Link</th>
-                          </tr>
-                        </thead>    
-                        <tbody>
-                          <tr>
-                            <td class="col-2">
-                              <select class="form-select rounded-0 uniform-input">
-                        <option selected disabled>Select type</option>
-                        <option value="internal">Internal</option>
-                        <option value="external">External</option>
-                      </select>
-                            </td>
-                            <td class="col-2">
-                              <select class="form-select rounded-0 uniform-input">
-                                <option selected disabled>Select location</option>
-                                <option value="">Germany</option>
-                                <option value="">Delhi</option>
-                                <option value="">Bahrain</option>
-                              </select>
-                            </td>
-                            <td class="col-2">
-                             <div class="multi-select-dropdown" ref="roleDropdown2">
-                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
-                                  <span>{{ selectedRoleText2 }}</span>
-                                  <span><i class="bi bi-chevron-down"></i></span>
-                                </div>
-                                <div class="dropdown-list" v-show="isOpen.dropdown2">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input
-                                      type="checkbox"
-                                      :value="option.short"
-                                      v-model="selectedRoles2"
-                                    />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
-                              </div>
-                            </td>
-                            <td class="col-6">
-                              <div class="position-relative w-100">
-                            <textarea
-                              id="shareLink"
-                              class="form-control form-control-sm border-bottom rounded-0"
-                              rows="2"
-                              readonly
-                              @click="copyLink"
-                              style="resize: none; overflow: hidden;white-space: normal;height: 42px;padding: 0 8px;"
-                            >
-                      https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=e16G1P
-                            </textarea>
 
-                            <!-- Popup message -->
-                            <div
-                              id="copyPopup"
-                              class="position-absolute px-2 py-1 rounded small text-white"
-                              style="background: grey; top: -40px; left: 50px; display: none;"
-                            >
-                              Link Copied!
-                            </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                    </table>
-                    
-                </div>
+              <div class="text-end">
+                <router-link to="/riskcriteria" class="btn stepper-btn mt-5">
+                Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+                </router-link>
               </div>
 
+            </div>
             </div>
           </div>
 
@@ -530,7 +554,7 @@ export default {
       showSlack: false,
       activePlatform: null,
       selectedJiraAsana: null, // 'jira' or 'asana'
-      notUsingJiraAsana: false// 'jira' or 'asana'
+      notUsingJiraAsana: false,
     };
   },
   computed: {
@@ -543,6 +567,7 @@ export default {
     selectedRoleText3() {
       return this.selectedRoles3.length > 0 ? this.selectedRoles3.join(', ') : 'Select roles';
     },
+    
   },
   methods: {
     initTooltips() {
@@ -705,6 +730,7 @@ export default {
         this.selectedJiraAsana = null; // reset selection when disabled
       }
     },
+ 
   },
   mounted() {
     this.initTooltips();

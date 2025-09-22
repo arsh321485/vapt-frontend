@@ -10,7 +10,7 @@
                         <DashboardMenu />
                     </div>
 
-                    <div class="col-11 pt-2 pb-3 px-4">
+                    <div class="col-11 pt-5 mt-2 pb-3 px-4">
                         <div class="row">
                             <div class="col-6 py-3">
                                 <router-link to="/supportticket" class="text-decoration-none" tag="button"

@@ -10,7 +10,7 @@
                         <DashboardMenu />
                     </div>
 
-                    <div class="col-11 pt-3 pb-3 px-4 pe-5">
+                    <div class="col-11 pt-5 mt-4 pb-3 px-4 pe-5">
                         <div class="d-flex justify-content-between">
                             <div>
                                 <router-link to="/userdashboard" style="color: rgba(49, 33, 177, 1);text-decoration: none;">

@@ -35,53 +35,51 @@
             
         </div> -->
     
-        <div class="d-flex justify-content-center py-2">
-    <div class="stepper mt-3">
-      <img src="@/assets/images/logo2.png" alt="" />
+      <div class="d-flex justify-content-start align-items-center welcome-bg">
+  <div class="stepper mt-3">
+    <!-- Step 1 -->
+    <div
+      class="step text-decoration-none" style="cursor: pointer;"
+      :class="{ active: isCompletedOrActive(1), disabled: currentStep < 1 }"
+      @click="goToStep(1)"
+    >
+      <div class="step-circle">1</div>
+      <div class="label">Add location and users</div>
+    </div>
 
-      <!-- Step 1 -->
-      <router-link
-        to="/location"
-        class="step text-decoration-none"
-        :class="{ active: isCompletedOrActive(1) }"
-      >
-        <div class="step-circle">1</div>
-        <div class="label">Add location and users</div>
-      </router-link>
+    <div class="line" :class="{ active: currentStep >= 2 }"></div>
 
-      <div class="line" :class="{ active: currentStep >= 2 }"></div>
+    <!-- Step 2 -->
+    <div
+      class="step text-decoration-none" style="cursor: pointer;"
+      :class="{ active: isCompletedOrActive(2) }"
+      @click="goToStep(2)"
+    >
+      <div class="step-circle">2</div>
+      <div class="label">Risk Criteria</div>
+    </div>
 
-      <!-- Step 2 -->
-      <router-link
-        to="/riskcriteria"
-        class="step text-decoration-none"
-        :class="{ active: isCompletedOrActive(2) }"
-      >
-        <div class="step-circle">2</div>
-        <div class="label">Risk Criteria</div>
-      </router-link>
+    <div class="line" :class="{ active: currentStep >= 3 }"></div>
 
-      <div class="line" :class="{ active: currentStep >= 3 }"></div>
-
-      <!-- Step 3 -->
-      <router-link
-        to="/uploadreport"
-        class="step text-decoration-none"
-        :class="{ active: isCompletedOrActive(3) }"
-      >
-        <div class="step-circle">3</div>
-        <div class="label">Vulnerability report</div>
-      </router-link>
-
-      <!-- Next Button -->
-      <button class="btn stepper-btn mt-5" @click="goNext">
-        Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-      </button>
+    <!-- Step 3 -->
+    <div
+      class="step text-decoration-none" style="cursor: pointer;"
+      :class="{ active: isCompletedOrActive(3) }"
+      @click="goToStep(3)"
+    >
+      <div class="step-circle">3</div>
+      <div class="label">Vulnerability report</div>
     </div>
   </div>
       </div>
+      </div>
     </div>
     </section>
+
+    <!-- Next Button -->
+      <!-- <button class="btn stepper-btn mt-5" @click="goNext">
+        Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+      </button> -->
     </main>
 </template>
 
@@ -98,39 +96,50 @@ export default {
       return this.steps.indexOf(this.$route.path) + 1;
     },
   },
-  methods: {
-    isCompletedOrActive(step) {
-      return step <= this.currentStep;
-    },
-    goNext() {
-       // special case for riskcriteria
-      if (this.$route.path === "/uploadreport") {
-        this.$router.push("/admindashboardonboarding");
-        return;
-      }
-      const currentIndex = this.steps.indexOf(this.$route.path);
-      if (currentIndex < this.steps.length - 1) {
-        this.$router.push(this.steps[currentIndex + 1]);
-      }
-    },
+ methods: {
+  isCompletedOrActive(step) {
+    return step <= this.currentStep;
   },
+  goToStep(step) {
+    const currentIndex = this.currentStep;
+
+    // Going forward (only next step allowed)
+    if (step === currentIndex + 1) {
+      this.$router.push(this.steps[step - 1]);
+    }
+
+    // Going backward (only previous step allowed)
+    if (step === currentIndex - 1) {
+      this.$router.push(this.steps[step - 1]);
+    }
+  }
+}
+
   }
 </script>
 
 
 <style scoped>
+/* .step.disabled {
+  cursor: pointer;
+  opacity: 0.5;
+} */
 .stepper {
   gap: 1.5rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Horizontal instead of column */
   align-items: center;
+  justify-content: center;
 }
+
 .step {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Keep number above text */
   align-items: center;
   text-align: center;
+  min-width: 150px; /* Ensures spacing between steps */
 }
+
 .step-circle {
   width: 32px;
   height: 32px;
@@ -141,35 +150,41 @@ export default {
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  margin-bottom: 6px;
 }
+
 .step.active .step-circle {
   background-color: #6c47ff;
   color: white;
 }
+
 .label {
-  margin-top: 6px;
   font-size: 0.875rem;
   color: #6c757d;
 }
+
 .step.active .label {
   color: #000;
   font-weight: 500;
 }
+
 .line {
-  width: 2px;
-  height: 70px;
+  flex-grow: 1;
+  height: 2px; /* thin horizontal line */
+  min-width: 130px; /* 👈 ensures line is visible */
   background-image: repeating-linear-gradient(
-    to bottom,
-    #ccc,
-    #ccc 4px,
+    to right,
+    #6c757d,
+    #6c757d 4px,
     transparent 4px,
     transparent 8px
   );
 }
+
 .line.active {
   background-image: repeating-linear-gradient(
-    to bottom,
-    #6c47ff,
+    to right,
+    #6c47ff,   
     #6c47ff 4px,
     transparent 4px,
     transparent 8px
