@@ -6,7 +6,7 @@
         <img src="@/assets/images/smaller-logo.png" alt="">
       </div> -->
 
-      <div class="flex-grow-1 d-flex flex-column align-items-center text-center pt-5">
+      <div class="flex-grow-1 d-flex flex-column align-items-center text-center pt-4">
          <div>
           <router-link to="/userdashboard">
           <button class="btn border-0" :class="{ activeBtn: isActive('/userdashboard') }"><i class="bi bi-house-door fs-5 nav-menu"></i>
