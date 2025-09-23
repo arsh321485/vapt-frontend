@@ -79,7 +79,7 @@
                       </div>
 
                       <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4" style="aspect-ratio:1/1; cursor:pointer;">
                           <div>
                             <!-- <button class="btn mt-2 mb-2 fw-semibold border-0" style="font-size: 12px;" @click="togglePlatformStatus"> {{ notUsingPlatform ? "I am using a platform" : "I'm not using any platform." }}</button> -->
                              <button class="btn mt-2 mb-2 fw-semibold border-0 fs-5"  @click="togglePlatformStatus"> {{ notUsingPlatform ? "select" : "None" }}</button>
@@ -159,7 +159,7 @@
                       </div>
 
                       <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4">
+                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4" style="aspect-ratio:1/1; cursor:pointer;">
                           <div>
                              <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="toggleJiraAsanaUsage">
             {{ notUsingJiraAsana ? 'Select' : 'None' }}
