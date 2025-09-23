@@ -18,7 +18,7 @@
                             <div class="d-flex flex-row mt-4">
                                 <div>
                                 <button type="button" class="btn pending-approval-btn rounded-pill">
-                                Choose premium and ask vaptfix for support 
+                                Go premium
                                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
                                 </button>
                             </div>

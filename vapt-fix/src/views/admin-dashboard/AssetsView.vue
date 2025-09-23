@@ -83,7 +83,7 @@
                   </form>
                 </div>
 
-                 <!-- Asset List -->
+                <!-- Asset List -->
                 <div class="d-flex flex-column gap-3 mt-3">
                   <div
                     v-for="(asset, index) in assets"
@@ -139,9 +139,9 @@
                         ></i>
                           </div>
                           <div>
-                             <p @click="toggleText" style="cursor: pointer;">
-    {{ isInternal ? 'Internal' : 'External' }}
-  </p>
+                             <p @click="asset.isInternal = !asset.isInternal" style="cursor: pointer;">
+  {{ asset.isInternal ? 'Internal' : 'External' }}
+</p>
                           </div>
                         </div>
                       </div>
@@ -261,68 +261,108 @@
                 </nav>
 
                 <!-- Held Vulnerabilities List -->
-                <div v-if="showHeld && heldAssets.length" class="card py-2 px-3 mt-4">
-                   <div class="d-flex justify-content-between align-items-center mb-3 ">
-                    <h5 class="mb-0">Mitigation on hold</h5>
-                    
-                     <i
-      class="bi bi-eye fs-5" 
+<div v-if="showHeld && heldAssets.length" class=" py-1 px-2 mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Mitigation on hold</h4>
+    <i
+      class="bi bi-eye fs-5"
       @click="toggleUnholdMode"
       title="Unhold"
       style="cursor: pointer;"
     ></i>
-                    </div>
-                  <ul class="me-3">
-                    <li
-                      v-for="(held, i) in heldAssets"
-                      :key="i"
-                      class="list-group-item text-muted d-flex align-items-center"
-                    >
-                    <!-- Checkbox only visible in unhold mode -->
-      <input
-        v-if="showUnholdCheckboxes"
-        type="checkbox"
-        v-model="held.selected"
-        class="form-check-input me-2"
-      />
-                      {{ held.ip }}
-                      
-                    
-                    <!-- Status Row (unchanged design) -->
-                    <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
-                      <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #b31c1c"
-                        ></span>
-                        <span class="text-danger fw-bold">11</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #f44336"
-                        ></span>
-                        <span class="text-danger fw-bold">4</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #f6b100"
-                        ></span>
-                        <span class="text-warning fw-bold">8</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #4caf50"
-                        ></span>
-                        <span class="text-success fw-bold">0</span>
-                      </span>
-                    </div> 
-                    </li>  
-                  </ul>
-                  
-                </div>
+  </div>
+
+  <div class="d-flex flex-column">
+    <div
+      v-for="(held, i) in heldAssets"
+      :key="i"
+      class="hold-asset border-bottom">
+      <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-start gap-1">
+          <!-- Checkbox only in unhold mode -->
+          <input
+            v-if="showUnholdCheckboxes"
+            type="checkbox"
+            v-model="held.selected"
+            class="form-check-input me-2"
+          />
+
+          <!-- Asset Name (grayed if held) -->
+          <span :class="{ 'text-muted': held.held }">{{ held.name }}</span>
+
+          <!-- Asset IP -->
+          <div
+            class="fw-semibold text-muted"
+            style="color: rgba(0, 0, 0, 0.87); font-size: 18px;"
+          >
+            {{ held.ip }}
+          </div>
+
+          <!-- Badge -->
+          <div>
+            <span class="d-flex align-items-center badge-critical ms-2">
+              <span
+                class="rounded-circle me-1"
+                style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"
+              ></span>
+              <span>Critical</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="align-items-end gap-2">
+          <div class="d-flex flex-row">
+            <div>
+              <i
+                class="bi bi-link-45deg me-1"
+                style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"
+              ></i>
+            </div>
+            <div>
+              <p class="mb-0">
+  {{ held.isInternal ? 'Internal' : 'External' }}
+</p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Row (same as assets) -->
+      <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
+        <span class="d-flex align-items-center">
+          <span
+            class="rounded-circle me-1"
+            style="width: 6px; height: 6px; background-color: #b31c1c"
+          ></span>
+          <span class="text-danger fw-bold">11</span>
+        </span>
+        <span class="d-flex align-items-center">
+          <span
+            class="rounded-circle me-1"
+            style="width: 6px; height: 6px; background-color: #f44336"
+          ></span>
+          <span class="text-danger fw-bold">4</span>
+        </span>
+        <span class="d-flex align-items-center">
+          <span
+            class="rounded-circle me-1"
+            style="width: 6px; height: 6px; background-color: #f6b100"
+          ></span>
+          <span class="text-warning fw-bold">8</span>
+        </span>
+        <span class="d-flex align-items-center">
+          <span
+            class="rounded-circle me-1"
+            style="width: 6px; height: 6px; background-color: #4caf50"
+          ></span>
+          <span class="text-success fw-bold">0</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
                   
                 </div>
 
@@ -814,19 +854,21 @@ export default {
       // ],
       activeIndex: 0,
        assets: [
-        { ip: "192.168.1.42", selected: false, held: false },
-        { ip: "192.168.1.43", selected: false, held: false },
-        { ip: "192.168.1.44", selected: false, held: false },
-        { ip: "192.168.1.45", selected: false, held: false },
-        { ip: "192.168.1.46", selected: false, held: false },
-        { ip: "192.168.1.47", selected: false, held: false },
+        { ip: "192.168.1.42",isInternal: true, selected: false, held: false },
+        { ip: "192.168.1.43",isInternal: false, selected: false, held: false },
+        { ip: "192.168.1.44",isInternal: false, selected: false, held: false },
+        { ip: "192.168.1.45",isInternal: true, selected: false, held: false },
+        { ip: "192.168.1.46",isInternal: false, selected: false, held: false },
+        { ip: "192.168.1.47",isInternal: true, selected: false, held: false },
       ],
+      
       heldAssets: [],
       showHoldCheckboxes: false,
       activeAction: "",
       showHeld: true, 
       isInternal: true, 
       showUnholdCheckboxes: false,
+      activeIndex: null
     };
   },
   computed: {
@@ -970,18 +1012,16 @@ export default {
       this.resetActions();
     },
     confirmHold() {
-      // Move selected items to held list
-      let selected = this.assets.filter(a => a.selected);
-      selected.forEach(a => {
-        a.held = true;
-        this.heldAssets.push({ ...a });
-      });
+  let selected = this.assets.filter(a => a.selected);
+  selected.forEach(a => {
+    a.held = true;
+    this.heldAssets.push({ ...a }); // copies isInternal too ✅
+  });
 
-      // Clear selection & hide checkboxes
-      this.assets = this.assets.map(a => ({ ...a, selected: false }));
-      this.showHoldCheckboxes = false;
-      this.resetActions();
-    },
+  this.assets = this.assets.map(a => ({ ...a, selected: false }));
+  this.showHoldCheckboxes = false;
+  this.resetActions();
+},
     toggleText() {
       this.isInternal = !this.isInternal;
     },
@@ -1022,6 +1062,11 @@ export default {
 <style scoped>
   .asset-item {
     padding: 12px 16px;
+    position: relative;
+  }
+
+  .hold-asset {
+    padding: 7px 10px;
     position: relative;
   }
 

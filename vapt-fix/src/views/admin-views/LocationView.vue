@@ -9,10 +9,26 @@
           <div class="col-lg-12 my-3  welcome-bg">
             <!-- <div class="col-lg-2 "></div> -->
             <div class="col-lg-10 offset-lg-2">
-              <img src="@/assets/images/smaller-logo.png" alt="" class="ms-3">
+              <!-- <img src="@/assets/images/smaller-logo.png" alt="" class="ms-3"> -->
             <div class="container-fluid py-2 px-5">
               <div class="row">  
-                <div class="col-1 d-flex justify-content-center align-items-center mb-3">
+                <div class="d-flex flex-row ms-5 ps-5">
+                  <div class="ms-5">
+                    <img src="@/assets/images/waving-hand.png" alt="" class="me-3 ms-5">
+                  </div>
+                  <div>
+                    <div class="d-flex justify-content-between">
+                    <div>
+                      <h1 class="fw-semibold welcome-head"> Welcome to vaptfix!</h1>
+                      <p class="welcome-subhead">Before we fix your information assets, ....</p>
+                    </div>
+                    <div>   
+                    </div>
+                    </div>
+                  </div>
+
+                </div>
+                <!-- <div class="col-1 d-flex justify-content-center align-items-center mb-3">
                   <img src="@/assets/images/waving-hand.png" alt="">
                 </div>
                 <div class="col-11">
@@ -25,7 +41,7 @@
                     </div>
                   </div>
 
-                </div>
+                </div> -->
               </div>
           
          

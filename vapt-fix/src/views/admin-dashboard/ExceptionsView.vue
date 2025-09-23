@@ -169,8 +169,66 @@
   <div v-if="showChat" class="chat-box">
   <div class="chat-middle">
     <div class="chat-header d-flex justify-content-between align-items-center px-4 py-3">
-      <h6 class="mb-0 fw-semibold">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</h6>
-      <div class="text-end gap-2">
+      <div class="d-flex flex-row">
+        <h6 class="mb-0 fw-semibold">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</h6>
+        
+<div class="position-relative d-inline-block">
+    <!-- Question Icon -->
+    <i
+      class="bi bi-question-circle"
+      @mouseenter="showBox = true"
+      @mouseleave="showBox = false"
+      style="cursor: pointer; font-size: 18px;"
+    ></i>
+
+    <!-- Hover Box -->
+    <div
+      v-if="showBox"
+      class="hover-box p-3"
+    >
+      <!-- Vulnerability Name -->
+      <h6 class="text-center fw-semibold mb-3" style="color: rgba(49, 33, 177, 1);">
+        VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)
+      </h6>
+
+      <!-- Asset Info Card -->
+      
+        <!-- First row -->
+        <div class="d-flex justify-content-between mb-3">
+          <div class="text-center flex-fill pe-2">
+            <p class="mb-1 fw-semibold text-secondary" style="font-size: 14px;">Asset:</p>
+            <p class="mb-0" style="font-size: 14px;">192.68.1.42</p>
+          </div>
+          <div class="text-center flex-fill ps-2">
+            <p class="mb-1 fw-semibold text-secondary" style="font-size: 14px;">CVSS Score:</p>
+            <p class="mb-0" style="font-size: 14px;">8.1</p>
+          </div>
+        </div>
+
+        <div class="asset-card p-2 mb-3">
+          <p class="mb-1" style="font-size: 14px;"><strong> <i class="bi bi-check-circle-fill text-success me-1"></i> Vendor Fix Available: </strong>Yes</p>
+        </div>
+
+        <div class="asset-card p-2 mb-3">
+            <p class="mb-1" style="font-size: 14px;"><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Hostname: </strong>fra-sto-shr-uat-lda9-evt-mgr-dbmigration</p>
+        </div>
+      
+
+      <!-- Description Card -->
+      <div class="card border rounded p-2" style="background: #e0f7f4; border-color: #97dfd5;">
+        <h6 class="fw-semibold text-center mb-2">Description</h6>
+        <p class="small text-muted mb-0 text-center">
+          Applications that use UriComponentsBuilder in Spring Framework 
+          to parse an externally provided URL (e.g. through a query parameter) 
+          AND perform validation checks on the host of the parsed URL may be vulnerable.
+        </p>
+      </div>
+    </div>
+  </div>
+
+   
+</div>
+      <div class="text-end gap-2" style="margin-top: -10px;">
         <button class="btn btn-sm text-dark border-0" @click="closeChat"><i class="bi bi-x-lg fs-5"></i></button>
       </div>
     </div>
@@ -216,7 +274,7 @@
       <button class="btn btn-primary btn-sm rounded-pill">Step 2:Code review</button>
     </div>
     <div class="right-section-item text-center">
-      <h6 class="fw-semibold mb-2">Description</h6>
+      <h6 class="fw-semibold mb-2">Issue Description</h6>
       <p class="small text-muted mb-1">The issue has been reviewed, but the current explanation is not sufficient. Please provide additional justification to proceed further.</p>
     </div>
   </div>
@@ -251,15 +309,28 @@ export default {
       messages: [
   { text: "Hi, can you explain the vulnerability?", sender: "bot", deletable: false, time: "10:30 AM" },
   { text: "Sure, this is related to Spring framework.", sender: "user", deletable: true, time: "10:35 AM" },
-],
-
-      newMessage: "",
+],  
+showBox: false,
     };
 },
  methods: {
     toggleChat() {
-      this.showChat = true;
-    },
+    this.showChat = !this.showChat;
+
+    this.$nextTick(() => {
+      const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+      [...popoverTriggerList].map(el => {
+        new bootstrap.Popover(el, {
+          container: 'body',
+          html: true,
+          placement: 'right'
+        });
+      });
+    });
+  },
+  closeChat() {
+    this.showChat = false;
+  },
     closeChat() {
       this.showChat = false;
     },
@@ -293,6 +364,15 @@ export default {
     },
   },
    mounted() {
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  [...popoverTriggerList].map(el => {
+    new bootstrap.Popover(el, {
+      container: 'body',   // append to body
+      html: true,
+      placement: 'right'
+    });
+  });
+
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');
     const options = dropdown.querySelectorAll('.dropdown-content a');
@@ -318,22 +398,39 @@ export default {
       }
     });
   },
+  
 };
 </script>
 
 <style scoped>
-/* Overall Chat Box and Layout */
+.hover-box {
+  position: absolute;
+  top: 40px;
+  right: -50px;
+  width: 400px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  z-index: 100;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}
+
+.asset-card {
+  background: #ccebe7;
+  border: 1px solid #97dfd5;
+  border-radius: 8px;
+}
+
 .chat-box {
-  /* background: #fcfcfd; */
   border-radius: 12px;
-  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); */
   display: flex;
   height: 90vh;
-  max-width: 900px; /* Adjusted max-width for two columns */
+  max-width: 900px;
   top: 54%;
   left: 65%;
   transform: translate(-50%, -50%);
   position: fixed;
+  overflow: visible !important;
 }
 
 /* The left column (chat history) is removed, so chat-middle now takes its place */

@@ -9,7 +9,7 @@
           <h2 class="vuln-exp-heading mb-4">Pricing plans</h2>
           <p class="vuln-exp-subhead mb-5">Vulnerability explorer provides access to a comprehensive database of vulnerabilities, enabling you<br> to quickly identify and address potential risks.</p>
         <div class="col-4">
-            <div class="card text-start shadow" style="border-radius: 12px;">
+            <div class="card text-start shadow h-100" style="border-radius: 12px;">
                 <div class="card-body">
                     <h2 class="card-title">Basic</h2>
                     <p class="card-text pricing-card-subhead">Basic features to fix your vulnerabilities</p>
@@ -18,48 +18,49 @@
                     <hr>
                     <p class="vuln-exp-subhead">Features you get:</p>
                     <ul class="list-unstyled">
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 1</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 2</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 3</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 4</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Vendor coordination (always included)</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Standard vulnerability reporting</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Access to basic remediation guidance</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Regular updates on known issues</li>
                     </ul>
 
                 </div>
             </div>
         </div>
         <div class="col-4">
-            <div class="card text-start shadow" style="border-radius: 12px;border-color: rgba(90, 68, 255, 1);">
+            <div class="card text-start shadow h-100" style="border-radius: 12px;border-color: rgba(90, 68, 255, 1);">
                 <div class="card-body">
-                    <h2 class="card-title">Advanced</h2>
+                    <h2 class="card-title">Plus</h2>
                     <p class="card-text pricing-card-subhead">Basic features to fix your vulnerabilities</p>
                     <h1 style="font-size: 55px;">$520<span class="mt-auto fs-5" style="color: rgba(0, 0, 0, 1);font-size: 16px;">per month</span></h1>
                     <a href="#" class="btn text-light rounded-pill w-100" style="background-color: rgba(18, 18, 18, 1);">Get started <i class="bi bi-arrow-right-circle-fill"></i></a>
                     <hr>
                     <p class="vuln-exp-subhead">Features you get:</p>
                     <ul class="list-unstyled">
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 1</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 2</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 3</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 4</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Everything in Basic</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Compensatory Controls (Plus) – provide additional suggested steps that can reduce risk temporarily until a full fix is applied</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Prioritized support via email/chat</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Tailored recommendations for their environment (partially customized, not fully hands-on)</li>
                     </ul>
 
                 </div>
             </div>
         </div>
         <div class="col-4">
-            <div class="card text-start shadow" style="border-radius: 12px;">
+            <div class="card text-start shadow h-100" style="border-radius: 12px;">
                 <div class="card-body">
-                    <h2 class="card-title">Entreprise</h2>
+                    <h2 class="card-title">Pro</h2>
                     <p class="card-text pricing-card-subhead">Basic features to fix your vulnerabilities</p>
                     <h1 style="font-size: 55px;">$720<span class="mt-auto fs-5" style="color: rgba(0, 0, 0, 1);font-size: 16px;">per month</span></h1>
                     <a href="#" class="btn text-light rounded-pill w-100" style="background-color: rgba(18, 18, 18, 1);">Get started <i class="bi bi-arrow-right-circle-fill"></i></a>
                     <hr>
                     <p class="vuln-exp-subhead">Features you get:</p>
                     <ul class="list-unstyled">
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 1</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 2</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 3</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Feature number 4</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Everything in Plus</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Full Compensatory Controls (Premium) – entire new steps or methods designed specifically for their environment to fix vulnerabilities</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Professional Support (Premium) – dedicated personal support to implement fixes</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Hands-on assistance for patching and configuration</li>
+                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Advanced reporting and monitoring tailored to their infrastructure</li>
                     </ul>
 
                 </div>

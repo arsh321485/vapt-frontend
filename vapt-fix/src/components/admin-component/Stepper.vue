@@ -35,8 +35,10 @@
             
         </div> -->
     
-      <div class="d-flex justify-content-start align-items-center welcome-bg">
-  <div class="stepper mt-3">
+    <div class="d-flex justify-content-start align-items-center welcome-bg">
+      
+    <div class="stepper text-center mt-5">
+
     <!-- Step 1 -->
     <div
       class="step text-decoration-none" style="cursor: pointer;"
@@ -51,10 +53,13 @@
 
     <!-- Step 2 -->
     <div
-      class="step text-decoration-none" style="cursor: pointer;"
+      class="step text-decoration-none position-relative" style="cursor: pointer;"
       :class="{ active: isCompletedOrActive(2) }"
       @click="goToStep(2)"
     >
+    <!-- Logo above Step 2 -->
+  <img src="@/assets/images/smaller-logo.png" alt="logo" class="step-logo">
+
       <div class="step-circle">2</div>
       <div class="label">Risk Criteria</div>
     </div>
@@ -70,7 +75,7 @@
       <div class="step-circle">3</div>
       <div class="label">Vulnerability report</div>
     </div>
-  </div>
+    </div>
       </div>
       </div>
     </div>
@@ -137,7 +142,16 @@ export default {
   flex-direction: column; /* Keep number above text */
   align-items: center;
   text-align: center;
-  min-width: 150px; /* Ensures spacing between steps */
+  min-width: 150px;
+  position: relative; /* Ensures spacing between steps */
+}
+
+.step-logo {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 60%;
 }
 
 .step-circle {
