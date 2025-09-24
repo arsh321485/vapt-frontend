@@ -781,13 +781,13 @@ html, body {
 }
 
 .sidebar .nav-menu {
-  font-size: 15px;            /* smaller icon size */
+  font-size: 18px;            /* smaller icon size */
 }
 
 .sidebar .menu-heading {
   font-size: 12px;            /* smaller text */
   margin: 0;
-  line-height:1;
+  line-height:1.2;
 }
 
 .sidebar-dot {

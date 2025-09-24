@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div class="d-flex">
+    <div class="d-flex mt-3">
     <div class="sidebar d-flex flex-column align-items-center ps-2">
       <!-- <div class=" d-flex flex-column align-items-center">
         <img src="@/assets/images/smaller-logo.png" alt="">
@@ -63,7 +63,7 @@
           </router-link>
         </div>
 
-        <div class="mt-auto d-flex align-items-center position-relative">
+        <div class="mt-auto d-flex align-items-center position-relative mb-4">
     <!-- Profile Circle -->
     <div 
       class="circle-bottom "
