@@ -15,7 +15,7 @@
                             <div><h2 class="ticket-head mt-4">Support Requests</h2></div>
                             <div class="d-flex flex-row gap-3 mt-4">
                                 
-                                <button type="button" class="btn pending-approval-btn rounded-pill">Go premium and get exclusive support
+                                <button type="button" class="btn pending-approval-btn rounded-pill">Go Premium
                                 <!-- Go premium and get exclusive support control request from us -->
                                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
                                 </button>

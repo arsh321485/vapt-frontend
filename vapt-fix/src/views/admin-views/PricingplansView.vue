@@ -18,11 +18,24 @@
                     <hr>
                     <p class="vuln-exp-subhead">Features you get:</p>
                     <ul class="list-unstyled">
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Vendor coordination (always included)</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Standard vulnerability reporting</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Access to basic remediation guidance</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Regular updates on known issues</li>
-                    </ul>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Vendor coordination (always included)</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Standard vulnerability reporting</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Access to basic remediation guidance</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Regular updates on known issues</span>
+  </li>
+</ul>
+
 
                 </div>
             </div>
@@ -37,11 +50,20 @@
                     <hr>
                     <p class="vuln-exp-subhead">Features you get:</p>
                     <ul class="list-unstyled">
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Everything in Basic</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Compensatory Controls (Plus) – provide additional suggested steps that can reduce risk temporarily until a full fix is applied</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Prioritized support via email/chat</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Tailored recommendations for their environment (partially customized, not fully hands-on)</li>
-                    </ul>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Everything in Basic</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Compensatory Controls (Plus) – provide additional suggested steps that can reduce risk temporarily until a full fix is applied</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Tailored recommendations for their environment (partially customized, not fully hands-on)</span>
+  </li>
+</ul>
+
 
                 </div>
             </div>
@@ -56,12 +78,28 @@
                     <hr>
                     <p class="vuln-exp-subhead">Features you get:</p>
                     <ul class="list-unstyled">
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Everything in Plus</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Full Compensatory Controls (Premium) – entire new steps or methods designed specifically for their environment to fix vulnerabilities</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Professional Support (Premium) – dedicated personal support to implement fixes</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Hands-on assistance for patching and configuration</li>
-                        <li style="color: rgba(0, 0, 0, 1);font-size: 15px;font-weight: 500;"><i class="bi bi-check2" style="color: rgba(21, 0, 158, 1);"></i> Advanced reporting and monitoring tailored to their infrastructure</li>
-                    </ul>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Everything in Plus</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Full Compensatory Controls (Premium) – entire new steps or methods designed specifically for their environment to fix vulnerabilities</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Professional Support (Premium) – dedicated personal support to implement fixes</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Hands-on assistance for patching and configuration</span>
+  </li>
+  <li class="d-flex align-items-start mb-2" style="font-size:15px;font-weight:500;color:#000;">
+    <i class="bi bi-check2 me-2" style="color: rgba(21, 0, 158, 1);"></i>
+    <span>Advanced reporting and monitoring tailored to their infrastructure</span>
+  </li>
+</ul>
+
 
                 </div>
             </div>

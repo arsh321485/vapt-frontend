@@ -41,10 +41,11 @@
 
     <!-- Step 1 -->
     <div
-      class="step text-decoration-none" style="cursor: pointer;"
+      class="step text-decoration-none position-relative" style="cursor: pointer;"
       :class="{ active: isCompletedOrActive(1), disabled: currentStep < 1 }"
       @click="goToStep(1)"
     >
+    <img src="@/assets/images/smaller-logo.png" alt="logo" class="step-logo">
       <div class="step-circle">1</div>
       <div class="label">Add location and users</div>
     </div>
@@ -53,12 +54,12 @@
 
     <!-- Step 2 -->
     <div
-      class="step text-decoration-none position-relative" style="cursor: pointer;"
+      class="step text-decoration-none " style="cursor: pointer;"
       :class="{ active: isCompletedOrActive(2) }"
       @click="goToStep(2)"
     >
     <!-- Logo above Step 2 -->
-  <img src="@/assets/images/smaller-logo.png" alt="logo" class="step-logo">
+  <!-- <img src="@/assets/images/smaller-logo.png" alt="logo" class="step-logo"> -->
 
       <div class="step-circle">2</div>
       <div class="label">Risk Criteria</div>
@@ -148,10 +149,13 @@ export default {
 
 .step-logo {
   position: absolute;
-  top: -50px;
-  left: 50%;
+  top: -140px;
+  left: -70%;
   transform: translateX(-50%);
-  height: 60%;
+  /* height: 70%;
+  width: 20%; */
+  height: 80px;
+  width: 40px;
 }
 
 .step-circle {

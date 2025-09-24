@@ -10,11 +10,11 @@
             <!-- <div class="col-lg-2 "></div> -->
             <div class="col-lg-10 offset-lg-2">
               <!-- <img src="@/assets/images/smaller-logo.png" alt="" class="ms-3"> -->
-            <div class="container-fluid py-2 px-5">
+            <div class="container-fluid py-2">
               <div class="row">  
-                <div class="d-flex flex-row ms-5 ps-5">
-                  <div class="ms-5">
-                    <img src="@/assets/images/waving-hand.png" alt="" class="me-3 ms-5">
+                <div class="d-flex flex-row">
+                  <div class="mt-2">
+                    <img src="@/assets/images/waving-hand.png" alt="" class="me-3">
                   </div>
                   <div>
                     <div class="d-flex justify-content-between">

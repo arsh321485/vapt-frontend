@@ -13,7 +13,7 @@
           <div class="col-11 pt-5 mt-2 pb-3 pe-5">
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
-                  <div class="d-flex justify-content-between ms-3">
+                  <div class="d-flex justify-content-between ms-3 pt-3">
                     <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 28px;">Assigned Assets (210)</h5>
                     <div class="d-flex flex-row gap-3 me-3 mt-1">
                       <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip"  :class="{ 'text-muted': activeAction !== '' && activeAction !== 'delete' }" @click="handleDeleteClick" title="Remove an asset"></i>
@@ -327,7 +327,7 @@
       </div>
 
       <!-- Status Row (same as assets) -->
-      <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
+      <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-1">
         <span class="d-flex align-items-center">
           <span
             class="rounded-circle me-1"
@@ -366,8 +366,18 @@
                 <div class="col-8">
                     <div class="row py-3 px-3">
                         <div class="d-flex justify-content-between">
-                          <p class="mt-3" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
+                          <p class="mt-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
+                          <div class="d-flex justify-content-between">
+                            <div class="dropdown">
+                          <div class="dropdown-btn"> Select location</div>
+                          <div class="dropdown-content">
+                              <a href="#">Greece</a>
+                              <a href="#">Germany</a>
+                              <a href="#">Bahrain</a>
+                          </div>
+                            </div>
                           <NotificationPanel />
+                          </div>
                         </div>
                         <div class="d-flex justify-content-between">
                             <div class="d-flex justify-content-start gap-3">
@@ -382,14 +392,7 @@
                             </span>
                                 </div>
                             <div>
-                            <div class="dropdown">
-                          <div class="dropdown-btn"> Select location</div>
-                          <div class="dropdown-content">
-                              <a href="#">Greece</a>
-                              <a href="#">Germany</a>
-                              <a href="#">Bahrain</a>
-                          </div>
-                            </div>
+                            
                         </div>
                         </div>
                     </div>

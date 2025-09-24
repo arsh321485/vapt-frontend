@@ -63,19 +63,33 @@
           </router-link>
         </div>
 
-        <div>
-          <router-link to="/yourteam">
-          <button class="btn border-0" :class="{ activeBtn: isActive('/yourteam') }">
-          <i class="bi bi-people nav-menu"></i>
-          <p class="menu-heading">Teams</p></button>
-          </router-link>
-        </div>
-        <div class="mt-auto d-flex flex-column align-items-center">
+        <div class="mt-auto d-flex align-items-center position-relative">
+    <!-- Profile Circle -->
+    <div 
+      class="circle-bottom "
+      @click="toggleMenu" style="cursor: pointer;"
+     
+    >
+      A
+    </div>
+
+    <!-- White Box on Right -->
+    <div 
+      v-if="showMenu" 
+      class="dropdown-box shadow"
+    >
+      <button class="btn btn-sm w-100 text-start border-0" @click="confirmLogout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+  </div>
+
+        <!-- <div class="mt-auto d-flex flex-column align-items-center">
         <div class="circle-bottom ">A</div>
         <button class="btn border-0" @click="confirmLogout">
           <i class="bi bi-box-arrow-right nav-menu"></i><p class="menu-heading">Logout</p>
         </button>
-      </div>
+        </div> -->
       </div>
 
 
@@ -97,7 +111,15 @@ export default {
 
     return { route, isActive };
   },
+  data() {
+    return {
+      showMenu: false
+    }
+  },
   methods: {
+     toggleMenu() {
+      this.showMenu = !this.showMenu;
+    },
     confirmLogout() {
       Swal.fire({
         title: "Are you sure?",
@@ -117,3 +139,17 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.dropdown-box {
+  position: absolute;
+  bottom: 40px;   /* move it above "A" */
+  right: -25px;        /* align with "A" horizontally */
+  background: #dad9d9;
+  border-radius: 6px;
+  padding: 4px;
+  min-width: 90px;
+  z-index: 1050;   /* keep it above text */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+</style>
