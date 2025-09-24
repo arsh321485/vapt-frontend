@@ -63,7 +63,7 @@
           </router-link>
         </div>
 
-        <div class="mt-auto d-flex align-items-center position-relative mb-5">
+        <div class="mt-auto d-flex align-items-center position-relative mb-4">
     <!-- Profile Circle -->
     <div 
       class="circle-bottom "
