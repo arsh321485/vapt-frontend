@@ -1,16 +1,16 @@
 <template>
   <main>
     <section>
-      <div class="container-fluid px-0">
-        <div class="row gx-0 no-gutters">
+      <div class="container-fluid">
+        <div class="row">
           <DashboardHeader />
         </div>
         <div class="row">
-          <div class="col-1 ps-0 menubar-col1">
+          <div class="col-1">
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1" style=" overflow-y:auto; height:100vh;">
+          <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1" >
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <div class="d-flex flex-row gap-2">
                 <h2>Vulnerability Management Program</h2>

@@ -772,8 +772,8 @@ html, body {
 .sidebar {
   width: 100px;   
   height: 100vh;              /* full viewport height */
-  position: fixed;            /* fixed on left */
-  top: 20;
+   position: fixed;       
+  /* top: 20; */
   left: 0;
   background-color: #fff;     /* or your theme color */
   border-right: 1px solid #ddd;
@@ -781,7 +781,7 @@ html, body {
 }
 
 .sidebar .nav-menu {
-  font-size: 18px;            /* smaller icon size */
+  font-size: 24px;            /* smaller icon size */
 }
 
 .sidebar .menu-heading {

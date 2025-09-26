@@ -3,37 +3,7 @@
     <section class="bg-light">
     <div class="container-fluid">
     <div class="row">
-        <!-- <div class="d-flex justify-content-center py-2">
-            <div class="stepper mt-3">
-              <img src="@/assets/images/logo2.png" alt="">
-
-            <div class="step active">
-                <div class="step-circle">1</div>
-                <div class="label">Add location and users</div>
-            </div>
-
-            <div class="line active"></div>
-
-
-            <div class="step">
-                <div class="step-circle">2</div>
-                <div class="label">Risk Criteria</div>
-            </div> 
-
-            <div class="line"></div>
-
-            
-            <div class="step">
-                <div class="step-circle">3</div>
-                <div class="label">Vulnerability report</div>
-            </div>
-
-            <router-link to="/riskcriteria" class="btn stepper-btn mt-5" tag="button">Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-            </router-link>
-
-            </div>
-            
-        </div> -->
+        
     
     <div class="d-flex justify-content-start align-items-center welcome-bg">
       

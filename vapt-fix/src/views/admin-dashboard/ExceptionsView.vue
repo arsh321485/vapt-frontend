@@ -260,7 +260,16 @@
   <div class="chat-right">
     <div class="text-center mb-4">
       <img src="@/assets/images/smaller-logo.png" alt="" class="mt-2" />
+      <div class="d-flex justify-content-end me-4">
+        <div class="avatar-container">
+        <div class="avatar ava-green" ref="germany">PM</div>
+      </div>
+      </div>
     </div>
+    <!-- <div class="d-flex justify-content-center gap-5">
+      <img src="@/assets/images/smaller-logo.png" alt="" class="mt-2" />
+      <p>PM</p>
+    </div> -->
     <div class="text-center mt-4">
       <div class="d-flex justify-content-between small text-dark">
         <span><strong class="text-secondary">Asset:</strong> 192.68.1.42</span>
