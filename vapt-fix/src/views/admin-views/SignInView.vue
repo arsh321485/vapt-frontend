@@ -1,10 +1,9 @@
 <template>
-    <main>
-     <div class="container d-flex align-items-center justify-content-center min-vh-100">
+  <main>
+    <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
-      <!-- Left Form Section -->
       <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
-        <img src="@/assets/images/logo2.png" alt="" class="mb-4">
+        <img src="@/assets/images/vapt-logo.png" alt="" class="mb-4" style="height: 40px;">
         <h1 class="form-heading mb-3">Welcome back!</h1>
         <p class="form-subheading mb-4">Login into your account to start fixing.</p>
 
@@ -16,45 +15,33 @@
                       <hr class="flex-grow-1">
                     </div>
 
-        
+        <form @submit.prevent="handleLogin">
 
-        <form>
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" placeholder="Enter your email" style="border: 1px solid #422CE9;">
-          </div>
-          <div class="mb-4 mt-4">
-            <label class="form-label">Your password</label>
-            <input type="password" class="form-control" placeholder="Enter your password">
-            <!-- Forgot password link -->
-  <div class="text-end mt-1">
-    <router-link to="/forgotpassword" class="text-primary" style="font-size: 14px; text-decoration: none;">
-      Forgot Password?
-    </router-link>
-  </div>
-          </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" id="email" class="form-control" v-model="form.email" placeholder="Enter your email">
+    </div>
 
-          <div style="padding:10px;border:1px solid #ccc;border-radius:4px;
-            width:300px;display:flex;align-items:center;justify-content:space-between;">
-  
-  <!-- Left side: tick box -->
-  <div style="display:flex;align-items:center;gap:10px;">
-    <input type="checkbox" id="captcha-check" style="width:20px;height:20px;cursor:pointer;">
-    <label for="captcha-check" style="cursor:pointer;">I'm not a robot</label>
-  </div>
+    <div class="mb-4 mt-4 position-relative">
+      <label class="form-label">Your password</label>
+      <input :type="showPassword ? 'text' : 'password'" class="form-control" v-model="form.password" placeholder="Enter your password" />
+      <i class="bi" :class="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'" 
+         @click="togglePassword" style="position:absolute; top:42px; right:20px; cursor:pointer;"></i>
 
-  <!-- Right side: fake recaptcha logo -->
-  <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" 
-       alt="recaptcha" style="height:30px;">
-</div>
+      <div class="text-end mt-1">
+        <router-link to="/forgotpassword" class="text-primary" style="font-size: 14px; text-decoration: none;">
+          Forgot Password?
+        </router-link>
+      </div>
+    </div>
 
+    <!-- ✅ Google reCAPTCHA -->
+    <div id="recaptcha-container" class="mb-3"></div>
 
-          <router-link to="/home">
-            <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-4">
-            Login into vaptfix <i class="bi bi-arrow-right-circle-fill"></i>  
-          </button>
-          </router-link>
-        </form>
+    <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-4">
+      Login into vaptfix <i class="bi bi-arrow-right-circle-fill"></i>
+    </button>
+  </form>
 
         <p class="mt-4 text-center">Don’t have an account? <span>
           <router-link to="/signup" class="text-decoration-none" tag="button" style="color: #422CE9;">Signup</router-link>
@@ -81,6 +68,83 @@ export default {
   name: 'SigninView',
   components: {
     Vue3Select
+  },
+  data() {
+    return {
+      form: {
+        email: "",
+        password: ""
+      },
+      showPassword: false
+    };
+  },
+  methods: {
+    togglePassword() {
+      this.showPassword = !this.showPassword;
+    },
+    async handleLogin() {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(this.form.email)) {
+    alert("Please enter a valid email address");
+    return;
+  }
+
+  if (!this.form.password) {
+    alert("Please enter your password");
+    return;
+  }
+
+  const recaptchaResponse = grecaptcha.getResponse();
+  if (!recaptchaResponse) {
+    alert("Please verify you are not a robot");
+    return;
+  }
+
+  const body = {
+    email: this.form.email,
+    password: this.form.password,
+    recaptcha: recaptchaResponse
+  };
+
+  try {
+    const res = await fetch("https://vapt-backend.onrender.com/api/admin/users/login/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    console.log("Login response:", data);
+
+    if (res.ok) {
+      alert("Login successful ✅");
+      this.$router.push("/home");
+    } else {
+      alert("Error: " + (data.error || JSON.stringify(data)));
+      grecaptcha.reset(); // reset captcha on failure
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Login request failed. Please try again.");
+  }
+}
+
+  },
+  mounted() {
+    // ✅ Render Google reCAPTCHA
+    if (window.grecaptcha) {
+      window.grecaptcha.ready(() => {
+        window.grecaptcha.render("recaptcha-container", {
+          sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr"
+        });
+      });
+    }
   }
 };
 </script>
+
+<style scoped>
+.position-relative input + i {
+  font-size: 1.2rem;
+}
+</style>

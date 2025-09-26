@@ -26,7 +26,7 @@ import PricingplansView from '../views/admin-views/PricingplansView.vue'
 import RiskCriteriaView from '../views/admin-views/RiskCriteriaView.vue'
 import HowitWork from '../components/admin-component/HowitWork.vue'
 import Profile from '../components/admin-component/Profile.vue'
-import ChangePasswordView from '../views/admin-views/ChangePasswordView.vue'
+import ResetPasswordView from '../views/admin-views/ResetPasswordView.vue'
 import NotificationPanel from '../components/admin-component/NotificationPanel.vue'
 
 // user import
@@ -177,9 +177,9 @@ const router = createRouter({
       component: Profile,
     },
     {
-      path: '/changepassword',
-      name: 'changepassword',
-      component: ChangePasswordView,
+      path: '/reset-password',
+      name: 'reset-password',
+      component: ResetPasswordView,
     },
     {
       path: '/notification',

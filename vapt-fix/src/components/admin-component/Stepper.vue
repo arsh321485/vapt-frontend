@@ -3,8 +3,6 @@
     <section class="bg-light">
     <div class="container-fluid">
     <div class="row">
-        
-    
     <div class="d-flex justify-content-start align-items-center welcome-bg">
       
     <div class="stepper text-center mt-5">

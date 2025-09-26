@@ -2,9 +2,9 @@
   <main>
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
-        <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
-            <img src="@/assets/images/logo2.png" alt="" class="mb-4">
-            <h3 class="mb-4">Change Password</h3>
+        <div class="col-lg-6 col-md-12 px-5 pb-4 form-section">
+            <img src="@/assets/images/vapt-logo.png" alt="" class="mb-4" style="height: 40px;">
+            <h3 class="mb-4">Set Password</h3>
             
             <div class="mb-4">
                 <label for="password" class="form-label">New Password</label>
@@ -25,8 +25,8 @@
                 />
             </div>
             
-            <router-link to="/" class="btn w-100 btn-vaptfix" style="background-color: #422CE9;">
-                Save Password
+            <router-link to="/signin" class="btn w-100 btn-vaptfix" style="background-color: #422CE9;">
+              Save Password
             </router-link>
             
         </div>
