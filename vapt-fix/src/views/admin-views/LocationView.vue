@@ -3,13 +3,11 @@
     <section class="bg-light">
       <div class="container-fluid">
         <div class="row">
-          <!-- <div class="col-lg-2 welcome-bg"> -->
-            <!-- <Stepper /> -->
-          <!-- </div> -->
+          
           <div class="col-lg-12 my-3  welcome-bg">
-            <!-- <div class="col-lg-2 "></div> -->
+           
             <div class="col-lg-10 offset-lg-2">
-              <!-- <img src="@/assets/images/smaller-logo.png" alt="" class="ms-3"> -->
+             
             <div class="container-fluid py-2">
               <div class="row">  
                 <div class="d-flex flex-row">
@@ -28,20 +26,7 @@
                   </div>
 
                 </div>
-                <!-- <div class="col-1 d-flex justify-content-center align-items-center mb-3">
-                  <img src="@/assets/images/waving-hand.png" alt="">
-                </div>
-                <div class="col-11">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                      <h1 class="fw-semibold welcome-head"> Welcome to vaptfix!</h1>
-                      <p class="welcome-subhead">Before we fix your information assets, ....</p>
-                    </div>
-                    <div>   
-                    </div>
-                  </div>
-
-                </div> -->
+               
               </div>
           
          
