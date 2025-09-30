@@ -83,7 +83,7 @@
 <script>
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
-import { signup } from "@/services/apiservices";
+import { signup } from "@/services/apiservices.ts";
 
 export default {
   name: 'SignupView',

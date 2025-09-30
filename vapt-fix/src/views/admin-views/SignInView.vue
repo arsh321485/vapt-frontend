@@ -62,7 +62,7 @@
 <script>
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
-import { loginUser } from "@/services/apiServices";
+import { loginUser } from "@/services/apiServices.ts";
 
 export default {
   name: 'SigninView',
