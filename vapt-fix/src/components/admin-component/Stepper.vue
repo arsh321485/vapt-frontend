@@ -13,7 +13,7 @@
       :class="{ active: isCompletedOrActive(1), disabled: currentStep < 1 }"
       @click="goToStep(1)"
     >
-    <img src="@/assets/images/vapt-logo.png" alt="logo" class="step-logo">
+    <img src="@/assets/images/logo-capital.png" alt="logo" class="step-logo">
       <div class="step-circle">1</div>
       <div class="label">Add location and users</div>
     </div>

@@ -43,13 +43,28 @@
 
         
         <div class="d-flex justify-content-start gap-2">
-          <router-link to="/signup" class="text-white text-decoration-none" tag="button">Signup / </router-link>
-          <router-link to="/signin" class="text-white text-decoration-none" tag="button">Signin</router-link>
+          <!-- Show Signup/Signin if no user -->
+  <template v-if="!user">
+    <router-link to="/signup" class="text-white text-decoration-none" tag="button">Signup /</router-link>
+    <router-link to="/signin" class="text-white text-decoration-none" tag="button">Signin</router-link>
+  </template>
+
           <!-- Static User Icon -->
-          <!-- <router-link to="/profile" class="text-center text-decoration-none">
-            <i class="bi bi-person-circle text-white fs-5"></i>
-            <p class="text-light mb-0" style="font-size: 14px;">John Doe</p>
-          </router-link> -->
+          <!-- Show profile avatar if user is logged in -->
+  <template v-else>
+    <router-link to="/profile" class="text-center text-decoration-none d-flex flex-column align-items-center">
+      <img 
+        src="https://cdn-icons-png.flaticon.com/512/147/147144.png" 
+        alt="Profile" 
+        class="rounded-circle" 
+        width="25" 
+        height="25"
+      />
+      <p class="text-light mb-0" style="font-size: 14px;">
+  {{ user.firstname }} {{ user.lastname }}
+</p>
+    </router-link>
+  </template>
         </div>
 
         </div>
@@ -61,6 +76,18 @@
 <script>
 export default {
   name: 'Header',
+  data() {
+  return {
+    user: null, // Will hold user info after login/signup
+  };
+},
+mounted() {
+    // Check if user info is saved in localStorage
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      this.user = JSON.parse(savedUser);
+    }
+  },
 };
 </script>
 

@@ -3,7 +3,7 @@
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
       <div class="col-lg-6 col-md-12 px-5 pb-4 form-section">
-        <img src="@/assets/images/vapt-logo.png" alt="" class="mb-4" style="height: 40px;">
+        <img src="@/assets/images/logo-capital.png" alt="" class="mb-4" style="height: 40px;">
         <h3 class="mb-2">Forgot Password</h3>
         <p class="text-muted mb-4">
           Enter your registered email to reset your password.
@@ -36,6 +36,8 @@
 </template>
 
 <script>
+import { forgotPassword } from "@/services/apiServices";
+
 export default {
   name: "ForgotPasswordView",
   data() {
@@ -44,43 +46,43 @@ export default {
     };
   },
   methods: {
-    async handleForgotPassword() {
-      // ✅ Validate email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.email)) {
-        alert("Please enter a valid email address");
-        return;
-      }
-
-      const body = {
-        email: this.email
-      };
-
-      try {
-        const res = await fetch("https://vapt-backend.onrender.com/api/admin/users/forgot-password/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
-
-        const data = await res.json();
-        console.log("Forgot Password response:", data);
-
-        if (res.ok) {
-          alert("Reset link sent to your email ✅");
-          // Optionally, redirect to some confirmation page
-        } else {
-          alert("Error: " + (data.error || JSON.stringify(data)));
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Request failed. Please try again.");
-      }
+  async handleForgotPassword() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address',
+        timer: 3000, // auto close after 3 seconds
+        showConfirmButton: false,
+      });
+      return;
     }
-  }
+
+    try {
+      const response = await forgotPassword({ email: this.email });
+      console.log("Forgot Password response:", response);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Reset Link Sent!',
+        text: 'Check your email for the reset link.',
+        timer: 5000, // auto close after 3 seconds
+        showConfirmButton: false,
+        position: 'center',
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.error || 'Something went wrong!',
+        timer: 4000,
+        showConfirmButton: false,
+      });
+    }
+  },
+},
+
 };
 </script>
 

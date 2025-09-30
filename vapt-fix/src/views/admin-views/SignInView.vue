@@ -3,7 +3,7 @@
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
       <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
-        <img src="@/assets/images/vapt-logo.png" alt="" class="mb-4" style="height: 40px;">
+        <img src="@/assets/images/logo-capital.png" alt="" class="mb-4" style="height: 40px;">
         <h1 class="form-heading mb-3">Welcome back!</h1>
         <p class="form-subheading mb-4">Login into your account to start fixing.</p>
 
@@ -60,21 +60,16 @@
 </template>
 
 <script>
-
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
+import { loginUser } from "@/services/apiServices";
 
 export default {
   name: 'SigninView',
-  components: {
-    Vue3Select
-  },
+  components: { Vue3Select },
   data() {
     return {
-      form: {
-        email: "",
-        password: ""
-      },
+      form: { email: "", password: "" },
       showPassword: false
     };
   },
@@ -82,56 +77,65 @@ export default {
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
+
+    // Validation functions inside the same component
+    isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    },
+    isPasswordFilled(password) {
+      return password && password.trim() !== "";
+    },
+
     async handleLogin() {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(this.form.email)) {
-    alert("Please enter a valid email address");
+  // Validate email
+  if (!this.isValidEmail(this.form.email)) {
+    alert("Please enter a valid email");
     return;
   }
 
-  if (!this.form.password) {
+  // Validate password
+  if (!this.isPasswordFilled(this.form.password)) {
     alert("Please enter your password");
     return;
   }
 
+  // Get reCAPTCHA response
   const recaptchaResponse = grecaptcha.getResponse();
   if (!recaptchaResponse) {
     alert("Please verify you are not a robot");
     return;
   }
 
-  const body = {
-    email: this.form.email,
-    password: this.form.password,
-    recaptcha: recaptchaResponse
-  };
-
   try {
-    const res = await fetch("https://vapt-backend.onrender.com/api/admin/users/login/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify(body)
+    // Call login API
+    const data = await loginUser({
+      email: this.form.email,
+      password: this.form.password,
+      recaptcha: recaptchaResponse
     });
 
-    const data = await res.json();
-    console.log("Login response:", data);
+    if (data.message === "Login successful") {
+  // alert("Login successful ✅\nWelcome " + data.user.full_name);
+  this.user = data.user;
+  localStorage.setItem("user", JSON.stringify(data.user));
+  this.$router.push("/home");
+} else {
+  alert("Error: " + (data.error || JSON.stringify(data)));
+  grecaptcha.reset();
+}
 
-    if (res.ok) {
-      alert("Login successful ✅");
-      this.$router.push("/home");
-    } else {
-      alert("Error: " + (data.error || JSON.stringify(data)));
-      grecaptcha.reset(); // reset captcha on failure
-    }
-  } catch (error) {
-    console.error("Error:", error);
+  } catch (err) {
+    // Plain JS: no type annotation
     alert("Login request failed. Please try again.");
+    console.error("Login API error:", err);
+    grecaptcha.reset();
   }
 }
 
+
   },
   mounted() {
-    // ✅ Render Google reCAPTCHA
     if (window.grecaptcha) {
       window.grecaptcha.ready(() => {
         window.grecaptcha.render("recaptcha-container", {
@@ -142,6 +146,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .position-relative input + i {

@@ -5,7 +5,7 @@
   <div class="d-flex align-items-center justify-content-between gap-4 py-2 px-4">
     
       <div class="browser-bar">
-        <img src="@/assets/images/vapt-logo.png" alt="">
+        <img src="@/assets/images/logo-capital.png" alt="">
       </div>
   
     <!-- Right Section -->

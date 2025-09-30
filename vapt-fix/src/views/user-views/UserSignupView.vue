@@ -5,7 +5,7 @@
     <div class="row overflow-hidden w-100">
       <!-- Left Form Section --> 
       <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
-        <img src="@/assets/images/vapt-logo.png" alt="" class="mb-4" style="height: 40px;">
+        <img src="@/assets/images/logo-capital.png" alt="" class="mb-4" style="height: 40px;">
         <h1 class="form-heading mb-2">Get started now</h1>
         <p class="form-subheading mb-4">You’re invited to join VAPTfix by Amit Gopal.</p>
 

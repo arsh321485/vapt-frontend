@@ -3,7 +3,7 @@
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="row overflow-hidden w-100">
       <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
-        <img src="@/assets/images/vapt-logo.png" alt="" class="mb-4" style="height: 40px;">
+        <img src="@/assets/images/logo-capital.png" alt="" class="mb-4" style="height: 40px;">
         <h1 class="form-heading mb-2">Get started now</h1>
         <p class="form-subheading mb-4">Join vaptfix, fix your vulnerabilities now</p>
 
@@ -65,6 +65,8 @@
       Signup for vaptfix <i class="bi bi-arrow-right-circle-fill"></i>
     </button>
   </form>
+
+
   <p class="text-center pt-3 mt-2">Already have an account? <span> <router-link to="/signin" class="text-decoration-none" tag="button" style="color: #422CE9;">Signin</router-link></span></p>
       </div>
 
@@ -81,6 +83,7 @@
 <script>
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
+import { signup } from "@/services/apiservices";
 
 export default {
   name: 'SignupView',
@@ -102,70 +105,36 @@ export default {
       showConfirmPassword: false
     };
   },
-  methods: {
+   methods: {
+    async handleSignup() {
+      try {
+        const recaptchaResponse = grecaptcha.getResponse();
+        if (!recaptchaResponse) {
+          alert("Please verify you are not a robot");
+          return;
+        }
+
+        const body = {
+          ...this.form,
+          "g-recaptcha-response": recaptchaResponse
+        };
+
+        const data = await signup(body);
+        console.log("Signup response:", data);
+
+        // alert("Signup successful ✅");
+        this.user = data.user;
+        localStorage.setItem("user", JSON.stringify(data.user));
+        this.$router.push("/home");
+      } catch (error) {
+        alert("Signup failed ❌: " + (error.message || "Server error"));
+      }
+    },
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
     toggleConfirmPassword() {
       this.showConfirmPassword = !this.showConfirmPassword;
-    },
-    async handleSignup() {
-      // ✅ Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.form.email)) {
-        alert("Please enter a valid email address");
-        return;
-      }
-
-      // ✅ Password validation
-      if (this.form.password.length < 8) {
-        alert("Password must be at least 8 characters");
-        return;
-      }
-
-      if (this.form.password !== this.form.confirm_password) {
-        alert("Passwords do not match");
-        return;
-      }
-
-      // ✅ Get reCAPTCHA token
-      const recaptchaResponse = grecaptcha.getResponse();
-      if (!recaptchaResponse) {
-        alert("Please verify you are not a robot");
-        return;
-      }
-
-      const body = {
-        ...this.form,
-        "g-recaptcha-response": recaptchaResponse
-      };
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
-        const res = await fetch("https://vapt-backend.onrender.com/api/admin/users/signup/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-          signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        const data = await res.json();
-        console.log("Signup response:", data);
-
-        if (res.ok) {
-          alert("Signup successful ✅");
-          this.$router.push("/home");
-        } else {
-          alert("Error: " + (data.message || "Signup failed"));
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Signup request failed. Please try again.");
-      }
     }
   },
   mounted() {
