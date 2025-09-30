@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { forgotPassword } from "@/services/apiServices.ts";
+import { forgotPassword } from "../../services/apiServices";
 
 export default {
   name: "ForgotPasswordView",

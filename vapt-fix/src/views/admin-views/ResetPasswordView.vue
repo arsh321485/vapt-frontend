@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { resetPassword } from "@/services/apiServices.ts";
+import { resetPassword } from "../../services/apiServices";
 
 export default {
   name: "ChangePasswordView",
