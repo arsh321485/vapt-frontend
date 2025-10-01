@@ -45,14 +45,30 @@ export const forgotPassword = async (payload: { email: string }) => {
 };
 
 // Reset Password API
+// export const resetPassword = async (
+//   userId: string,
+//   token: string,
+//   payload: { new_password: string; confirm_password: string }
+// ) => {
+//   try {
+//     const res = await endpoint.put(
+//       `/admin/users/set-password/${userId}/${token}/`,
+//       payload
+//     );
+//     return res.data;
+//   } catch (error: any) {
+//     console.error("Reset Password API error:", error.response?.data || error.message);
+//     throw error.response?.data || error;
+//   }
+// };
 export const resetPassword = async (
   userId: string,
   token: string,
   payload: { new_password: string; confirm_password: string }
 ) => {
   try {
-    const res = await endpoint.put(
-      `/admin/users/set-password/${userId}/${token}/`,
+    const res = await axios.put(
+      `https://vapt-backend.onrender.com/set-password/${userId}/${token}/`,
       payload
     );
     return res.data;
