@@ -60,17 +60,19 @@
 </template>
 
 <script>
-import Vue3Select from 'vue3-select';
-import 'vue3-select/dist/vue3-select.css';
-import { loginUser } from "../../services/apiServices";
+import Vue3Select from "vue3-select";
+import "vue3-select/dist/vue3-select.css";
+import { useAuthStore } from "../../stores/authStore";
+import Swal from "sweetalert2";
 
 export default {
-  name: 'SigninView',
+  name: "SigninView",
   components: { Vue3Select },
   data() {
     return {
       form: { email: "", password: "" },
-      showPassword: false
+      showPassword: false,
+      loading: false,
     };
   },
   methods: {
@@ -78,7 +80,6 @@ export default {
       this.showPassword = !this.showPassword;
     },
 
-    // Validation functions inside the same component
     isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
@@ -88,62 +89,62 @@ export default {
     },
 
     async handleLogin() {
-  // Validate email
-  if (!this.isValidEmail(this.form.email)) {
-    alert("Please enter a valid email");
-    return;
-  }
+      if (!this.isValidEmail(this.form.email)) {
+        Swal.fire("Error", "Please enter a valid email", "error");
+        return;
+      }
+      if (!this.isPasswordFilled(this.form.password)) {
+        Swal.fire("Error", "Please enter your password", "error");
+        return;
+      }
 
-  // Validate password
-  if (!this.isPasswordFilled(this.form.password)) {
-    alert("Please enter your password");
-    return;
-  }
+      const recaptchaResponse = grecaptcha.getResponse();
+      if (!recaptchaResponse) {
+        Swal.fire("Error", "Please verify you are not a robot", "error");
+        return;
+      }
 
-  // Get reCAPTCHA response
-  const recaptchaResponse = grecaptcha.getResponse();
-  if (!recaptchaResponse) {
-    alert("Please verify you are not a robot");
-    return;
-  }
+      this.loading = true;
+      try {
+        const authStore = useAuthStore();
+        const result = await authStore.login({
+          email: this.form.email,
+          password: this.form.password,
+          recaptcha: recaptchaResponse,
+        });
 
-  try {
-    // Call login API
-    const data = await loginUser({
-      email: this.form.email,
-      password: this.form.password,
-      recaptcha: recaptchaResponse
-    });
+        if (result.status) {
+          Swal.fire("Success", result.data.message || "Login successful ✅", "success");
 
-    if (data.message === "Login successful") {
-  // alert("Login successful ✅\nWelcome " + data.user.full_name);
-  this.user = data.user;
-  localStorage.setItem("user", JSON.stringify(data.user));
-  this.$router.push("/home");
-} else {
-  alert("Error: " + (data.error || JSON.stringify(data)));
-  grecaptcha.reset();
-}
+          // 🔎 Show tokens and user in console
+          console.log("✅ Access Token:", localStorage.getItem("authorization"));
+          console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
+          console.log("✅ User:", localStorage.getItem("user"));
+          console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
 
-  } catch (err) {
-    // Plain JS: no type annotation
-    alert("Login request failed. Please try again.");
-    console.error("Login API error:", err);
-    grecaptcha.reset();
-  }
-}
-
-
+          this.$router.push("/home");
+        } else {
+          Swal.fire("Error", result.message || "Login failed ❌", "error");
+          grecaptcha.reset();
+        }
+      } catch (err) {
+        console.error("Login API error:", err);
+        Swal.fire("Error", "Login request failed. Please try again.", "error");
+        grecaptcha.reset();
+      } finally {
+        this.loading = false;
+      }
+    },
   },
   mounted() {
     if (window.grecaptcha) {
       window.grecaptcha.ready(() => {
         window.grecaptcha.render("recaptcha-container", {
-          sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr"
+          sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
         });
       });
     }
-  }
+  },
 };
 </script>
 

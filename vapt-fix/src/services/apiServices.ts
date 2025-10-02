@@ -1,81 +1,72 @@
 import axios from "axios";
+import router from "../router";
+import Swal from "sweetalert2";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// ✅ Create axios instance
 const endpoint = axios.create({
   baseURL: BASE_URL,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-// ✅ Signup API
-export const signup = async (payload: any) => {
-  try {
-    const res = await endpoint.post("/admin/users/signup/", payload);
-    return res.data;
-  } catch (error: any) {
-    console.error("Signup API error:", error.response?.data || error.message);
-    throw error.response?.data || error;
-  }
-};
+// ✅ Add token to requests (if exists)
+// endpoint.interceptors.request.use(
+//   (config) => {
+//     const authorization = localStorage.getItem("authorization");
 
-// Login(Signin)
-export const loginUser = async (body: { email: string; password: string; recaptcha: string }) => {
-  try {
-    const res = await endpoint.post("/admin/users/login/", body);
-    return res.data; 
-  } catch (error: any) {
-    console.error("Login API error:", error.response?.data || error.message);
-    throw error.response?.data || error;
-  }
-};
+//     if (authorization && authorization !== "null" && authorization !== "undefined") {
+//       try {
+//         const token = JSON.parse(authorization);
 
-// Forgotpassword on 
-export const forgotPassword = async (payload: { email: string }) => {
-  try {
-    const res = await endpoint.post("/admin/users/forgot-password/", payload);
-    return res.data;
-  } catch (error: any) {
-    console.error(
-      "Forgot Password API error:",
-      error.response?.data || error.message
-    );
-    throw error.response?.data || error;
-  }
-};
+//         if (token) {
+//           config.headers["Authorization"] = `Bearer ${token}`;
+//         }
+//       } catch (e) {
+//         console.error("Invalid token format", e);
+//       }
+//     }
 
-// Reset Password API
-// export const resetPassword = async (
-//   userId: string,
-//   token: string,
-//   payload: { new_password: string; confirm_password: string }
-// ) => {
-//   try {
-//     const res = await endpoint.put(
-//       `/admin/users/set-password/${userId}/${token}/`,
-//       payload
-//     );
-//     return res.data;
-//   } catch (error: any) {
-//     console.error("Reset Password API error:", error.response?.data || error.message);
-//     throw error.response?.data || error;
-//   }
-// };
-export const resetPassword = async (
-  userId: string,
-  token: string,
-  payload: { new_password: string; confirm_password: string }
-) => {
-  try {
-    const res = await axios.put(
-      `https://vapt-backend.onrender.com/set-password/${userId}/${token}/`,
-      payload
-    );
-    return res.data;
-  } catch (error: any) {
-    console.error("Reset Password API error:", error.response?.data || error.message);
-    throw error.response?.data || error;
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
+// ✅ Add token to requests (if exists)
+endpoint.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authorization");
+
+    if (token && token !== "null" && token !== "undefined") {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ✅ Handle session expiry
+endpoint.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Clear localStorage directly
+      localStorage.removeItem("authorization");
+      localStorage.removeItem("user");
+      localStorage.removeItem("authenticated");
+      localStorage.removeItem("refreshToken");
+
+      router.push("/signin");
+
+      Swal.fire({
+        icon: "error",
+        title: "Session Expired",
+        text: "Please log in again.",
+      });
+    }
+    return Promise.reject(error);
   }
-};
+);
 
 export default endpoint;

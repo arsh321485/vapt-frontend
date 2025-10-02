@@ -36,7 +36,8 @@
 </template>
 
 <script>
-import { forgotPassword } from "../../services/apiServices";
+import Swal from "sweetalert2";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: "ForgotPasswordView",
@@ -53,33 +54,32 @@ export default {
         icon: 'error',
         title: 'Invalid Email',
         text: 'Please enter a valid email address',
-        timer: 3000, // auto close after 3 seconds
+        timer: 3000,
         showConfirmButton: false,
       });
       return;
     }
 
-    try {
-      const response = await forgotPassword({ email: this.email });
-      console.log("Forgot Password response:", response);
+    const authStore = useAuthStore();
+    const response = await authStore.forgotPassword({ email: this.email });
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Reset Link Sent!',
-        text: 'Check your email for the reset link.',
-        timer: 5000, // auto close after 3 seconds
-        showConfirmButton: false,
-        position: 'center',
-      });
-    } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: err.error || 'Something went wrong!',
-        timer: 4000,
-        showConfirmButton: false,
-      });
-    }
+    if (response.status) {
+        Swal.fire({
+          icon: "success",
+          title: "Reset Link Sent!",
+          text: "Check your email for the reset link.",
+          timer: 5000,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response.message || "Something went wrong!",
+          timer: 4000,
+          showConfirmButton: false,
+        });
+      }
   },
 },
 

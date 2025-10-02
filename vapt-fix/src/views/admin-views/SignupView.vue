@@ -83,7 +83,8 @@
 <script>
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
-import { signup } from "../../services/apiServices";
+import { useAuthStore } from "../../stores/authStore";
+import Swal from "sweetalert2";
 
 export default {
   name: 'SignupView',
@@ -102,50 +103,64 @@ export default {
         confirm_password: ""
       },
       showPassword: false,
-      showConfirmPassword: false
+      showConfirmPassword: false,
+      loading: false,
     };
   },
-   methods: {
+methods: {
     async handleSignup() {
+      this.loading = true;
       try {
-        const recaptchaResponse = grecaptcha.getResponse();
-        if (!recaptchaResponse) {
-          alert("Please verify you are not a robot");
-          return;
+        const authStore = useAuthStore();
+        const result = await authStore.signup(this.form);
+
+        if (result.status) {
+          Swal.fire(
+            "Success",
+            result.data.message || "Signup successful ✅",
+            "success"
+          );
+
+          // 🔎 Debug logs (tokens & user)
+          console.log("✅ Access Token:", localStorage.getItem("authorization"));
+          console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
+          console.log("✅ User:", localStorage.getItem("user"));
+          console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
+
+          this.$router.push("/home");
+        } else {
+          console.error("Signup failed details:", result.details);
+          Swal.fire("Error", result.message, "error");
         }
-
-        const body = {
-          ...this.form,
-          "g-recaptcha-response": recaptchaResponse
-        };
-
-        const data = await signup(body);
-        console.log("Signup response:", data);
-
-        // alert("Signup successful ✅");
-        this.user = data.user;
-        localStorage.setItem("user", JSON.stringify(data.user));
-        this.$router.push("/home");
       } catch (error) {
-        alert("Signup failed ❌: " + (error.message || "Server error"));
+        console.error("Unexpected signup error:", error);
+        Swal.fire(
+          "Error",
+          error.message || "Something went wrong ❌",
+          "error"
+        );
+      } finally {
+        this.loading = false;
       }
     },
+
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
     toggleConfirmPassword() {
       this.showConfirmPassword = !this.showConfirmPassword;
-    }
+    },
   },
+
   mounted() {
     if (window.grecaptcha) {
       window.grecaptcha.ready(() => {
         window.grecaptcha.render("recaptcha-container", {
-          sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr"
+          sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
         });
       });
     }
-  }
+  },
 };
 </script>
 
