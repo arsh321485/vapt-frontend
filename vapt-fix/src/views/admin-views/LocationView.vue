@@ -3,11 +3,8 @@
     <section class="bg-light">
       <div class="container-fluid">
         <div class="row">
-          
           <div class="col-lg-12 my-3  welcome-bg">
-           
             <div class="col-lg-10 offset-lg-2">
-             
             <div class="container-fluid py-2">
               <div class="row">  
                 <div class="d-flex flex-row">
@@ -24,17 +21,13 @@
                     </div>
                     </div>
                   </div>
-
                 </div>
-               
               </div>
           
-         
-  <div class="row">
-    <Stepper />
-  </div>
+              <div class="row">
+                <Stepper />
+              </div>
 
-  
               <div class="row mt-5 mb-4" v-if="showPlatforms">
               <div class="col-9 location-card py-4 px-4 ms-3">
                 <div class="row">
@@ -500,7 +493,6 @@
                   </div>
                 </div>
               </div>
-
 
               <div class="text-end">
                 <router-link to="/riskcriteria" class="btn stepper-btn mt-5">
