@@ -12,27 +12,6 @@ const endpoint = axios.create({
 });
 
 // ✅ Add token to requests (if exists)
-// endpoint.interceptors.request.use(
-//   (config) => {
-//     const authorization = localStorage.getItem("authorization");
-
-//     if (authorization && authorization !== "null" && authorization !== "undefined") {
-//       try {
-//         const token = JSON.parse(authorization);
-
-//         if (token) {
-//           config.headers["Authorization"] = `Bearer ${token}`;
-//         }
-//       } catch (e) {
-//         console.error("Invalid token format", e);
-//       }
-//     }
-
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
-// ✅ Add token to requests (if exists)
 endpoint.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authorization");
@@ -56,6 +35,7 @@ endpoint.interceptors.response.use(
       localStorage.removeItem("user");
       localStorage.removeItem("authenticated");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("locations");
 
       router.push("/signin");
 

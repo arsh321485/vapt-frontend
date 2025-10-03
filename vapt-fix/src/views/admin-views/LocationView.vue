@@ -181,21 +181,27 @@
                   </div>
                   <div class="row mt-2">
                     <div class="col-5">
-                      <input type="text" class="form-control rounded-0 uniform-input" id="locationName"
+                      <input type="text" class="form-control rounded-0 uniform-input" id="locationName" v-model="locationName"
                         placeholder="Enter the name of the location..." />
                     </div>
                     <div class="col-3">
-                      <button class="btn btn-sm mt-2 add-location-btn text-light" type="submit"><i
+                      <button class="btn btn-sm mt-2 add-location-btn text-light" type="button" @click="handleAddLocation"><i
                           class="bi bi-plus me-2"></i>Add location </button>
                     </div>
                     <div class="col-4 pt-1">
                       <div class="avatar-container">
-                        <!-- <div class="avatar ava-green">GM</div>
-                        <div class="avatar ava-blue">DH</div>
-                        <div class="avatar ava-yellow">BH</div> -->
-                        <div class="avatar ava-green" ref="germany" :title="locations.germany">GM</div>
-    <div class="avatar ava-blue" ref="delhi" :title="locations.delhi">DH</div>
-    <div class="avatar ava-yellow" ref="bahrain" :title="locations.bahrain">BH</div>
+                        <!-- <div class="avatar ava-green" ref="germany" :title="locations.germany">GM</div>
+                        <div class="avatar ava-blue" ref="delhi" :title="locations.delhi">DH</div>
+                        <div class="avatar ava-yellow" ref="bahrain" :title="locations.bahrain">BH</div> -->
+                        <div
+          v-for="(loc, index) in authStore.locations"
+          :key="loc._id || index"
+          class="avatar"
+          :class="getAvatarClass(index)"
+          :title="loc.location_name"
+        >
+          {{ getInitials(loc.location_name) }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -513,6 +519,7 @@
 
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: 'LocationView',
@@ -547,8 +554,10 @@ export default {
       isSlackActive: false,
       showSlack: false,
       activePlatform: null,
-      selectedJiraAsana: null, // 'jira' or 'asana'
+      selectedJiraAsana: null,
       notUsingJiraAsana: false,
+      locationName: "",
+      authStore: useAuthStore(),
     };
   },
   computed: {
@@ -565,7 +574,6 @@ export default {
   },
   methods: {
     initTooltips() {
-      // Initialize bootstrap tooltips on refs
       Object.values(this.$refs).forEach((el) => {
         new bootstrap.Tooltip(el);
       });
@@ -724,7 +732,28 @@ export default {
         this.selectedJiraAsana = null; // reset selection when disabled
       }
     },
- 
+    
+    async handleAddLocation() {
+      if (!this.locationName.trim()) return;
+
+      const res = await this.authStore.addLocation(this.locationName.trim());
+
+      if (res.status) {
+        this.locationName = ""; // clear input
+      } else {
+        console.error("Error:", res.message);
+      }
+    },
+
+    getInitials(name) {
+      if (!name) return "";
+      return name.substring(0, 2).toUpperCase();
+    },
+
+    getAvatarClass(index) {
+      const classes = ["ava-green", "ava-blue", "ava-yellow"];
+      return classes[index % classes.length];
+    },
   },
   mounted() {
     this.initTooltips();
