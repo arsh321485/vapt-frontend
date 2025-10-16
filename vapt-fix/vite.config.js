@@ -4,6 +4,9 @@ import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 // https://vite.dev/config/
 export default defineConfig({
+    build: {
+    chunkSizeWarningLimit: 1000, // increase limit to 1MB
+  },
     plugins: [
         vue(),
         vueDevTools(),

@@ -320,7 +320,7 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Add Risk Criteria
-  async addRiskCriteria(payload) {
+  async addRiskCriteria(payload: any) {
     try {
       const adminId =
         this.user?.admin_id ||
@@ -349,9 +349,8 @@ export const useAuthStore = defineStore("auth", {
       }
 
       return { status: false, message: "Failed to create Risk Criteria" };
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Error adding Risk Criteria:", error);
-      // No type checks, just return message
       return { status: false, message: error?.response?.data?.message || error.message || "Failed to add Risk Criteria" };
     }
   },

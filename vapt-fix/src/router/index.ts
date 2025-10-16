@@ -177,12 +177,12 @@ const router = createRouter({
       component: Profile,
     },
     {
-      // path: '/reset-password',
-      // name: 'reset-password',
-      // component: ResetPasswordView,
-      path: "/set-password/:userId/:token(.*)",
-      name: "ResetPassword",
-      component: () => import("@/views/admin-views/ResetPasswordView.vue")
+      path: '/reset-password',
+      name: 'reset-password',
+      component: ResetPasswordView,
+      // path: "/set-password/:userId/:token(.*)",
+      // name: "ResetPassword",
+      // component: () => import("@/views/admin-views/ResetPasswordView.vue")
     },
     {
       path: '/notification',
