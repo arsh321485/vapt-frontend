@@ -219,7 +219,7 @@
 import Stepper from '@/components/admin-component/Stepper.vue';
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
-import { useAuthStore } from "@/stores/authstore";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: 'RiskCriteriaView',
