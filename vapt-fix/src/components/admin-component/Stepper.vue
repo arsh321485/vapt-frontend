@@ -49,11 +49,6 @@
       </div>
     </div>
     </section>
-
-    <!-- Next Button -->
-      <!-- <button class="btn stepper-btn mt-5" @click="goNext">
-        Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-      </button> -->
     </main>
 </template>
 
@@ -78,9 +73,9 @@ export default {
     const currentIndex = this.currentStep;
 
     // Going forward (only next step allowed)
-    if (step === currentIndex + 1) {
-      this.$router.push(this.steps[step - 1]);
-    }
+    // if (step === currentIndex + 1) {
+    //   this.$router.push(this.steps[step - 1]);
+    // }
 
     // Going backward (only previous step allowed)
     if (step === currentIndex - 1) {
@@ -94,14 +89,10 @@ export default {
 
 
 <style scoped>
-/* .step.disabled {
-  cursor: pointer;
-  opacity: 0.5;
-} */
 .stepper {
   gap: 1.5rem;
   display: flex;
-  flex-direction: row; /* Horizontal instead of column */
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 }

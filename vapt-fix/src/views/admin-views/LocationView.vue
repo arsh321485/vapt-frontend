@@ -63,8 +63,8 @@
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
                         :style="{ backgroundColor: notUsingPlatform ? '#d3d3d3' : (activePlatform === 'slack' ? 'aquamarine' : '')}"
                             style="aspect-ratio:1/1; cursor:pointer;">
-                          <button class="btn border-0"  @click="activatePlatform('slack')" :disabled="notUsingPlatform">
-                            <div >
+                          <button class="btn border-0"  @click="startSlackLogin" :disabled="notUsingPlatform">
+                            <div>
                             <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Slack</p>
                           </div>
@@ -190,17 +190,13 @@
                     </div>
                     <div class="col-4 pt-1">
                       <div class="avatar-container">
-                        <!-- <div class="avatar ava-green" ref="germany" :title="locations.germany">GM</div>
-                        <div class="avatar ava-blue" ref="delhi" :title="locations.delhi">DH</div>
-                        <div class="avatar ava-yellow" ref="bahrain" :title="locations.bahrain">BH</div> -->
                         <div
-          v-for="(loc, index) in authStore.locations"
-          :key="loc._id || index"
-          class="avatar"
-          :class="getAvatarClass(index)"
-          :title="loc.location_name"
-        >
-          {{ getInitials(loc.location_name) }}
+                          v-for="(loc, index) in authStore.locations"
+                          :key="loc._id || index"
+                          class="avatar"
+                          :class="getAvatarClass(index)"
+                          :title="loc.location_name">
+                          {{ getInitials(loc.location_name) }}
                         </div>
                       </div>
                     </div>
@@ -227,34 +223,41 @@
                         <th class="text-center" style="width: 15%;">First Name</th>
                         <th class="text-center" style="width: 15%;">Last Name</th>
                         <th class="text-center" style="width: 25%;">Email</th> 
-                        <th class="text-center" style="width: 15%;">Select Location</th> 
+                        <th class="text-center" style="width: 15%;">Location</th> 
                         <th class="text-center" style="width: 15%;">Member Role</th>
                       </tr>
                       </thead>    
                       <tbody>
                       <tr>
                         <td>
-                          <select class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
-                            <option selected disabled>Select type</option>
+                          <select  v-model="form.user_type" class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                            <option selected disabled value="">Select</option>
                             <option value="internal">Internal</option>
                             <option value="external">External</option>
                           </select>
                         </td>
                         <td>
-                          <input type="text" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                          <input v-model="form.first_name" id="firstname" type="text" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
                         </td>
                         <td>
-                          <input type="text" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                          <input  v-model="form.last_name" type="text" id="lastname" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
                         </td>
                         <td>
-                          <input type="email" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                          <input  v-model="form.email" id="email" type="email" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
                         </td>
                         <td>
-                          <select class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
-                            <option selected disabled value="">Select locati</option>
-                            <option value="">Germany</option>
-                            <option value="">Delhi</option>
-                            <option value="">Bahrain</option>
+                          <select
+                            v-model="selectedLocation"
+                            class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6"
+                          >
+                            <option disabled value="">Select</option>
+                            <option
+                              v-for="(loc, index) in authStore.locations"
+                              :key="loc._id || index"
+                              :value="loc._id"
+                            >
+                              {{ loc.location_name }}
+                            </option>
                           </select>
                         </td>
                         <td>
@@ -280,7 +283,7 @@
                       </table>
                       <div class="row">
                         <div class="col-2">
-                          <button class="btn btn-sm px-3 add-location-btn text-light" type="submit"><i
+                          <button class="btn btn-sm px-3 add-location-btn text-light" type="button"  @click="addUser"><i
                               class="bi bi-plus me-2"></i>Add user </button>
                         </div>
                       </div>
@@ -305,7 +308,7 @@
                         <thead class="table-light">
                           <tr>
                             <th class="col-2 text-center">User Type</th>                   
-                            <th class="col-2 text-center">Select Location</th>
+                            <th class="col-2 text-center">Location</th>
                             <th class="col-2 text-center">Member Role</th>
                             <th class="col-6 text-center">Copy Link</th>
                           </tr>
@@ -314,18 +317,26 @@
                           <tr>
                             <td class="col-2">
                               <select class="form-select rounded-0 uniform-input">
-                        <option selected disabled>Select type</option>
+                        <option selected disabled>Select</option>
                         <option value="internal">Internal</option>
                         <option value="external">External</option>
                       </select>
                             </td>
                             <td class="col-2">
-                              <select class="form-select rounded-0 uniform-input">
-                                <option selected disabled>Select location</option>
-                                <option value="">Germany</option>
-                                <option value="">Delhi</option>
-                                <option value="">Bahrain</option>
-                              </select>
+
+                              <select
+                            v-model="selectedLocation"
+                            class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6"
+                          >
+                            <option disabled value="">Select</option>
+                            <option
+                              v-for="(loc, index) in authStore.locations"
+                              :key="loc._id || index"
+                              :value="loc._id"
+                            >
+                              {{ loc.location_name }}
+                            </option>
+                          </select>
                             </td>
                             <td class="col-2">
                              <div class="multi-select-dropdown" ref="roleDropdown2">
@@ -380,9 +391,9 @@
                   <div class="row pb-4 pt-2 px-2" >
                   <div class="d-flex justify-content-start mb-3">
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-microsoft-teams fs-5"></i>
+                      <i class="bi bi-slack fs-5"></i>
                     </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Teams</h5>
+                    <h5 class="fw-semibold ms-2 mt-2">Slack</h5>
                     <p class="ms-3 fw-semibold" style="font-size: 13px;margin-top: 12px;">(Add Internal Users)</p>
                   </div>
                       <div class="card border-0">
@@ -397,15 +408,15 @@
                               <th scope="col">Action</th>
                             </tr>
                           </thead>
-                          <tbody>
-                            <tr>
+                          <!-- <tbody> -->
+                            <!-- <tr>
                               <td>1</td>
                               <td>
                                 <img src="https://randomuser.me/api/portraits/men/11.jpg" class="rounded-circle me-2" width="40" height="40" />
                                 Cameron Williamson
                               </td>
                               <td>curtis@example.com</td>
-                              <!-- <td>Patch Management</td> -->
+                             
                                <td>
                                 <div class="multi-select-dropdown" ref="roleDropdown3">
                                 <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown3')">
@@ -492,8 +503,33 @@
                               <td>
                                 <button class="btn btn-sm btn-primary">Assign</button>
                               </td>
-                            </tr>
-                          </tbody>
+                            </tr> -->
+                          <!-- </tbody> -->
+                          <tbody>
+  <!-- ✅ Dynamically Added Slack Users -->
+  <tr v-for="(user, index) in slackUsers" :key="user.id">
+    <td>{{ index + 1 }}</td>
+    <td>
+      <img
+        :src="user.image"
+        class="rounded-circle me-2"
+        width="40"
+        height="40"
+      />
+      {{ user.name }}
+    </td>
+    <td>{{ user.email }}</td>
+    <td>—</td>
+    <td>—</td>
+    <td>
+      <button class="btn btn-sm btn-primary">Assign</button>
+    </td>
+  </tr>
+
+  <!-- 🧾 Your static example rows below remain unchanged -->
+  <!-- existing rows go here -->
+</tbody>
+
                         </table>
                       </div>
                   </div>
@@ -529,6 +565,7 @@ export default {
     data() {
     return {
       showPlatforms: true,
+      selectedLocation: "",
       locations: {
         germany: "Germany",
         delhi: "Delhi",
@@ -558,17 +595,32 @@ export default {
       notUsingJiraAsana: false,
       locationName: "",
       authStore: useAuthStore(),
+      form: {
+        admin_id: "", 
+        location_id: "",
+        first_name: "",
+        last_name: "",
+        user_type: "",
+        email: "",
+        select_location: "",
+        Member_role: "",
+      },
+      usersList: [],
+      activePlatform: null,
+      slackUsers: [],
+      slackAuthUrl: "",
+      teamsUser: null,
     };
   },
   computed: {
     selectedRoleText1() {
-      return this.selectedRoles1.length > 0 ? this.selectedRoles1.join(', ') : 'Select roles';
+      return this.selectedRoles1.length > 0 ? this.selectedRoles1.join(', ') : 'Select';
     },
     selectedRoleText2() {
-      return this.selectedRoles2.length > 0 ? this.selectedRoles2.join(', ') : 'Select roles';
+      return this.selectedRoles2.length > 0 ? this.selectedRoles2.join(', ') : 'Select';
     },
     selectedRoleText3() {
-      return this.selectedRoles3.length > 0 ? this.selectedRoles3.join(', ') : 'Select roles';
+      return this.selectedRoles3.length > 0 ? this.selectedRoles3.join(', ') : 'Select';
     },
     
   },
@@ -613,7 +665,7 @@ export default {
         popup.style.display = "none";
       }, 2000);
     },
-     togglePlatformStatus() {
+    togglePlatformStatus() {
       this.notUsingPlatform = !this.notUsingPlatform;
       if (this.notUsingPlatform) {
         this.activePlatform = null;
@@ -667,64 +719,260 @@ export default {
         this.showSlack = true;
       }
     },
-    activatePlatform(platform) {
-      if (this.notUsingPlatform) return;
+    async activatePlatform(platform) {
+    if (this.notUsingPlatform) return;
 
-      // If nothing selected yet → directly activate
-      if (!this.activePlatform) {
+    // First-time selection
+    if (!this.activePlatform) {
+      this.activePlatform = platform;
+      this.showData = true;
+
+      // Call respective login
+      if (platform === "slack") {
+        await this.startSlackLogin();
+      } else if (platform === "teams") {
+        await this.startTeamsLogin();
+      }
+      return;
+    }
+
+    // If same platform clicked again, do nothing
+    if (this.activePlatform === platform) return;
+
+    // If switching
+    Swal.fire({
+      title: "Switch Platform?",
+      text: `Do you want to switch to ${platform === "teams" ? "Teams" : "Slack"}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
         this.activePlatform = platform;
         this.showData = true;
+
+        if (platform === "slack") {
+          await this.startSlackLogin();
+        } else if (platform === "teams") {
+          await this.startTeamsLogin();
+        }
+      }
+    });
+    },
+   // ✅ Teams OAuth flow (new)
+  async startTeamsLogin() {
+    try {
+      const tenantId = "d8d3c1d1-f608-4781-9aa2-3d85c0b3c24b";
+      const clientId = "cd35fdf0-6f75-41e9-8b58-a713dd7b9aeb"; 
+      const redirectUri = "http://localhost:5173/"; 
+      const authStore = useAuthStore();
+      const backendLoginUrl = "https://vapt-backend.onrender.com/api/admin/users/microsoft-teams-oauth/";
+
+      // 🔗 Step 1: Build Microsoft Auth URL
+      const authUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&response_mode=query&scope=${encodeURIComponent(
+        "https://graph.microsoft.com/.default offline_access openid profile email"
+      )}`;
+
+      // 🪟 Step 2: Open popup for Teams login
+      const popup = window.open(authUrl, "_blank", "width=700,height=800");
+      if (!popup || popup.closed || typeof popup.closed === "undefined") {
+        Swal.fire("Popup Blocked", "Please allow popups for Microsoft login.", "info");
         return;
       }
 
-      // If same platform clicked again → do nothing
-      if (this.activePlatform === platform) return;
+      // 👀 Step 3: Watch for redirect back with ?code=
+      const interval = setInterval(async () => {
+        try {
+          if (popup.closed) {
+            clearInterval(interval);
+            return;
+          }
 
-      // If switching → ask confirmation
-      Swal.fire({
-        title: "Switch Platform?",
-        text: `Do you want to switch to ${platform === "teams" ? "Teams" : "Slack"}?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes",
-        cancelButtonText: "No",
-        reverseButtons: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.activePlatform = platform;
-          this.showData = true;
+          const url = popup.location.href;
+          if (url.includes("?code=")) {
+            clearInterval(interval);
+            const urlParams = new URLSearchParams(popup.location.search);
+            const code = urlParams.get("code");
+            popup.close();
 
-          Swal.fire({
-            title: "Switched!",
-            text: `You are now using ${platform === "teams" ? "Teams" : "Slack"}.`,
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false
-          });
+            console.log("✅ Microsoft Auth Code:", code);
+
+            // 🚀 Step 4: Send the code to backend (NOT to Microsoft)
+            const backendRes = await fetch(backendLoginUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code }), // ✅ Only send code
+            });
+
+            const result = await backendRes.json();
+            console.log("🧠 Teams Backend Response:", result);
+
+            if (backendRes.ok && result.message === "Microsoft Teams login successful") {
+              Swal.fire("Success", "Teams login successful ✅", "success");
+              localStorage.setItem("user", JSON.stringify(result.user));
+              localStorage.setItem("accessToken", result.tokens.access);
+              localStorage.setItem("refreshToken", result.tokens.refresh);
+            } else {
+              Swal.fire("Error", result.message || "Teams login failed ❌", "error");
+            }
+          }
+        } catch (err) {
+          // Ignore CORS errors until redirected
         }
-      });
-    },
-    async handleJiraAsanaClick(platform) {
-      if (this.notUsingJiraAsana) return;
+      }, 500);
+    } catch (error) {
+      console.error("⚠ Teams login error:", error);
+      Swal.fire("Error", "Something went wrong during Teams login.", "error");
+    }
+  },
 
-      if (!this.selectedJiraAsana) {
-        this.selectedJiraAsana = platform;
-      } else if (this.selectedJiraAsana === platform) {
-        return; // already selected
-      } else {
-        const result = await Swal.fire({
-          title: `Do you want to switch to ${platform === "jira" ? "Jira" : "Asana"}?`,
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Yes",
-          cancelButtonText: "No"
-        });
+    // 🧠 Slack OAuth flow
+    // startSlackLogin() {
+    //   const clientId = "9441923811621.9515115381619";
+    //   const backendRedirect = "https://vapt-backend.onrender.com/api/admin/users/slack/callback/";
+    //   const frontendRedirect = window.location.origin + "/location";
+    //   const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=chat:write,channels:manage,channels:join,mpim:write,groups:write,im:write,users:read,users:read.email&user_scope=identity.basic,identity.email,identity.avatar,identity.team&redirect_uri=${encodeURIComponent(
+    //     backendRedirect
+    //   )}&state=${encodeURIComponent(frontendRedirect)}`;
+    //     const win = window.open(slackAuthUrl, "_blank");
+    //     if (!win || win.closed || typeof win.closed === "undefined") {
+    //       Swal.fire({
+    //         icon: "info",
+    //         title: "Popup Blocked!",
+    //         text: "Please allow popups for this site to log in with Slack.",
+    //       });
+    //     }
+    // },
+    // 🧠 Slack OAuth flow
+  async startSlackLogin() {
+      try {
+    // ✅ Your Slack app details (must match backend .env)
+    const clientId = "9441923811621.9515115381619"; // <-- same as in Slack app
+    const backendRedirect = "https://5831bd39fa1f.ngrok-free.app/api/admin/users/slack/callback/";
+    const frontendRedirect = window.location.origin + "/location";
 
-        if (result.isConfirmed) {
-          this.selectedJiraAsana = platform;
+    // Step 1️⃣: Create Slack authorization URL
+    const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=chat:write,channels:manage,channels:join,mpim:write,groups:write,im:write,users:read,users:read.email&user_scope=identity.basic,identity.email,identity.avatar,identity.team&redirect_uri=${encodeURIComponent(
+      backendRedirect
+    )}&state=${encodeURIComponent(frontendRedirect)}`;
+
+    // Step 2️⃣: Open Slack login popup
+    const popup = window.open(slackAuthUrl, "_blank", "width=700,height=800");
+    if (!popup || popup.closed || typeof popup.closed === "undefined") {
+      Swal.fire("Popup Blocked", "Please allow popups for Slack login.", "info");
+      return;
+    }
+
+    // Step 3️⃣: Poll popup until Slack redirects with ?code=
+    const interval = setInterval(async () => {
+      try {
+        if (popup.closed) {
+          clearInterval(interval);
+          return;
         }
+
+        const url = popup.location.href;
+
+        // ✅ When Slack redirects to your backend, the code will be visible
+        if (url.includes("?code=")) {
+          clearInterval(interval);
+          const urlParams = new URLSearchParams(popup.location.search);
+          const code = urlParams.get("code");
+          popup.close();
+
+          console.log("✅ Slack Auth Code:", code);
+
+          // Step 4️⃣: Exchange the code for tokens (call backend login API)
+          const authStore = useAuthStore();
+          const result = await authStore.loginWithSlack(code, backendRedirect);
+
+          // Step 5️⃣: Handle response
+          if (result.status) {
+            Swal.fire("Success", "Slack login successful ✅", "success");
+            console.log("👤 Slack User:", result.data.user);
+          } else {
+            Swal.fire("Error", result.message, "error");
+          }
+        }
+      } catch (err) {
+        // Ignore CORS cross-domain errors until redirect happens
       }
-    },
+    }, 700);
+  } catch (error) {
+    console.error("Slack login error:", error);
+    Swal.fire("Error", "Something went wrong during Slack login.", "error");
+  }
+  },
+    
+    // async handleJiraAsanaClick(platform) {
+    //   if (this.notUsingJiraAsana) return;
+
+    //   if (!this.selectedJiraAsana) {
+    //     this.selectedJiraAsana = platform;
+    //   } else if (this.selectedJiraAsana === platform) {
+    //     return;
+    //   } else {
+    //     const result = await Swal.fire({
+    //       title: `Do you want to switch to ${platform === "jira" ? "Jira" : "Asana"}?`,
+    //       icon: "question",
+    //       showCancelButton: true,
+    //       confirmButtonText: "Yes",
+    //       cancelButtonText: "No"
+    //     });
+
+    //     if (result.isConfirmed) {
+    //       this.selectedJiraAsana = platform;
+    //     }
+    //   }
+    // },
+    
+    async handleJiraAsanaClick(platform) {
+  if (this.notUsingJiraAsana) return;
+
+  this.selectedJiraAsana = platform;
+
+  if (platform === "jira") {
+    try {
+      const authStore = useAuthStore();
+      const res = await authStore.getJiraAuthUrl();
+
+      if (res.status && res.url) {
+        // ✅ Open Jira auth in a popup (like Google)
+        const popup = window.open(res.url, "_blank", "width=700,height=800");
+
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          Swal.fire("Popup Blocked", "Please allow popups for Jira login.", "info");
+          return;
+        }
+
+        // 🕒 (Optional) Poll to detect callback success (if backend updates session)
+        const checkLogin = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkLogin);
+            Swal.fire(
+              "Success",
+              "Jira authorization completed ✅",
+              "success"
+            );
+            // You can now call your backend `/jira/login/` if needed
+          }
+        }, 1000);
+      } else {
+        Swal.fire("Error", res.message || "Failed to start Jira login ❌", "error");
+      }
+    } catch (err) {
+      console.error("⚠️ Jira login error:", err);
+      Swal.fire("Error", "Something went wrong during Jira login.", "error");
+    }
+  } else {
+    Swal.fire("Info", "This button is for Jira login.", "info");
+  }
+  },
+
     toggleJiraAsanaUsage() {
       this.notUsingJiraAsana = !this.notUsingJiraAsana;
 
@@ -732,30 +980,126 @@ export default {
         this.selectedJiraAsana = null; // reset selection when disabled
       }
     },
-    
     async handleAddLocation() {
       if (!this.locationName.trim()) return;
 
       const res = await this.authStore.addLocation(this.locationName.trim());
 
       if (res.status) {
-        this.locationName = ""; // clear input
+        this.locationName = ""; 
       } else {
         console.error("Error:", res.message);
       }
     },
-
     getInitials(name) {
       if (!name) return "";
       return name.substring(0, 2).toUpperCase();
     },
-
     getAvatarClass(index) {
       const classes = ["ava-green", "ava-blue", "ava-yellow"];
       return classes[index % classes.length];
     },
+    async addUser() {
+  try {
+    // ✅ 1️⃣ Get admin_id from logged-in user (stored in authStore)
+    const adminId = this.authStore.user?._id || this.authStore.user?.id;
+    if (!adminId) {
+      Swal.fire({
+        icon: "error",
+        title: "Missing Admin ID",
+        text: "Please log in again.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    // ✅ 2️⃣ Prepare form data according to your backend structure
+    this.form.admin_id = adminId;
+    this.form.location_id = this.selectedLocation;
+
+    // find location name
+    const selectedLoc = this.authStore.locations.find(
+      (loc) => loc._id === this.selectedLocation
+    );
+    this.form.select_location = selectedLoc ? selectedLoc.location_name : "";
+
+    // combine selected roles
+    this.form.Member_role = this.selectedRoles1.join(", ");
+
+    // ✅ 3️⃣ Call API
+    const response = await this.authStore.createUserDetail(this.form);
+
+    if (response.status) {
+      console.log("✅ User Added Successfully:", response.data);
+
+      Swal.fire({
+        icon: "success",
+        title: "User Added Successfully",
+        text: response.message,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+
+      // ✅ 4️⃣ Save user to localStorage
+      const existingUsers = JSON.parse(localStorage.getItem("addedUsers") || "[]");
+
+      // prevent duplicate by email
+      const userExists = existingUsers.some(
+        (u) => u.email === response.data.email
+      );
+      if (!userExists) {
+        existingUsers.push(response.data);
+      }
+
+      this.usersList = existingUsers;
+      localStorage.setItem("addedUsers", JSON.stringify(this.usersList));
+
+      // ✅ 5️⃣ Reset form
+      this.form = {
+        admin_id: "",
+        location_id: "",
+        first_name: "",
+        last_name: "",
+        user_type: "",
+        email: "",
+        select_location: "",
+        Member_role: "",
+      };
+      this.selectedLocation = "";
+      this.selectedRoles1 = [];
+    } else {
+      console.error("❌ Error:", response.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error Adding User",
+        text: response.message,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    }
+  } catch (error) {
+    console.error("❌ Add user failed:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Request Failed",
+      text: "Something went wrong. Please try again.",
+      timer: 3000,
+      showConfirmButton: false,
+    });
+  }
+    },
   },
   mounted() {
+    // Load users from localStorage on page load
+    const savedUsers = localStorage.getItem("addedUsers");
+    if (savedUsers) {
+      this.usersList = JSON.parse(savedUsers);
+      console.log("📌 Loaded users from localStorage:", this.usersList);
+    }
+    if (!this.authStore.locations.length) {
+    this.authStore.fetchLocations();
+  }
     this.initTooltips();
     document.addEventListener('click', this.onClickOutside);
   },

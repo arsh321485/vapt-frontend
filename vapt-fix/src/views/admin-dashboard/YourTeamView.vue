@@ -22,165 +22,9 @@
                                 <NotificationPanel />
                             </div>
                         </div>
-                        <div class="row my-4">
-                            <div class="col-10">
-                            <div class="d-flex justify-content-between tab-wrapper position-relative">
-                                <p class="nav-item active" style="width: 25%;color: rgba(49, 33, 177, 1);">Patch management</p>
-                                <p class="nav-item" style="width: 25%;">Configuration management</p>
-                                <p class="nav-item" style="width: 25%;">Network security</p>
-                                <p class="nav-item" style="width: 25%;">Architectural flaws</p>
 
-                                <!-- Blue underline for active tab -->
-                                <div class="tab-line" style="width: 25%; left: 0;"></div>
-                            </div>
-                            <div class="col-2">
-                                <!-- blank -->
-                            </div>
-                            </div>
-                        </div>
-                        <h5 style="color: rgba(0, 0, 0, 1);font-weight: 600;">Internal (32)</h5>
-                        <div class="row mb-5">
-                            <div class="col-8">
-                                
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                
-                                <div class="multi-select-dropdown" ref="roleDropdown1">
-                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown1')">
-                                  <span>{{ selectedRoleText1 }}</span>
-                                  <span><i class="bi bi-chevron-down"></i></span>
-                                </div>
-                                <div class="dropdown-list" v-show="isOpen.dropdown1">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input
-                                      type="checkbox"
-                                      :value="option.short"
-                                      v-model="selectedRoles1"
-                                    />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
-                              </div>
-                                
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
-
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                   
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
-
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                    <div
-                                        class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                        style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                        AB
-                                    </div>
-                                    <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    
-                                    
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
-
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
-
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                   
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
                         <!-- Add Team Member modal -->
                             <div class="">
-                                
-
                                 <!-- Modal -->
                                 <div
                                 class="modal fade"
@@ -341,158 +185,167 @@
                                     </div>
                                 </div>
                                 </div>
-
                             </div>
 
-                            </div>
-                        </div>
+                        <div class="row my-4">
+    <div class="col-10">
+      <div class="d-flex justify-content-between tab-wrapper position-relative">
+        <p 
+          v-for="(tab, index) in tabs" 
+          :key="index" 
+          class="nav-item"
+          :class="{ active: activeTab === index }"
+          :style="{ width: '25%', color: activeTab === index ? 'rgba(49, 33, 177, 1)' : '#000' }"
+          @click="selectTab(index)"
+        >
+          {{ tab.name }}
+        </p>
 
-                        <!-- technical(external) -->
-                        <h5 style="color: rgba(0, 0, 0, 1);font-weight: 600;">External (5)</h5>
-                        <div class="row">
-                            <div class="col-8">
-                                
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                
-                                <div class="multi-select-dropdown" ref="roleDropdown2">
-                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
-                                  <span>{{ selectedRoleText2 }}</span>
-                                  <span><i class="bi bi-chevron-down"></i></span>
-                                </div>
-                                <div class="dropdown-list" v-show="isOpen.dropdown2">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input
-                                      type="checkbox"
-                                      :value="option.short"
-                                      v-model="selectedRoles2"
-                                    />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
-                              </div>
-                                
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
+        <!-- Blue underline -->
+        <div 
+          class="tab-line" 
+          :style="{ width: '25%', left: 25 * activeTab + '%' }">
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <!-- blank -->
+    </div>
 
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                   
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
+    <div class="col-12 mt-4">
+        <!-- Dynamic Content per Tab -->
+        <div v-for="(tab, index) in tabs" :key="index" v-show="activeTab === index">
+        <!-- Internal Users -->
+        <h5 style="color: rgba(0, 0, 0, 1); font-weight: 600;">
+            Internal ({{ filteredUsers(tab.name, 'Internal').length }})
+        </h5>
 
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                    <div
-                                        class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                        style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                        AB
-                                    </div>
-                                    <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    
-                                    
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
+        <div class="row mb-4">
+            <div class="col-8">
+            <div
+                v-for="user in filteredUsers(tab.name, 'Internal')"
+                :key="user._id"
+                class="d-flex align-items-center justify-content-start mb-3 gap-5"
+            >
+                <div class="d-flex align-items-center">
+                <div
+                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
+                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
+                >
+                    {{ getInitials(user.first_name, user.last_name) }}
+                </div>
+                <span class="fw-medium text-dark">{{ user.first_name }} {{ user.last_name }}</span>
+                </div>
 
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                    
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
+                <div class="d-flex align-items-center">
+                <p class="mt-3">{{ user.select_location }}</p>
+                </div>
 
-                            <!-- Repeat this block for each member -->
-                            <div class="d-flex align-items-center justify-content-start mb-3 gap-5">
-                                <div class="d-flex align-items-center">
-                                <div
-                                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;">
-                                    AB
-                                </div>
-                                <span class="fw-medium text-dark">Aditi Bose</span>
-                                </div>
-                                <div class="d-flex align-items-center "><p class="mt-3">Germany</p></div>
-                                <div><select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;color: rgba(130, 91, 0, 1);">
-                                    <option style="font-size: 15px;color: rgba(130, 91, 0, 1);" selected disabled>Team</option>
-                                    <option class="text-dark"style="font-size: 15px;" value="patch management">Patch Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Configuration Management</option>
-                                    <option class="text-dark" style="font-size: 15px;">Network Security</option>
-                                    <option class="text-dark" style="font-size: 15px;" value="architectural flaws">Architectural Flaws</option>
-                                   
-                                </select></div>
-                                <a href="#" class="d-flex align-items-center ms-5 fw-semibold" style="font-size: 15px; text-decoration: none;color: rgba(49, 33, 177, 1);">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                            </div>
-                            <hr class="my-2">
-                        
+                <!-- Dropdown for Roles -->
+                <div class="multi-select-dropdown">
+                <div class="dropdown-input rounded-0" @click="toggleDropdown(user._id)">
+                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+                    <span><i class="bi bi-chevron-down"></i></span>
+                </div>
+                <div class="dropdown-list" v-show="isOpen[user._id]">
+                    <label v-for="option in roleOptions" :key="option.short">
+                    <input
+                        type="checkbox"
+                        :value="option.short"
+                        v-model="selectedRoles[user._id]"
+                    />
+                    {{ option.full }}
+                    </label>
+                </div>
+                </div>
 
-                            </div>
-                        </div>
+                <!-- Remove Button -->
+                <a
+                href="#"
+                class="d-flex align-items-center ms-5 fw-semibold"
+                style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
+                @click.prevent="removeUser(user._id)"
+                >
+                <i class="bi bi-dash-circle me-1"></i> Remove
+                </a>
+                <!-- <div v-for="role in user.Member_role.split(',')" :key="role" class="d-flex align-items-center align-items-center ms-3">
+  <span>{{ role.trim() }}</span>
+  <a
+    href="#"
+    class="ms-2 text-danger"
+    @click.prevent="removeUserFromRole(user, role.trim())"
+  >
+    <i class="bi bi-dash-circle"></i> Remove
+  </a>
+</div> -->
 
-                    </div>
+            </div>
+            <hr class="my-2" />
+            </div>
+        </div>
+
+        <!-- External Users -->
+        <h5 style="color: rgba(0, 0, 0, 1); font-weight: 600;">
+            External ({{ filteredUsers(tab.name, 'External').length }})
+        </h5>
+
+        <div class="row">
+            <div class="col-8">
+            <div
+                v-for="user in filteredUsers(tab.name, 'External')"
+                :key="user._id"
+                class="d-flex align-items-center justify-content-start mb-3 gap-5"
+            >
+                <div class="d-flex align-items-center">
+                <div
+                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
+                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
+                >
+                    {{ getInitials(user.first_name, user.last_name) }}
+                </div>
+                <span class="fw-medium text-dark">{{ user.first_name }} {{ user.last_name }}</span>
+                </div>
+
+                <div class="d-flex align-items-center">
+                <p class="mt-3">{{ user.select_location }}</p>
+                </div>
+
+                <!-- Dropdown -->
+                <div class="multi-select-dropdown">
+                <div class="dropdown-input rounded-0" @click="toggleDropdown(user._id)">
+                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+                    <span><i class="bi bi-chevron-down"></i></span>
+                </div>
+                <div class="dropdown-list" v-show="isOpen[user._id]">
+                    <label v-for="option in roleOptions" :key="option.short">
+                    <input
+                        type="checkbox"
+                        :value="option.short"
+                        v-model="selectedRoles[user._id]"
+                    />
+                    {{ option.full }}
+                    </label>
+                </div>
+                </div>
+
+                <!-- Remove Button -->
+                <a
+                href="#"
+                class="d-flex align-items-center ms-5 fw-semibold"
+                style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
+                @click.prevent="removeUser(user._id)"
+                >
+                <i class="bi bi-dash-circle me-1"></i> Remove
+                </a>
+            </div>
+            <hr class="my-2" />
+            </div>
+        </div>
+        </div>
+    </div>
+    
+            </div>
+                </div>
 
                 </div>
             </div>
@@ -505,6 +358,7 @@
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: 'YourTeamView',
@@ -515,11 +369,9 @@ export default {
     },
     data() {
     return {
-        showPopup: false,
-      isOpen: {
-        dropdown1: false,
-        dropdown2: false,
-        dropdown3: false
+      showPopup: false,
+        isOpen: {
+      dropdown3: false
       },
       selectedRoles1: [],
       selectedRoles2: [],
@@ -531,6 +383,24 @@ export default {
         { short: 'AF', full: 'Architectural Flaws' }
       ],
       linkCopied: false,
+      activeTab: 0,
+      tabs: [
+        { name: "Patch management" },
+        { name: "Configuration management" },
+        { name: "Network security" },
+        { name: "Architectural flaws" }
+      ],
+      authStore: useAuthStore(),
+      users: [],
+      isOpen: {},
+      selectedRoles: {},
+      selectedRoleText: {},
+      roleMapping: {
+      "Patch management": "PM",
+      "Configuration management": "CM",
+      "Network security": "NS",
+      "Architectural flaws": "AF"
+    }
     };
   },
   computed: {
@@ -545,6 +415,9 @@ export default {
     },
   },
   methods: {
+    selectTab(index) {
+      this.activeTab = index;
+    },
      copyLink() {
       const copyText = document.getElementById("shareLink");
       copyText.select();
@@ -580,10 +453,144 @@ export default {
         this.isOpen.dropdown3 = false;
       }
     },
+    getInitials(first, last) {
+      return (first?.[0] || '') + (last?.[0] || '');
+    },
+    removeUser(userId) {
+    const removedUser = this.users.find(u => u._id === userId);
+    if (removedUser) {
+      console.log(`🗑 User removed completely: ${removedUser.first_name} ${removedUser.last_name}`);
+    }
+
+    this.users = this.users.filter(u => u._id !== userId);
+    localStorage.setItem('users', JSON.stringify(this.users));
+
+    // Clean up dropdown states
+    delete this.selectedRoles[userId];
+    delete this.selectedRoleText[userId];
+    delete this.isOpen[userId];
+    },
+    toggleDropdown(id) {
+      this.$set(this.isOpen, id, !this.isOpen[id]);
+    },
+    filteredUsers(tabName, type) {
+      if (!Array.isArray(this.users)) return [];
+
+      const roleCode = this.roleMapping[tabName]; 
+      return this.users.filter(user => {
+        const matchType = user.user_type?.toLowerCase() === type.toLowerCase();
+        if (!user.Member_role) return false;
+
+        // handle multiple roles (comma-separated) just in case
+        const roles = user.Member_role.split(',').map(r => r.trim());
+        const matchRole = roles.includes(roleCode);
+
+        return matchType && matchRole;
+      });
+    },
+    removeUserFromRole(user, roleToRemove) {
+  roleToRemove = roleToRemove.trim().toUpperCase();
+
+  // Get current roles of user
+  const originalRoles = user.Member_role
+    ? user.Member_role.split(',').map(r => r.trim().toUpperCase())
+    : [];
+
+  // Only remove the selected role
+  const filteredRoles = originalRoles.filter(r => r !== roleToRemove);
+
+  if (filteredRoles.length > 0) {
+    // Update user with remaining roles
+    const updatedUser = { ...user, Member_role: filteredRoles.join(', ') };
+    
+    // Replace user in users array
+    this.users = this.users.map(u => (u._id === user._id ? updatedUser : u));
+
+    console.log(`✂ Role removed: ${roleToRemove} from ${user.first_name} ${user.last_name}`);
+  } else {
+    // No roles left → remove user completely
+    this.users = this.users.filter(u => u._id !== user._id);
+    console.log(`🗑 User removed completely (no roles left): ${user.first_name} ${user.last_name}`);
+  }
+
+  // Update localStorage
+  localStorage.setItem('users', JSON.stringify(this.users));
+
+  // Clean up dropdown state for that role
+  delete this.selectedRoles[user._id];
+  delete this.selectedRoleText[user._id];
+  delete this.isOpen[user._id];
+    },
+    async addUser() {
+    try {
+      const adminId = this.authStore.user?._id || this.authStore.user?.id;
+      if (!adminId) {
+        alert("Admin ID not found. Please login again.");
+        return;
+      }
+
+      const roleFullMap = {
+        PM: "Patch Management",
+        CM: "Configuration Management",
+        NS: "Network Security",
+        AF: "Architectural Flaws"
+      };
+
+      this.form.admin_id = adminId;
+      this.form.location_id = this.selectedLocation;
+      this.form.Member_role = this.selectedRoles1
+        .map(short => roleFullMap[short] || short)
+        .join(", ");
+
+      const res = await endpoint.post("/admin/users_details/add-user-detail/", this.form);
+
+      if (res.data.message === "User detail created successfully") {
+        console.log("✅ User created:", res.data.data);
+      }
+    } catch (err) {
+      console.error("❌ Error adding user:", err);
+    }
+    }
   },
-  mounted() {
-    document.addEventListener('click', this.onClickOutside);
-  },
+  
+  async mounted() {
+  document.addEventListener('click', this.onClickOutside);
+
+  const storedUsers = JSON.parse(localStorage.getItem('users'));
+  if (storedUsers && storedUsers.length > 0) {
+    this.users = storedUsers;
+    console.log("✅ Users loaded from localStorage:", this.users);
+    return;
+  }
+
+  try {
+    const res = await this.authStore.fetchAllUsers();
+    if (res.status) {
+      let usersArray = Array.isArray(res.data) ? res.data : res.data.data;
+
+      // ✅ Normalize Member_role from full name → short code
+      const roleReverseMap = {
+        "Patch Management": "PM",
+        "Configuration Management": "CM",
+        "Network Security": "NS",
+        "Architectural Flaws": "AF"
+      };
+
+      usersArray = usersArray.map(u => ({
+        ...u,
+        Member_role: roleReverseMap[u.Member_role?.trim()] || u.Member_role
+      }));
+
+      this.users = usersArray;
+      localStorage.setItem('users', JSON.stringify(this.users));
+      console.log("✅ Users loaded & normalized:", this.users);
+    } else {
+      console.error("❌ Failed to load users:", res.message);
+    }
+  } catch (err) {
+    console.error("⚠️ Error fetching users:", err);
+  }
+},
   beforeUnmount() {
     document.removeEventListener('click', this.onClickOutside);
   }

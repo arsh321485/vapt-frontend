@@ -192,27 +192,86 @@ export default {
       showConfirmPassword: false,
     };
   },
-   async created() {
-    const authStore = useAuthStore();
-    const response = await authStore.getUserProfile();
+  
+  async created() {
+  const authStore = useAuthStore();
 
+  // First try restore normal tokens
+  const restored = authStore.restoreFromStorage();
+
+  if (restored) {
+    // we have accessToken + user in store/localStorage
+    // fill UI quickly from localStorage
+    const raw = localStorage.getItem("user");
+    if (raw) {
+      const u = JSON.parse(raw);
+      this.user.full_name = u.full_name || "";
+      this.user.email = u.email || "";
+      this.firstName = u.firstname || "";
+      this.lastName = u.lastname || "";
+      this.orgName = u.organisation_name || "";
+      this.orgUrl = u.organisation_url || "";
+    }
+
+    // then refresh from backend
+    const response = await authStore.getUserProfile();
     if (response.status) {
       const u = response.data.user;
-
-      // ✅ Fill details from API
-      this.user = {
-        full_name: u.full_name,
-        email: u.email,
-        profileImage: "", 
-      };
+      this.user.full_name = u.full_name;
+      this.user.email = u.email;
       this.firstName = u.firstname;
       this.lastName = u.lastname;
       this.orgName = u.organisation_name;
       this.orgUrl = u.organisation_url;
     } else {
-      console.error("Profile fetch failed:", response.message);
+      // If refresh fails, maybe tokens expired — optionally try refresh token flow
+      console.warn("Profile refresh failed:", response.message);
     }
-  },
+
+    return;
+  }
+
+  // No normal tokens restored. Check for google_id_token and attempt exchange
+  const googleIdToken = localStorage.getItem("google_id_token");
+  if (googleIdToken) {
+    // exchange google token for app tokens + user
+    const exchange = await authStore.googleLogin(googleIdToken);
+
+    if (exchange.status) {
+      // successful exchange: data saved in store/localStorage inside googleLogin
+      const user = authStore.user;
+      if (user) {
+        this.user.full_name = user.full_name || "";
+        this.user.email = user.email || "";
+        this.firstName = user.firstname || "";
+        this.lastName = user.lastname || "";
+        this.orgName = user.organisation_name || "";
+        this.orgUrl = user.organisation_url || "";
+      }
+
+      // optionally fetch latest profile
+      const response = await authStore.getUserProfile();
+      if (response.status) {
+        const u = response.data.user;
+        this.user.full_name = u.full_name;
+        this.user.email = u.email;
+        this.firstName = u.firstname;
+        this.lastName = u.lastname;
+        this.orgName = u.organisation_name;
+        this.orgUrl = u.organisation_url;
+      }
+      return;
+    } else {
+      // exchange failed -> force login
+      console.warn("Google token exchange failed:", exchange.message);
+      this.$router.push("/signin");
+      return;
+    }
+  }
+
+  // No tokens at all -> redirect to login
+  this.$router.push("/signin");
+},
   methods: {
     async handleUpdate() {
       const authStore = useAuthStore();

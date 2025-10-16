@@ -7,7 +7,10 @@
         <h1 class="form-heading mb-3">Welcome back!</h1>
         <p class="form-subheading mb-4">Login into your account to start fixing.</p>
 
+        <!-- <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button> -->
+         <div id="googleButton">
         <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
+      </div>
 
                     <div class="d-flex align-items-center mt-3">
                       <hr class="flex-grow-1">
@@ -73,13 +76,13 @@ export default {
       form: { email: "", password: "" },
       showPassword: false,
       loading: false,
+      authStore: useAuthStore(),
     };
   },
   methods: {
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
-
     isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
@@ -87,7 +90,6 @@ export default {
     isPasswordFilled(password) {
       return password && password.trim() !== "";
     },
-
     async handleLogin() {
       if (!this.isValidEmail(this.form.email)) {
         Swal.fire("Error", "Please enter a valid email", "error");
@@ -114,7 +116,7 @@ export default {
         });
 
         if (result.status) {
-          Swal.fire("Success", result.data.message || "Login successful ✅", "success");
+          // Swal.fire("Success", result.data.message || "Login successful ✅", "success");
 
           // 🔎 Show tokens and user in console
           console.log("✅ Access Token:", localStorage.getItem("authorization"));
@@ -135,15 +137,82 @@ export default {
         this.loading = false;
       }
     },
+    //  Google login 
+    initializeGoogleLogin() {
+      google.accounts.id.initialize({
+        client_id:
+          "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
+        callback: this.handleGoogleResponse,
+      });
+
+      // ✅ Optional: render Google Sign-In button
+      google.accounts.id.renderButton(
+        document.getElementById("googleButton"), 
+        { theme: "outline", size: "large", text: "signin_with" }
+      );
+    },
+    async handleGoogleResponse(response) {
+  try {
+    const id_token = response.credential;
+    console.log("🧠 Received Google ID Token:", id_token);
+
+    localStorage.setItem("google_id_token", id_token);
+
+    const authStore = useAuthStore();
+    const result = await authStore.googleLogin(id_token);
+
+    console.log("📦 Google login result:", result);
+    if (result.status) {
+      const { user, tokens } = result;
+      if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
+      if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
+      if (user) localStorage.setItem("user", JSON.stringify(user));
+      this.$router.push("/home");
+    } else {
+      Swal.fire("Error", result.message || "Google login failed ❌", "error");
+    }
+  } catch (error) {
+    console.error("Google login API error:", error);
+    Swal.fire("Error", "Something went wrong during Google login ❌", "error");
+  }
+    },
   },
   mounted() {
-    if (window.grecaptcha) {
-      window.grecaptcha.ready(() => {
-        window.grecaptcha.render("recaptcha-container", {
-          sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
-        });
+  const script = document.createElement("script");
+  script.src = "https://accounts.google.com/gsi/client";
+  script.async = true;
+  script.defer = true;
+  script.onload = () => {
+    google.accounts.id.initialize({
+      client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
+      callback: this.handleGoogleResponse,
+    });
+
+    // Optional: render a Google button
+    const buttonContainer = document.getElementById("googleButton");
+    if (buttonContainer) {
+      google.accounts.id.renderButton(buttonContainer, {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "rectangular",
       });
-    }
+    } 
+  };
+
+  document.head.appendChild(script);
+
+  if (window.grecaptcha) {
+    window.grecaptcha.ready(() => {
+      window.grecaptcha.render("recaptcha-container", {
+        sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
+      });
+    });
+  }
+  const isAuthenticated = localStorage.getItem("authenticated");
+  if (isAuthenticated === "true") {
+    this.$router.push("/home");
+  }
   },
 };
 </script>

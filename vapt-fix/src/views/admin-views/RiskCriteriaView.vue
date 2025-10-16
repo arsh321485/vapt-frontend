@@ -34,9 +34,6 @@
               <div class="row mt-5">
                 <div class="col-lg-9 location-card px-5 pt-5 pb-4">
                   <div class="row">
-                    <!-- <router-link to="/location" class="mb-3" style="color: rgba(49, 33, 177, 1);text-decoration: none;">
-                                <i class="bi bi-arrow-left"></i> Back
-                                </router-link> -->
                     <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-exclamation-triangle-fill fs-4"></i>
                     </div>
@@ -67,19 +64,19 @@
                               </span>
                                 </div>
                                 <div>
-                                <select id="Critical" name="Critical" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);margin-left: 8px;">
-                              
-                                    <option value="">1 Day</option>
-                                    <option value="">2 Days</option>
-                                    <option value="">3 Days</option>
-                                    <option value="">4 Days</option>
-                                    <option value="">5 Days</option>
-                                    <option value="">6 Days</option>
-                                    <option value="">1 Week</option>
-                                    <option value="">2 Weeks</option>
-                                    <option value="">3 Weeks</option>
-                                    <option value="">4 Weeks</option>
-                                    <option value="">5 Weeks</option>
+                                <select v-model="form.critical" id="Critical" name="Critical" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);margin-left: 8px;">
+                                    <option disabled value="">Select</option>
+                                    <option value="1 Day">1 Day</option>
+                                    <option value="2 Days">2 Days</option>
+                                    <option value="3 Days">3 Days</option>
+                                    <option value="4 Days">4 Days</option>
+                                    <option value="5 Days">5 Days</option>
+                                    <option value="6 Days">6 Days</option>
+                                    <option value="1 Week">1 Week</option>
+                                    <option value="2 Weeks">2 Weeks</option>
+                                    <option value="3 Weeks">3 Weeks</option>
+                                    <option value="4 Weeks">4 Weeks</option>
+                                    <option value="5 Weeks">5 Weeks</option>
                                 </select>
                                 </div>
                             </div>
@@ -100,18 +97,19 @@
                               </span>
                             </div>
                             <div>
-                                <select id="High" name="High" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);">
-                                    <option value="">1 Day</option>
-                                    <option value="">2 Days</option>
-                                    <option value="">3 Days</option>
-                                    <option value="">4 Days</option>
-                                    <option value="">5 Days</option>
-                                    <option value="">6 Days</option>
-                                    <option value="">1 Week</option>
-                                    <option value="">2 Weeks</option>
-                                    <option value="">3 Weeks</option>
-                                    <option value="">4 Weeks</option>
-                                    <option value="">5 Weeks</option>
+                                <select v-model="form.high" id="High" name="High" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);">
+                                  <option disabled value="">Select</option>
+                                    <option value="1 Day">1 Day</option>
+  <option value="2 Days">2 Days</option>
+  <option value="3 Days">3 Days</option>
+  <option value="4 Days">4 Days</option>
+  <option value="5 Days">5 Days</option>
+  <option value="6 Days">6 Days</option>
+  <option value="1 Week">1 Week</option>
+  <option value="2 Weeks">2 Weeks</option>
+  <option value="3 Weeks">3 Weeks</option>
+  <option value="4 Weeks">4 Weeks</option>
+  <option value="5 Weeks">5 Weeks</option>
                                 </select>
                             </div>
                             </div>
@@ -135,18 +133,19 @@
                               </span>
                                 </div>
                                 <div>
-                                <select id="Medium" name="Medium" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);">
-                                    <option value="">1 Day</option>
-                                    <option value="">2 Days</option>
-                                    <option value="">3 Days</option>
-                                    <option value="">4 Days</option>
-                                    <option value="">5 Days</option>
-                                    <option value="">6 Days</option>
-                                    <option value="">1 Week</option>
-                                    <option value="">2 Weeks</option>
-                                    <option value="">3 Weeks</option>
-                                    <option value="">4 Weeks</option>
-                                    <option value="">5 Weeks</option>
+                                <select v-model="form.medium" id="Medium" name="Medium" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);">
+                                  <option disabled value="">Select</option>
+                                    <option value="1 Day">1 Day</option>
+  <option value="2 Days">2 Days</option>
+  <option value="3 Days">3 Days</option>
+  <option value="4 Days">4 Days</option>
+  <option value="5 Days">5 Days</option>
+  <option value="6 Days">6 Days</option>
+  <option value="1 Week">1 Week</option>
+  <option value="2 Weeks">2 Weeks</option>
+  <option value="3 Weeks">3 Weeks</option>
+  <option value="4 Weeks">4 Weeks</option>
+  <option value="5 Weeks">5 Weeks</option>
                                 </select>
                                 </div>
                             </div>
@@ -167,34 +166,43 @@
                               </span>
                             </div>
                             <div>
-                                <select id="Low" name="Low" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);margin-left: 5px;">
-                                    <option value="">1 Day</option>
-                                    <option value="">2 Days</option>
-                                    <option value="">3 Days</option>
-                                    <option value="">4 Days</option>
-                                    <option value="">5 Days</option>
-                                    <option value="">6 Days</option>
-                                    <option value="">1 Week</option>
-                                    <option value="">2 Weeks</option>
-                                    <option value="">3 Weeks</option>
-                                    <option value="">4 Weeks</option>
-                                    <option value="">5 Weeks</option>
+                                <select v-model="form.low" id="Low" name="Low" class="p-2" style="border-color: rgba(0, 0, 0, 0.16);margin-left: 5px;">
+                                  <option disabled value="">Select</option>
+                                    <option value="1 Day">1 Day</option>
+  <option value="2 Days">2 Days</option>
+  <option value="3 Days">3 Days</option>
+  <option value="4 Days">4 Days</option>
+  <option value="5 Days">5 Days</option>
+  <option value="6 Days">6 Days</option>
+  <option value="1 Week">1 Week</option>
+  <option value="2 Weeks">2 Weeks</option>
+  <option value="3 Weeks">3 Weeks</option>
+  <option value="4 Weeks">4 Weeks</option>
+  <option value="5 Weeks">5 Weeks</option>
                                 </select>
                             </div>
                             </div>
                         </div>
                     </div>
-                  </div>
-
-                  
+                  </div>  
                 </div>
               </div>
 
-              <div class="text-end">
+              <!-- <div class="text-end">
                 <router-link to="/uploadreport" class="btn stepper-btn mt-5">
                 Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
                 </router-link>
-              </div>
+              </div> -->
+              <div class="text-end">
+  <button
+    class="btn stepper-btn mt-5"
+    :disabled="loading"
+    @click="submitRiskCriteria"
+  >
+    {{ loading ? "Saving..." : "Next" }}
+    <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+  </button>
+</div>
 
             </div>
         </div>
@@ -211,6 +219,7 @@
 import Stepper from '@/components/admin-component/Stepper.vue';
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
+import { useAuthStore } from "@/stores/authstore";
 
 export default {
   name: 'RiskCriteriaView',
@@ -218,9 +227,83 @@ export default {
     Stepper,
     Vue3Select
   },
-  
+
+  data() {
+    return {
+      form: {
+        critical: '',
+        high: '',
+        medium: '',
+        low: ''
+      },
+      loading: false,
+      message: ''
+    };
+  },
+
+  methods: {
+    async submitRiskCriteria() {
+  try {
+    this.loading = true;
+    this.message = '';
+
+    const auth = useAuthStore();
+    const payload = {
+      critical: this.form.critical,
+      high: this.form.high,
+      medium: this.form.medium,
+      low: this.form.low,
+    };
+
+    const res = await auth.addRiskCriteria(payload);
+
+    if (res.status) {
+      console.log("✅ Risk Criteria Added:", res.data);
+      this.message = res.message;
+
+      // ✅ Show success SweetAlert
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: res.message,
+        showConfirmButton: false, 
+        timer: 3000,             
+        timerProgressBar: true 
+      });
+
+      // ✅ Redirect to next page after user clicks OK
+      this.$router.push("/uploadreport");
+    } else {
+      this.message = res.message || "Something went wrong";
+
+      // ❌ Show error SweetAlert
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: this.message,
+        confirmButtonText: 'OK'
+      });
+    }
+  } catch (err) {
+    console.error("❌ Error submitting Risk Criteria:", err);
+    this.message = "An error occurred while submitting.";
+
+    // ❌ Show catch error in SweetAlert
+    Swal.fire({
+      icon: 'error',
+      title: 'Error!',
+      text: this.message,
+      confirmButtonText: 'OK'
+    });
+  } finally {
+    this.loading = false;
+  }
+},
+  }
 };
 </script>
+
+
 
 <style scoped>
  .tooltip-text {
