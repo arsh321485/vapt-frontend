@@ -63,7 +63,7 @@
                         <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
                         :style="{ backgroundColor: notUsingPlatform ? '#d3d3d3' : (activePlatform === 'slack' ? 'aquamarine' : '')}"
                             style="aspect-ratio:1/1; cursor:pointer;">
-                          <button class="btn border-0"  @click="startSlackLogin" :disabled="notUsingPlatform">
+                          <button class="btn border-0"  v-if="!user" @click="startSlackLogin" :disabled="notUsingPlatform">
                             <div>
                             <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
                             <p class="mt-2 fw-semibold mb-0">Slack</p>
@@ -81,39 +81,7 @@
                         </div>
                         
                       </div>
-
-                      <!-- Jira -->
-                      <!-- <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
-                          <div>
-                            <img src="@/assets/images/jira.png" alt="Jira" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Jira</p>
-                          </div>
-                        </div>
-                      </div> -->
-
-                      <!-- Confluence -->
-                      <!-- <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
-                          <div class="d-flex flex-column align-items-center justify-content-center text-center">
-                            <img src="@/assets/images/confluence.png" alt="Confluence" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Confluence</p>
-                          </div>
-                        </div>
-                      </div> -->
-
-                      <!-- Asana -->
-                      <!-- <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                            style="aspect-ratio:1/1; cursor:pointer;">
-                          <div>
-                            <img src="@/assets/images/asana.png" alt="Asana" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Asana</p>
-                          </div>
-                        </div>
-                      </div> -->
+                      
                     </div>
 
                     <!-- Second row: 3 cards -->
@@ -386,7 +354,7 @@
                 </div>
               </div>
 
-              <div class="row mt-4" v-if="showData">
+              <div class="row mt-4" v-if="user">
                 <div class="col-lg-12 add-users py-4 px-4 ms-3">
                   <div class="row pb-4 pt-2 px-2" >
                   <div class="d-flex justify-content-start mb-3">
@@ -506,12 +474,11 @@
                             </tr> -->
                           <!-- </tbody> -->
                           <tbody>
-  <!-- ✅ Dynamically Added Slack Users -->
-  <tr v-for="(user, index) in slackUsers" :key="user.id">
+  <tr>
     <td>{{ index + 1 }}</td>
     <td>
       <img
-        :src="user.image"
+        :src="user.image || defaultImage"
         class="rounded-circle me-2"
         width="40"
         height="40"
@@ -525,9 +492,6 @@
       <button class="btn btn-sm btn-primary">Assign</button>
     </td>
   </tr>
-
-  <!-- 🧾 Your static example rows below remain unchanged -->
-  <!-- existing rows go here -->
 </tbody>
 
                         </table>
@@ -556,6 +520,8 @@
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
 import { useAuthStore } from "@/stores/authStore";
+import endpoint from "@/services/apiServices";
+import Swal from "sweetalert2";
 
 export default {
     name: 'LocationView',
@@ -590,7 +556,7 @@ export default {
       notUsingPlatform: false,
       isSlackActive: false,
       showSlack: false,
-      activePlatform: null,
+      activePlatform: "",
       selectedJiraAsana: null,
       notUsingJiraAsana: false,
       locationName: "",
@@ -610,6 +576,13 @@ export default {
       slackUsers: [],
       slackAuthUrl: "",
       teamsUser: null,
+      user: null,
+      userShown: false,
+      defaultImage:
+        "https://a.slack-edge.com/80588/img/avatars/ava_0001-512.png",
+        popupPollInterval: null,
+      popupWindow: null,
+      backendBase: "https://vapt-backend.onrender.com", 
     };
   },
   computed: {
@@ -763,150 +736,171 @@ export default {
     },
    // ✅ Teams OAuth flow (new)
   async startTeamsLogin() {
-    try {
-      const tenantId = "d8d3c1d1-f608-4781-9aa2-3d85c0b3c24b";
-      const clientId = "cd35fdf0-6f75-41e9-8b58-a713dd7b9aeb"; 
-      const redirectUri = "http://localhost:5173/"; 
-      const authStore = useAuthStore();
-      const backendLoginUrl = "https://vapt-backend.onrender.com/api/admin/users/microsoft-teams-oauth/";
-
-      // 🔗 Step 1: Build Microsoft Auth URL
-      const authUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(
-        redirectUri
-      )}&response_mode=query&scope=${encodeURIComponent(
-        "https://graph.microsoft.com/.default offline_access openid profile email"
-      )}`;
-
-      // 🪟 Step 2: Open popup for Teams login
-      const popup = window.open(authUrl, "_blank", "width=700,height=800");
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        Swal.fire("Popup Blocked", "Please allow popups for Microsoft login.", "info");
-        return;
-      }
-
-      // 👀 Step 3: Watch for redirect back with ?code=
-      const interval = setInterval(async () => {
-        try {
-          if (popup.closed) {
-            clearInterval(interval);
-            return;
-          }
-
-          const url = popup.location.href;
-          if (url.includes("?code=")) {
-            clearInterval(interval);
-            const urlParams = new URLSearchParams(popup.location.search);
-            const code = urlParams.get("code");
-            popup.close();
-
-            console.log("✅ Microsoft Auth Code:", code);
-
-            // 🚀 Step 4: Send the code to backend (NOT to Microsoft)
-            const backendRes = await fetch(backendLoginUrl, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ code }), // ✅ Only send code
-            });
-
-            const result = await backendRes.json();
-            console.log("🧠 Teams Backend Response:", result);
-
-            if (backendRes.ok && result.message === "Microsoft Teams login successful") {
-              Swal.fire("Success", "Teams login successful ✅", "success");
-              localStorage.setItem("user", JSON.stringify(result.user));
-              localStorage.setItem("accessToken", result.tokens.access);
-              localStorage.setItem("refreshToken", result.tokens.refresh);
-            } else {
-              Swal.fire("Error", result.message || "Teams login failed ❌", "error");
-            }
-          }
-        } catch (err) {
-          // Ignore CORS errors until redirected
-        }
-      }, 500);
-    } catch (error) {
-      console.error("⚠ Teams login error:", error);
-      Swal.fire("Error", "Something went wrong during Teams login.", "error");
-    }
-  },
-
-    // 🧠 Slack OAuth flow
-    // startSlackLogin() {
-    //   const clientId = "9441923811621.9515115381619";
-    //   const backendRedirect = "https://vapt-backend.onrender.com/api/admin/users/slack/callback/";
-    //   const frontendRedirect = window.location.origin + "/location";
-    //   const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=chat:write,channels:manage,channels:join,mpim:write,groups:write,im:write,users:read,users:read.email&user_scope=identity.basic,identity.email,identity.avatar,identity.team&redirect_uri=${encodeURIComponent(
-    //     backendRedirect
-    //   )}&state=${encodeURIComponent(frontendRedirect)}`;
-    //     const win = window.open(slackAuthUrl, "_blank");
-    //     if (!win || win.closed || typeof win.closed === "undefined") {
-    //       Swal.fire({
-    //         icon: "info",
-    //         title: "Popup Blocked!",
-    //         text: "Please allow popups for this site to log in with Slack.",
-    //       });
-    //     }
-    // },
-    // 🧠 Slack OAuth flow
-  async startSlackLogin() {
       try {
-    // ✅ Your Slack app details (must match backend .env)
-    const clientId = "9441923811621.9515115381619"; // <-- same as in Slack app
-    const backendRedirect = "https://5831bd39fa1f.ngrok-free.app/api/admin/users/slack/callback/";
-    const frontendRedirect = window.location.origin + "/location";
+        console.log("🚀 Starting Microsoft Teams login...");
 
-    // Step 1️⃣: Create Slack authorization URL
-    const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=chat:write,channels:manage,channels:join,mpim:write,groups:write,im:write,users:read,users:read.email&user_scope=identity.basic,identity.email,identity.avatar,identity.team&redirect_uri=${encodeURIComponent(
-      backendRedirect
-    )}&state=${encodeURIComponent(frontendRedirect)}`;
+        const width = 600, height = 700;
+        const left = window.screen.width / 2 - width / 2;
+        const top = window.screen.height / 2 - height / 2;
+        const popup = window.open("", "MicrosoftTeamsLogin", `width=${width},height=${height},top=${top},left=${left}`);
 
-    // Step 2️⃣: Open Slack login popup
-    const popup = window.open(slackAuthUrl, "_blank", "width=700,height=800");
-    if (!popup || popup.closed || typeof popup.closed === "undefined") {
-      Swal.fire("Popup Blocked", "Please allow popups for Slack login.", "info");
-      return;
-    }
-
-    // Step 3️⃣: Poll popup until Slack redirects with ?code=
-    const interval = setInterval(async () => {
-      try {
-        if (popup.closed) {
-          clearInterval(interval);
+        if (!popup) {
+          Swal.fire({ icon: "info", title: "Popup Blocked!", text: "Please allow popups for this site." });
           return;
         }
 
-        const url = popup.location.href;
+        const frontendRedirect = window.location.origin;
+        const res = await fetch(
+          `https://vapt-backend.onrender.com/api/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(frontendRedirect)}`
+        );
 
-        // ✅ When Slack redirects to your backend, the code will be visible
-        if (url.includes("?code=")) {
-          clearInterval(interval);
-          const urlParams = new URLSearchParams(popup.location.search);
-          const code = urlParams.get("code");
+        const data = await res.json();
+        if (!data?.auth_url) {
           popup.close();
-
-          console.log("✅ Slack Auth Code:", code);
-
-          // Step 4️⃣: Exchange the code for tokens (call backend login API)
-          const authStore = useAuthStore();
-          const result = await authStore.loginWithSlack(code, backendRedirect);
-
-          // Step 5️⃣: Handle response
-          if (result.status) {
-            Swal.fire("Success", "Slack login successful ✅", "success");
-            console.log("👤 Slack User:", result.data.user);
-          } else {
-            Swal.fire("Error", result.message, "error");
-          }
+          Swal.fire({ icon: "error", title: "Auth URL Missing", text: "Backend did not return OAuth URL." });
+          return;
         }
+
+        popup.location.href = data.auth_url + "&prompt=select_account";
+
+        window.addEventListener("message", async (event) => {
+          if (event.data?.code) {
+            console.log("✅ Microsoft Teams login success:", event.data);
+            popup.close();
+
+            Swal.fire({
+              icon: "success",
+              title: "Microsoft Teams Connected!",
+              timer: 1500,
+              showConfirmButton: false,
+            });
+
+            // Save user info
+            localStorage.setItem("teams_code", event.data.code);
+            localStorage.setItem("teams_state", event.data.state);
+          }
+        });
+
+
       } catch (err) {
-        // Ignore CORS cross-domain errors until redirect happens
+        console.error("❌ Teams login error:", err);
+        Swal.fire("Error", "Microsoft Teams login failed.", "error");
       }
-    }, 700);
+    },
+
+    // 🧠 Slack OAuth flow
+  // async startSlackLogin() {
+  // try {
+  //   const res = await endpoint.post("/admin/users/slack/oauth-url/", {
+  //     base_url: "https://vapt-backend.onrender.com",
+  //   });
+  //   if (!res.data.success) {
+  //     Swal.fire("Error", "Failed to get Slack OAuth URL", "error");
+  //     return;
+  //   }
+  //   const authUrl = res.data.auth_url;
+  //   console.log("🔗 Slack Auth URL:", authUrl);
+  //   const popup = window.open(authUrl, "_blank", "width=700,height=800");
+  //   if (!popup || popup.closed || typeof popup.closed === "undefined") {
+  //     Swal.fire("Popup Blocked", "Please allow popups for Slack login.", "info");
+  //     return;
+  //   }
+  //   const interval = setInterval(async () => {
+  //     try {
+  //       if (popup.closed) {
+  //         clearInterval(interval);
+  //         return;
+  //       }
+  //       const url = popup.location.href;
+  //       if (url.includes("?code=")) {
+  //         clearInterval(interval);
+  //         const urlParams = new URLSearchParams(popup.location.search);
+  //         const code = urlParams.get("code");
+  //         popup.close();
+
+  //         console.log("✅ Slack Auth Code:", code);
+  //         const redirectUri = "https://vapt-backend.onrender.com/api/admin/users/slack/callback/";
+  //         const authStore = useAuthStore();
+  //         const result = await authStore.loginWithSlack(code, redirectUri);
+  //         if (result.status) {
+  //           Swal.fire("Success", "Slack login successful ✅", "success");
+  //           console.log("👤 Slack User:", result.data.user);
+  //         } else {
+  //           Swal.fire("Error", result.message, "error");
+  //         }
+  //       }
+  //     } catch (err) {
+  //     }
+  //   }, 700);
+  // } catch (error) {
+  //   console.error("Slack login error:", error);
+  //   Swal.fire("Error", "Something went wrong during Slack login.", "error");
+  // }
+  // },
+ async startSlackLogin() {
+  const authStore = useAuthStore();
+
+  try {
+    // 1️⃣ Get Slack OAuth URL
+    const { data: slackData } = await authStore.getSlackOAuthUrl(this.backendBase);
+    const authUrl = slackData.auth_url;
+    console.log("🔗 Slack Auth URL:", authUrl);
+
+    // 2️⃣ Listen BEFORE opening popup
+    const handler = (event) => {
+      if (!event.data || event.data.type !== "slack-auth-success") return;
+
+      const payload = event.data.payload;
+      console.log("✅ Slack OAuth Payload:", payload);
+
+      if (!payload.success) {
+        Swal.fire("Error", payload.error || "Slack login failed", "error");
+        return;
+      }
+
+      // ✅ Store Slack user info
+      localStorage.setItem("slack_user_login", payload.bot_access_token);
+      localStorage.setItem("slack_user_email", payload.user_email);
+      localStorage.setItem("slack_user_name", payload.user_name);
+
+      // ✅ Show Slack success popup
+      Swal.fire({
+        title: "🎉 Slack Login Successful!",
+        html: `
+          <b>Welcome, ${payload.user_name}!</b><br>
+          <small>Logged in as <i>${payload.user_email}</i></small>
+        `,
+        icon: "success",
+        confirmButtonText: "OK",
+        background: "#fff",
+        color: "#333",
+        timer: 4000,
+        timerProgressBar: true,
+      });
+
+      console.log("👤 Slack User Saved:", payload.user_name, payload.user_email);
+
+      // ✅ Remove listener
+      window.removeEventListener("message", handler);
+    };
+
+    window.addEventListener("message", handler, { once: true });
+
+    // 3️⃣ Open popup after listener
+    const popup = window.open(authUrl, "SlackAuth", "width=700,height=800");
+
+    // 4️⃣ Fallback: check every 2s if user logged in
+    const fallbackTimer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(fallbackTimer);
+        console.log("Popup closed");
+      }
+    }, 2000);
   } catch (error) {
     console.error("Slack login error:", error);
     Swal.fire("Error", "Something went wrong during Slack login.", "error");
   }
-  },
+},
     
     // async handleJiraAsanaClick(platform) {
     //   if (this.notUsingJiraAsana) return;
@@ -1091,7 +1085,6 @@ export default {
     },
   },
   mounted() {
-    // Load users from localStorage on page load
     const savedUsers = localStorage.getItem("addedUsers");
     if (savedUsers) {
       this.usersList = JSON.parse(savedUsers);
@@ -1102,9 +1095,79 @@ export default {
   }
     this.initTooltips();
     document.addEventListener('click', this.onClickOutside);
+
+    try {
+      // 🟢 1️⃣ Handle Microsoft Teams popup redirect
+      if (window.opener && window.location.search.includes("code=")) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get("code");
+        const state = urlParams.get("state");
+
+        console.log("📩 Received Teams code:", code);
+
+        // ✅ Exchange code with backend for tokens & user info
+        fetch("https://vapt-backend.onrender.com/api/admin/users/microsoft-oauth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, state }),
+        })
+          .then(async (res) => {
+            const data = await res.json();
+            console.log("✅ Teams OAuth response:", data);
+
+            if (res.ok && data?.user_info) {
+              // 🧩 Send full login success message to parent
+              window.opener.postMessage(
+                {
+                  type: "teams-login-success",
+                  code,
+                  state,
+                  token_data: data.token_data,
+                  user_info: data.user_info,
+                },
+                window.location.origin
+              );
+
+              // Show confirmation in popup
+              document.body.innerHTML = "<h2>Microsoft login successful! Closing...</h2>";
+              setTimeout(() => window.close(), 1000);
+            } else {
+              console.error("❌ Microsoft OAuth failed:", data);
+              document.body.innerHTML = "<h2>Failed to get user info</h2>";
+            }
+          })
+          .catch((err) => {
+            console.error("❌ Teams OAuth error:", err);
+            document.body.innerHTML = "<h2>Login error</h2>";
+          });
+
+        return; // stop executing rest of mounted()
+      }
+
+      // 🟠 2️⃣ Handle Slack OAuth redirect
+      // this.handleSlackRedirect();
+
+      // 🟣 3️⃣ Load saved users (existing logic)
+      const savedUsers = localStorage.getItem("addedUsers");
+      if (savedUsers) this.usersList = JSON.parse(savedUsers);
+
+      // 🟡 4️⃣ Fetch locations if not loaded
+      if (!this.authStore.locations.length) {
+        this.authStore.fetchLocations();
+      }
+
+      // 🟣 5️⃣ Initialize tooltips and click listeners
+      this.initTooltips();
+      document.addEventListener("click", this.onClickOutside);
+
+    } catch (err) {
+      console.error("Redirect page error:", err);
+    }
   },
   beforeUnmount() {
     document.removeEventListener('click', this.onClickOutside);
+
+    window.removeEventListener("message", this.handleSlackMessage);
   }
 };
 </script>
