@@ -13,7 +13,7 @@
                     <div class="col-11 pt-5 pb-3 px-4">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h2 class="ticket-head mt-3">Support tickets</h2>
+                                <h2 class="ticket-head mt-3">Support Tickets</h2>
                             </div>
                             <div class="d-flex flex-row mt-4">
                                 <div>
@@ -28,9 +28,9 @@
                         <div class="row">
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
                                 <div class="d-flex gap-3">
-                                    <button class="btn btn-primary btn-pill active-tab fw-semibold">All</button>
-                                    <button class="btn btn-danger btn-pill other-btn">Open</button>
-                                    <button class="btn btn-success btn-pill other-btn">Closed</button>
+                                    <button class="btn btn-primary btn-pill active-tab fw-semibold" @click="loadAllTickets">All</button>
+                                    <button class="btn btn-danger btn-pill other-btn" @click="loadOpenTickets">Open</button>
+                                    <button class="btn btn-success btn-pill other-btn" @click="loadClosedTickets">Closed</button>
                                 </div>
                                 <div>
                                     <router-link to="/createnewticket">
@@ -40,13 +40,14 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row mt-5">
                             
                             <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
+                                <table class="table align-middle table-hover">
+                                    <thead class="table-light">
                                         <tr>
-                                            <th scope="col">Subject</th>
+                                            <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
                                             <th scope="col">Description</th>
                                             <th scope="col">Category</th>
@@ -56,71 +57,51 @@
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description.</td>
-                                            <td>Bug</td>
-                                            <td>Open</td>
-                                            <td>23/06/2025</td>
-                                            <td><router-link to="" style="text-decoration: none;">
-                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description.</td>
-                                            <td>Help</td>
-                                            <td>Close</td>
-                                            <td>23/06/2025</td>
-                                            <td><router-link to="" style="text-decoration: none;">
-                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description.</td>
-                                            <td>Feature request</td>
-                                            <td>Close</td>
-                                            <td>23/06/2025</td>
-                                            <td><router-link to="" style="text-decoration: none;">
-                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description.</td>
-                                            <td>Feature request</td>
-                                            <td>Open</td>
-                                            <td>23/06/2025</td>
-                                            <td><router-link to="" style="text-decoration: none;">
-                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>This is the description.</td>
-                                            <td>Feature request</td>
-                                            <td>Open</td>
-                                            <td>23/06/2025</td>
-                                            <td><router-link to="" style="text-decoration: none;">
-                                              <button class="btn fw-semibold border-0" style="color: rgba(49, 33, 177, 1);">Chat with us <i class="bi bi-chat-dots ms-2"></i></button>
-                                            </router-link></td>
-                                        </tr>
+                                    <tr v-for="(ticket, i) in tickets" :key="i">
+                                        <td class="text-truncate" style="max-width: 200px;">{{ ticket.subject }}</td>
+                                        <td>{{ ticket.asset }}</td>
+                                        <td style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
+                                        {{ ticket.description }}
+                                        </td>
+                                        <td>{{ ticket.category }}</td>
+                                        <td>{{ ticket.status }}</td>
+                                        <td>{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
+                                        <td>
+                                        <router-link to="" style="text-decoration: none;">
+                                            <button class="btn fw-semibold border-0" style="color: rgba(49,33,177,1);">
+                                            Chat with us <i class="bi bi-chat-dots ms-2"></i>
+                                            </button>
+                                        </router-link>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                           
+                        <!-- view Requests Modal -->
+                      <div class="modal fade" id="viewRequestsModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title">Issues Raised for Support</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <h6 class="fw-semibold">Description</h6>
+            <textarea class="form-control rounded-0" rows="4" readonly>
+              {{ selectedDescription }}
+            </textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
                         </div>
 
                     </div>
@@ -135,6 +116,7 @@
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: 'SupportTicketView',
@@ -142,7 +124,39 @@ export default {
         DashboardMenu,
         DashboardHeader,
         NotificationPanel
+    },
+    data() {
+    return {
+      authStore: useAuthStore(),
+      tickets: [],
+      selectedDescription: "",
+    };
+  },
+
+  methods: {
+    async loadAllTickets() {
+      const res = await this.authStore.getAllTickets();
+      if (res.status) {
+        this.tickets = this.authStore.tickets;
+      }
+    },
+    async loadOpenTickets() {
+    const res = await this.authStore.getOpenTickets();
+    if (res.status) {
+      this.tickets = this.authStore.tickets;
     }
+    },
+    async loadClosedTickets() {
+    const res = await this.authStore.getClosedTickets();
+    if (res.status) {
+      this.tickets = this.authStore.tickets;
+    }
+    },
+  },
+
+  async mounted() {
+    await this.loadAllTickets(); 
+  },
 };
 </script>
 

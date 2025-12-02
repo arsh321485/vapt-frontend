@@ -16,7 +16,8 @@
         style="cursor:pointer;"
         @click="toggleDropdown"
       >
-        A
+        <!-- A -->
+         {{ userInitial }}
       </div>
 
       <!-- Dropdown -->
@@ -35,7 +36,7 @@
         </router-link>
 
         <!-- Logout -->
-        <button class="btn btn-sm btn-danger w-100" @click="confirmLogout">
+        <button class="btn btn-sm btn-danger w-100" @click="handleLogout">
           Logout
         </button>
       </div>
@@ -50,33 +51,96 @@
 </template>
 
 <script>
+import { useAuthStore } from "@/stores/authStore";
+import Swal from "sweetalert2";
+import router from "@/router";
+
 export default {
   name: 'DashboardHeader',
   data() {
     return {
       showDropdown: false,
-      userEmail: "user@email.com",
+      userEmail: "",
+      userInitial: "",
     };
   },
   methods: {
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
-    confirmLogout() {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will be logged out.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "No",
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "/home";
-        }
-      });
+    setUserData(user) {
+      if (!user) return;
+
+      this.userEmail = user.email || "";
+
+      const nameSource =
+        user.first_name ||
+        user.firstname ||
+        user.full_name ||
+        user.name ||
+        user.email || "";
+
+      this.userInitial = nameSource.trim().charAt(0).toUpperCase();
+    },
+    async loadUserData() {
+      const authStore = useAuthStore();
+
+      // 1️⃣ Try from store/localStorage first (fast UI)
+      const storedUser =
+        authStore.user ||
+        JSON.parse(localStorage.getItem("user") || "null");
+
+      if (storedUser) {
+        this.setUserData(storedUser);
+      }
+
+      // 2️⃣ Then refresh from API and override
+      const response = await authStore.getUserProfile();
+
+      if (response.status && response.data && response.data.user) {
+        const freshUser = response.data.user;
+        this.setUserData(freshUser);
+      }
+    },
+    async fetchUserProfile() {
+  const authStore = useAuthStore();
+  const response = await authStore.getUserProfile();
+
+  console.log("PROFILE RESPONSE:", response);
+
+  const user = response.data?.data?.user || response.data?.user;
+
+  if (user) {
+    this.userEmail = user.email;
+    this.userInitial = (user.firstname || user.name || "")
+      .trim()
+      .charAt(0)
+      .toUpperCase();
+  }
+},
+    async handleLogout() {
+      const authStore = useAuthStore();
+
+      const response = await authStore.logout();
+
+      if (response.status) {
+        Swal.fire({
+          icon: "success",
+          title: "Logged out",
+          text: "You have been logged out successfully.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+        router.push("/signin");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Logout Failed",
+          text: response.message || "Something went wrong!",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      }
     },
     handleClickOutside(e) {
       if (
@@ -87,9 +151,11 @@ export default {
       }
     },
   },
+  
   mounted() {
-    document.addEventListener("click", this.handleClickOutside);
-  },
+  document.addEventListener("click", this.handleClickOutside);
+  this.loadUserData();
+},
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);
   },

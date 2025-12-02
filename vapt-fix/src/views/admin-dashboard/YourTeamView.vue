@@ -221,66 +221,107 @@
         </h5>
 
         <div class="row mb-4">
-            <div class="col-8">
-            <div
-                v-for="user in filteredUsers(tab.name, 'Internal')"
-                :key="user._id"
-                class="d-flex align-items-center justify-content-start mb-3 gap-5"
-            >
-                <div class="d-flex align-items-center">
-                <div
-                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
-                >
-                    {{ getInitials(user.first_name, user.last_name) }}
-                </div>
-                <span class="fw-medium text-dark">{{ user.first_name }} {{ user.last_name }}</span>
-                </div>
+            <div class="col-10">
+              <!-- <table class="table align-middle table-hover">
+                <thead class="table-light">
+                  <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Location</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Role</th>
+                                            <th scope="col"></th>
+                                            
+                                        </tr>
+                </thead>
+                <tbody class="raised-tbody">
+                  <tr>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table> -->
+            <table class="table align-middle table-hover">
+  <thead class="table-light">
+    <tr>
+      <th class="text-center" scope="col">Name</th>
+      <th class="text-center" scope="col">Location</th>
+      <th class="text-center" scope="col">Email</th>
+      <th class="text-center" scope="col">Role</th>
+      <th class="text-center" scope="col"></th>
+    </tr>
+  </thead>
 
-                <div class="d-flex align-items-center">
-                <p class="mt-3">{{ user.select_location }}</p>
-                </div>
+  <tbody class="raised-tbody">
+    <tr
+      v-for="user in filteredUsers(tab.name, 'Internal')"
+      :key="user._id"
+    >
+      <!-- Name + initials -->
+      <td>
+        <div class="d-flex align-items-center">
+          <div
+            class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
+            style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
+          >
+            {{ getInitials(user.first_name, user.last_name) }}
+          </div>
+          <span class="fw-medium text-dark">
+            {{ user.first_name }} {{ user.last_name }}
+          </span>
+        </div>
+      </td>
 
-                <!-- Dropdown for Roles -->
-                <div class="multi-select-dropdown">
-                <div class="dropdown-input rounded-0" @click="toggleDropdown(user._id)">
-                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-                    <span><i class="bi bi-chevron-down"></i></span>
-                </div>
-                <div class="dropdown-list" v-show="isOpen[user._id]">
-                    <label v-for="option in roleOptions" :key="option.short">
-                    <input
-                        type="checkbox"
-                        :value="option.short"
-                        v-model="selectedRoles[user._id]"
-                    />
-                    {{ option.full }}
-                    </label>
-                </div>
-                </div>
+      <!-- Location -->
+      <td>
+        {{ user.select_location }}
+      </td>
 
-                <!-- Remove Button -->
-                <a
-                href="#"
-                class="d-flex align-items-center ms-5 fw-semibold"
-                style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
-                @click.prevent="removeUser(user._id)"
-                >
-                <i class="bi bi-dash-circle me-1"></i> Remove
-                </a>
-                <!-- <div v-for="role in user.Member_role.split(',')" :key="role" class="d-flex align-items-center align-items-center ms-3">
-  <span>{{ role.trim() }}</span>
-  <a
-    href="#"
-    class="ms-2 text-danger"
-    @click.prevent="removeUserFromRole(user, role.trim())"
-  >
-    <i class="bi bi-dash-circle"></i> Remove
-  </a>
-</div> -->
+      <!-- Email -->
+      <td>
+        {{ user.email }}
+      </td>
 
-            </div>
-            <hr class="my-2" />
+      <!-- Role dropdown -->
+      <td>
+        <div class="multi-select-dropdown">
+          <div
+            class="dropdown-input rounded-0"
+            @click="toggleDropdown(user._id)"
+          >
+            <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+            <span><i class="bi bi-chevron-down"></i></span>
+          </div>
+
+          <div class="dropdown-list" v-show="isOpen[user._id]">
+            <label v-for="option in roleOptions" :key="option.short">
+              <input
+                type="checkbox"
+                :value="option.short"
+                v-model="selectedRoles[user._id]"
+                @change="updateSelectedRoleText(user._id)"
+              />
+              {{ option.full }}
+            </label>
+          </div>
+        </div>
+      </td>
+
+      <!-- Remove button -->
+      <td>
+        <a
+          href="#"
+          class="d-flex align-items-center fw-semibold"
+          style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
+          @click.prevent="removeUserFromCurrentTab(user)"
+        >
+          <i class="bi bi-dash-circle me-1"></i> Remove
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+              
             </div>
         </div>
 
@@ -290,55 +331,89 @@
         </h5>
 
         <div class="row">
-            <div class="col-8">
-            <div
-                v-for="user in filteredUsers(tab.name, 'External')"
-                :key="user._id"
-                class="d-flex align-items-center justify-content-start mb-3 gap-5"
-            >
-                <div class="d-flex align-items-center">
-                <div
-                    class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-                    style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
-                >
-                    {{ getInitials(user.first_name, user.last_name) }}
-                </div>
-                <span class="fw-medium text-dark">{{ user.first_name }} {{ user.last_name }}</span>
-                </div>
+            <div class="col-10">
+              <table class="table align-middle table-hover">
+  <thead class="table-light">
+    <tr>
+      <th class="text-center" scope="col">Name</th>
+      <th class="text-center" scope="col">Location</th>
+      <th class="text-center" scope="col">Email</th>
+      <th class="text-center" scope="col">Role</th>
+      <th class="text-center" scope="col"></th>
+    </tr>
+  </thead>
 
-                <div class="d-flex align-items-center">
-                <p class="mt-3">{{ user.select_location }}</p>
-                </div>
+  <tbody class="raised-tbody">
+    <tr
+      v-for="user in filteredUsers(tab.name, 'External')"
+      :key="user._id"
+    >
+      <!-- Name + initials -->
+      <td>
+        <div class="d-flex align-items-center">
+          <div
+            class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
+            style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
+          >
+            {{ getInitials(user.first_name, user.last_name) }}
+          </div>
+          <span class="fw-medium text-dark">
+            {{ user.first_name }} {{ user.last_name }}
+          </span>
+        </div>
+      </td>
 
-                <!-- Dropdown -->
-                <div class="multi-select-dropdown">
-                <div class="dropdown-input rounded-0" @click="toggleDropdown(user._id)">
-                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-                    <span><i class="bi bi-chevron-down"></i></span>
-                </div>
-                <div class="dropdown-list" v-show="isOpen[user._id]">
-                    <label v-for="option in roleOptions" :key="option.short">
-                    <input
-                        type="checkbox"
-                        :value="option.short"
-                        v-model="selectedRoles[user._id]"
-                    />
-                    {{ option.full }}
-                    </label>
-                </div>
-                </div>
+      <!-- Location -->
+      <td>
+        {{ user.select_location }}
+      </td>
 
-                <!-- Remove Button -->
-                <a
-                href="#"
-                class="d-flex align-items-center ms-5 fw-semibold"
-                style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
-                @click.prevent="removeUser(user._id)"
-                >
-                <i class="bi bi-dash-circle me-1"></i> Remove
-                </a>
-            </div>
-            <hr class="my-2" />
+      <!-- Email -->
+      <td>
+        {{ user.email }}
+      </td>
+
+      <!-- Role dropdown (external) -->
+      <td>
+        <div class="multi-select-dropdown">
+          <div
+            class="dropdown-input rounded-0"
+            @click="toggleDropdown(user._id)"
+          >
+            <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+            <span><i class="bi bi-chevron-down"></i></span>
+          </div>
+
+          <div class="dropdown-list" v-show="isOpen[user._id]">
+            <label v-for="option in roleOptions" :key="option.short">
+              <input
+                type="checkbox"
+                :value="option.short"
+                v-model="selectedRoles[user._id]"
+                @change="updateSelectedRoleText(user._id)"
+              />
+              {{ option.full }}
+            </label>
+          </div>
+        </div>
+      </td>
+
+      <!-- Remove button -->
+      <td>
+        <a
+          href="#"
+          class="d-flex align-items-center fw-semibold"
+          style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
+          @click.prevent="removeUserFromCurrentTab(user)"
+        >
+          <i class="bi bi-dash-circle me-1"></i> Remove
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            
             </div>
         </div>
         </div>
@@ -359,6 +434,7 @@ import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
+import endpoint from "@/services/apiServices";
 
 export default {
     name: 'YourTeamView',
@@ -369,6 +445,7 @@ export default {
     },
     data() {
     return {
+      dropdownRefs: {},
       showPopup: false,
         isOpen: {
       dropdown3: false
@@ -385,10 +462,10 @@ export default {
       linkCopied: false,
       activeTab: 0,
       tabs: [
-        { name: "Patch management" },
-        { name: "Configuration management" },
-        { name: "Network security" },
-        { name: "Architectural flaws" }
+        { name: "Patch Management" },
+        { name: "Configuration Management" },
+        { name: "Network Security" },
+        { name: "Architectural Flaws" }
       ],
       authStore: useAuthStore(),
       users: [],
@@ -396,10 +473,10 @@ export default {
       selectedRoles: {},
       selectedRoleText: {},
       roleMapping: {
-      "Patch management": "PM",
-      "Configuration management": "CM",
-      "Network security": "NS",
-      "Architectural flaws": "AF"
+      "Patch Management": "PM",
+      "Configuration Management": "CM",
+      "Network Security": "NS",
+      "Architectural Flaws": "AF"
     }
     };
   },
@@ -440,157 +517,240 @@ export default {
       this.isOpen[dropdownName] = !this.isOpen[dropdownName];
     },
     onClickOutside(event) {
-      const isClickInsideDropdown1 = this.$refs.roleDropdown1.contains(event.target);
-      const isClickInsideDropdown2 = this.$refs.roleDropdown2.contains(event.target);
-      const isClickInsideDropdown3 = this.$refs.roleDropdown3.contains(event.target);
-      if (!isClickInsideDropdown1) {
-        this.isOpen.dropdown1 = false;
+    for (const key in this.isOpen) {
+      const dropdown = document.getElementById(`dropdown-${key}`);
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.isOpen[key] = false;
       }
-      if (!isClickInsideDropdown2) {
-        this.isOpen.dropdown2 = false;
-      }
-      if (!isClickInsideDropdown3) {
-        this.isOpen.dropdown3 = false;
-      }
-    },
+    }
+  },
     getInitials(first, last) {
       return (first?.[0] || '') + (last?.[0] || '');
     },
-    removeUser(userId) {
-    const removedUser = this.users.find(u => u._id === userId);
-    if (removedUser) {
-      console.log(`🗑 User removed completely: ${removedUser.first_name} ${removedUser.last_name}`);
-    }
-
-    this.users = this.users.filter(u => u._id !== userId);
-    localStorage.setItem('users', JSON.stringify(this.users));
-
-    // Clean up dropdown states
-    delete this.selectedRoles[userId];
-    delete this.selectedRoleText[userId];
-    delete this.isOpen[userId];
-    },
     toggleDropdown(id) {
-      this.$set(this.isOpen, id, !this.isOpen[id]);
-    },
-    filteredUsers(tabName, type) {
-      if (!Array.isArray(this.users)) return [];
-
-      const roleCode = this.roleMapping[tabName]; 
-      return this.users.filter(user => {
-        const matchType = user.user_type?.toLowerCase() === type.toLowerCase();
-        if (!user.Member_role) return false;
-
-        // handle multiple roles (comma-separated) just in case
-        const roles = user.Member_role.split(',').map(r => r.trim());
-        const matchRole = roles.includes(roleCode);
-
-        return matchType && matchRole;
-      });
-    },
-    removeUserFromRole(user, roleToRemove) {
-  roleToRemove = roleToRemove.trim().toUpperCase();
-
-  // Get current roles of user
-  const originalRoles = user.Member_role
-    ? user.Member_role.split(',').map(r => r.trim().toUpperCase())
-    : [];
-
-  // Only remove the selected role
-  const filteredRoles = originalRoles.filter(r => r !== roleToRemove);
-
-  if (filteredRoles.length > 0) {
-    // Update user with remaining roles
-    const updatedUser = { ...user, Member_role: filteredRoles.join(', ') };
-    
-    // Replace user in users array
-    this.users = this.users.map(u => (u._id === user._id ? updatedUser : u));
-
-    console.log(`✂ Role removed: ${roleToRemove} from ${user.first_name} ${user.last_name}`);
-  } else {
-    // No roles left → remove user completely
-    this.users = this.users.filter(u => u._id !== user._id);
-    console.log(`🗑 User removed completely (no roles left): ${user.first_name} ${user.last_name}`);
-  }
-
-  // Update localStorage
-  localStorage.setItem('users', JSON.stringify(this.users));
-
-  // Clean up dropdown state for that role
-  delete this.selectedRoles[user._id];
-  delete this.selectedRoleText[user._id];
-  delete this.isOpen[user._id];
-    },
-    async addUser() {
-    try {
-      const adminId = this.authStore.user?._id || this.authStore.user?.id;
-      if (!adminId) {
-        alert("Admin ID not found. Please login again.");
-        return;
-      }
-
-      const roleFullMap = {
-        PM: "Patch Management",
-        CM: "Configuration Management",
-        NS: "Network Security",
-        AF: "Architectural Flaws"
-      };
-
-      this.form.admin_id = adminId;
-      this.form.location_id = this.selectedLocation;
-      this.form.Member_role = this.selectedRoles1
-        .map(short => roleFullMap[short] || short)
-        .join(", ");
-
-      const res = await endpoint.post("/admin/users_details/add-user-detail/", this.form);
-
-      if (res.data.message === "User detail created successfully") {
-        console.log("✅ User created:", res.data.data);
-      }
-    } catch (err) {
-      console.error("❌ Error adding user:", err);
-    }
-    }
+    Object.keys(this.isOpen).forEach(key => {
+      if (key !== id) this.isOpen[key] = false;
+    });
+    this.isOpen[id] = !this.isOpen[id];
   },
-  
-  async mounted() {
-  document.addEventListener('click', this.onClickOutside);
+    filteredUsers(tabName, type) {
+  if (!Array.isArray(this.users)) return [];
 
-  const storedUsers = JSON.parse(localStorage.getItem('users'));
-  if (storedUsers && storedUsers.length > 0) {
-    this.users = storedUsers;
-    console.log("✅ Users loaded from localStorage:", this.users);
-    return;
-  }
+  return this.users.filter((user) => {
+    // Match Internal / External
+    const matchType =
+      user.user_type?.toLowerCase() === type.toLowerCase();
 
+    // Match Role (array check)
+    const matchRole = Array.isArray(user.Member_role)
+      ? user.Member_role.some(
+          (role) => role.toLowerCase() === tabName.toLowerCase()
+        )
+      : false;
+
+    return matchType && matchRole;
+  });
+  },
+  async addUser() {
   try {
-    const res = await this.authStore.fetchAllUsers();
-    if (res.status) {
-      let usersArray = Array.isArray(res.data) ? res.data : res.data.data;
+    // ✅ 1️⃣ Get admin ID
+    const adminId = this.authStore.user?._id || this.authStore.user?.id;
+    if (!adminId) {
+      Swal.fire({
+        icon: "error",
+        title: "Missing Admin ID",
+        text: "Please log in again.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
-      // ✅ Normalize Member_role from full name → short code
-      const roleReverseMap = {
-        "Patch Management": "PM",
-        "Configuration Management": "CM",
-        "Network Security": "NS",
-        "Architectural Flaws": "AF"
+    // ✅ 2️⃣ Map short role codes → full names
+    const roleFullMap = {
+      PM: "Patch Management",
+      CM: "Configuration Management",
+      NS: "Network Security",
+      AF: "Architectural Flaws",
+    };
+
+    // ✅ 3️⃣ Prepare payload
+    this.form.admin_id = adminId;
+    this.form.location_id = this.selectedLocation;
+
+    const selectedLoc = this.authStore.locations.find(
+      (loc) => loc._id === this.selectedLocation
+    );
+    this.form.select_location = selectedLoc ? selectedLoc.location_name : "";
+
+    // Convert short codes to full names → array format (backend expects array)
+    this.form.Member_role = this.selectedRoles1.map(
+      (short) => roleFullMap[short] || short
+    );
+
+    // ✅ 4️⃣ Call API
+    const res = await endpoint.post(
+      "/admin/users_details/add-user-detail/",
+      this.form
+    );
+
+    if (res.data.message === "User detail created successfully") {
+      console.log("✅ User created:", res.data.data);
+
+      Swal.fire({
+        icon: "success",
+        title: "User Added",
+        text: res.data.message,
+        timer: 2500,
+        showConfirmButton: false,
+      });
+
+      // ✅ 5️⃣ Add newly created user to UI immediately
+      const newUser = res.data.data;
+
+      // Initialize usersList if not exists
+      if (!this.usersList) this.usersList = [];
+
+      // Prevent duplicate (based on email)
+      const exists = this.usersList.some(
+        (u) => u.email.toLowerCase() === newUser.email.toLowerCase()
+      );
+
+      if (!exists) {
+        this.usersList.unshift(newUser); // show newly added user first
+      }
+
+      // ✅ 6️⃣ Save in localStorage for persistence
+      localStorage.setItem("addedUsers", JSON.stringify(this.usersList));
+
+      // ✅ 7️⃣ Reset form
+      this.form = {
+        admin_id: "",
+        location_id: "",
+        first_name: "",
+        last_name: "",
+        user_type: "",
+        email: "",
+        select_location: "",
+        Member_role: [],
       };
-
-      usersArray = usersArray.map(u => ({
-        ...u,
-        Member_role: roleReverseMap[u.Member_role?.trim()] || u.Member_role
-      }));
-
-      this.users = usersArray;
-      localStorage.setItem('users', JSON.stringify(this.users));
-      console.log("✅ Users loaded & normalized:", this.users);
-    } else {
-      console.error("❌ Failed to load users:", res.message);
+      this.selectedLocation = "";
+      this.selectedRoles1 = [];
     }
   } catch (err) {
-    console.error("⚠️ Error fetching users:", err);
+    console.error("❌ Error adding user:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Error Adding User",
+      text: err.response?.data?.message || "Please try again.",
+      timer: 3000,
+      showConfirmButton: false,
+    });
   }
-},
+  },
+  //  Remove user from current role tab
+  async removeUserFromCurrentTab(user) {
+    const roleToRemove = this.tabs[this.activeTab].name; // now matches backend exactly
+
+    try {
+      console.log('Deleting role', { confirm: true, member_role: roleToRemove });
+
+      const res = await endpoint.delete(
+        `/admin/users_details/user-detail/${user._id}/delete-role/`,
+        {
+          data: {
+            confirm: true,
+            member_role: roleToRemove, // exact match from backend
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        user.Member_role = res.data.remaining_roles || [];
+
+        Swal.fire({
+          icon: "success",
+          title: "Role Removed",
+          text: `Role '${roleToRemove}' removed successfully from ${user.first_name}.`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (err) {
+      console.error("❌ Error removing user from role:", err);
+      console.log('Response data:', err.response?.data);
+
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Remove Role",
+        text: err.response?.data?.message || err.message || "Please try again.",
+      });
+    }
+  },
+  async updateSelectedRoleText(userId) {
+    this.selectedRoleText[userId] = this.selectedRoles[userId].join(", ");
+    const fullRoles = this.selectedRoles[userId].map(short =>
+      Object.keys(this.roleMapping).find(key => this.roleMapping[key] === short)
+    );
+    const res = await this.authStore.updateUserRoles(userId, fullRoles);
+
+    if (res.status) {
+      const user = this.users.find(u => u._id === userId);
+      if (user) {
+        user.Member_role = res.updated_roles; 
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Roles Updated",
+        text: res.message,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Update",
+        text: res.message,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  },
+  },
+  async mounted() {
+    document.addEventListener('click', this.onClickOutside);
+
+    const storedUsers = JSON.parse(localStorage.getItem('users'));
+    if (storedUsers && storedUsers.length > 0) {
+      this.users = storedUsers;
+      this.users.forEach(user => {
+        this.selectedRoles[user._id] = user.Member_role?.map(
+          full => this.roleMapping[full]   
+        ) || [];
+
+        this.selectedRoleText[user._id] = this.selectedRoles[user._id].join(", ");
+        this.isOpen[user._id] = false;
+      });
+
+      console.log("Initial roles", this.selectedRoles);
+      return;
+    }
+    const res = await this.authStore.fetchAllUsers();
+    if (res.status) {
+      this.users = res.data;
+      this.users.forEach(user => {
+        this.selectedRoles[user._id] = user.Member_role?.map(
+          full => this.roleMapping[full]
+        ) || [];
+
+        this.selectedRoleText[user._id] = this.selectedRoles[user._id].join(", ");
+        this.isOpen[user._id] = false;
+      });
+
+      console.log("Initial Roles", this.selectedRoles);
+    }
+  },
   beforeUnmount() {
     document.removeEventListener('click', this.onClickOutside);
   }

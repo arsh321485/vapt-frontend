@@ -14,19 +14,24 @@
                         <div class="d-flex justify-content-between">
                             <div><h2 class="ticket-head mt-4">Support Requests</h2></div>
                             <div class="d-flex flex-row gap-3 mt-4">
-                                
-                                <button type="button" class="btn pending-approval-btn rounded-pill">Go Premium
-                                <!-- Go premium and get exclusive support control request from us -->
-                                <i class="bi bi-arrow-right ms-1 fs-5"></i>
-                                </button>
-                                <div class="dropdown">
+                                <router-link to="/pricingplan" class="btn pending-approval-btn rounded-pill text-decoration-none">Go Premium
+                                <i class="bi bi-arrow-right"></i></router-link>
+                
+                                <!-- <div class="dropdown">
                             <div class="dropdown-btn"> Select location</div>
                             <div class="dropdown-content">
                               <a href="#">Greece</a>
                               <a href="#">Germany</a>
                               <a href="#">Bahrain</a>
                             </div>
-                                </div>
+                                </div> -->
+                                <!-- <div><select class="form-select rounded-pill" v-model="selectedLocation">
+                                        <option disabled value="">Select location</option>
+                                        <option value="germany">Germany</option>
+                                        <option value="delhi">Delhi</option>
+                                        <option value="bahrain">Bahrain</option>
+                                        <option value="greece">Greece</option>
+                                    </select></div> -->
                                 <NotificationPanel />
                             </div>
                         </div>
@@ -44,8 +49,8 @@
                         <div class="row mt-5">
                             
                             <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
+                                <table class="table align-middle table-hover">
+                                    <thead class="table-light">
                                         <tr>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
@@ -320,6 +325,7 @@ export default {
   { text: "Sure, this is related to Spring framework.", sender: "user", deletable: true, time: "10:35 AM" },
 ],  
 showBox: false,
+selectedLocation: "greece",
     };
 },
  methods: {
@@ -340,9 +346,6 @@ showBox: false,
   closeChat() {
     this.showChat = false;
   },
-    closeChat() {
-      this.showChat = false;
-    },
     minimizeChat() {
       this.minimized = !this.minimized;
     },
@@ -372,41 +375,87 @@ showBox: false,
       }
     },
   },
-   mounted() {
-    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  //  mounted() {
+  //   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  // [...popoverTriggerList].map(el => {
+  //   new bootstrap.Popover(el, {
+  //     container: 'body',   
+  //     html: true,
+  //     placement: 'right'
+  //   });
+  // });
+
+  //   const dropdown = document.querySelector('.dropdown');
+  //   const btn = dropdown.querySelector('.dropdown-btn');
+  //   const options = dropdown.querySelectorAll('.dropdown-content a');
+
+  //   btn.addEventListener('click', () => {
+  //     dropdown.classList.toggle('show');
+  //   });
+
+    
+  //   options.forEach(option => {
+  //     option.addEventListener('click', (e) => {
+  //       e.preventDefault();
+  //       btn.textContent = option.textContent; 
+  //       dropdown.classList.remove('show'); 
+  //     });
+  //   });
+
+  //   document.addEventListener('click', (e) => {
+  //     if (!dropdown.contains(e.target)) {
+  //       dropdown.classList.remove('show');
+  //     }
+  //   });
+  // },
+  mounted() {
+  // Initialize Bootstrap popovers (only if bootstrap is available)
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   [...popoverTriggerList].map(el => {
-    new bootstrap.Popover(el, {
-      container: 'body',   // append to body
-      html: true,
-      placement: 'right'
+    // Optional safety check
+    if (typeof bootstrap !== "undefined" && bootstrap?.Popover) {
+      new bootstrap.Popover(el, {
+        container: "body",
+        html: true,
+        placement: "right",
+      });
+    }
+  });
+
+  // 🔹 Safely handle dropdown – only if it exists on this page
+  const dropdown = document.querySelector(".dropdown");
+  if (!dropdown) {
+    // No dropdown on this view, so just stop here (no error, chat will still work)
+    return;
+  }
+
+  const btn = dropdown.querySelector(".dropdown-btn");
+  const options = dropdown.querySelectorAll(".dropdown-content a");
+
+  if (!btn) return;
+
+  // Toggle dropdown open/close
+  btn.addEventListener("click", () => {
+    dropdown.classList.toggle("show");
+  });
+
+  // Set selected option
+  options.forEach((option) => {
+    option.addEventListener("click", (e) => {
+      e.preventDefault();
+      btn.textContent = option.textContent; // update button text
+      dropdown.classList.remove("show"); // close dropdown
     });
   });
 
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove("show");
+    }
+  });
+},
 
-    // Toggle dropdown open/close
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    // Set selected option
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
-      });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-  },
   
 };
 </script>

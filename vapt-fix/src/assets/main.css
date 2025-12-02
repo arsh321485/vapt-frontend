@@ -849,7 +849,7 @@ html, body {
   background-color: rgba(236, 233, 254, 1);
   border: none;
   color: rgba(0, 0, 0, 1);
-  padding: 8px 18px;
+  padding: 13px 18px;
 }
 
 .pending-approval-btn:hover {
@@ -1231,7 +1231,7 @@ html, body {
   border-left: 1px solid #ddd;
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   transition: right 0.3s ease-in-out;
-  z-index: 1050;
+  z-index: 10000;
 }
 
 .notification-panel.open {

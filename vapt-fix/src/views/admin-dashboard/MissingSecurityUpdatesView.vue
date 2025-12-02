@@ -35,8 +35,9 @@
                         <div class="row mt-5">
                             <h6 class="fw-semibold mb-3"><i class="bi bi-microsoft me-1"></i> Microsoft(23 assets)</h6>
                             <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
+                                <!-- <table class="table align-middle table-borderless"> -->
+                                    <table class="table table-hover align-middle">
+                                    <thead class="table-light">
                                         <tr>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
@@ -118,8 +119,8 @@
                         <div class="row mt-5">
                             <h6 class="fw-semibold mb-3"><i class="bi bi-microsoft me-1"></i> Apple(61 assets)</h6>
                             <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
+                                <table class="table align-middle table-hover">
+                                    <thead class="table-light">
                                         <tr>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>

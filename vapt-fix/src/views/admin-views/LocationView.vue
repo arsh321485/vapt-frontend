@@ -137,6 +137,7 @@
               </div>
               </div>
 
+              <!-- add location -->
               <div class="row">
                 <div class="col-lg-9 location-card py-4 px-4 ms-3">
                   <div class="row">
@@ -172,6 +173,7 @@
                 </div>
               </div>
 
+              <!-- add users -->
               <div class="row mt-4">
                 <div class="col-lg-12 add-users py-4 px-4 ms-3">
                   <div class="row mb-3">
@@ -231,7 +233,11 @@
                         <td>
                         <div class="multi-select-dropdown" ref="roleDropdown1">
                           <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown1')">
-                                  <span>{{ selectedRoleText1 }}</span>
+                                  <!-- <span>{{ selectedRoleText1 }}</span> -->
+                                   <span>
+        <!-- Display short forms only -->
+        {{ selectedRolesShortDisplay }}
+      </span>
                                   <span><i class="bi bi-chevron-down"></i></span>
                                 </div>
                                 <div class="dropdown-list" v-show="isOpen.dropdown1">
@@ -261,7 +267,8 @@
                   
                 </div>
               </div>
-
+              
+              <!-- create invite link -->
               <div class="row mt-4">
                 <div class="col-lg-12 add-users py-4 px-4 ms-3">
                     <div class="row mb-3">
@@ -269,13 +276,13 @@
                       <div class="col-1 d-flex justify-content-center align-items-center location-icon">
                       <i class="bi bi-link-45deg fs-5"></i>
                     </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Create invite link</h5>
+                    <h5 class="fw-semibold ms-2 mt-2">Create invite link for external member</h5>
                     </div>
                     </div>
                     <table class="table align-middle table-borderless">
                         <thead class="table-light">
                           <tr>
-                            <th class="col-2 text-center">User Type</th>                   
+                            <!-- <th class="col-2 text-center">User Type</th>                    -->
                             <th class="col-2 text-center">Location</th>
                             <th class="col-2 text-center">Member Role</th>
                             <th class="col-6 text-center">Copy Link</th>
@@ -283,13 +290,13 @@
                         </thead>    
                         <tbody>
                           <tr>
-                            <td class="col-2">
+                            <!-- <td class="col-2">
                               <select class="form-select rounded-0 uniform-input">
                         <option selected disabled>Select</option>
                         <option value="internal">Internal</option>
                         <option value="external">External</option>
                       </select>
-                            </td>
+                            </td> -->
                             <td class="col-2">
 
                               <select
@@ -354,6 +361,7 @@
                 </div>
               </div>
 
+              <!-- slack users -->
               <div class="row mt-4" v-if="user">
                 <div class="col-lg-12 add-users py-4 px-4 ms-3">
                   <div class="row pb-4 pt-2 px-2" >
@@ -474,26 +482,25 @@
                             </tr> -->
                           <!-- </tbody> -->
                           <tbody>
-  <tr>
-    <td>{{ index + 1 }}</td>
-    <td>
-      <img
-        :src="user.image || defaultImage"
-        class="rounded-circle me-2"
-        width="40"
-        height="40"
-      />
-      {{ user.name }}
-    </td>
-    <td>{{ user.email }}</td>
-    <td>—</td>
-    <td>—</td>
-    <td>
-      <button class="btn btn-sm btn-primary">Assign</button>
-    </td>
-  </tr>
-</tbody>
-
+                            <tr>
+                              <td>{{ index + 1 }}</td>
+                              <td>
+                                <img
+                                  :src="user.image || defaultImage"
+                                  class="rounded-circle me-2"
+                                  width="40"
+                                  height="40"
+                                />
+                                {{ user.name }}
+                              </td>
+                              <td>{{ user.email }}</td>
+                              <td>—</td>
+                              <td>—</td>
+                              <td>
+                                <button class="btn btn-sm btn-primary">Assign</button>
+                              </td>
+                            </tr>
+                          </tbody>
                         </table>
                       </div>
                   </div>
@@ -520,13 +527,12 @@
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
 import { useAuthStore } from "@/stores/authStore";
-import endpoint from "@/services/apiServices";
 import Swal from "sweetalert2";
 
 export default {
     name: 'LocationView',
     components: {
-       Stepper
+      Stepper
     },
     data() {
     return {
@@ -586,9 +592,14 @@ export default {
     };
   },
   computed: {
-    selectedRoleText1() {
-      return this.selectedRoles1.length > 0 ? this.selectedRoles1.join(', ') : 'Select';
-    },
+    selectedRolesShortDisplay() {
+    return this.selectedRoles1.length > 0
+      ? this.selectedRoles1.join(", ")
+      : "Select Roles";
+  },
+    // selectedRoleText1() {
+    //   return this.selectedRoles1.length > 0 ? this.selectedRoles1.join(', ') : 'Select';
+    // },
     selectedRoleText2() {
       return this.selectedRoles2.length > 0 ? this.selectedRoles2.join(', ') : 'Select';
     },
@@ -603,14 +614,17 @@ export default {
         new bootstrap.Tooltip(el);
       });
     },
-    toggleDropdown(dropdownName) {
-      for (const key in this.isOpen) {
-        if (key !== dropdownName) {
-          this.isOpen[key] = false;
-        }
-      }
-      this.isOpen[dropdownName] = !this.isOpen[dropdownName];
-    },
+    toggleDropdown(drop) {
+    this.isOpen[drop] = !this.isOpen[drop];
+  },
+    // toggleDropdown(dropdownName) {
+    //   for (const key in this.isOpen) {
+    //     if (key !== dropdownName) {
+    //       this.isOpen[key] = false;
+    //     }
+    //   }
+    //   this.isOpen[dropdownName] = !this.isOpen[dropdownName];
+    // },
     onClickOutside(event) {
       const isClickInsideDropdown1 = this.$refs.roleDropdown1.contains(event.target);
       const isClickInsideDropdown2 = this.$refs.roleDropdown2.contains(event.target);
@@ -786,145 +800,73 @@ export default {
         console.error("❌ Teams login error:", err);
         Swal.fire("Error", "Microsoft Teams login failed.", "error");
       }
-    },
-
+  },
     // 🧠 Slack OAuth flow
-  // async startSlackLogin() {
-  // try {
-  //   const res = await endpoint.post("/admin/users/slack/oauth-url/", {
-  //     base_url: "https://vapt-backend.onrender.com",
-  //   });
-  //   if (!res.data.success) {
-  //     Swal.fire("Error", "Failed to get Slack OAuth URL", "error");
-  //     return;
-  //   }
-  //   const authUrl = res.data.auth_url;
-  //   console.log("🔗 Slack Auth URL:", authUrl);
-  //   const popup = window.open(authUrl, "_blank", "width=700,height=800");
-  //   if (!popup || popup.closed || typeof popup.closed === "undefined") {
-  //     Swal.fire("Popup Blocked", "Please allow popups for Slack login.", "info");
-  //     return;
-  //   }
-  //   const interval = setInterval(async () => {
-  //     try {
-  //       if (popup.closed) {
-  //         clearInterval(interval);
-  //         return;
-  //       }
-  //       const url = popup.location.href;
-  //       if (url.includes("?code=")) {
-  //         clearInterval(interval);
-  //         const urlParams = new URLSearchParams(popup.location.search);
-  //         const code = urlParams.get("code");
-  //         popup.close();
+  async startSlackLogin() {
+    const authStore = useAuthStore();
 
-  //         console.log("✅ Slack Auth Code:", code);
-  //         const redirectUri = "https://vapt-backend.onrender.com/api/admin/users/slack/callback/";
-  //         const authStore = useAuthStore();
-  //         const result = await authStore.loginWithSlack(code, redirectUri);
-  //         if (result.status) {
-  //           Swal.fire("Success", "Slack login successful ✅", "success");
-  //           console.log("👤 Slack User:", result.data.user);
-  //         } else {
-  //           Swal.fire("Error", result.message, "error");
-  //         }
-  //       }
-  //     } catch (err) {
-  //     }
-  //   }, 700);
-  // } catch (error) {
-  //   console.error("Slack login error:", error);
-  //   Swal.fire("Error", "Something went wrong during Slack login.", "error");
-  // }
-  // },
- async startSlackLogin() {
-  const authStore = useAuthStore();
+    try {
+      // 1️⃣ Get Slack OAuth URL
+      const { data: slackData } = await authStore.getSlackOAuthUrl(this.backendBase);
+      const authUrl = slackData.auth_url;
+      console.log("🔗 Slack Auth URL:", authUrl);
 
-  try {
-    // 1️⃣ Get Slack OAuth URL
-    const { data: slackData } = await authStore.getSlackOAuthUrl(this.backendBase);
-    const authUrl = slackData.auth_url;
-    console.log("🔗 Slack Auth URL:", authUrl);
+      // 2️⃣ Listen BEFORE opening popup
+      const handler = (event) => {
+        if (!event.data || event.data.type !== "slack-auth-success") return;
 
-    // 2️⃣ Listen BEFORE opening popup
-    const handler = (event) => {
-      if (!event.data || event.data.type !== "slack-auth-success") return;
+        const payload = event.data.payload;
+        console.log("✅ Slack OAuth Payload:", payload);
 
-      const payload = event.data.payload;
-      console.log("✅ Slack OAuth Payload:", payload);
+        if (!payload.success) {
+          Swal.fire("Error", payload.error || "Slack login failed", "error");
+          return;
+        }
 
-      if (!payload.success) {
-        Swal.fire("Error", payload.error || "Slack login failed", "error");
-        return;
-      }
+        // ✅ Store Slack user info
+        localStorage.setItem("slack_user_login", payload.bot_access_token);
+        localStorage.setItem("slack_user_email", payload.user_email);
+        localStorage.setItem("slack_user_name", payload.user_name);
 
-      // ✅ Store Slack user info
-      localStorage.setItem("slack_user_login", payload.bot_access_token);
-      localStorage.setItem("slack_user_email", payload.user_email);
-      localStorage.setItem("slack_user_name", payload.user_name);
+        // ✅ Show Slack success popup
+        Swal.fire({
+          title: "🎉 Slack Login Successful!",
+          html: `
+            <b>Welcome, ${payload.user_name}!</b><br>
+            <small>Logged in as <i>${payload.user_email}</i></small>
+          `,
+          icon: "success",
+          confirmButtonText: "OK",
+          background: "#fff",
+          color: "#333",
+          timer: 4000,
+          timerProgressBar: true,
+        });
 
-      // ✅ Show Slack success popup
-      Swal.fire({
-        title: "🎉 Slack Login Successful!",
-        html: `
-          <b>Welcome, ${payload.user_name}!</b><br>
-          <small>Logged in as <i>${payload.user_email}</i></small>
-        `,
-        icon: "success",
-        confirmButtonText: "OK",
-        background: "#fff",
-        color: "#333",
-        timer: 4000,
-        timerProgressBar: true,
-      });
+        console.log("👤 Slack User Saved:", payload.user_name, payload.user_email);
 
-      console.log("👤 Slack User Saved:", payload.user_name, payload.user_email);
+        // ✅ Remove listener
+        window.removeEventListener("message", handler);
+      };
 
-      // ✅ Remove listener
-      window.removeEventListener("message", handler);
-    };
+      window.addEventListener("message", handler, { once: true });
 
-    window.addEventListener("message", handler, { once: true });
+      // 3️⃣ Open popup after listener
+      const popup = window.open(authUrl, "SlackAuth", "width=700,height=800");
 
-    // 3️⃣ Open popup after listener
-    const popup = window.open(authUrl, "SlackAuth", "width=700,height=800");
-
-    // 4️⃣ Fallback: check every 2s if user logged in
-    const fallbackTimer = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(fallbackTimer);
-        console.log("Popup closed");
-      }
-    }, 2000);
-  } catch (error) {
-    console.error("Slack login error:", error);
-    Swal.fire("Error", "Something went wrong during Slack login.", "error");
-  }
-},
-    
-    // async handleJiraAsanaClick(platform) {
-    //   if (this.notUsingJiraAsana) return;
-
-    //   if (!this.selectedJiraAsana) {
-    //     this.selectedJiraAsana = platform;
-    //   } else if (this.selectedJiraAsana === platform) {
-    //     return;
-    //   } else {
-    //     const result = await Swal.fire({
-    //       title: `Do you want to switch to ${platform === "jira" ? "Jira" : "Asana"}?`,
-    //       icon: "question",
-    //       showCancelButton: true,
-    //       confirmButtonText: "Yes",
-    //       cancelButtonText: "No"
-    //     });
-
-    //     if (result.isConfirmed) {
-    //       this.selectedJiraAsana = platform;
-    //     }
-    //   }
-    // },
-    
-    async handleJiraAsanaClick(platform) {
+      // 4️⃣ Fallback: check every 2s if user logged in
+      const fallbackTimer = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(fallbackTimer);
+          console.log("Popup closed");
+        }
+      }, 2000);
+    } catch (error) {
+      console.error("Slack login error:", error);
+      Swal.fire("Error", "Something went wrong during Slack login.", "error");
+    }
+  },
+  async handleJiraAsanaClick(platform) {
   if (this.notUsingJiraAsana) return;
 
   this.selectedJiraAsana = platform;
@@ -966,7 +908,6 @@ export default {
     Swal.fire("Info", "This button is for Jira login.", "info");
   }
   },
-
     toggleJiraAsanaUsage() {
       this.notUsingJiraAsana = !this.notUsingJiraAsana;
 
@@ -1017,9 +958,29 @@ export default {
       (loc) => loc._id === this.selectedLocation
     );
     this.form.select_location = selectedLoc ? selectedLoc.location_name : "";
+    this.form.Member_role = this.selectedRoles1.map(
+        (short) =>
+          this.roleOptions.find((opt) => opt.short === short)?.full || short
+      );
 
-    // combine selected roles
-    this.form.Member_role = this.selectedRoles1.join(", ");
+    // ✅ 3️⃣ Validate all required fields before API call
+    if (
+      !this.form.first_name ||
+      !this.form.last_name ||
+      !this.form.email ||
+      !this.form.user_type ||
+      !this.form.location_id ||
+      this.form.Member_role.length === 0
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please fill all required fields.",
+        timer: 2500,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
     // ✅ 3️⃣ Call API
     const response = await this.authStore.createUserDetail(this.form);
@@ -1058,7 +1019,8 @@ export default {
         user_type: "",
         email: "",
         select_location: "",
-        Member_role: "",
+        // Member_role: "",
+        Member_role: [],
       };
       this.selectedLocation = "";
       this.selectedRoles1 = [];
@@ -1095,7 +1057,6 @@ export default {
   }
     this.initTooltips();
     document.addEventListener('click', this.onClickOutside);
-
     try {
       // 🟢 1️⃣ Handle Microsoft Teams popup redirect
       if (window.opener && window.location.search.includes("code=")) {
@@ -1141,7 +1102,7 @@ export default {
             document.body.innerHTML = "<h2>Login error</h2>";
           });
 
-        return; // stop executing rest of mounted()
+        return; 
       }
 
       // 🟠 2️⃣ Handle Slack OAuth redirect

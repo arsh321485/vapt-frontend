@@ -462,7 +462,7 @@
                             <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                               <div class="d-flex justify-content-start align-items-center gap-3">
                               <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-                              <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">CVE-2024-22259 - org.springframework:spring-web</p>
+                              <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">CVE-2024-2225982 - org.springframe (CVE - 2025-22225) </p>
                               <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
                               <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
                               <span>High</span>                           
@@ -470,7 +470,7 @@
                               <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
                               <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
                               <span>Open</span>
-                              </span>                      
+                              </span>                     
                               </div> 
                              </button>
                               </h2>

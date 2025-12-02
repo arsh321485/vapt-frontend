@@ -238,7 +238,6 @@ export default {
     const exchange = await authStore.googleLogin(googleIdToken);
 
     if (exchange.status) {
-      // successful exchange: data saved in store/localStorage inside googleLogin
       const user = authStore.user;
       if (user) {
         this.user.full_name = user.full_name || "";
@@ -279,7 +278,7 @@ export default {
       const payload = {
         firstname: this.firstName,
         lastname: this.lastName,
-        organisation_name: this.orgName, // ✅ keep same, don’t allow edit
+        organisation_name: this.orgName, 
         organisation_url: this.orgUrl,
       };
 

@@ -145,22 +145,3 @@ export default {
   }
 };
 </script>
-
-<!-- <style scoped>
-.notification-panel {
-  position: fixed;
-  top: 0;
-  right: -400px;
-  width: 400px;
-  height: 100%;
-  background: #fff;
-  z-index: 1050;
-  transition: right 0.3s ease-in-out;
-}
-.notification-panel.open {
-  right: 0;
-}
-.notification-panel.fullscreen {
-  width: 100%;
-}
-</style> -->

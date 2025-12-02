@@ -15,7 +15,8 @@
         style="cursor:pointer;"
         @click="toggleDropdown"
       >
-        A
+        <!-- A -->
+         {{ userInitial }}
       </div>
 
       <!-- Dropdown -->
@@ -34,7 +35,7 @@
         </router-link>
 
         <!-- Logout -->
-        <button class="btn btn-sm btn-danger w-100" @click="confirmLogout">
+        <button class="btn btn-sm btn-danger w-100" @click="handleLogout">
           Logout
         </button>
       </div>
@@ -49,33 +50,57 @@
 </template>
 
 <script>
+import { useAuthStore } from "@/stores/authStore";
+import Swal from "sweetalert2";
+
 export default {
   name: 'DashboardHeader',
   data() {
     return {
       showDropdown: false,
-      userEmail: "user@email.com",
+      userEmail: "",
+      userInitial: "U",
     };
   },
   methods: {
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
-    confirmLogout() {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will be logged out.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "No",
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "/home";
-        }
-      });
+    async fetchUserProfile() {
+      const authStore = useAuthStore();
+      const response = await authStore.getUserProfile();
+
+      if (response.status && response.data.user) {
+        const user = response.data.user;
+        this.userEmail = user.email;
+        this.userInitial = user.firstname
+          ? user.firstname.charAt(0).toUpperCase()
+          : "U";
+      }
+    },
+    async handleLogout() {
+      const authStore = useAuthStore();
+
+      const response = await authStore.logout();
+
+      if (response.status) {
+        Swal.fire({
+          icon: "success",
+          title: "Logged out",
+          text: "You have been logged out successfully.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+        router.push("/signin");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Logout Failed",
+          text: response.message || "Something went wrong!",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      }
     },
     handleClickOutside(e) {
       if (
@@ -88,6 +113,7 @@ export default {
   },
   mounted() {
     document.addEventListener("click", this.handleClickOutside);
+    this.fetchUserProfile(); 
   },
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);

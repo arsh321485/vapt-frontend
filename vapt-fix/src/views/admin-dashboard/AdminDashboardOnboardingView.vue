@@ -337,10 +337,8 @@
                 <div class="card pb-2 pt-3 px-3">
                   <div class="d-flex flex-row align-items-center justify-content-between py-3">
                     <h4 class="fw-semibold">Mitigation Strategy</h4>
-                    <button type="button" class="btn pending-approval-btn rounded-pill">
-                11 Support requests ongoing
-                <i class="bi bi-arrow-right ms-1 fs-5"></i>
-              </button>
+              <router-link to="/exceptions" class="btn pending-approval-btn rounded-pill text-decoration-none">11 Support requests ongoing
+                <i class="bi bi-arrow-right ms-1 fs-5"></i></router-link>
                   </div>
                   <div class="row mt-3">
                     <div class="col-12">

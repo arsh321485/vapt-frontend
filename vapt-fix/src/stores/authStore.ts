@@ -36,11 +36,12 @@ export const useAuthStore = defineStore("auth", {
       : [] as Location[],
     accessToken: localStorage.getItem("authorization") || null,
     refreshToken: localStorage.getItem("refreshToken") || null,
+    tickets: [] as any[], 
   }),
 
   actions: {
-    // ✅ Restore session on reload
-    restoreFromStorage() {
+  // ✅ Restore session on reload
+  restoreFromStorage() {
       const access = localStorage.getItem("accessToken");
       const refresh = localStorage.getItem("refreshToken");
       const user = localStorage.getItem("user");
@@ -54,10 +55,10 @@ export const useAuthStore = defineStore("auth", {
         return true;
       }
       return false;
-    },
+  },
 
-    // signup
-    async signup(payload: any) {
+  // signup
+  async signup(payload: any) {
       try {
         const res = await endpoint.post("/admin/users/signup/", payload);
         const data = res.data;
@@ -83,10 +84,10 @@ export const useAuthStore = defineStore("auth", {
           details: error.response?.data || null,
         };
       }
-    },
+  },
 
-    // ✅ Login (signin)
-    async login(payload: any) {
+  // ✅ Login (signin)
+  async login(payload: any) {
       try {
         const res = await endpoint.post("/admin/users/login/", payload);
         const data = res.data;
@@ -117,10 +118,10 @@ export const useAuthStore = defineStore("auth", {
           details: error.response?.data || null,
         };
       }
-    },
+  },
 
-    // ✅ Forgot Password
-    async forgotPassword(payload: { email: string }) {
+  // ✅ Forgot Password
+  async forgotPassword(payload: { email: string }) {
       try {
         const res = await endpoint.post("/admin/users/forgot-password/", payload);
         return { status: true, data: res.data };
@@ -131,10 +132,10 @@ export const useAuthStore = defineStore("auth", {
           details: error.response?.data || null,
         };
       }
-    },
+  },
 
-    // ✅ Get User Profile
-    async getUserProfile() {
+  // ✅ Get User Profile
+  async getUserProfile() {
       try {
         const response = await endpoint.get("/admin/users/profile");
         const data = response.data;
@@ -148,7 +149,7 @@ export const useAuthStore = defineStore("auth", {
         console.error("Profile fetch error:", error);
         return { status: false, message: "Unable to fetch profile" };
       }
-    },
+  },
   
   // ✅ Update User Profile
   async updateUserProfile(payload: { firstname: string; lastname: string; organisation_name: string; organisation_url: string }) {
@@ -294,15 +295,13 @@ export const useAuthStore = defineStore("auth", {
       const data = res.data;
 
       console.log("✅ All users fetched successfully:", data);
-      console.log("✅ All users fetched successfully:", data);
-
-    // Extract user list properly
-    const users = Array.isArray(data.data) ? data.data : [];
+    // const users = Array.isArray(data.data) ? data.data : [];
+    const users = Array.isArray(data) ? data : [];
 
       return {
         status: true,
-        message: data.message || "All users fetched successfully",
-        data: data || [],
+        message: "All users fetched successfully",
+        data: users,
       };
     } catch (error : unknown) {
       const err = error as any;
@@ -315,6 +314,27 @@ export const useAuthStore = defineStore("auth", {
           err.message ||
           "Failed to fetch users",
         details: err.response?.data || null,
+      };
+    }
+  },
+
+  // Update Member Role
+  async updateUserRoles(userId: string, newRoles: string[]): Promise<any> {
+    try {
+      const res = await endpoint.patch(
+        `/admin/users_details/user-detail/${userId}/update-role/`,
+        { new_roles: newRoles }
+      );
+
+      return {
+        status: true,
+        message: res.data.message,
+        updated_roles: res.data.updated_roles,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message,
       };
     }
   },
@@ -385,71 +405,10 @@ export const useAuthStore = defineStore("auth", {
         err.response?.data?.message || "Microsoft login failed, please try again",
     };
   }
-},
+  },
 
   // 🧠 Login with Slack OAuth  
-  // async getSlackOAuthUrl(baseUrl: string) {
-  //     try {
-  //       const res = await endpoint.post("/admin/users/slack/oauth-url/", {
-  //         base_url: baseUrl,
-  //       });
-
-  //       if (res.data.success) {
-  //         console.log("✅ Slack OAuth URL received:", res.data.auth_url);
-  //         return { status: true, data: res.data };
-  //       } else {
-  //         return { status: false, message: "Failed to get Slack OAuth URL" };
-  //       }
-  //     } catch (error: any) {
-  //       console.error("Slack OAuth URL API error:", error);
-  //       return {
-  //         status: false,
-  //         message:
-  //           error.response?.data?.message ||
-  //           error.message ||
-  //           "Slack OAuth URL fetch failed",
-  //         details: error.response?.data || null,
-  //       };
-  //     }
-  //   },
-  //   async loginWithSlack(code: string, redirectUri: string) {
-  //     try {
-  //       const res = await endpoint.post("/admin/users/slack-oauth/", {
-  //         code,
-  //         redirect_uri: redirectUri,
-  //       });
-
-  //       const data = res.data;
-
-  //       if (data.success) {
-  //         const slackData = data.data;
-  //         if (slackData.user_access_token) {
-  //           localStorage.setItem("slackAccessToken", slackData.user_access_token);
-  //         }
-  //         if (slackData.bot_access_token) {
-  //           localStorage.setItem("slackBotToken", slackData.bot_access_token);
-  //         }
-  //         if (slackData.user) {
-  //           this.user = slackData.user;
-  //           localStorage.setItem("slackUser", JSON.stringify(this.user));
-  //           console.log("👤 Slack User Saved:", this.user);
-  //         }
-  //         return { status: true, data: slackData };
-  //       }
-  //       return { status: false, message: "Slack login failed" };
-  //     } catch (error: any) {
-  //       console.error("Slack login API error:", error);
-  //       return {
-  //         status: false,
-  //         message:
-  //           error.response?.data?.message ||
-  //           error.message ||
-  //           "Slack login failed",
-  //         details: error.response?.data || null,
-  //       };
-  //     }
-  //   },
-    async getSlackOAuthUrl(baseUrl: string) {
+  async getSlackOAuthUrl(baseUrl: string) {
       try {
         const res = await endpoint.post("/admin/users/slack/oauth-url/", {
           base_url: baseUrl,
@@ -472,8 +431,8 @@ export const useAuthStore = defineStore("auth", {
           details: error.response?.data || null,
         };
       }
-    },
-    async getSlackBotToken(code: string) {
+  },
+  async getSlackBotToken(code: string) {
       try {
         const res = await endpoint.get("/admin/users/slack/callback/", {
           params: { code, state: "dummy_state" },
@@ -499,8 +458,8 @@ export const useAuthStore = defineStore("auth", {
             "Slack callback failed",
         };
       }
-    },
-    async loginWithSlack(botToken: string, code: string, redirectUri: string) {
+  },
+  async loginWithSlack(botToken: string, code: string, redirectUri: string) {
       try {
         // Debug
         console.log("🚀 Using bot token for login:", botToken);
@@ -538,7 +497,7 @@ export const useAuthStore = defineStore("auth", {
             "Slack login failed",
         };
       }
-    },
+  },
 
   // 🧠 Jira OAuth - Get Authorization URL
   async getJiraAuthUrl() {
@@ -605,6 +564,110 @@ export const useAuthStore = defineStore("auth", {
   }
   },
 
+  // create Ticket
+  async createTicket(payload: any) {
+    try {
+      const res = await endpoint.post("/admin/tickets/create/", payload);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      console.error("Create Ticket Error:", error.response?.data || error.message);
+
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Ticket creation failed",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
+  // GET ALL TICKETS
+    async getAllTickets() {
+      try {
+        const res = await endpoint.get("/admin/tickets/list/");
+        const data = res.data;
+
+        if (data?.tickets) {
+          this.tickets = data.tickets;    
+        }
+
+        return {
+          status: true,
+          message: data.message || "Tickets fetched successfully",
+          data,
+        };
+      } catch (error: any) {
+        console.error("Get Tickets error:", error.response?.data || error.message);
+
+        return {
+          status: false,
+          message:
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to load tickets",
+          details: error.response?.data || null,
+        };
+      }
+    },
+
+  // === Get OPEN Tickets ===
+    async getOpenTickets() {
+      try {
+        const res = await endpoint.get("/admin/tickets/list/open/");
+        const data = res.data;
+
+        if (data?.tickets) {
+          this.tickets = data.tickets;
+        }
+
+        return {
+          status: true,
+          message: data.message || "Open tickets fetched successfully",
+          data,
+        };
+      } catch (error: any) {
+        console.error("Get Open Tickets Error:", error.response?.data || error.message);
+
+        return {
+          status: false,
+          message:
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to load open tickets",
+          details: error.response?.data || null,
+        };
+      }
+    },
+    
+  // === Get CLOSED Tickets ===
+    async getClosedTickets() {
+      try {
+        const res = await endpoint.get("/admin/tickets/list/closed/");
+        const data = res.data;
+
+        if (data?.tickets) {
+          this.tickets = data.tickets;
+        }
+
+        return {
+          status: true,
+          message: data.message || "Closed tickets fetched successfully",
+          data,
+        };
+      } catch (error: any) {
+        return {
+          status: false,
+          message:
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to load closed tickets",
+          details: error.response?.data || null,
+        };
+      }
+    },  
+
   // ✅ Logout user
   async logout() {
     try {
@@ -660,8 +723,8 @@ export const useAuthStore = defineStore("auth", {
       console.log("✅ Auth set successfully:", this.user, this.locations);
   },
 
-    getAuthorization() {
-      return this.token;
-    },
+  getAuthorization() {
+    return this.token;
+  },
   },
 });

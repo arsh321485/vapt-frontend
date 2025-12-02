@@ -78,11 +78,10 @@ export default {
   name: 'Header',
   data() {
   return {
-    user: null, // Will hold user info after login/signup
+    user: null, 
   };
 },
 mounted() {
-    // Check if user info is saved in localStorage
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
       this.user = JSON.parse(savedUser);
