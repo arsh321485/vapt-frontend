@@ -378,11 +378,20 @@
                     </div>
 
                     <div class="d-flex gap-4 my-3">
-                      <div class="d-flex flex-column gap-2">
+                      <!-- <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
                           <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
                         </button>
-                      </div>
+                      </div> -->
+                      <div class="d-flex flex-column gap-2">
+                        <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
+                      <button class="btn patch-btn rounded-pill text-nowrap d-flex align-items-center justify-content-center w-100">
+  {{ days }} Days
+  <i class="bi bi-plus-circle text-danger ms-2" style="cursor:pointer;" @click.stop="openModal"></i>
+</button></div>
+
+
+
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-danger">High</button>
                           <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
@@ -505,6 +514,28 @@
           </div>
         </div>
       </div>
+
+      <div v-if="showModal" class="custom-modal-backdrop">
+  <div class="custom-modal-box">
+    <h5 class="mb-3">Update Days</h5>
+
+    <div class="mb-3">
+      <label class="form-label">Add Days</label>
+      <input type="number" class="form-control" style="border-radius: 10px;" v-model="addDays">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Reason</label>
+      <textarea class="form-control" style="border-radius: 10px;" rows="2" v-model="reason"></textarea>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-secondary" @click="closeModal">Cancel</button>
+      <button class="btn btn-primary" @click="submitForm">Submit</button>
+    </div>
+  </div>
+</div>
+
     </section>
   </main>
 </template>
@@ -533,7 +564,10 @@ export default {
         20: "medium",
         23: "low",
       },
-    
+      days: 10,              // default days
+      showModal: false,      // modal visibility
+      addDays: "",           // input: additional days
+      reason: ""  
     };
   },
   computed: {
@@ -589,6 +623,27 @@ export default {
       }
     
     },
+    openModal() {
+      this.showModal = true;
+    },
+
+    closeModal() {
+      this.showModal = false;
+      this.addDays = "";
+      this.reason = "";
+    },
+
+    submitForm() {
+      if (!this.addDays) {
+        alert("Please enter number of days");
+        return;
+      }
+
+      this.days += Number(this.addDays); // update UI days
+      alert("Days updated successfully!");
+
+      this.closeModal();
+    }
     
   },
   mounted() {
@@ -622,6 +677,24 @@ export default {
 </script>
 
 <style scoped>
+.custom-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.custom-modal-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 350px;
+}
+
+
 .bg-maroon {
   background-color: maroon !important;
 }
