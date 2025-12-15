@@ -30,6 +30,12 @@
           {{ userEmail }}
         </div>
 
+        <router-link to="/location" class="btn btn-sm btn-outline-primary w-100 mb-2">
+          Add Location
+        </router-link>
+        <router-link to="/uploadreport" class="btn btn-sm btn-outline-primary w-100 mb-2">
+          Upload Report
+        </router-link>
         <!-- Upgrade -->
         <router-link to="/pricingplan" class="btn btn-sm btn-outline-dark w-100 mb-2">
           Upgrade Plan

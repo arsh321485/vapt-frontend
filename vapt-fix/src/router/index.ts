@@ -41,10 +41,12 @@ import UserVulnerabilityregisterView from '../views/user-views/UserVulnerability
 import UserDashboard1View from '../views/user-views/UserDashboard1View.vue'
 import UserSignupView from '../views/user-views/UserSignupView.vue'
 
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     // admin path
+   
     {
       path: '/',
       name: 'login',

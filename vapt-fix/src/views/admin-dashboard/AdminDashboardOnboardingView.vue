@@ -165,7 +165,6 @@
 
                 </div>
             </div>
-           
 
             <div class="row">
               <div class="col-3">
@@ -177,8 +176,19 @@
                     <p class="assets-para">Total assets<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2">
-                    <h1 class="text-212">212</h1>
-                    <p style="margin-top: 37px;">Avg. score: <span class="fw-bold">7.8</span></p>
+                    <!-- <h1 class="text-212">212</h1> -->
+                      <h1 class="text-212">
+                        {{ authStore.totalAssets }}
+                      </h1>
+                    <!-- <p style="margin-top: 37px;">Avg. score: <span class="fw-bold">7.8</span></p> -->
+                    <!-- <p style="margin-top: 37px;">
+                      Avg. score:<span class="fw-bold">
+                        {{ authStore.avgScore }}</span>
+                    </p> -->
+                    <p style="margin-top: 37px;">
+                      Avg. score:<span class="fw-bold">
+                        {{ Number(authStore.avgScore).toFixed(2) }}</span>
+                    </p>
                   </div>
                   </div>
                 </router-link>
@@ -195,23 +205,34 @@
                     </div>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <!-- <div id="highAge" class="fs-5 fw-semibold">87</div> -->
+                      <div id="highAge" class="fs-5 fw-semibold">
+                        {{ authStore.vulnerabilities.critical }}
+                      </div>
                         <div class="bar maroon vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">56</div>
+                        <!-- <div id="highAge" class="fs-5 fw-semibold">56</div> -->
+                        <div id="highAge" class="fs-5 fw-semibold">
+                          {{ authStore.vulnerabilities.high }}
+                        </div>
                         <div class="bar red vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: red;">● High</small>
                       </div>
-                      
                       <div class="text-center">
-                        <div id="mediumAge" class="fs-5 fw-semibold">127</div>
+                        <!-- <div id="mediumAge" class="fs-5 fw-semibold">127</div> -->
+                        <div id="mediumAge" class="fs-5 fw-semibold">
+                          {{ authStore.vulnerabilities.medium }}
+                        </div>
                         <div class="bar yellow vul-bar mt-1"></div>
                         <small class="text-warning mt-1 d-block">● Medium</small>
                       </div>
                       <div class="text-center">
-                        <div id="lowAge" class="fs-5 fw-semibold">42</div>
+                        <!-- <div id="lowAge" class="fs-5 fw-semibold">42</div> -->
+                        <div id="lowAge" class="fs-5 fw-semibold">
+                          {{ authStore.vulnerabilities.low }}
+                        </div>
                         <div class="bar green vul-bar mt-1"></div>
                         <small class="text-success mt-1 d-block">● Low</small>
                       </div>
@@ -230,22 +251,34 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highCount" class="fs-4 fw-semibold">1d 10hrs</div>
+                        <!-- <div id="highCount" class="fs-4 fw-semibold">1d 10hrs</div> -->
+                         <div id="highCount" class="fs-5 fw-semibold">
+  {{ authStore.mitigationTimeline?.critical_days }}D
+</div>
                         <div class="bar maroon w-100 mt-1"></div>
                         <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
                       </div>
                       <div class="text-center">
-                        <div id="highCount" class="fs-4 fw-semibold">2d 11hrs</div>
+                        <!-- <div id="highCount" class="fs-4 fw-semibold">2d 11hrs</div> -->
+                         <div id="highCount" class="fs-5 fw-semibold">
+  {{ authStore.mitigationTimeline?.high_days }}D
+</div>
                         <div class="bar red w-100 mt-1"></div>
                         <small class="mt-1 d-block" style="color: red;">● High</small>
                       </div>
                       <div class="text-center">
-                        <div id="mediumCount" class="fs-4 fw-semibold">3d 4hrs</div>
+                        <!-- <div id="mediumCount" class="fs-4 fw-semibold">3d 4hrs</div> -->
+                         <div id="mediumCount" class="fs-5 fw-semibold">
+  {{ authStore.mitigationTimeline?.medium_days }}D
+</div>
                         <div class="bar yellow w-100 mt-1"></div>
                         <small class="text-warning mt-1 d-block">● Medium</small>
                       </div>
                       <div class="text-center">
-                        <div id="lowCount" class="fs-4 fw-semibold">2d 2hrs</div>
+                        <!-- <div id="lowCount" class="fs-4 fw-semibold">2d 2hrs</div> -->
+                         <div id="lowCount" class="fs-5 fw-semibold">
+  {{ authStore.mitigationTimeline?.low_days }}D
+</div>
                         <div class="bar green w-100 mt-1"></div>
                         <small class="text-success mt-1 d-block">● Low</small>
                       </div>
@@ -264,26 +297,26 @@
                     <p class="assets-para">Total Vulnerabilities Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-5 ps-3">
-                    <h1 class="text-78">78</h1>
+                    <h1 class="text-78">00</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <div id="highAge" class="fs-5 fw-semibold">0</div>
                         <div class="bar maroon vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: maroon;">● Critical<br> fixed</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">56</div>
+                        <div id="highAge" class="fs-5 fw-semibold">0</div>
                         <div class="bar red vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: red;">● High <br> fixed</small>
                       </div>
                       
                       <div class="text-center">
-                        <div id="mediumAge" class="fs-5 fw-semibold">127</div>
+                        <div id="mediumAge" class="fs-5 fw-semibold">0</div>
                         <div class="bar yellow vul-bar mt-1"></div>
                         <small class="text-warning mt-1 d-block">● Medium<br> fixed</small>
                       </div>
                       <div class="text-center">
-                        <div id="lowAge" class="fs-5 fw-semibold">42</div>
+                        <div id="lowAge" class="fs-5 fw-semibold">0</div>
                         <div class="bar green vul-bar mt-1"></div>
                         <small class="text-success mt-1 d-block">● Low<br> fixed</small>
                       </div>
@@ -299,7 +332,13 @@
                     <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-center gap-2 py-3">
-                    <h1 class="text-78">2d 11 hrs</h1>
+                    <!-- <h1 class="text-78">2d 11 hrs</h1> -->
+                     <!-- <h1 class="text-78">
+  {{ meanRemediateDays }}d {{ meanRemediateHours }} hrs
+</h1> -->
+<h1 class="text-78">{{ meanRemediateHuman }}</h1>
+
+
                   </div>
                 </div>
               </div>
@@ -312,15 +351,15 @@
                     <p class="assets-para">Support Requests<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row gap-5 py-3">
-                    <h1 class="text-78">32</h1>
+                    <h1 class="text-78">00</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">14</div>
+                        <div id="highAge" class="fs-5 fw-semibold">0</div>
                         <div class="bar dark-yellow vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: yellow;">● Pending</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">18</div>
+                        <div id="highAge" class="fs-5 fw-semibold">0</div>
                         <div class="bar light-green vul-bar mt-1" style="color: blue;"></div>
                         <small class="mt-1 d-block" style="color: rgb(71, 199, 71);">● Closed</small>
                       </div> 
@@ -378,11 +417,7 @@
                     </div>
 
                     <div class="d-flex gap-4 my-3">
-                      <!-- <div class="d-flex flex-column gap-2">
-                          <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
-                      </div> -->
+                      
                       <div class="d-flex flex-column gap-2">
                         <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
                       <button class="btn patch-btn rounded-pill text-nowrap d-flex align-items-center justify-content-center w-100">
@@ -544,6 +579,7 @@
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: 'AdminDashboardOnboardingView',
@@ -554,6 +590,7 @@ export default {
   },
   data() {
     return {
+      authStore: useAuthStore(),
       showReport: false,
       showCalendar: false,
       currentDate: new Date(),
@@ -567,7 +604,8 @@ export default {
       days: 10,              // default days
       showModal: false,      // modal visibility
       addDays: "",           // input: additional days
-      reason: ""  
+      reason: ""  ,
+      mitigationTimeline: null,
     };
   },
   computed: {
@@ -589,6 +627,9 @@ export default {
     
     },
     
+    meanRemediateHuman() {
+  return this.authStore.meanTime?.mean_time_simple_human || "0d 0 hrs";
+},
   },
    methods: {
     toggleCalendar() {
@@ -626,13 +667,11 @@ export default {
     openModal() {
       this.showModal = true;
     },
-
     closeModal() {
       this.showModal = false;
       this.addDays = "";
       this.reason = "";
     },
-
     submitForm() {
       if (!this.addDays) {
         alert("Please enter number of days");
@@ -643,36 +682,47 @@ export default {
       alert("Days updated successfully!");
 
       this.closeModal();
-    }
-    
+    },
+    async loadMitigationTimeline() {
+      const res = await this.authStore.fetchMitigationTimeline(this.reportId);
+      if (res.status) {
+        this.mitigationTimeline = res.data;
+      }
+    },
   },
   mounted() {
     const dropdown = document.querySelector('.dropdown');
     const btn = dropdown.querySelector('.dropdown-btn');
     const options = dropdown.querySelectorAll('.dropdown-content a');
 
-    // Toggle dropdown open/close
     btn.addEventListener('click', () => {
       dropdown.classList.toggle('show');
     });
-
-    // Set selected option
     options.forEach(option => {
       option.addEventListener('click', (e) => {
         e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
+        btn.textContent = option.textContent; 
+        dropdown.classList.remove('show');
       });
     });
-
-    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!dropdown.contains(e.target)) {
         dropdown.classList.remove('show');
       }
     });
     
-  },
+    // this.authStore.fetchTotalAssets(
+    //   "6939141e2fe47c715e4b6212"
+    // );
+
+    const reportId = localStorage.getItem("reportId");
+      if (!reportId) return;
+      this.authStore.fetchTotalAssets(reportId);
+      this.authStore.fetchAvgScore(reportId);
+      this.authStore.fetchVulnerabilities(reportId);
+      this.authStore.fetchMitigationTimeline(reportId);
+      this.authStore.fetchMeanTimeToRemediate(reportId);
+    },
 };
 </script>
 

@@ -1,175 +1,190 @@
 <template>
-    <main>
+  <main>
     <section class="bg-light">
-    <div class="container-fluid">
-    <div class="row">
-        <!-- <div class="col-lg-2">
+      <div class="container-fluid">
+        <div class="row">
+          <!-- <div class="col-lg-2">
             <Stepper />
         </div> -->
-        <div class="col-lg-12  welcome-bg">
-        <div class="col-lg-10 offset-lg-2">
-            <div class="container-fluid py-4">
-              <div class="row">  
-                <div class="d-flex flex-row">
-                  <div class="mt-2">
-                    <img src="@/assets/images/waving-hand.png" alt="" class="me-3">
-                  </div>
-                  <div>
-                    <div class="d-flex justify-content-between">
+          <div class="col-lg-12  welcome-bg">
+            <div class="col-lg-10 offset-lg-2">
+              <div class="container-fluid py-4">
+                <div class="row">
+                  <div class="d-flex flex-row">
+                    <div class="mt-2">
+                      <img src="@/assets/images/waving-hand.png" alt="" class="me-3">
+                    </div>
                     <div>
-                      <h1 class="fw-semibold welcome-head"> Welcome to vaptfix!</h1>
-                      <p class="welcome-subhead">Before we fix your information assets, ....</p>
+                      <div class="d-flex justify-content-between">
+                        <div>
+                          <h1 class="fw-semibold welcome-head"> Welcome to vaptfix!</h1>
+                          <p class="welcome-subhead">Before we fix your information assets, ....</p>
+                        </div>
+                        <div>
+                        </div>
+                      </div>
                     </div>
-                    <div>   
-                    </div>
-                    </div>
+
                   </div>
 
                 </div>
-               
-              </div>
-          
 
-              <div class="row">
-                <Stepper />
-              </div>
+                <div class="row">
+                  <Stepper />
+                </div>
 
-              <div class="row mt-5">
-                <div class="col-lg-8 location-card py-5 px-4 mb-5">
-                  <div class="row">
-                    <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-geo-alt-fill fs-4"></i>
+                <div class="row mt-5">
+                  <div class="col-lg-8 location-card py-5 px-4 mb-5">
+                    <div class="row">
+                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                        <i class="bi bi-geo-alt-fill fs-4"></i>
+                      </div>
+                      <div class="col-8 mb-3">
+                        <h4 class="fw-semibold">Pick location to upload report for:</h4>
+                        <p class="text-muted" style="font-size: 15px;">Pick a location and then add a vulnerability
+                          report for it</p>
+                      </div>
                     </div>
-                    <div class="col-8 mb-3">
-                      <h4 class="fw-semibold">Pick location to upload report for:</h4>
-                      <p class="text-muted" style="font-size: 15px;">Pick a location and then add a vulnerability report for it</p> 
-                    </div>
-                  </div> 
-                  <div class="d-flex justify-content-start gap-3">
+                    <div class="d-flex justify-content-start gap-3">
                       <div>
-                          <select v-model="selectedLocation" class="form-select" @change="checkLocation">
-                            <option selected disabled value="">Select Location</option>
-                            
-                            <option v-for="loc in locations" :key="loc" :value="loc" :disabled="isAlreadyUploaded(loc, selectedType)">
-                             {{ loc }}</option>
-                          </select>
+                        <select v-model="selectedLocation" class="form-select" @change="checkLocation">
+                          <option selected disabled value="">Select Location</option>
+                          <option value="ALL">
+                            Apply for all locations
+                          </option>
+                          <option v-for="loc in authStore.locations"
+                           :key="loc._id" :value="loc._id"
+                            :disabled="isAlreadyUploaded(loc._id, selectedType)">
+                            {{ loc.location_name }}
+                          </option>
+                        </select>
                       </div>
                       <div>
-                          <select v-model="selectedType" class="form-select">
-                            <option selected disabled value="">Select type</option>
-                            <option value="internal">Internal</option>
-                            <option value="external">External</option>
-                          </select>
+                        <select v-model="selectedType" class="form-select">
+                          <option selected disabled value="">Select type</option>
+                          <option value="internal" :disabled="isTypeDisabled('internal')">Internal</option>
+                          <option value="external" :disabled="isTypeDisabled('external')">External</option>
+                        </select>
                       </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              
-              <div class="row">
-              <div class="col-lg-6 location-card text-center py-5">
-                 <!-- Upload box -->
-              <div class="text-center py-5">
-                <!-- Before upload -->
-                <div v-if="!uploadingStarted">
-                  <input
-                    type="file"
-                    ref="pdfFileInput"
-                    accept=".nessus,.xml,.csv,.pdf,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    @change="handleFileUpload"
-                    style="display: none"
-                  />
-                  <button class="btn upload-report-btn" @click="triggerFileInput" :disabled="!selectedLocation || !selectedType">
-                    <i class="bi bi-arrow-up-circle fs-5"></i>
-                  </button>
-                  <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
-                  <p class="text-muted location-subtext">
-                    You can upload a PDF, CSV, Nessus, XML or Excel file
-                  </p>
                 </div>
 
-                <!-- Upload progress -->
-                <div v-if="uploadingStarted" class="upload-box mt-4">
-                  <div class="progress-bar-container">
-                    <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
+                <div class="row">
+                  <div class="col-lg-6 location-card text-center py-5">
+                    <!-- Upload box -->
+                    <div class="text-center py-5">
+                      <!-- Before upload -->
+                      <div v-if="!uploadingStarted">
+                        <input type="file" ref="pdfFileInput"
+                           accept=".nessus,.html,text/html,application/octet-stream"
+                          @change="handleFileUpload" style="display: none" />
+                        <!-- <button class="btn upload-report-btn" @click="triggerFileInput"
+                          :disabled="!selectedLocation || !selectedType">
+                          <i class="bi bi-arrow-up-circle fs-5"></i>
+                        </button> -->
+                        <button
+                          class="btn upload-report-btn"
+                          @click="triggerFileInput"
+                          :disabled="!selectedLocation || !selectedType || uploadedFiles.length >= 1"
+                        >
+                          <i class="bi bi-arrow-up-circle fs-5"></i>
+                        </button>
+                        <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
+                        <p class="text-muted location-subtext">
+                          You can upload a Nessus file
+                        </p>
+                      </div>
+
+                      <!-- Upload progress -->
+                      <div v-if="uploadingStarted" class="upload-box mt-4">
+                        <div class="progress-bar-container">
+                          <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
+                        </div>
+                        <p class="text-muted mt-2">
+                          {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }} </p>
+                            <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
+                            <p class="text-muted">{{ uploadedFileSize }}</p>
+                            <div v-if="uploadProgress === 100" class="d-flex justify-content-center gap-2 mt-3">
+
+                              <button class="btn btn-sm btn-primary"
+                                @click="viewFile(uploadedFiles[uploadedFiles.length - 1])">
+                                <i class="bi bi-eye"></i> View
+                              </button>
+                              <button class="btn btn-sm btn-danger"
+                                @click="deleteProgressFile(uploadedFiles.length - 1)">
+                                <i class="bi bi-trash"></i> Delete
+                              </button>
+                            </div>
+                      </div>
+                    </div>
                   </div>
-                  <p class="text-muted mt-2">
-                    {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }}
-                  </p>
-                  <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
-                  <p class="text-muted">{{ uploadedFileSize }}</p>
-                  <div v-if="uploadProgress === 100" class="d-flex justify-content-center gap-2 mt-3">
-                    
-                    <button 
-                      class="btn btn-sm btn-primary" 
-                      @click="viewFile(uploadedFiles[uploadedFiles.length - 1])">
-                      <i class="bi bi-eye"></i> View
-                    </button>
-                    <button 
-                      class="btn btn-sm btn-danger" 
-                      @click="deleteProgressFile(uploadedFiles.length - 1)">
-                      <i class="bi bi-trash"></i> Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-              </div>
-                
-              <div class="col-lg-6">
-                <div v-if="uploadedFiles.length > 0" class="card border-0 shadow-sm py-3 px-3" style="border-radius: 18px;">
-                <h6 class="text-center my-2">Uploaded Files <i class="bi bi-cloud-check"></i></h6>
-                <table class="table table-bordered align-middle">
-                  <thead class="table-light">
-                    <tr>
-                      <th>File Name</th>
-                      <th>Type</th>
-                      <th>Location</th>
-                      <!-- <th>Actions</th> -->
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(file, index) in uploadedFiles" :key="index">
-                      <td><strong>{{ file.fileName }}</strong></td>
-                      <td>{{ file.type }}</td>
-                      <td>{{ file.location }}</td>
-                      <!-- <td>
+
+                  <div class="col-lg-6">
+                    <div v-if="uploadedFiles.length > 0" class="card border-0 shadow-sm py-3 px-3"
+                      style="border-radius: 18px;">
+                      <h6 class="text-center my-2">Uploaded Files <i class="bi bi-cloud-check"></i></h6>
+                      <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                          <tr>
+                            <th>File Name</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <!-- <th>Actions</th> -->
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(file, index) in uploadedFiles" :key="index">
+                            <td><strong>{{ file.fileName }}</strong></td>
+                            <td>{{ file.type }}</td>
+                            <td>{{ file.location }}</td>
+                            <!-- <td>
                         <div class="d-flex gap-2">
                           <button class="btn btn-sm btn-primary" @click="viewFile(file)"><i class="bi bi-eye"></i></button>
                           <button class="btn btn-sm btn-danger" @click="deleteProgressFile(index)"> <i class="bi bi-trash"></i></button>
                         </div>
                       </td> -->
-                    </tr>
-                  </tbody>
-                </table>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div v-if="toastMessage" class="toast-message"> {{ toastMessage }}</div>
                 </div>
-              </div>
-              
-              <div
-                v-if="toastMessage"
-                class="toast-message"> {{ toastMessage }}</div>
-              </div>
-              
 
-              <div class="text-end">
-                <router-link to="/admindashboardonboarding" class="btn stepper-btn mt-5">
-                Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-                </router-link>
-              </div>
 
+                <div class="text-end">
+                  <!-- <router-link to="/admindashboardonboarding" class="btn stepper-btn mt-5">
+                    Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+                  </router-link> -->
+                  <router-link
+  to="/admindashboardonboarding"
+  class="btn stepper-btn mt-5"
+  :class="{ disabled: !canGoNext }"
+  @click.prevent="!canGoNext && blockNext()"
+>
+  Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+</router-link>
+
+                </div>
+
+              </div>
             </div>
-        </div>
-        </div>
+          </div>
 
-    </div>
-    </div>
+        </div>
+      </div>
     </section>
-        
-    </main>
+
+  </main>
 </template>
 
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: 'UploadReportView',
@@ -180,9 +195,10 @@ export default {
   data() {
     return {
       selectedLocation: "",
+      selectedLocations: [],
+      authStore: useAuthStore(),
       selectedType: "",
-      locations: ["Apply for all locations", "Greece", "Germany", "Bahrain", "Delhi"],
-    uploadedFiles: [],
+      uploadedFiles: [],
       uploadingStarted: false,
       uploadProgress: 0,
       uploadedFileName: "",
@@ -191,129 +207,220 @@ export default {
       toastMessage: ""
     };
   },
- methods: {
-  // ✅ Check if location+type already has file
-  isAlreadyUploaded(location, type) {
-    return this.uploadedFiles.some(file => file.location === location && file.type === type);
+  computed: {
+    canGoNext() {
+  return (
+    this.uploadedFiles.length > 0 &&
+    this.uploadProgress === 100 &&
+    !!localStorage.getItem("reportId")
+  );
+}
   },
+  mounted() {
+    const adminId =
+      this.authStore.user?.admin_id ||
+      this.authStore.user?.id ||
+      this.authStore.user?._id;
 
-  checkLocation() {
-    if (this.isAlreadyUploaded(this.selectedLocation, this.selectedType)) {
-      this.selectedLocation = ""; // reset dropdown
-    } else {
-      // ✅ Reset upload state when user selects new location
-      this.uploadingStarted = false;
-      this.uploadProgress = 0;
-      this.uploadedFileName = "";
-      this.uploadedFileSize = "";
-      this.$refs.pdfFileInput.value = "";
+    if (adminId && !this.authStore.locations.length) {
+      this.authStore.fetchLocationsByAdminId(adminId);
     }
   },
-
-  triggerFileInput() {
-    if (this.selectedLocation && this.selectedType) {
-      this.$refs.pdfFileInput.click();
-    }
-  },
-
-  // ✅ Generate SHA-256 hash for file content
-  async getFileHash(file) {
-    const arrayBuffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-  },
-
-  async handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file && this.selectedLocation && this.selectedType) {
-      // ✅ Generate hash for file content
-      const fileHash = await this.getFileHash(file);
-
-      // 🔍 Check for duplicate file by hash
-      const duplicate = this.uploadedFiles.some(f => f.hash === fileHash);
-      if (duplicate) {
+  methods: {
+    checkLocation() {
+      if (this.selectedLocation === "ALL") {
+        this.selectedLocations = this.authStore.locations.map(
+          (loc) => loc.location_name
+        );
+      } else {
+        this.selectedLocations = [this.selectedLocation];
+      }
+      console.log("✅ Effective selected locations:", this.selectedLocations);
+    },
+    isAlreadyUploaded(locId, type) {
+      if (!locId || !type) return false;
+      return this.uploadedFiles.some(
+        (file) => file.locationId === locId && file.type === type
+      );
+    },
+    isTypeDisabled(type) {
+      if (!this.selectedLocation || !type) return false;
+      return this.isAlreadyUploaded(this.selectedLocation, type);
+    },
+    triggerFileInput() {
+      if (this.uploadedFiles.length >= 1) {
         Swal.fire({
-          icon: "error",
-          title: "Duplicate File",
-          text: "This file has already been uploaded (same content)!",
+          icon: "info",
+          title: "File already uploaded",
+          text: "Only one report can be uploaded. Delete the existing file to upload a new one.",
         });
-        this.$refs.pdfFileInput.value = ""; // reset
         return;
       }
-
-      this.uploadingStarted = true;
-      this.uploadedFileName = file.name;
-      this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
-      this.uploadProgress = 0;
-
-      let progress = 0;
-      const interval = setInterval(() => {
-        if (progress >= 100) {
-          clearInterval(interval);
-
-          // ✅ Create URL for viewing
-          const fileURL = URL.createObjectURL(file);
-
-          // Save file info including hash
-          this.uploadedFiles.push({
-            location: this.selectedLocation,
-            type: this.selectedType,
-            fileName: this.uploadedFileName,
-            fileURL: fileURL,
-            hash: fileHash, // 👈 store hash
-          });
-
-          this.showToast(
-            `File "${this.uploadedFileName}" uploaded for ${this.selectedLocation} (${this.selectedType}) ✅`
-          );
-        } else {
-          progress += 20;
-          this.uploadProgress = progress;
-        }
-      }, 500);
-    }
-  },
-
-  viewFile(file) {
-    // ✅ Open the uploaded file in a new tab
-    window.open(file.fileURL, "_blank");
-  },
-
-  deleteProgressFile(index) {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This file will be permanently deleted!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Remove file from list
-        this.uploadedFiles.splice(index, 1);
-
-        // ✅ Reset upload bar + file info
-        this.uploadingStarted = false;
-        this.uploadProgress = 0;
-        this.uploadedFileName = "";
-        this.uploadedFileSize = "";
-        this.$refs.pdfFileInput.value = "";
-
-        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+      if (this.selectedLocation && this.selectedType) {
+        this.$refs.pdfFileInput.click();
       }
-    });
-  },
+    },
+    async getFileHash(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    },
+    async handleFileUpload(event) {
+  const file = event.target.files[0];
 
-  showToast(message) {
-    this.toastMessage = message;
-    setTimeout(() => {
-      this.toastMessage = "";
-    }, 5000);
-  },
+  if (!file || !this.selectedLocation || !this.selectedType) return;
+
+  // ❌ Don't allow duplicate (location + type)
+  if (this.isAlreadyUploaded(this.selectedLocation, this.selectedType)) {
+    Swal.fire({
+      icon: "error",
+      title: "Already uploaded",
+      text: `A report for this location (${this.selectedType}) is already uploaded. Please change location or type.`,
+    });
+    if (this.$refs.pdfFileInput) {
+      this.$refs.pdfFileInput.value = "";
+    }
+    return;
+  }
+
+  // ✅ Optional: same-content (hash) check
+  const fileHash = await this.getFileHash(file);
+  const duplicate = this.uploadedFiles.some((f) => f.hash === fileHash);
+  if (duplicate) {
+    Swal.fire({
+      icon: "error",
+      title: "Duplicate File",
+      text: "This file has already been uploaded (same content)!",
+    });
+    if (this.$refs.pdfFileInput) {
+      this.$refs.pdfFileInput.value = "";
+    }
+    return;
+  }
+
+  this.uploadingStarted = true;
+  this.uploadedFileName = file.name;
+  this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
+  this.uploadProgress = 20;
+
+  // 🔹 Build FormData for API
+  const formData = new FormData();
+
+  // Backend expects "all" string when user selects ALL
+  const locationToSend =
+    this.selectedLocation === "ALL" ? "all" : this.selectedLocation; // ✅ ObjectId or "all"
+
+  formData.append("location", locationToSend);   // or "Location" if your backend is case-sensitive that way
+  formData.append("member_type", this.selectedType); // internal / external
+  formData.append("file", file); // "file" field name as in backend
+
+  // 🔹 Call API via authStore
+  const res = await this.authStore.uploadReport(formData);
+
+  if (!res.status) {
+    console.error("❌ Upload report failed:", res);
+    Swal.fire({
+      icon: "error",
+      title: "Upload failed",
+      text: res.message || "Something went wrong. Please try again.",
+    });
+
+    this.uploadingStarted = false;
+    this.uploadProgress = 0;
+    if (this.$refs.pdfFileInput) {
+      this.$refs.pdfFileInput.value = "";
+    }
+    return;
+  }  
+console.log("✅ Final upload response:", res.data);
+this.uploadProgress = 100;
+
+const reportId = res.reportId || res.data?.upload_report?._id || res.data?.upload_report?.id || null;
+
+if (reportId) {
+  localStorage.setItem("reportId", reportId);
+  await this.authStore.fetchTotalAssets(reportId);
+  await this.authStore.fetchAvgScore(reportId);
+  await this.authStore.fetchVulnerabilities(reportId);
+} else {
+  console.warn("No reportId returned from upload response");
 }
+
+// update UI list as before (store values are now populated)
+const fileURL = URL.createObjectURL(file);
+
+const locationName =
+  this.selectedLocation === "ALL"
+    ? "All locations"
+    : this.getLocationName(this.selectedLocation);
+
+this.uploadedFiles = [
+  {
+    locationId: this.selectedLocation,
+    location: locationName,
+    type: this.selectedType,
+    fileName: this.uploadedFileName,
+    fileURL,
+    hash: fileHash,
+    reportId, 
+  },
+];
+
+this.showToast(
+  `File "${this.uploadedFileName}" uploaded for ${locationName} (${this.selectedType}) ✅`
+);
+
+if (this.$refs.pdfFileInput) {
+  this.$refs.pdfFileInput.value = "";
+}
+    },
+    getLocationName(id) {
+      const loc = this.authStore.locations.find((l) => l._id === id);
+      return loc ? loc.location_name : id;
+    },
+    viewFile(file) {
+      window.open(file.fileURL, "_blank");
+    },
+    deleteProgressFile(index) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This file will be permanently deleted!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.uploadedFiles.splice(index, 1);
+          this.uploadingStarted = false;
+          this.uploadProgress = 0;
+          this.uploadedFileName = "";
+          this.uploadedFileSize = "";
+          this.selectedLocation = "";
+          this.selectedType = "";
+          this.$refs.pdfFileInput.value = "";
+
+          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        }
+      });
+    },
+    showToast(message) {
+      this.toastMessage = message;
+      setTimeout(() => {
+        this.toastMessage = "";
+      }, 5000);
+    },
+    blockNext() {
+  Swal.fire({
+    icon: "warning",
+    title: "Upload required",
+    text: "Please complete report upload before proceeding.",
+  });
+},
+  }
 
 };
 </script>
@@ -340,57 +447,58 @@ export default {
   background: linear-gradient(to right, #4d47ff, #a58dff);
   transition: width 0.2s ease;
 }
+
 .dropdown {
-    position: relative;
-    display: inline-block;
-    width: 250px;
+  position: relative;
+  display: inline-block;
+  width: 250px;
 }
 
 .dropdown-btn {
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.16);
-    border-radius: 50px;
-    padding: 8px 40px 8px 16px; 
-    cursor: pointer;
-    position: relative;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 50px;
+  padding: 8px 40px 8px 16px;
+  cursor: pointer;
+  position: relative;
 }
 
 .dropdown-btn::after {
-    content: "▼"; 
-    font-size: 12px;
-    color: #333;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
+  content: "▼";
+  font-size: 12px;
+  color: #333;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 100%;
-    border-radius: 12px;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    z-index: 1;
-    margin-top: 4px;
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  margin-top: 4px;
 }
 
 .dropdown-content a {
-    padding: 8px 12px;
-    display: block;
-    text-decoration: none;
-    color: black;
-    border-radius: 8px;
+  padding: 8px 12px;
+  display: block;
+  text-decoration: none;
+  color: black;
+  border-radius: 8px;
 }
 
 .dropdown-content a:hover {
-    background-color: #f1f1f1;
+  background-color: #f1f1f1;
 }
 
 .dropdown.show .dropdown-content {
-    display: block;
+  display: block;
 }
 
 /* stepper */
@@ -400,12 +508,14 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
+
 .step-circle {
   width: 32px;
   height: 32px;
@@ -417,38 +527,39 @@ export default {
   justify-content: center;
   font-weight: 600;
 }
+
 .step.active .step-circle {
   background-color: #6c47ff;
   color: white;
 }
+
 .label {
   margin-top: 6px;
   font-size: 0.875rem;
   color: #6c757d;
 }
+
 .step.active .label {
   color: #000;
   font-weight: 500;
 }
+
 .line {
   width: 2px;
   height: 70px;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    #ccc,
-    #ccc 4px,
-    transparent 4px,
-    transparent 8px
-  );
+  background-image: repeating-linear-gradient(to bottom,
+      #ccc,
+      #ccc 4px,
+      transparent 4px,
+      transparent 8px);
 }
+
 .line.active {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    #6c47ff,
-    #6c47ff 4px,
-    transparent 4px,
-    transparent 8px
-  );
+  background-image: repeating-linear-gradient(to bottom,
+      #6c47ff,
+      #6c47ff 4px,
+      transparent 4px,
+      transparent 8px);
 }
 
 /* Simple toast styling */
@@ -461,14 +572,28 @@ export default {
   padding: 10px 20px;
   border-radius: 6px;
   font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   animation: fadeInOut 3s forwards;
 }
 
 @keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(20px); }
-  10% { opacity: 1; transform: translateY(0); }
-  90% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(20px); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 }
 </style>

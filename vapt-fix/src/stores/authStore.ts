@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import endpoint from "../services/apiServices";
+import axios from "axios";
 
 interface Location {
   _id: string;
@@ -37,6 +38,31 @@ export const useAuthStore = defineStore("auth", {
     accessToken: localStorage.getItem("authorization") || null,
     refreshToken: localStorage.getItem("refreshToken") || null,
     tickets: [] as any[], 
+    countries: [] as string[],
+    totalAssets: 0 as number,
+    avgScore: 0 as number,
+    vulnerabilities: { critical: 0,high: 0,medium: 0,low: 0, },
+    vulnerabilityRegister: [] as any[],
+    vulnerabilityCount: 0,
+    vulnerabilityRows: [] as any[],
+    assetRows: [] as any[],
+    assetCount: 0,
+    assetSearchResults: [] as any[],
+    assetSearchCount: 0,
+    selectedAssetDetail: null as any,
+    selectedAssetVulnerabilities: [] as any[],
+    mitigationTimeline: null,
+    meanTimeToRemediate: null as null | {
+    mean_time_to_remediate_days: number;
+    mean_time_to_remediate_hours: number;
+    risk_criteria_days: {
+      critical: number;
+      high: number;
+      medium: number;
+      low: number;
+      };
+    },
+    // meanTimeToRemediate: null as any,
   }),
 
   actions: {
@@ -57,67 +83,109 @@ export const useAuthStore = defineStore("auth", {
       return false;
   },
 
+  // ✅ Restore auth + auto-fetch locations on refresh
+  initFromStorage() {
+    try {
+      // 1️⃣ Restore user
+      const savedUser = localStorage.getItem("user");
+      if (savedUser) {
+        this.user = JSON.parse(savedUser);
+        console.log("♻️ Restored user from storage:", this.user);
+      }
+
+      // 2️⃣ Restore locations quickly (so UI shows instantly)
+      const savedLocations = localStorage.getItem("locations");
+      if (savedLocations) {
+        this.locations = JSON.parse(savedLocations);
+        console.log("♻️ Restored locations from storage:", this.locations);
+      }
+
+      // 3️⃣ Then re-fetch fresh locations from API (by admin id)
+      const adminId =
+        this.user?.admin_id || this.user?.id || this.user?._id;
+
+      if (adminId) {
+        this.fetchLocationsByAdminId(adminId);
+      }
+    } catch (e) {
+      console.error("initFromStorage error:", e);
+    }
+  },
+
   // signup
   async signup(payload: any) {
-      try {
-        const res = await endpoint.post("/admin/users/signup/", payload);
-        const data = res.data;
+  try {
+    const res = await endpoint.post(
+      "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
+      payload
+    );
 
-        if (data.tokens?.access) {
-          this.setAuth(data.tokens.access, data.user);
+    const data = res.data;
 
-          if (data.tokens.refresh) {
-            localStorage.setItem("refreshToken", data.tokens.refresh); 
-          }
-        }
+    if (data.tokens?.access) {
+      this.setAuth(data.tokens.access, data.user);
 
-        return { status: true, data };
-      } catch (error: any) {
-        console.error("Signup error:", error.response?.data || error.message);
-
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Signup failed",
-          details: error.response?.data || null,
-        };
+      if (data.tokens.refresh) {
+        localStorage.setItem("refreshToken", data.tokens.refresh);
       }
+    }
+
+    localStorage.setItem("isNewUser", "true");
+    return { status: true, data };
+  } catch (error: any) {
+    return {
+      status: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Signup failed",
+      details: error.response?.data || null,
+    };
+  }
   },
 
   // ✅ Login (signin)
   async login(payload: any) {
-      try {
-        const res = await endpoint.post("/admin/users/login/", payload);
-        const data = res.data;
+    try {
+      const res = await endpoint.post(
+        "https://vaptbackend.secureitlab.com/api/admin/users/login/",
+        payload
+      );
 
-        if (data.tokens?.access) {
-          this.setAuth(data.tokens.access, data.user,data.locations || []);
+      const data = res.data;
 
-          if (data.tokens.refresh) {
-            localStorage.setItem("refreshToken", data.tokens.refresh);
-          }
+      if (data.tokens?.access) {
+        this.setAuth(data.tokens.access, data.user, data.locations || []);
 
-          // ✅ Save user in localStorage (for later use like admin_id)
-          if (data?.user) {
-            this.user = data.user;
-            localStorage.setItem("user", JSON.stringify(this.user));
-            console.log("👤 Logged-in Admin Saved:", this.user);
-          }
-
-          // ✅ Fetch locations after login
-          await this.fetchLocations();
+        if (data.tokens.refresh) {
+          localStorage.setItem("refreshToken", data.tokens.refresh);
         }
 
-        return { status: true, data };
-      } catch (error: any) {
-        return {
-          status: false,
-          message: error.response?.data?.message || error.message || "Login failed",
-          details: error.response?.data || null,
-        };
+        if (data?.user) {
+          this.user = data.user;
+          localStorage.setItem("user", JSON.stringify(this.user));
+        }
+
+        const adminId =
+          data.user.admin_id || data.user.id || data.user._id;
+
+        if (adminId) {
+          await this.fetchLocationsByAdminId(adminId);
+        }
       }
+
+      localStorage.setItem("isNewUser", "false");
+      return { status: true, data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Login failed",
+        details: error.response?.data || null,
+      };
+    }
   },
 
   // ✅ Forgot Password
@@ -179,6 +247,38 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // ✅ Get all countries
+  async fetchCountries() {
+    try {
+      const res = await endpoint.get("/admin/location/countries/");
+      const data = res.data;
+
+      if (Array.isArray(data.countries)) {
+        this.countries = data.countries;
+        console.log("🌍 Countries fetched:", this.countries);
+      } else {
+        this.countries = [];
+        console.warn("⚠ No countries array found in response:", data);
+      }
+
+      return { status: true, data };
+    } catch (error: any) {
+      console.error(
+        "Fetch countries error:",
+        error.response?.data || error.message
+      );
+
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Fetch countries failed",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
   // add location
   async addLocation(locationName: string) {
       try {
@@ -216,34 +316,40 @@ export const useAuthStore = defineStore("auth", {
       } 
   }, 
 
-  // ✅ Fetch all locations
-  async fetchLocations() {
+  // ✅ Fetch locations by particular admin ID
+  async fetchLocationsByAdminId(adminId: string) {
     try {
-      const res = await endpoint.get("/admin/location/locations/");
+      const res = await endpoint.get(
+        `/admin/location/locations/admin/${adminId}/`
+      );
+
       const data = res.data;
 
-      // Handle array or object response safely
       if (Array.isArray(data.locations) && data.locations.length > 0) {
         this.locations = data.locations;
 
-        // ✅ Save to localStorage for persistence
+        // ✅ Save to localStorage
         localStorage.setItem("locations", JSON.stringify(this.locations));
-        console.log("📌 Locations fetched & saved:", this.locations);
+
+        console.log("📌 Locations fetched for admin:", adminId, this.locations);
       } else {
-        console.warn("⚠ No locations received from API:", data);
+        console.warn("⚠ No locations found for admin:", adminId);
         this.locations = [];
         localStorage.removeItem("locations");
       }
 
       return { status: true, data };
-    } catch (error :any) {
+    } catch (error: any) {
       console.error("❌ Failed to fetch locations:", error);
 
-      // Fallback: load from localStorage if available
+      // ✅ Fallback: load from localStorage
       const saved = localStorage.getItem("locations");
       if (saved) {
         this.locations = JSON.parse(saved);
-        console.log("📦 Loaded locations from localStorage (offline mode):", this.locations);
+        console.log(
+          "📦 Loaded locations from localStorage (offline mode):",
+          this.locations
+        );
       }
 
       return {
@@ -252,6 +358,31 @@ export const useAuthStore = defineStore("auth", {
           error.response?.data?.message ||
           error.message ||
           "Fetch locations failed",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
+  // ✅ Upload report
+  async uploadReport(formData: FormData) {
+    try {
+      const res = await endpoint.post(
+        "https://vaptbackend.secureitlab.com/api/admin/upload_report/upload/",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      const data = res.data;
+      const reportId = data?.upload_report?._id || data?.upload_report?.id || null;
+
+      return { status: true, data, reportId };
+    } catch (error: any) {
+      console.error("Upload error:", error.response?.data || error.message);
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message,
         details: error.response?.data || null,
       };
     }
@@ -564,6 +695,315 @@ export const useAuthStore = defineStore("auth", {
   }
   },
 
+  // fetch total assets
+  async fetchTotalAssets(reportId: string) {
+  try {
+    const res = await endpoint.get(
+      `/admin/admindashboard/report/${reportId}/total-assets/`
+    );
+
+    this.totalAssets = res.data.total_assets ?? 0;
+    return { status: true, data: res.data };
+  } catch (error: any) {
+    console.error("Total assets error:", error.response?.data || error.message);
+    return { status: false, message: "Failed to fetch total assets", details: error.response?.data || null };
+  }
+  },
+
+  // 🔹 FETCH AVG SCORE
+  async fetchAvgScore(reportId: string) {
+  try {
+    const res = await endpoint.get(
+      `/admin/admindashboard/report/${reportId}/avg-score/`
+    );
+    this.avgScore = res.data?.avg_score ?? 0;
+    return { status: true, data: res.data };
+  } catch (error: any) {
+    console.error("Avg score error:", error.response?.data || error.message);
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message || "Failed to fetch avg score",
+      details: error.response?.data || null,
+    };
+  }
+  },
+
+  // ✅ ADD THIS
+  async fetchVulnerabilities(reportId: string) {
+  try {
+    const res = await endpoint.get(
+      `/admin/admindashboard/report/${reportId}/vulnerabilities/`
+    );
+    this.vulnerabilities = res.data || { critical: 0, high: 0, medium: 0, low: 0 };
+    return { status: true, data: res.data };
+  } catch (error: any) {
+    console.error("Vulnerabilities error:", error.response?.data || error.message);
+    this.vulnerabilities = { critical: 0, high: 0, medium: 0, low: 0 };
+    return { status: false, message: "Failed to fetch vulnerabilities", details: error.response?.data || null };
+  }
+  },
+
+  // fetch Mitigation Timeline
+  async fetchMitigationTimeline(reportId: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/admindashboard/report/${reportId}/mitigation-timeline/`
+      );
+
+      this.mitigationTimeline = res.data;
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.detail || "Failed to fetch mitigation timeline",
+      };
+    }
+  },
+
+  // fetch MeanTime To Remediate
+  async fetchMeanTimeToRemediate(reportId: string) {
+  try {
+    console.log("[MTTR] Calling API for reportId:", reportId);
+
+    const res = await endpoint.get(
+      `/admin/admindashboard/report/${reportId}/mean-time-remediate/`
+    );
+
+    console.log("[MTTR] API response:", res.data);
+
+    this.meanTimeToRemediate = res.data;
+
+    console.log("[MTTR] Stored in authStore:", this.meanTimeToRemediate);
+
+    return { status: true, data: res.data };
+  } catch (error: any) {
+    console.error(
+      "[MTTR] API error:",
+      error.response?.data || error.message
+    );
+
+    return {
+      status: false,
+      message:
+        error.response?.data?.detail ||
+        "Failed to fetch mean time to remediate",
+    };
+  }
+  },
+
+  // FETCH Vulnerability Register
+  async fetchVulnerabilityRegister(reportId: string) {
+  try {
+    if (!reportId) {
+      console.warn("Vulnerability Register → Missing reportId");
+      this.vulnerabilityRows = [];
+      this.vulnerabilityCount = 0;
+      return { status: false, message: "No reportId provided" };
+    }
+
+    console.log("Fetching Vulnerability Register for:", reportId);
+
+    const res = await endpoint.get(
+      `/admin/adminregister/register/${reportId}/vulns/`
+    );
+
+    console.log("Vulnerability Register response raw:", res && res.data ? res.data : res);
+
+    // Try a few likely response shapes:
+    const rows =
+      res.data?.rows ??
+      res.data?.data?.rows ??
+      res.data?.results ??
+      res.data?.vulnerabilities ??
+      res.data ??
+      [];
+
+    // If rows is an object with keys (not an array), try to extract an array
+    const finalRows = Array.isArray(rows) ? rows : Array.isArray(res.data?.rows) ? res.data.rows : [];
+
+    this.vulnerabilityRows = finalRows;
+    this.vulnerabilityCount = this.vulnerabilityRows.length;
+
+    console.log("Vulnerability Count:", this.vulnerabilityCount);
+
+    return { status: true, data: this.vulnerabilityRows };
+  } catch (error: any) {
+    console.error(
+      "Vulnerability Register error:",
+      error.response?.status,
+      error.response?.data || error.message
+    );
+
+    this.vulnerabilityRows = [];
+    this.vulnerabilityCount = 0;
+
+    return {
+      status: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch vulnerability register",
+      details: error.response?.data || null,
+    };
+  }
+  },
+
+  // GET ALL ASSETS
+  async fetchAssets(reportId: string) {
+    try {
+      // console.log("[authStore] fetchAssets -> reportId:", reportId);
+      const res = await endpoint.get(`/admin/adminasset/report/${reportId}/assets/`);
+      // console.log("[authStore] fetchAssets response:", res.data);
+      const rows = res.data.assets || [];
+      const normalized = rows.map((a: any) => ({
+        ...a,
+        selected: !!a.selected || false,
+        held: !!a.held || false,
+        isInternal: (a.exposure || "").toLowerCase() === "internal",
+        host_information: a.host_information || {},
+        severity_counts: a.severity_counts || { critical: 0, high: 0, medium: 0, low: 0 },
+      }));
+      this.assetRows = normalized;
+      this.assetCount = res.data.count ?? normalized.length;
+      console.log("[authStore] assetRows length:", this.assetRows.length);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      console.error("[authStore] fetchAssets error:", error.response?.data || error.message);
+      return { status: false, error: error.response?.data || error.message };
+    }
+  },
+
+  // DELETE Asset from report
+  async deleteAsset(reportId: string, assetIp: string) {
+    try {
+      const res = await endpoint.delete(
+        `/admin/adminasset/report/${reportId}/assets/${assetIp}/`
+      );
+
+      console.log("✔ Asset deleted:", res.data);
+      this.assetRows = this.assetRows.filter(a => a.asset !== assetIp);
+
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      console.error("❌ Delete Asset Error:", error.response?.data || error.message);
+      return { status: false, error: error.response?.data || error.message };
+    }
+  },
+
+  // HOLD asset
+  async holdAsset(reportId: string, assetIp: string) {
+  try {
+    const res = await endpoint.post(
+      `/admin/adminasset/report/${reportId}/assets/${assetIp}/hold/`
+    );
+
+    if (typeof res.data?.total_assets === "number") {
+      this.assetCount = res.data.total_assets;
+    }
+
+    return {
+      status: true,
+      heldAsset: res.data.asset,
+      data: res.data,
+    };
+  } catch (error: any) {
+    return {
+      status: false,
+      message: error.response?.data?.detail || "Failed to hold asset",
+    };
+  }
+  },
+
+  //  fetch held assets list
+  async fetchHeldAssets(reportId: string) {
+  try {
+    const res = await endpoint.get(
+      `/admin/adminasset/report/${reportId}/assets/hold-list/`
+    );
+
+    return {
+      status: true,
+      assets: res.data.assets || [],
+      count: res.data.count || 0,
+    };
+  } catch (error: any) {
+    return {
+      status: false,
+      assets: [],
+      message: error.response?.data?.detail || "Failed to fetch held assets",
+    };
+  }
+  },
+
+  // UNHOLD asset
+  async unholdAsset(reportId: string, assetIp: string) {
+    try {
+      const res = await endpoint.post(
+        `/admin/adminasset/report/${reportId}/assets/${assetIp}/unhold/`
+      );
+
+      if (typeof res.data?.total_assets === "number") {
+        this.assetCount = res.data.total_assets;
+      }
+
+      return {
+        status: true,
+        restoredAsset: res.data.asset, // ✅ important
+        data: res.data,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.detail || "Failed to unhold asset",
+      };
+    }
+  },
+
+  // search assets
+  async searchAssets(q: string) {
+    try {
+      console.log("[authStore] searchAssets -> q:", q);
+      const res = await endpoint.get("/admin/adminasset/assets/search/", {
+        params: { q }, 
+      });
+
+      console.log("[authStore] searchAssets response:", res.data);
+      this.assetSearchResults = res.data.results || res.data.assets || [];
+      this.assetSearchCount = res.data.count ?? this.assetSearchResults.length;
+
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      console.error("[authStore] searchAssets error:", error.response?.data || error.message);
+      return { status: false, error: error.response?.data || error.message };
+    }
+  },
+
+  // fetch single asset
+  async fetchSingleAssetVulnerabilities(reportId: string, asset: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/adminasset/report/${reportId}/asset/${asset}/vulnerabilities/`
+      );
+
+      const vulns = res.data.vulnerabilities || [];
+
+      this.selectedAssetVulnerabilities = vulns;
+
+      this.selectedAssetDetail = {
+        asset: res.data.asset,
+        exposure: vulns[0]?.exposure || "",
+        owner: vulns[0]?.owner || "",
+        severity: vulns[0]?.severity || "",
+      };
+
+      return { status: true };
+    } catch (error) {
+      this.selectedAssetDetail = null;
+      this.selectedAssetVulnerabilities = [];
+      return { status: false };
+    }
+  },
+
   // create Ticket
   async createTicket(payload: any) {
     try {
@@ -584,7 +1024,7 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // GET ALL TICKETS
-    async getAllTickets() {
+  async getAllTickets() {
       try {
         const res = await endpoint.get("/admin/tickets/list/");
         const data = res.data;
@@ -610,7 +1050,7 @@ export const useAuthStore = defineStore("auth", {
           details: error.response?.data || null,
         };
       }
-    },
+  },
 
   // === Get OPEN Tickets ===
     async getOpenTickets() {
@@ -726,5 +1166,6 @@ export const useAuthStore = defineStore("auth", {
   getAuthorization() {
     return this.token;
   },
+
   },
 });

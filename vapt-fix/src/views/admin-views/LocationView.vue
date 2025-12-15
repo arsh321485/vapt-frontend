@@ -149,10 +149,39 @@
                     </div> 
                   </div>
                   <div class="row mt-2">
-                    <div class="col-5">
+                    <!-- <div class="col-5">
                       <input type="text" class="form-control rounded-0 uniform-input" id="locationName" v-model="locationName"
                         placeholder="Enter the name of the location..." />
+                    </div> -->
+                    <div class="col-5 location-dropdown-wrapper" style="position: relative;">
+                      <input
+                        type="text"
+                        class="form-control rounded-0 uniform-input"
+                        id="locationName"
+                        v-model="locationName"
+                        placeholder="Enter the name of the location..."
+                        @input="onLocationInput"
+                        @focus="onLocationInput"
+                      />
+                      <!-- Dropdown -->
+                      <ul
+                        v-if="showDropdown && filteredCountries.length"
+                        class="list-group"
+                        style="position: absolute; top: 100%; left: 12; right: 10; z-index: 10; max-height: 200px; overflow-y: auto;width: 95%;"
+                      >
+                        <li
+                          v-for="country in filteredCountries"
+                          :key="country"
+                          class="list-group-item list-group-item-action"
+                          @click="selectCountry(country)"
+                          style="cursor: pointer;"
+                        >
+                          {{ country }}
+                        </li>
+                      </ul>
                     </div>
+
+
                     <div class="col-3">
                       <button class="btn btn-sm mt-2 add-location-btn text-light" type="button" @click="handleAddLocation"><i
                           class="bi bi-plus me-2"></i>Add location </button>
@@ -282,7 +311,6 @@
                     <table class="table align-middle table-borderless">
                         <thead class="table-light">
                           <tr>
-                            <!-- <th class="col-2 text-center">User Type</th>                    -->
                             <th class="col-2 text-center">Location</th>
                             <th class="col-2 text-center">Member Role</th>
                             <th class="col-6 text-center">Copy Link</th>
@@ -290,15 +318,7 @@
                         </thead>    
                         <tbody>
                           <tr>
-                            <!-- <td class="col-2">
-                              <select class="form-select rounded-0 uniform-input">
-                        <option selected disabled>Select</option>
-                        <option value="internal">Internal</option>
-                        <option value="external">External</option>
-                      </select>
-                            </td> -->
                             <td class="col-2">
-
                               <select
                             v-model="selectedLocation"
                             class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6"
@@ -566,6 +586,8 @@ export default {
       selectedJiraAsana: null,
       notUsingJiraAsana: false,
       locationName: "",
+      showDropdown: false,
+      filteredCountries: [],
       authStore: useAuthStore(),
       form: {
         admin_id: "", 
@@ -597,18 +619,46 @@ export default {
       ? this.selectedRoles1.join(", ")
       : "Select Roles";
   },
-    // selectedRoleText1() {
-    //   return this.selectedRoles1.length > 0 ? this.selectedRoles1.join(', ') : 'Select';
-    // },
     selectedRoleText2() {
       return this.selectedRoles2.length > 0 ? this.selectedRoles2.join(', ') : 'Select';
     },
     selectedRoleText3() {
       return this.selectedRoles3.length > 0 ? this.selectedRoles3.join(', ') : 'Select';
     },
-    
+    authStore() {
+      return useAuthStore();
+    },
   },
   methods: {
+    onLocationInput() {
+      this.showDropdown = true;
+      this.filterCountries();
+    },
+    filterCountries() {
+      const input = this.locationName.toLowerCase().trim();
+
+      if (!input) {
+        this.filteredCountries = [];
+        return;
+      }
+
+      const allCountries = this.authStore.countries || [];
+
+      this.filteredCountries = allCountries.filter((country) =>
+        country.toLowerCase().includes(input)
+      );
+    },
+    selectCountry(country) {
+      this.locationName = country;
+      this.showDropdown = false;
+    },
+    handleOutsideClick(e) {
+      // close dropdown when click outside input + dropdown wrapper
+      if (!e.target.closest(".location-dropdown-wrapper")) {
+        this.showDropdown = false;
+      }
+    },
+
     initTooltips() {
       Object.values(this.$refs).forEach((el) => {
         new bootstrap.Tooltip(el);
@@ -617,14 +667,6 @@ export default {
     toggleDropdown(drop) {
     this.isOpen[drop] = !this.isOpen[drop];
   },
-    // toggleDropdown(dropdownName) {
-    //   for (const key in this.isOpen) {
-    //     if (key !== dropdownName) {
-    //       this.isOpen[key] = false;
-    //     }
-    //   }
-    //   this.isOpen[dropdownName] = !this.isOpen[dropdownName];
-    // },
     onClickOutside(event) {
       const isClickInsideDropdown1 = this.$refs.roleDropdown1.contains(event.target);
       const isClickInsideDropdown2 = this.$refs.roleDropdown2.contains(event.target);
@@ -1047,14 +1089,26 @@ export default {
     },
   },
   mounted() {
+    this.authStore.fetchCountries();
     const savedUsers = localStorage.getItem("addedUsers");
     if (savedUsers) {
       this.usersList = JSON.parse(savedUsers);
       console.log("📌 Loaded users from localStorage:", this.usersList);
     }
-    if (!this.authStore.locations.length) {
-    this.authStore.fetchLocations();
-  }
+    // 🟡 3️⃣ Fetch locations by admin id instead of old fetchLocations()
+      const user =
+        this.authStore.user ||
+        JSON.parse(localStorage.getItem("user") || "null");
+
+      if (user) {
+        this.authStore.user = user; // keep store in sync
+        const adminId =
+          user.admin_id || user.id || user._id;
+
+        if (adminId) {
+          this.authStore.fetchLocationsByAdminId(adminId);
+        }
+      }
     this.initTooltips();
     document.addEventListener('click', this.onClickOutside);
     try {
@@ -1124,16 +1178,34 @@ export default {
     } catch (err) {
       console.error("Redirect page error:", err);
     }
+     document.addEventListener("click", this.handleOutsideClick);
   },
   beforeUnmount() {
     document.removeEventListener('click', this.onClickOutside);
 
     window.removeEventListener("message", this.handleSlackMessage);
+
+    document.removeEventListener("click", this.handleOutsideClick);
   }
 };
 </script>
 
 <style scoped>
+  .location-autocomplete {
+  position: relative;
+}
+
+.location-autocomplete .country-dropdown {
+  position: absolute;
+  top: 100%;          /* just below input */
+  left: 0;
+  right: 0;           /* => same width as input */
+  z-index: 20;
+  max-height: 200px;
+  overflow-y: auto;
+  border-top: none;   /* optional: so it looks attached to input */
+}
+
 .multi-select-dropdown {
     position: relative;
     width: 160px;
