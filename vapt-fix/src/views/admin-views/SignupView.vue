@@ -8,7 +8,7 @@
         <p class="form-subheading mb-4">Join vaptfix, fix your vulnerabilities now</p>
 
         <div id="googleButton">
-        <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
+        <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Signup with Google</button>
       </div>
                      
                     <div class="d-flex align-items-center mt-3">
@@ -160,38 +160,44 @@ export default {
         callback: this.handleGoogleResponse,
       });
     },
-    async handleGoogleResponse(response) {
-  try {
-    const id_token = response.credential;
-    console.log("🧠 Received Google ID Token:", id_token);
+  //   async handleGoogleResponse(response) {
+  // try {
+  //   const id_token = response.credential;
+  //   console.log("🧠 Received Google ID Token:", id_token);
 
-    localStorage.setItem("google_id_token", id_token);
+  //   localStorage.setItem("google_id_token", id_token);
 
-    const authStore = useAuthStore();
-    const result = await authStore.googleLogin(id_token);
+  //   const authStore = useAuthStore();
+  //   const result = await authStore.googleLogin(id_token);
 
-    console.log("📦 Google login result:", result);
+  //   console.log("📦 Google login result:", result);
 
-    // ✅ use the same structure as your authStore return
-    if (result.status) {
-      const { user, tokens } = result;
+  //   // ✅ use the same structure as your authStore return
+  //   if (result.status) {
+  //     const { user, tokens } = result;
 
-      // ✅ save everything properly
-      if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
-      if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
-      if (user) localStorage.setItem("user", JSON.stringify(user));
+  //     // ✅ save everything properly
+  //     if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
+  //     if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
+  //     if (user) localStorage.setItem("user", JSON.stringify(user));
 
-      // Swal.fire("Success", "Google login successful ✅", "success");
+  //     // Swal.fire("Success", "Google login successful ✅", "success");
 
-      this.$router.push("/home");
-    } else {
-      Swal.fire("Error", result.message || "Google login failed ❌", "error");
-    }
-  } catch (error) {
-    console.error("Google login API error:", error);
-    Swal.fire("Error", "Something went wrong during Google login ❌", "error");
+  //     this.$router.push("/home");
+  //   } else {
+  //     Swal.fire("Error", result.message || "Google login failed ❌", "error");
+  //   }
+  // } catch (error) {
+  //   console.error("Google login API error:", error);
+  //   Swal.fire("Error", "Something went wrong during Google login ❌", "error");
+  // }
+  // },
+  async handleGoogleResponse(response) {
+  const result = await this.authStore.googleLogin(response.credential);
+  if (result.status) {
+    this.$router.push("/home");
   }
-  },
+},
   },
   mounted() {
   // ✅ Load Google Identity Services script safely
@@ -202,19 +208,17 @@ export default {
 
   // When script loads → initialize Google Login
   script.onload = () => {
-    // Initialize Google Sign-In
     google.accounts.id.initialize({
       client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
       callback: this.handleGoogleResponse,
     });
 
-    // Optional: render a Google button
     const buttonContainer = document.getElementById("googleButton");
     if (buttonContainer) {
       google.accounts.id.renderButton(buttonContainer, {
         theme: "outline",
         size: "large",
-        text: "signin_with",
+        text: "signup_with",
         shape: "rectangular",
       });
     }   

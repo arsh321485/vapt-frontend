@@ -528,9 +528,16 @@
               </div>
 
               <div class="text-end">
-                <router-link to="/riskcriteria" class="btn stepper-btn mt-5">
-                Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-                </router-link>
+                
+                <router-link
+  :to="nextPath"
+  class="btn stepper-btn mt-5"
+>
+  {{ buttonLabel }}
+  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+</router-link>
+
+
               </div>
 
             </div>
@@ -628,6 +635,16 @@ export default {
     authStore() {
       return useAuthStore();
     },
+    nextPath() {
+    return this.$route.query.from === "dashboard"
+      ? "/admindashboardonboarding"
+      : "/riskcriteria";
+  },
+   buttonLabel() {
+    return this.$route.query.from === "dashboard"
+      ? "Back to dashboard"
+      : "Next";
+  },
   },
   methods: {
     onLocationInput() {

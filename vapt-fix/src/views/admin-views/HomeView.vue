@@ -367,7 +367,6 @@
 <script>
 import Header from '@/components/admin-component/Header.vue';
 import Footer from '@/components/admin-component/Footer.vue';
-import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: 'HomeView',
@@ -375,14 +374,18 @@ export default {
     Header,
     Footer
   },
-  // Add this method to the methods section of your Home component
 methods: {
   handleFixNow() {
-    const isNew = localStorage.getItem("isNewUser") === "true";
-    if (isNew) {
-      localStorage.removeItem("isNewUser");
+    const isNewUser = localStorage.getItem("isNewUser");
+
+    // ✅ DEBUG LOG (ADD HERE)
+    console.log("isNewUser =", isNewUser);
+
+    if (isNewUser === "true") {
+      // NEW USER
       this.$router.push("/location");
     } else {
+      // OLD USER
       this.$router.push("/admindashboardonboarding");
     }
   }

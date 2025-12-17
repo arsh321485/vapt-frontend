@@ -155,17 +155,18 @@
 
 
                 <div class="text-end">
-                  <!-- <router-link to="/admindashboardonboarding" class="btn stepper-btn mt-5">
-                    Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-                  </router-link> -->
-                  <router-link
-  to="/admindashboardonboarding"
+         
+<router-link
+  :to="nextPath"
   class="btn stepper-btn mt-5"
   :class="{ disabled: !canGoNext }"
   @click.prevent="!canGoNext && blockNext()"
 >
-  Next <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+  {{ buttonLabel }}
+  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
 </router-link>
+
+
 
                 </div>
 
@@ -214,7 +215,23 @@ export default {
     this.uploadProgress === 100 &&
     !!localStorage.getItem("reportId")
   );
-}
+},
+nextPath() {
+    return "/admindashboardonboarding";
+  },
+
+  buttonLabel() {
+    return this.$route.query.from === "dashboard"
+      ? "Back to dashboard"
+      : "Next";
+  }
+// nextPath() {
+//     return this.$route.query.from === "dashboard"
+//       ? "/admindashboardonboarding"
+//       : "/admindashboardonboarding"; 
+      
+//   }
+
   },
   mounted() {
     const adminId =

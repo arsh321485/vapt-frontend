@@ -72,23 +72,11 @@
                   </div>
                 </div>
 
-                <div class="mb-4 pe-3 ms-3">
-                  <!-- <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
-                      style="padding-top: 6px;padding-bottom: 6px;">
-                    <button class="btn btn-sm btn-secondary" type="submit">Search</button>
-                  </form> -->
-                  <form class="d-flex" @submit.prevent="onSearch">
-                    <input v-model="query" class="form-control me-2" type="search" placeholder="Search" />
-                    <button class="btn btn-sm btn-secondary" type="submit">Search</button>
-                  </form>
-
-                  <div v-if="authStore.assetSearchResults.length" class="mt-3">
-                    <p>Found: {{ authStore.assetSearchCount }}</p>
-                    <ul>
-                      <li v-for="(a, i) in authStore.assetSearchResults" :key="i">{{ a.asset || a.ip || a }}</li>
-                    </ul>
-                  </div>
+                <div class="position-relative">
+                  <input v-model="query" class="form-control pe-5"  placeholder="Search asset"
+                     @input="onSearchInput" />
+                  <i v-if="query" class="bi bi-x-circle-fill position-absolute"
+                    style="right:12px; top:50%; transform:translateY(-50%); cursor:pointer;" @click="clearSearch"></i>
                 </div>
 
                 <!-- Asset List -->
@@ -164,14 +152,9 @@
                 <div class="asset-list-wrapper">
                   <div class="d-flex flex-column mt-3">
                     <div v-for="(asset, i) in pagedAssets" :key="asset.id || asset.asset || i"
-                      class="asset-item border-bottom"
-                      :class="{ active: activeIndex === asset.asset }"
-
-                      :style="activeIndex === asset.asset
-  ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);'
-  : ''"
-
-                      @click="setActive(asset)">
+                      class="asset-item border-bottom" :class="{ active: activeIndex === asset.asset }" :style="activeIndex === asset.asset
+                        ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);'
+                        : ''" @click="setActive(asset)">
 
                       <div class="d-flex justify-content-between">
                         <div class="d-flex justify-content-start gap-3">
@@ -376,7 +359,7 @@
                       </div>
 
                       <!-- Status Row (same as assets) -->
-                      
+
                       <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-1">
                         <span class="d-flex align-items-center">
                           <span class="rounded-circle me-1" style="width:6px;height:6px;background:#b31c1c"></span>
@@ -909,6 +892,7 @@ export default {
       currentPage: 1,
       pageSize: 5,
       query: "",
+      isSearching: false,
       reportId: localStorage.getItem("reportId"),
       selectedAsset: "",
       activeSeverity: 'All',
@@ -926,20 +910,38 @@ export default {
       return "Filter";
     },
     pagedAssets() {
-  const start = (this.currentPage - 1) * this.pageSize;
+      const start = (this.currentPage - 1) * this.pageSize;
 
-  // 🔥 clone + sort BEFORE pagination
-  const sorted = [...this.authStore.assetRows].sort((a, b) => {
-    const aSev = this.getPrioritySeverity(a);
-    const bSev = this.getPrioritySeverity(b);
+      // 🔍 STEP 1: filter by search query
+      let list = this.authStore.assetRows;
 
-    return this.getSeverityRank(aSev) - this.getSeverityRank(bSev);
-  });
+      if (this.query && this.query.trim()) {
+        const q = this.query.trim().toLowerCase();
 
-  return sorted.slice(start, start + this.pageSize);
+        list = list.filter(a =>
+          a.asset.toLowerCase().includes(q)
+        );
+      }
+
+      // 🔥 STEP 2: sort by severity
+      const sorted = [...list].sort((a, b) => {
+        return (
+          this.getSeverityRank(this.getPrioritySeverity(a)) -
+          this.getSeverityRank(this.getPrioritySeverity(b))
+        );
+      });
+
+      // 📄 STEP 3: paginate
+      return sorted.slice(start, start + this.pageSize);
     },
     totalPages() {
-      return Math.max(1, Math.ceil(this.authStore.assetRows.length / this.pageSize));
+      const list = this.query
+        ? this.authStore.assetRows.filter(a =>
+          a.asset.toLowerCase().includes(this.query.toLowerCase())
+        )
+        : this.authStore.assetRows;
+
+      return Math.max(1, Math.ceil(list.length / this.pageSize));
     },
     pageNumbers() {
       const pages = [];
@@ -947,54 +949,43 @@ export default {
       return pages;
     },
 
-    // filteredVulnerabilities() {
-    //   if (this.activeSeverity === 'All') {
-    //     return this.authStore.selectedAssetVulnerabilities;
-    //   }
-    //   return this.authStore.selectedAssetVulnerabilities.filter(
-    //     v => v.severity === this.activeSeverity
-    //   );
-    // },
-
     filteredVulnerabilities() {
-  const list =
-    this.activeSeverity === "All"
-      ? this.authStore.selectedAssetVulnerabilities
-      : this.authStore.selectedAssetVulnerabilities.filter(
-          v => v.severity === this.activeSeverity
+      const list =
+        this.activeSeverity === "All"
+          ? this.authStore.selectedAssetVulnerabilities
+          : this.authStore.selectedAssetVulnerabilities.filter(
+            v => v.severity === this.activeSeverity
+          );
+
+      // 🔥 sort by severity priority
+      return [...list].sort((a, b) => {
+        return (
+          this.getSeverityRank(a.severity) -
+          this.getSeverityRank(b.severity)
         );
-
-  // 🔥 sort by severity priority
-  return [...list].sort((a, b) => {
-    return (
-      this.getSeverityRank(a.severity) -
-      this.getSeverityRank(b.severity)
-    );
-  });
-},
-
-
+      });
+    },
     pagedHeldAssets() {
-  const start = (this.currentPage - 1) * this.pageSize;
+      const start = (this.currentPage - 1) * this.pageSize;
 
-  const sorted = [...this.heldAssets].sort((a, b) => {
-    const aSev = this.getHeldPrioritySeverity(a);
-    const bSev = this.getHeldPrioritySeverity(b);
+      const sorted = [...this.heldAssets].sort((a, b) => {
+        const aSev = this.getHeldPrioritySeverity(a);
+        const bSev = this.getHeldPrioritySeverity(b);
 
-    return this.getSeverityRank(aSev) - this.getSeverityRank(bSev);
-  });
+        return this.getSeverityRank(aSev) - this.getSeverityRank(bSev);
+      });
 
-  return sorted.slice(start, start + this.pageSize);
+      return sorted.slice(start, start + this.pageSize);
     },
   },
   watch: {
     pagedAssets: {
-    handler(list) {
-      if (list.length && !this.activeIndex) {
-        this.setActive(list[0]);
-      }
-    },
-    immediate: true
+      handler(list) {
+        if (list.length && !this.activeIndex) {
+          this.setActive(list[0]);
+        }
+      },
+      immediate: true
     },
     heldAssets: {
       handler(val) {
@@ -1007,11 +998,11 @@ export default {
   },
   methods: {
     getSeverityRank(sev) {
-  if (sev === "Critical") return 1;
-  if (sev === "High") return 2;
-  if (sev === "Medium") return 3;
-  if (sev === "Low") return 4;
-  return 99;
+      if (sev === "Critical") return 1;
+      if (sev === "High") return 2;
+      if (sev === "Medium") return 3;
+      if (sev === "Low") return 4;
+      return 99;
     },
     getSeverityColor(sev) {
       if (sev === "Critical") return "maroon";
@@ -1289,15 +1280,34 @@ export default {
       return "";
     },
 
-    async onSearch() {
-      if (!this.query || this.query.trim().length === 0) {
-        return;
-      }
-      console.log("[AssetsSearch] submitting:", this.query);
-      const res = await this.authStore.searchAssets(this.query.trim());
-      console.log("[AssetsSearch] result:", res);
-    },
+    onSearchInput() {
+    // user cleared using native ×
+    if (!this.query) {
+      this.clearSearch();
+      return;
+    }
 
+    // optional: live search (WhatsApp style)
+    this.authStore.searchAssets(
+      this.reportId,
+      this.query.trim()
+    );
+    },
+    clearSearch() {
+      this.query = "";
+      this.authStore.assetSearchResults = [];
+      this.authStore.assetSearchCount = 0;
+
+      this.currentPage = 1;
+      this.activeIndex = null;
+
+      // open first asset again
+      this.$nextTick(() => {
+        if (this.pagedAssets.length) {
+          this.setActive(this.pagedAssets[0]);
+        }
+      });
+    },
     goToPage(page) {
       if (page < 1 || page > this.totalPages) return;
       this.currentPage = page;

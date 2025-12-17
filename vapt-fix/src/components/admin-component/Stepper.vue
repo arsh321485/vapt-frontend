@@ -26,8 +26,6 @@
       :class="{ active: isCompletedOrActive(2) }"
       @click="goToStep(2)"
     >
-    <!-- Logo above Step 2 -->
-  <!-- <img src="@/assets/images/smaller-logo.png" alt="logo" class="step-logo"> -->
 
       <div class="step-circle">2</div>
       <div class="label">Risk Criteria</div>
@@ -64,20 +62,27 @@ export default {
     currentStep() {
       return this.steps.indexOf(this.$route.path) + 1;
     },
+    isFromDashboard() {
+    return this.$route.query.from === "dashboard";
+  }
   },
  methods: {
+  // isCompletedOrActive(step) {
+  //   return step <= this.currentStep;
+  // },
+  // goToStep(step) {
+  //   const currentIndex = this.currentStep;
+  //   if (step === currentIndex - 1) {
+  //     this.$router.push(this.steps[step - 1]);
+  //   }
+  // }
   isCompletedOrActive(step) {
     return step <= this.currentStep;
   },
   goToStep(step) {
+    if (this.isFromDashboard && step === 2) return;
+
     const currentIndex = this.currentStep;
-
-    // Going forward (only next step allowed)
-    // if (step === currentIndex + 1) {
-    //   this.$router.push(this.steps[step - 1]);
-    // }
-
-    // Going backward (only previous step allowed)
     if (step === currentIndex - 1) {
       this.$router.push(this.steps[step - 1]);
     }

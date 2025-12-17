@@ -113,38 +113,109 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // signup
+  // async signup(payload: any) {
+  // try {
+  //   const res = await endpoint.post(
+  //     "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
+  //     payload
+  //   );
+
+  //   const data = res.data;
+
+  //   if (data.tokens?.access) {
+  //     this.setAuth(data.tokens.access, data.user);
+
+  //     if (data.tokens.refresh) {
+  //       localStorage.setItem("refreshToken", data.tokens.refresh);
+  //     }
+  //   }
+
+  //   localStorage.setItem("isNewUser", "true");
+  //   return { status: true, data };
+  // } catch (error: any) {
+  //   return {
+  //     status: false,
+  //     message:
+  //       error.response?.data?.message ||
+  //       error.message ||
+  //       "Signup failed",
+  //     details: error.response?.data || null,
+  //   };
+  // }
+  // },
   async signup(payload: any) {
-  try {
-    const res = await endpoint.post(
-      "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
-      payload
-    );
+    try {
+      const res = await endpoint.post(
+        "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
+        payload
+      );
 
-    const data = res.data;
+      const data = res.data;
 
-    if (data.tokens?.access) {
-      this.setAuth(data.tokens.access, data.user);
-
-      if (data.tokens.refresh) {
-        localStorage.setItem("refreshToken", data.tokens.refresh);
+      if (data.tokens?.access) {
+        this.setAuth(data.tokens.access, data.user);
+        if (data.tokens.refresh) {
+          localStorage.setItem("refreshToken", data.tokens.refresh);
+        }
       }
-    }
 
-    localStorage.setItem("isNewUser", "true");
-    return { status: true, data };
-  } catch (error: any) {
-    return {
-      status: false,
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Signup failed",
-      details: error.response?.data || null,
-    };
-  }
+      // ✅ NEW USER
+      localStorage.setItem("isNewUser", "true");
+
+      return { status: true, data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || "Signup failed",
+        details: error.response?.data || null,
+      };
+    }
   },
 
   // ✅ Login (signin)
+  // async login(payload: any) {
+  //   try {
+  //     const res = await endpoint.post(
+  //       "https://vaptbackend.secureitlab.com/api/admin/users/login/",
+  //       payload
+  //     );
+
+  //     const data = res.data;
+
+  //     if (data.tokens?.access) {
+  //       this.setAuth(data.tokens.access, data.user, data.locations || []);
+
+  //       if (data.tokens.refresh) {
+  //         localStorage.setItem("refreshToken", data.tokens.refresh);
+  //       }
+
+  //       if (data?.user) {
+  //         this.user = data.user;
+  //         localStorage.setItem("user", JSON.stringify(this.user));
+  //       }
+
+  //       const adminId =
+  //         data.user.admin_id || data.user.id || data.user._id;
+
+  //       if (adminId) {
+  //         await this.fetchLocationsByAdminId(adminId);
+  //       }
+  //     }
+
+  //     // localStorage.setItem("isNewUser", "false");
+  //     localStorage.removeItem("isNewUser");
+  //     return { status: true, data };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         error.message ||
+  //         "Login failed",
+  //       details: error.response?.data || null,
+  //     };
+  //   }
+  // },
   async login(payload: any) {
     try {
       const res = await endpoint.post(
@@ -156,37 +227,84 @@ export const useAuthStore = defineStore("auth", {
 
       if (data.tokens?.access) {
         this.setAuth(data.tokens.access, data.user, data.locations || []);
-
         if (data.tokens.refresh) {
           localStorage.setItem("refreshToken", data.tokens.refresh);
         }
-
-        if (data?.user) {
-          this.user = data.user;
-          localStorage.setItem("user", JSON.stringify(this.user));
-        }
-
-        const adminId =
-          data.user.admin_id || data.user.id || data.user._id;
-
-        if (adminId) {
-          await this.fetchLocationsByAdminId(adminId);
-        }
       }
 
+      // ✅ OLD USER
       localStorage.setItem("isNewUser", "false");
+
       return { status: true, data };
     } catch (error: any) {
       return {
         status: false,
-        message:
-          error.response?.data?.message ||
-          error.message ||
-          "Login failed",
+        message: error.response?.data?.message || "Login failed",
         details: error.response?.data || null,
       };
     }
   },
+
+  // ✅ Google login
+  // async googleLogin(id_token: string) {
+  // try {
+  //   const response = await endpoint.post("/admin/users/google-oauth/", {
+  //     id_token,
+  //   });
+
+  //   const data = response.data;
+  //   console.log("✅ Google login successful:", data);
+
+  //   if (data && data.tokens && data.user) {
+  //     // Save to localStorage
+  //     localStorage.setItem("user", JSON.stringify(data.user));
+  //     localStorage.setItem("authorization", data.tokens.access);
+  //     localStorage.setItem("refreshToken", data.tokens.refresh);
+  //     localStorage.setItem("authenticated", JSON.stringify(true));
+
+  //     this.user = data.user;
+  //     this.token = data.tokens.access;
+  //     this.accessToken = data.tokens.access;
+  //     this.refreshToken = data.tokens.refresh;
+  //     this.authenticated = true;
+
+  //     // ✅ also store google_id_token for restoration
+  //     localStorage.setItem("google_id_token", id_token);
+
+  //     return { status: true, data }; // <-- important
+  //   } else {
+  //     return { status: false, message: "Invalid Google login response" };
+  //   }
+  // } catch (error: any) {
+  //   console.error("❌ Google login API error:", error);
+  //   return {
+  //     status: false,
+  //     message:
+  //       error.response?.data?.message || "Google login failed, please try again",
+  //   };
+  // }
+  // },
+  async googleLogin(id_token: string) {
+  const res = await endpoint.post("/admin/users/google-oauth/", { id_token });
+  const data = res.data;
+
+  if (!data?.tokens?.access || !data?.user) {
+    return { status: false, message: "Google login failed" };
+  }
+
+  this.setAuth(data.tokens.access, data.user);
+  localStorage.setItem("refreshToken", data.tokens.refresh);
+
+  // ✅ TRUST BACKEND (THIS IS THE FIX)
+  localStorage.setItem(
+    "isNewUser",
+    data.is_new_user === true ? "true" : "false"
+  );
+
+  console.log("Google login → isNewUser =", localStorage.getItem("isNewUser"));
+
+  return { status: true };
+},
 
   // ✅ Forgot Password
   async forgotPassword(payload: { email: string }) {
@@ -655,46 +773,6 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // ✅ Google login
-  async googleLogin(id_token: string) {
-  try {
-    const response = await endpoint.post("/admin/users/google-oauth/", {
-      id_token,
-    });
-
-    const data = response.data;
-    console.log("✅ Google login successful:", data);
-
-    if (data && data.tokens && data.user) {
-      // Save to localStorage
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("authorization", data.tokens.access);
-      localStorage.setItem("refreshToken", data.tokens.refresh);
-      localStorage.setItem("authenticated", JSON.stringify(true));
-
-      this.user = data.user;
-      this.token = data.tokens.access;
-      this.accessToken = data.tokens.access;
-      this.refreshToken = data.tokens.refresh;
-      this.authenticated = true;
-
-      // ✅ also store google_id_token for restoration
-      localStorage.setItem("google_id_token", id_token);
-
-      return { status: true, data }; // <-- important
-    } else {
-      return { status: false, message: "Invalid Google login response" };
-    }
-  } catch (error: any) {
-    console.error("❌ Google login API error:", error);
-    return {
-      status: false,
-      message:
-        error.response?.data?.message || "Google login failed, please try again",
-    };
-  }
-  },
-
   // fetch total assets
   async fetchTotalAssets(reportId: string) {
   try {
@@ -873,6 +951,51 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // search assets (UPDATED for new API)
+  async searchAssets(reportId: string, q: string) {
+    try {
+      console.log("[authStore] searchAssets ->", { reportId, q });
+
+      const res = await endpoint.get(
+        `/admin/adminasset/report/${reportId}/assets/`,
+        {
+          params: { q }
+        }
+      );
+
+      const assets = res.data.assets || [];
+
+      // normalize same as fetchAssets
+      const normalized = assets.map((a: any) => ({
+        ...a,
+        selected: false,
+        held: false,
+        isInternal: (a.exposure || "").toLowerCase() === "internal",
+        host_information: a.host_information || {},
+        severity_counts: a.severity_counts || {
+          critical: 0,
+          high: 0,
+          medium: 0,
+          low: 0
+        }
+      }));
+
+      this.assetSearchResults = normalized;
+      this.assetSearchCount =
+        res.data.total_assets ?? normalized.length;
+
+      console.log("[authStore] searchAssets results:", normalized);
+
+      return { status: true, data: normalized };
+    } catch (error: any) {
+      console.error(
+        "[authStore] searchAssets error:",
+        error.response?.data || error.message
+      );
+      return { status: false, error: error.response?.data || error.message };
+    }
+  },
+
   // DELETE Asset from report
   async deleteAsset(reportId: string, assetIp: string) {
     try {
@@ -956,25 +1079,6 @@ export const useAuthStore = defineStore("auth", {
         status: false,
         message: error.response?.data?.detail || "Failed to unhold asset",
       };
-    }
-  },
-
-  // search assets
-  async searchAssets(q: string) {
-    try {
-      console.log("[authStore] searchAssets -> q:", q);
-      const res = await endpoint.get("/admin/adminasset/assets/search/", {
-        params: { q }, 
-      });
-
-      console.log("[authStore] searchAssets response:", res.data);
-      this.assetSearchResults = res.data.results || res.data.assets || [];
-      this.assetSearchCount = res.data.count ?? this.assetSearchResults.length;
-
-      return { status: true, data: res.data };
-    } catch (error: any) {
-      console.error("[authStore] searchAssets error:", error.response?.data || error.message);
-      return { status: false, error: error.response?.data || error.message };
     }
   },
 
@@ -1124,6 +1228,7 @@ export const useAuthStore = defineStore("auth", {
       localStorage.removeItem("authenticated");
       localStorage.removeItem("locations");
       localStorage.removeItem("google_id_token");
+      localStorage.removeItem("isNewUser");
       this.user = null;
       this.accessToken = null;
       this.refreshToken = null;
