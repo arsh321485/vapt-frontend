@@ -113,36 +113,6 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // signup
-  // async signup(payload: any) {
-  // try {
-  //   const res = await endpoint.post(
-  //     "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
-  //     payload
-  //   );
-
-  //   const data = res.data;
-
-  //   if (data.tokens?.access) {
-  //     this.setAuth(data.tokens.access, data.user);
-
-  //     if (data.tokens.refresh) {
-  //       localStorage.setItem("refreshToken", data.tokens.refresh);
-  //     }
-  //   }
-
-  //   localStorage.setItem("isNewUser", "true");
-  //   return { status: true, data };
-  // } catch (error: any) {
-  //   return {
-  //     status: false,
-  //     message:
-  //       error.response?.data?.message ||
-  //       error.message ||
-  //       "Signup failed",
-  //     details: error.response?.data || null,
-  //   };
-  // }
-  // },
   async signup(payload: any) {
     try {
       const res = await endpoint.post(
@@ -173,49 +143,6 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Login (signin)
-  // async login(payload: any) {
-  //   try {
-  //     const res = await endpoint.post(
-  //       "https://vaptbackend.secureitlab.com/api/admin/users/login/",
-  //       payload
-  //     );
-
-  //     const data = res.data;
-
-  //     if (data.tokens?.access) {
-  //       this.setAuth(data.tokens.access, data.user, data.locations || []);
-
-  //       if (data.tokens.refresh) {
-  //         localStorage.setItem("refreshToken", data.tokens.refresh);
-  //       }
-
-  //       if (data?.user) {
-  //         this.user = data.user;
-  //         localStorage.setItem("user", JSON.stringify(this.user));
-  //       }
-
-  //       const adminId =
-  //         data.user.admin_id || data.user.id || data.user._id;
-
-  //       if (adminId) {
-  //         await this.fetchLocationsByAdminId(adminId);
-  //       }
-  //     }
-
-  //     // localStorage.setItem("isNewUser", "false");
-  //     localStorage.removeItem("isNewUser");
-  //     return { status: true, data };
-  //   } catch (error: any) {
-  //     return {
-  //       status: false,
-  //       message:
-  //         error.response?.data?.message ||
-  //         error.message ||
-  //         "Login failed",
-  //       details: error.response?.data || null,
-  //     };
-  //   }
-  // },
   async login(payload: any) {
     try {
       const res = await endpoint.post(
@@ -246,44 +173,6 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Google login
-  // async googleLogin(id_token: string) {
-  // try {
-  //   const response = await endpoint.post("/admin/users/google-oauth/", {
-  //     id_token,
-  //   });
-
-  //   const data = response.data;
-  //   console.log("✅ Google login successful:", data);
-
-  //   if (data && data.tokens && data.user) {
-  //     // Save to localStorage
-  //     localStorage.setItem("user", JSON.stringify(data.user));
-  //     localStorage.setItem("authorization", data.tokens.access);
-  //     localStorage.setItem("refreshToken", data.tokens.refresh);
-  //     localStorage.setItem("authenticated", JSON.stringify(true));
-
-  //     this.user = data.user;
-  //     this.token = data.tokens.access;
-  //     this.accessToken = data.tokens.access;
-  //     this.refreshToken = data.tokens.refresh;
-  //     this.authenticated = true;
-
-  //     // ✅ also store google_id_token for restoration
-  //     localStorage.setItem("google_id_token", id_token);
-
-  //     return { status: true, data }; // <-- important
-  //   } else {
-  //     return { status: false, message: "Invalid Google login response" };
-  //   }
-  // } catch (error: any) {
-  //   console.error("❌ Google login API error:", error);
-  //   return {
-  //     status: false,
-  //     message:
-  //       error.response?.data?.message || "Google login failed, please try again",
-  //   };
-  // }
-  // },
   async googleLogin(id_token: string) {
   const res = await endpoint.post("/admin/users/google-oauth/", { id_token });
   const data = res.data;
@@ -304,7 +193,7 @@ export const useAuthStore = defineStore("auth", {
   console.log("Google login → isNewUser =", localStorage.getItem("isNewUser"));
 
   return { status: true };
-},
+  },
 
   // ✅ Forgot Password
   async forgotPassword(payload: { email: string }) {

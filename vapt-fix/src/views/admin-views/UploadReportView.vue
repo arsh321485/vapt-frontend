@@ -49,11 +49,10 @@
                       <div>
                         <select v-model="selectedLocation" class="form-select" @change="checkLocation">
                           <option selected disabled value="">Select Location</option>
-                          <option value="ALL">
+                          <option  v-if="authStore.locations && authStore.locations.length > 0" value="ALL">
                             Apply for all locations
                           </option>
-                          <option v-for="loc in authStore.locations"
-                           :key="loc._id" :value="loc._id"
+                          <option v-for="loc in authStore.locations" :key="loc._id" :value="loc._id"
                             :disabled="isAlreadyUploaded(loc._id, selectedType)">
                             {{ loc.location_name }}
                           </option>
@@ -76,18 +75,14 @@
                     <div class="text-center py-5">
                       <!-- Before upload -->
                       <div v-if="!uploadingStarted">
-                        <input type="file" ref="pdfFileInput"
-                           accept=".nessus,.html,text/html,application/octet-stream"
+                        <input type="file" ref="pdfFileInput" accept=".nessus,.html,text/html,application/octet-stream"
                           @change="handleFileUpload" style="display: none" />
                         <!-- <button class="btn upload-report-btn" @click="triggerFileInput"
                           :disabled="!selectedLocation || !selectedType">
                           <i class="bi bi-arrow-up-circle fs-5"></i>
                         </button> -->
-                        <button
-                          class="btn upload-report-btn"
-                          @click="triggerFileInput"
-                          :disabled="!selectedLocation || !selectedType || uploadedFiles.length >= 1"
-                        >
+                        <button class="btn upload-report-btn" @click="triggerFileInput"
+                          :disabled="!selectedLocation || !selectedType || uploadedFiles.length >= 1">
                           <i class="bi bi-arrow-up-circle fs-5"></i>
                         </button>
                         <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
@@ -155,19 +150,11 @@
 
 
                 <div class="text-end">
-         
-<router-link
-  :to="nextPath"
-  class="btn stepper-btn mt-5"
-  :class="{ disabled: !canGoNext }"
-  @click.prevent="!canGoNext && blockNext()"
->
-  {{ buttonLabel }}
-  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-</router-link>
-
-
-
+                  <router-link :to="nextPath" class="btn stepper-btn mt-5" :class="{ disabled: !canGoNext }"
+                    @click.prevent="!canGoNext && blockNext()">
+                    {{ buttonLabel }}
+                    <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+                  </router-link>
                 </div>
 
               </div>
@@ -210,28 +197,21 @@ export default {
   },
   computed: {
     canGoNext() {
-  return (
-    this.uploadedFiles.length > 0 &&
-    this.uploadProgress === 100 &&
-    !!localStorage.getItem("reportId")
-  );
-},
-nextPath() {
-    return "/admindashboardonboarding";
-  },
+      return (
+        this.uploadedFiles.length > 0 &&
+        this.uploadProgress === 100 &&
+        !!localStorage.getItem("reportId")
+      );
+    },
+    nextPath() {
+      return "/admindashboardonboarding";
+    },
 
-  buttonLabel() {
-    return this.$route.query.from === "dashboard"
-      ? "Back to dashboard"
-      : "Next";
-  }
-// nextPath() {
-//     return this.$route.query.from === "dashboard"
-//       ? "/admindashboardonboarding"
-//       : "/admindashboardonboarding"; 
-      
-//   }
-
+    buttonLabel() {
+      return this.$route.query.from === "dashboard"
+        ? "Back to dashboard"
+        : "Next";
+    }
   },
   mounted() {
     const adminId =
@@ -284,113 +264,102 @@ nextPath() {
       return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
     },
     async handleFileUpload(event) {
-  const file = event.target.files[0];
+      const file = event.target.files[0];
 
-  if (!file || !this.selectedLocation || !this.selectedType) return;
+      if (!file || !this.selectedLocation || !this.selectedType) return;
+      if (this.isAlreadyUploaded(this.selectedLocation, this.selectedType)) {
+        Swal.fire({
+          icon: "error",
+          title: "Already uploaded",
+          text: `A report for this location (${this.selectedType}) is already uploaded. Please change location or type.`,
+        });
+        if (this.$refs.pdfFileInput) {
+          this.$refs.pdfFileInput.value = "";
+        }
+        return;
+      }
+      const fileHash = await this.getFileHash(file);
+      const duplicate = this.uploadedFiles.some((f) => f.hash === fileHash);
+      if (duplicate) {
+        Swal.fire({
+          icon: "error",
+          title: "Duplicate File",
+          text: "This file has already been uploaded (same content)!",
+        });
+        if (this.$refs.pdfFileInput) {
+          this.$refs.pdfFileInput.value = "";
+        }
+        return;
+      }
 
-  // ❌ Don't allow duplicate (location + type)
-  if (this.isAlreadyUploaded(this.selectedLocation, this.selectedType)) {
-    Swal.fire({
-      icon: "error",
-      title: "Already uploaded",
-      text: `A report for this location (${this.selectedType}) is already uploaded. Please change location or type.`,
-    });
-    if (this.$refs.pdfFileInput) {
-      this.$refs.pdfFileInput.value = "";
-    }
-    return;
-  }
+      this.uploadingStarted = true;
+      this.uploadedFileName = file.name;
+      this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
+      this.uploadProgress = 20;
+      const formData = new FormData();
+      const locationToSend =
+        this.selectedLocation === "ALL" ? "all" : this.selectedLocation; 
+      formData.append("location", locationToSend);   
+      formData.append("member_type", this.selectedType); 
+      formData.append("file", file); 
+      const res = await this.authStore.uploadReport(formData);
 
-  // ✅ Optional: same-content (hash) check
-  const fileHash = await this.getFileHash(file);
-  const duplicate = this.uploadedFiles.some((f) => f.hash === fileHash);
-  if (duplicate) {
-    Swal.fire({
-      icon: "error",
-      title: "Duplicate File",
-      text: "This file has already been uploaded (same content)!",
-    });
-    if (this.$refs.pdfFileInput) {
-      this.$refs.pdfFileInput.value = "";
-    }
-    return;
-  }
+      if (!res.status) {
+        console.error("❌ Upload report failed:", res);
+        Swal.fire({
+          icon: "error",
+          title: "Upload failed",
+          text: res.message || "Something went wrong. Please try again.",
+        });
 
-  this.uploadingStarted = true;
-  this.uploadedFileName = file.name;
-  this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
-  this.uploadProgress = 20;
+        this.uploadingStarted = false;
+        this.uploadProgress = 0;
+        if (this.$refs.pdfFileInput) {
+          this.$refs.pdfFileInput.value = "";
+        }
+        return;
+      }
+      console.log("✅ Final upload response:", res.data);
+      this.uploadProgress = 100;
 
-  // 🔹 Build FormData for API
-  const formData = new FormData();
+      const reportId = res.reportId || res.data?.upload_report?._id || res.data?.upload_report?.id || null;
 
-  // Backend expects "all" string when user selects ALL
-  const locationToSend =
-    this.selectedLocation === "ALL" ? "all" : this.selectedLocation; // ✅ ObjectId or "all"
+      if (reportId) {
+        localStorage.setItem("reportId", reportId);
+        await this.authStore.fetchTotalAssets(reportId);
+        await this.authStore.fetchAvgScore(reportId);
+        await this.authStore.fetchVulnerabilities(reportId);
+      } else {
+        console.warn("No reportId returned from upload response");
+      }
 
-  formData.append("location", locationToSend);   // or "Location" if your backend is case-sensitive that way
-  formData.append("member_type", this.selectedType); // internal / external
-  formData.append("file", file); // "file" field name as in backend
+      // update UI list as before (store values are now populated)
+      const fileURL = URL.createObjectURL(file);
 
-  // 🔹 Call API via authStore
-  const res = await this.authStore.uploadReport(formData);
+      const locationName =
+        this.selectedLocation === "ALL"
+          ? "All locations"
+          : this.getLocationName(this.selectedLocation);
 
-  if (!res.status) {
-    console.error("❌ Upload report failed:", res);
-    Swal.fire({
-      icon: "error",
-      title: "Upload failed",
-      text: res.message || "Something went wrong. Please try again.",
-    });
+      this.uploadedFiles = [
+        {
+          locationId: this.selectedLocation,
+          location: locationName,
+          type: this.selectedType,
+          fileName: this.uploadedFileName,
+          fileURL,
+          hash: fileHash,
+          reportId,
+        },
+      ];
 
-    this.uploadingStarted = false;
-    this.uploadProgress = 0;
-    if (this.$refs.pdfFileInput) {
-      this.$refs.pdfFileInput.value = "";
-    }
-    return;
-  }  
-console.log("✅ Final upload response:", res.data);
-this.uploadProgress = 100;
+      this.showToast(
+        `File "${this.uploadedFileName}" uploaded for ${locationName} (${this.selectedType}) ✅`
+      );
 
-const reportId = res.reportId || res.data?.upload_report?._id || res.data?.upload_report?.id || null;
-
-if (reportId) {
-  localStorage.setItem("reportId", reportId);
-  await this.authStore.fetchTotalAssets(reportId);
-  await this.authStore.fetchAvgScore(reportId);
-  await this.authStore.fetchVulnerabilities(reportId);
-} else {
-  console.warn("No reportId returned from upload response");
-}
-
-// update UI list as before (store values are now populated)
-const fileURL = URL.createObjectURL(file);
-
-const locationName =
-  this.selectedLocation === "ALL"
-    ? "All locations"
-    : this.getLocationName(this.selectedLocation);
-
-this.uploadedFiles = [
-  {
-    locationId: this.selectedLocation,
-    location: locationName,
-    type: this.selectedType,
-    fileName: this.uploadedFileName,
-    fileURL,
-    hash: fileHash,
-    reportId, 
-  },
-];
-
-this.showToast(
-  `File "${this.uploadedFileName}" uploaded for ${locationName} (${this.selectedType}) ✅`
-);
-
-if (this.$refs.pdfFileInput) {
-  this.$refs.pdfFileInput.value = "";
-}
+      if (this.$refs.pdfFileInput) {
+        this.$refs.pdfFileInput.value = "";
+      }
     },
     getLocationName(id) {
       const loc = this.authStore.locations.find((l) => l._id === id);
@@ -431,12 +400,12 @@ if (this.$refs.pdfFileInput) {
       }, 5000);
     },
     blockNext() {
-  Swal.fire({
-    icon: "warning",
-    title: "Upload required",
-    text: "Please complete report upload before proceeding.",
-  });
-},
+      Swal.fire({
+        icon: "warning",
+        title: "Upload required",
+        text: "Please complete report upload before proceeding.",
+      });
+    },
   }
 
 };

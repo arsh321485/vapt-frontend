@@ -35,17 +35,16 @@
                         <option value="external">External</option>
                       </select>
                     </form>
-                    <div class="filter-dropdown d-inline">
-                      <!-- Filter Button -->
+                    <!-- <div class="filter-dropdown d-inline">
+                     
                       <button class="btn btn-sm py-2 px-3 filter-btn dropdown-toggle"
                         style="border-radius: 20px; border-color: rgba(0, 0, 0, 0.12);" data-bs-toggle="dropdown">
                         <i class="bi bi-funnel me-1"></i>
                         {{ filterLabel }}
                       </button>
 
-                      <!-- Filter Options -->
                       <div class="dropdown-menu p-3 filter-content" style="min-width: 250px;">
-                        <!-- Severity -->
+                       
                         <div class="mb-3">
                           <label class="form-label fw-bold">Severity</label>
                           <select class="form-select" v-model="selectedSeverity">
@@ -56,18 +55,18 @@
                             <option value="low">Low</option>
                           </select>
                         </div>
-                        <!-- IP Address -->
+                      
                         <div class="mb-3">
                           <label class="form-label fw-bold">IP Address</label>
                           <input type="text" class="form-control" placeholder="Enter IP address" v-model="ipAddress"
                             @input="formatIP" @keypress="validateIPInput" />
                         </div>
-                        <!-- Apply Button -->
+                       
                         <button class="btn btn-primary w-100 btn-sm" @click="applyFilters">
                           Apply Filters
                         </button>
                       </div>
-                    </div>
+                    </div> -->
 
                   </div>
                 </div>

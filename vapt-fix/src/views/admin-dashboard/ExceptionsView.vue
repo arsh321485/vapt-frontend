@@ -214,9 +214,9 @@
           <p class="mb-1" style="font-size: 14px;"><strong> <i class="bi bi-check-circle-fill text-success me-1"></i> Vendor Fix Available: </strong>Yes</p>
         </div>
 
-        <div class="asset-card p-2 mb-3">
+        <!-- <div class="asset-card p-2 mb-3">
             <p class="mb-1" style="font-size: 14px;"><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Hostname: </strong>fra-sto-shr-uat-lda9-evt-mgr-dbmigration</p>
-        </div>
+        </div> -->
       
 
       <!-- Description Card -->

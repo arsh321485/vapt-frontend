@@ -230,7 +230,8 @@ export default {
   if (window.grecaptcha) {
     window.grecaptcha.ready(() => {
       window.grecaptcha.render("recaptcha-container", {
-        sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
+        // sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
+        sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
       });
     });
   }
