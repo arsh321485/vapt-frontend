@@ -7,7 +7,7 @@
         <h1 class="form-heading mb-3">Welcome back!</h1>
         <p class="form-subheading mb-4">Login into your account to start fixing.</p>
 
-        <!-- <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button> -->
+        
          <div id="googleButton">
         <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
       </div>
@@ -177,44 +177,101 @@ export default {
   }
     },
   },
-  mounted() {
-  const script = document.createElement("script");
-  script.src = "https://accounts.google.com/gsi/client";
-  script.async = true;
-  script.defer = true;
-  script.onload = () => {
+  // mounted() {
+  // const script = document.createElement("script");
+  // script.src = "https://accounts.google.com/gsi/client";
+  // script.async = true;
+  // script.defer = true;
+  // script.onload = () => {
+  //   google.accounts.id.initialize({
+  //     client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
+  //     callback: this.handleGoogleResponse,
+  //   });
+
+  //   const buttonContainer = document.getElementById("googleButton");
+  //   if (buttonContainer) {
+  //     google.accounts.id.renderButton(buttonContainer, {
+  //       theme: "outline",
+  //       size: "large",
+  //       text: "signin_with",
+  //       shape: "rectangular",
+  //     });
+  //   } 
+  // };
+
+  // document.head.appendChild(script);
+
+  // if (window.grecaptcha) {
+  //   window.grecaptcha.ready(() => {
+  //     window.grecaptcha.render("recaptcha-container", {
+  //       // sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
+  //       sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
+  //     });
+  //   });
+  // }
+  // const isAuthenticated = localStorage.getItem("authenticated");
+  // if (isAuthenticated === "true") {
+  //   this.$router.push("/home");
+  // }
+  // },
+  beforeUnmount() {
+  if (window.grecaptcha) {
+    try {
+      window.grecaptcha.reset();
+    } catch (e) {}
+  }
+},
+mounted() {
+  const googleScript = document.createElement("script");
+  googleScript.src = "https://accounts.google.com/gsi/client";
+  googleScript.async = true;
+  googleScript.defer = true;
+
+  googleScript.onload = () => {
     google.accounts.id.initialize({
       client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
       callback: this.handleGoogleResponse,
     });
 
-    // Optional: render a Google button
-    const buttonContainer = document.getElementById("googleButton");
-    if (buttonContainer) {
-      google.accounts.id.renderButton(buttonContainer, {
-        theme: "outline",
-        size: "large",
-        text: "signin_with",
-        shape: "rectangular",
-      });
-    } 
+    const btn = document.getElementById("googleButton");
+if (btn) {
+  google.accounts.id.renderButton(btn, {
+    theme: "outline",
+    size: "large",
+    text: "signin_with",
+    shape: "rectangular",
+  });
+}
+
   };
 
-  document.head.appendChild(script);
+  document.head.appendChild(googleScript);
 
-  if (window.grecaptcha) {
-    window.grecaptcha.ready(() => {
-      window.grecaptcha.render("recaptcha-container", {
-        // sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
-        sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
-      });
-    });
-  }
+  const recaptchaScript = document.createElement("script");
+  recaptchaScript.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+  recaptchaScript.async = true;
+  recaptchaScript.defer = true;
+
+  recaptchaScript.onload = () => {
+  if (this.$route.name !== "signin") return;
+
+  const el = document.getElementById("recaptcha-container");
+  if (!el) return;
+
+  window.grecaptcha.render(el, {
+    sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
+  });
+};
+
+
+  document.head.appendChild(recaptchaScript);
+
   const isAuthenticated = localStorage.getItem("authenticated");
   if (isAuthenticated === "true") {
     this.$router.push("/home");
   }
-  },
+}
+
 };
 </script>
 

@@ -53,11 +53,26 @@
         </div>
 
         <div>
-          <router-link to="/supportticket">
+          <!-- <router-link to="/supportticket">
           <button class="btn border-0" :class="{ activeBtn: isActive('/supportticket') }">
           <i class="bi bi-question-circle nav-menu"></i>
           <p class="menu-heading">Tickets</p></button>
-          </router-link>
+          </router-link> -->
+          <router-link
+  :to="{
+    name: 'supportticket',
+    params: { reportId: activeReportId }
+  }"
+>
+  <button
+    class="btn border-0"
+    :class="{ activeBtn: isActive('/supportticket') }"
+  >
+    <i class="bi bi-question-circle nav-menu"></i>
+    <p class="menu-heading">Tickets</p>
+  </button>
+</router-link>
+
         </div>
 
        <div>
@@ -78,6 +93,7 @@
 
 <script>
 import { RouterLink, useRoute } from "vue-router";
+
 export default {
   name: 'DashboardMenu',
   setup() {
@@ -85,7 +101,13 @@ export default {
     const isActive = (path) => route.path === path;
 
     return { route, isActive };
-  }
+  },
+  
+  data() {
+  return {
+    activeReportId: localStorage.getItem("reportId") || ""
+  };
+}
   
 };
 </script>

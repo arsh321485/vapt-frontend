@@ -118,12 +118,7 @@ export default {
         const result = await authStore.signup(this.form);
 
         if (result.status) {
-          // Swal.fire(
-          //   "Success",
-          //   result.data.message || "Signup successful ✅",
-          //   "success"
-          // );
-
+          
           // 🔎 Debug logs (tokens & user)
           console.log("✅ Access Token:", localStorage.getItem("authorization"));
           console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
@@ -152,7 +147,6 @@ export default {
     toggleConfirmPassword() {
       this.showConfirmPassword = !this.showConfirmPassword;
     },
-    //  Google login 
   initializeGoogleLogin() {
       google.accounts.id.initialize({
         client_id:
@@ -160,88 +154,128 @@ export default {
         callback: this.handleGoogleResponse,
       });
     },
-  //   async handleGoogleResponse(response) {
-  // try {
-  //   const id_token = response.credential;
-  //   console.log("🧠 Received Google ID Token:", id_token);
+//   async handleGoogleResponse(response) {
+//   const result = await this.authStore.googleLogin(response.credential);
+//   if (result.status) {
+//     this.$router.push("/home");
+//   }
+// },
+async handleGoogleResponse(response) {
+  const res = await this.authStore.googleLogin(response.credential);
 
-  //   localStorage.setItem("google_id_token", id_token);
+  if (!res) return;
 
-  //   const authStore = useAuthStore();
-  //   const result = await authStore.googleLogin(id_token);
+  const user = res.user || res.data?.user;
+  const access = res.accessToken || res.data?.accessToken;
+  const refresh = res.refreshToken || res.data?.refreshToken;
 
-  //   console.log("📦 Google login result:", result);
-
-  //   // ✅ use the same structure as your authStore return
-  //   if (result.status) {
-  //     const { user, tokens } = result;
-
-  //     // ✅ save everything properly
-  //     if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
-  //     if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
-  //     if (user) localStorage.setItem("user", JSON.stringify(user));
-
-  //     // Swal.fire("Success", "Google login successful ✅", "success");
-
-  //     this.$router.push("/home");
-  //   } else {
-  //     Swal.fire("Error", result.message || "Google login failed ❌", "error");
-  //   }
-  // } catch (error) {
-  //   console.error("Google login API error:", error);
-  //   Swal.fire("Error", "Something went wrong during Google login ❌", "error");
-  // }
-  // },
-  async handleGoogleResponse(response) {
-  const result = await this.authStore.googleLogin(response.credential);
-  if (result.status) {
-    this.$router.push("/home");
+  if (user) {
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("authenticated", "true");
+    this.$router.push("/profile");
   }
+  console.log("Google login response:", res);
+
 },
   },
-  mounted() {
-  // ✅ Load Google Identity Services script safely
-  const script = document.createElement("script");
-  script.src = "https://accounts.google.com/gsi/client";
-  script.async = true;
-  script.defer = true;
+//   mounted() {
+//   const script = document.createElement("script");
+//   script.src = "https://accounts.google.com/gsi/client";
+//   script.async = true;
+//   script.defer = true;
+//   script.onload = () => { 
+//     google.accounts.id.initialize({
+//       client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
+//       callback: this.handleGoogleResponse,
+//     });
 
-  // When script loads → initialize Google Login
-  script.onload = () => {
+//     const buttonContainer = document.getElementById("googleButton");
+//     if (buttonContainer) {
+//       google.accounts.id.renderButton(buttonContainer, {
+//         theme: "outline",
+//         size: "large",
+//         text: "signup_with",
+//         shape: "rectangular",
+//       });
+//     }   
+//   };
+
+//   document.head.appendChild(script);
+
+//   // ✅ reCAPTCHA setup (keep your existing)
+//   if (window.grecaptcha) {
+//     window.grecaptcha.ready(() => {
+//       window.grecaptcha.render("recaptcha-container", {
+//         // sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
+//         sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
+//       });
+//     });
+//   }
+
+//   // ✅ Redirect if already authenticated
+//   const isAuthenticated = localStorage.getItem("authenticated");
+//   if (isAuthenticated === "true") {
+//     this.$router.push("/home");
+//   }
+// },
+beforeUnmount() {
+  if (window.grecaptcha) {
+    try {
+      window.grecaptcha.reset();
+    } catch (e) {}
+  }
+},
+mounted() {
+  const googleScript = document.createElement("script");
+  googleScript.src = "https://accounts.google.com/gsi/client";
+  googleScript.async = true;
+  googleScript.defer = true;
+
+  googleScript.onload = () => {
     google.accounts.id.initialize({
       client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
       callback: this.handleGoogleResponse,
     });
 
-    const buttonContainer = document.getElementById("googleButton");
-    if (buttonContainer) {
-      google.accounts.id.renderButton(buttonContainer, {
-        theme: "outline",
-        size: "large",
-        text: "signup_with",
-        shape: "rectangular",
-      });
-    }   
+    const btn = document.getElementById("googleButton");
+if (btn) {
+  google.accounts.id.renderButton(btn, {
+    theme: "outline",
+    size: "large",
+    text: "signup_with",
+    shape: "rectangular",
+  });
+}
+
   };
 
-  document.head.appendChild(script);
+  document.head.appendChild(googleScript);
 
-  // ✅ reCAPTCHA setup (keep your existing)
-  if (window.grecaptcha) {
-    window.grecaptcha.ready(() => {
-      window.grecaptcha.render("recaptcha-container", {
-        // sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
-        sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
-      });
-    });
-  }
+  const recaptchaScript = document.createElement("script");
+  recaptchaScript.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+  recaptchaScript.async = true;
+  recaptchaScript.defer = true;
 
-  // ✅ Redirect if already authenticated
+  recaptchaScript.onload = () => {
+  if (this.$route.name !== "signup") return;
+
+  const el = document.getElementById("recaptcha-container");
+  if (!el) return;
+
+  window.grecaptcha.render(el, {
+    sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
+  });
+};
+
+
+  document.head.appendChild(recaptchaScript);
+
   const isAuthenticated = localStorage.getItem("authenticated");
   if (isAuthenticated === "true") {
     this.$router.push("/home");
   }
-},
+}
+
 };
 </script>
 

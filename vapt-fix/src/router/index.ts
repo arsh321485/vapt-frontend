@@ -102,10 +102,16 @@ const router = createRouter({
       name: 'missingsecurityupdates',
       component: MissingSecurityUpdatesView,
     },
+    // {
+    //   path: '/vulnerabilitycard',
+    //   name: 'vulnerabilitycard',
+    //   component: VulnerabilityCardView,
+    // },
     {
-      path: '/vulnerabilitycard',
-      name: 'vulnerabilitycard',
+      path: '/vulnerabilitycard/:reportId/:asset',
+      name: "VulFix",
       component: VulnerabilityCardView,
+      props: true
     },
     {
       path: '/signup',
@@ -128,16 +134,28 @@ const router = createRouter({
       component: Dashboard1View,
     },
 
+    // {
+    //   path: '/createnewticket',
+    //   name: 'createnewticket',
+    //   component: CreateNewTicketView,
+    // },
     {
-      path: '/createnewticket',
-      name: 'createnewticket',
-      component: CreateNewTicketView,
-    },
+  path: "/ticket/:reportId/:fixVulId/:asset",
+  name: "CreateTicket",
+  component: CreateNewTicketView,
+},
+    // {
+    //   path: '/supportticket',
+    //   name: 'supportticket',
+    //   component: SupportTicketView,
+    // },
     {
-      path: '/supportticket',
-      name: 'supportticket',
-      component: SupportTicketView,
-    },
+  // path: '/supportticket/:reportId',
+  path: '/supportticket/:reportId?',
+  name: 'supportticket',
+  component: SupportTicketView,
+  props: true
+},
     {
       path: '/pending',
       name: 'pending',

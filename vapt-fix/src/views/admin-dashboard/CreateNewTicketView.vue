@@ -18,34 +18,44 @@
                                     Back</router-link>
                                 <h2 class="ticket-head mt-3">Create a new ticket</h2>
                                   <form>
-                                    <label class="ps-1 mt-5 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
-                                    Category</label>
-                                    <div class="position-relative">
-                                     <select v-model="selectedCategory" class="form-select ps-3 py-2 pe-5 placeholder-style"
-                                        style="background-color: rgba(246, 246, 246, 1); border: none; border-radius: 8px;">
-                                    <option value="" disabled selected hidden>Select a category...</option>
-                                    <option value="bug">Report a bug ?</option>
-                                    <option value="fix">The fix steps not working (we contact the vendor on your behalf)?</option>
                                     
-                                    </select>
-                                    </div>
-                                <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">
-                                    Asset</label>
-                                <div class="position-relative" style="width: 260px;">
-                                     <select v-model="selectedAsset" class="form-select ps-3 py-2 pe-5 placeholder-style" style="background-color: rgba(246, 246, 246, 1); border: none; border-radius: 8px;">
-                                      <option value="" disabled selected hidden>Select an asset...</option>
-                                      <option value="192.168.1.10">192.168.1.10</option>
-                                      <option value="192.168.1.11">192.168.1.11</option>
-                                      <option value="192.168.1.12">192.168.1.12</option>
-                                    </select>
-                                </div>
-                                    <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">Subject</label>
-                                    <input v-model="subject" type="text" class="form-control py-2" placeholder="Write a subject..." style="border:none;background-color: rgba(246, 246, 246, 1); border-radius: 8px;">
+                                    <label class="ps-1 mt-5 mb-2">Category</label>
+<select
+  v-model="selectedCategory"
+  class="form-select ps-3 py-2"
+  style="background:#f6f6f6;border:none;border-radius:8px;"
+>
+  <option value="" disabled>Select a category...</option>
+  <option value="bug">Report a bug</option>
+  <option value="fix">Fix steps not working</option>
+  <option value="other">Other</option>
+</select>
+<label class="ps-1 mt-4 mb-2">Asset</label>
+<input
+  type="text"
+  class="form-control py-2"
+  v-model="selectedAsset"
+  readonly
+  style="background:#f6f6f6;border:none;border-radius:8px;"
+/>
+<label class="ps-1 mt-4 mb-2">Subject</label>
+<input
+  v-model="subject"
+  type="text"
+  class="form-control py-2"
+  placeholder="Write a subject..."
+  style="background:#f6f6f6;border:none;border-radius:8px;"
+/>
+<label class="ps-1 mt-4 mb-2">Description</label>
+<textarea
+  v-model="description"
+  class="form-control py-2"
+  rows="7"
+  :placeholder="descriptionPlaceholder"
+  style="background:#f6f6f6;border:none;border-radius:8px;"
+></textarea>
                                     </form>
-                                    <div class="mt-3">
-                                    <label class="ps-1 mt-4 mb-2" style="font-size: 18px;color: rgba(0, 0, 0, 1);font-weight: 500;">Description</label>
-                                    <textarea v-model="description" type="text" class="form-control py-2 " rows="7" :placeholder="descriptionPlaceholder" style="border:none;background-color: rgba(246, 246, 246, 1); border-radius: 8px;"></textarea>
-                                    </div>
+                                   
                                 <button type="submit" class="btn btn-ticket py-2 px-5 mt-5" data-bs-toggle="modal" data-bs-target="#ticketModal"><i class="bi bi-plus-lg"></i> Create a new ticket</button>
                             </div>
 
@@ -111,66 +121,71 @@ export default {
       selectedAsset: "",
       subject: "",
       description: "",
-      adminId: "",  
+      adminId: "", 
+      reportId: "", 
+      fixVulnerabilityId: ""
     };
 },
 created() {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData && userData.id) {
-      this.adminId = userData.id;  
-    }
+  const { reportId, fixVulId, asset } = this.$route.params;
+
+  console.log("Ticket Page Params:", reportId, fixVulId, asset);
+
+  this.reportId = reportId || "";
+  this.fixVulnerabilityId = fixVulId || "";
+  this.selectedAsset = asset || "";
   },
  computed: {
     descriptionPlaceholder() {
       if (this.selectedCategory === "fix") {
-        return "Please make sure you have followed our steps. What is the real problem you are facing? Which team do you want support from?"
+        return "Please make sure you have followed our steps. What issue are you facing?";
       }
-      return "Write your description here"
+      return "Write your description here";
     },
   },
   methods: {
     async submitTicket() {
+  if (!this.selectedCategory || !this.subject || !this.description) {
+    Swal.fire({
+      icon: "warning",
+      title: "Please fill all required fields",
+      timer: 2500,
+      showConfirmButton: false
+    });
+    return;
+  }
+
   const authStore = useAuthStore();
 
   const payload = {
-    admin_id: this.adminId,
-    subject: this.subject,
-    asset: this.selectedAsset,
-    description: this.description,
     category: this.selectedCategory,
-    status: "close",
+    subject: this.subject,
+    description: this.description
   };
 
-  const res = await authStore.createTicket(payload);
+  const res = await authStore.createTicket(
+    this.reportId,
+    this.fixVulnerabilityId,
+    payload
+  );
 
   if (res.status) {
     Swal.fire({
       icon: "success",
       title: "Ticket Created Successfully",
       timer: 3000,
-      showConfirmButton: false,
-      
+      showConfirmButton: false
     });
-
-    this.resetForm();
   } else {
     Swal.fire({
       icon: "error",
       title: "Failed",
       text: res.message,
       timer: 3000,
-      showConfirmButton: false,
-     
+      showConfirmButton: false
     });
   }
 },
-
-    resetForm() {
-      this.selectedCategory = "";
-      this.selectedAsset = "";
-      this.subject = "";
-      this.description = "";
-    },
   },
 };
 </script>

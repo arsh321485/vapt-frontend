@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import endpoint from "../services/apiServices";
-import axios from "axios";
+import type { AxiosError } from "axios";
 
 interface Location {
   _id: string;
@@ -815,6 +815,141 @@ export const useAuthStore = defineStore("auth", {
   }
   },
 
+  // FIX Vulnerability
+  async createFixVulnerability(reportId: string,asset: string,payload: Record<string, any>) {
+  try {
+    const res = await endpoint.post(
+      `/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
+      payload
+    );
+    return {
+      status: true,
+      data: res.data.data,
+      message: res.data.message
+    };
+  } catch (error) {
+    const err = error as AxiosError<any>;
+    return {
+      status: false,
+      message:
+        err.response?.data?.message || "Fix vulnerability failed",
+      details: err.response?.data || null
+    };
+  }
+  },
+
+  // create Raise Support Request (UPDATED API)
+  async raiseSupportRequest(
+    reportId: string,
+    vulnerabilityId: string,
+    payload: {
+      step: string;
+      description: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/admin/adminregister/support-requests/raise/report/${reportId}/vulnerability/${vulnerabilityId}/`,
+        payload
+      );
+
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to raise support request",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Get raise support request by ID
+  async getRaiseSupportRequestById(requestId: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/adminregister/support-requests/${requestId}/`
+      );
+
+      return {
+        status: true,
+        data: res.data.data
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to fetch support request",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Create new ticket (updated API)
+  async createTicket(
+    reportId: string,
+    fixVulnerabilityId: string,
+    payload: {
+      category: string;
+      subject: string;
+      description: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/admin/adminregister/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
+        payload
+      );
+
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to create ticket",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Get all tickets by report id
+  async getTicketsByReport(reportId: string) {
+    try {
+      console.log("🔥 Fetching tickets for report:", reportId);
+
+      const res = await endpoint.get(
+        `/admin/adminregister/tickets/report/${reportId}/`
+      );
+
+      console.log("✅ Tickets API response:", res.data);
+
+      return {
+        status: true,
+        data: res.data.results
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      console.error("❌ Tickets API error:", err.response?.data || err);
+
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to fetch tickets"
+      };
+    }
+  },
+
   // GET ALL ASSETS
   async fetchAssets(reportId: string) {
     try {
@@ -997,109 +1132,20 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // create Ticket
-  async createTicket(payload: any) {
-    try {
-      const res = await endpoint.post("/admin/tickets/create/", payload);
-      return { status: true, data: res.data };
-    } catch (error: any) {
-      console.error("Create Ticket Error:", error.response?.data || error.message);
+  // Get all support requests by report id
+  async getSupportRequestsByReport(reportId: string) {
+  console.log("📡 Store API called with:", reportId);
 
-      return {
-        status: false,
-        message:
-          error.response?.data?.message ||
-          error.message ||
-          "Ticket creation failed",
-        details: error.response?.data || null,
-      };
-    }
+  const res = await endpoint.get(
+    `/admin/adminregister/support-requests/report/${reportId}/`
+  );
+
+  return {
+    status: true,
+    data: res.data.results,
+    count: res.data.count
+  };
   },
-
-  // GET ALL TICKETS
-  async getAllTickets() {
-      try {
-        const res = await endpoint.get("/admin/tickets/list/");
-        const data = res.data;
-
-        if (data?.tickets) {
-          this.tickets = data.tickets;    
-        }
-
-        return {
-          status: true,
-          message: data.message || "Tickets fetched successfully",
-          data,
-        };
-      } catch (error: any) {
-        console.error("Get Tickets error:", error.response?.data || error.message);
-
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to load tickets",
-          details: error.response?.data || null,
-        };
-      }
-  },
-
-  // === Get OPEN Tickets ===
-    async getOpenTickets() {
-      try {
-        const res = await endpoint.get("/admin/tickets/list/open/");
-        const data = res.data;
-
-        if (data?.tickets) {
-          this.tickets = data.tickets;
-        }
-
-        return {
-          status: true,
-          message: data.message || "Open tickets fetched successfully",
-          data,
-        };
-      } catch (error: any) {
-        console.error("Get Open Tickets Error:", error.response?.data || error.message);
-
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to load open tickets",
-          details: error.response?.data || null,
-        };
-      }
-    },
-    
-  // === Get CLOSED Tickets ===
-    async getClosedTickets() {
-      try {
-        const res = await endpoint.get("/admin/tickets/list/closed/");
-        const data = res.data;
-
-        if (data?.tickets) {
-          this.tickets = data.tickets;
-        }
-
-        return {
-          status: true,
-          message: data.message || "Closed tickets fetched successfully",
-          data,
-        };
-      } catch (error: any) {
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to load closed tickets",
-          details: error.response?.data || null,
-        };
-      }
-    },  
 
   // ✅ Logout user
   async logout() {
