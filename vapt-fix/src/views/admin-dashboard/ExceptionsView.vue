@@ -81,7 +81,7 @@
                       <td>{{ req.host_name }}</td>
 
                       <!-- Description / Status -->
-                      <td style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
+                      <td style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#viewRequestsModal" @click="openViewRequestModal(req)">
                         {{ req.description }}
                       </td>
 
@@ -110,7 +110,7 @@
                     </tr>
                   </tbody>
                 </table>
-                <!-- view Requests Modal -->
+                <!-- view Support Requests Modal -->
                 <div class="modal fade" id="viewRequestsModal" tabindex="-1" aria-labelledby="viewRequestsModalLabel"
                   aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered">
@@ -118,25 +118,30 @@
 
                       <!-- Modal Header -->
                       <div class="modal-header">
-                        <h5 class="modal-title" id="viewRequestsModalLabel">Issues Raised for Support</h5>
+                        <h5 class="modal-title" id="viewRequestsModalLabel">Issues Raised for Support Requests</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
 
                       <!-- Modal Body -->
-                      <div class="modal-body">
+                      <div class="modal-body" v-if="selectedSupportRequest">
                         <div class="row g-2">
-                          <div class="col-4">
-                            <span class="badge rounded-pill w-100 py-2 text-center bg-primary"
-                              style="cursor: pointer; font-size: 12px;">Step 2: Code review</span>
-                          </div>
-                          <div class="col-4">
-                            <span class="badge rounded-pill w-100 py-2 text-center bg-primary"
-                              style="cursor: pointer; font-size: 12px;">Step 4: Code review</span>
-                          </div>
-                        </div>
+  <div
+    class="col-4"
+    v-for="(step, index) in selectedStepsArray"
+    :key="index"
+  >
+    <span
+      class="badge rounded-pill w-100 py-2 text-center bg-primary"
+      style="font-size: 12px;"
+    >
+      {{ step }}: Code review
+    </span>
+  </div>
+</div>
+
 
                         <h6 class="mt-3 fw-semibold">Description</h6>
-                        <textarea class="form-control rounded-0" rows="4" readonly>The issue has been reviewed, but the current explanation is not sufficient. Please provide additional justification to proceed further.
+                        <textarea class="form-control rounded-0" rows="4" readonly>{{ selectedSupportRequest.description }}
                               </textarea>
                       </div>
 
@@ -297,6 +302,7 @@ export default {
       authStore: useAuthStore(),
       supportRequests: [],
       loadingRequests: false,
+      selectedSupportRequest: null ,
       showChat: false,
       minimized: false,
       messages: [
@@ -307,11 +313,28 @@ export default {
       selectedLocation: "greece",
     };
   },
+  computed: {
+  selectedStepsArray() {
+    if (!this.selectedSupportRequest?.step_requested) return [];
+
+    // handles: "Step 1", "Step 1, Step 6", "All Steps"
+    if (this.selectedSupportRequest.step_requested === "All Steps") {
+      return ["All Steps"];
+    }
+
+    return this.selectedSupportRequest.step_requested
+      .split(",")
+      .map(s => s.trim());
+  }
+},
   created() {
     console.log("🔥 SupportRequests created()");
     this.fetchSupportRequests();
   },
   methods: {
+    openViewRequestModal(req) {
+    this.selectedSupportRequest = req;
+  },
     async fetchSupportRequests() {
       console.log("➡️ fetchSupportRequests called");
 

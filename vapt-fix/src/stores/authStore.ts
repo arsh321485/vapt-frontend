@@ -47,6 +47,7 @@ export const useAuthStore = defineStore("auth", {
     vulnerabilityRows: [] as any[],
     assetRows: [] as any[],
     assetCount: 0,
+    memberType: "",
     assetSearchResults: [] as any[],
     assetSearchCount: 0,
     selectedAssetDetail: null as any,
@@ -869,24 +870,25 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // Get raise support request by ID
-  async getRaiseSupportRequestById(requestId: string) {
+  // Get raise support request by vulnerability ID
+  async getRaiseSupportRequestByVulnerability(vulnerabilityId: string) {
     try {
       const res = await endpoint.get(
-        `/admin/adminregister/support-requests/${requestId}/`
+        `/admin/adminregister/raise-support-requests/vulnerability/${vulnerabilityId}/`
       );
 
       return {
         status: true,
-        data: res.data.data
+        exists: res.data.exists,
+        data: res.data.data || null
       };
-    } catch (error) {
-      const err = error as AxiosError<any>;
+    } catch (error: any) {
       return {
         status: false,
+        exists: false,
         message:
-          err.response?.data?.message || "Failed to fetch support request",
-        details: err.response?.data || null
+          error.response?.data?.message ||
+          "Failed to fetch support request"
       };
     }
   },
@@ -953,9 +955,7 @@ export const useAuthStore = defineStore("auth", {
   // GET ALL ASSETS
   async fetchAssets(reportId: string) {
     try {
-      // console.log("[authStore] fetchAssets -> reportId:", reportId);
       const res = await endpoint.get(`/admin/adminasset/report/${reportId}/assets/`);
-      // console.log("[authStore] fetchAssets response:", res.data);
       const rows = res.data.assets || [];
       const normalized = rows.map((a: any) => ({
         ...a,
@@ -967,6 +967,7 @@ export const useAuthStore = defineStore("auth", {
       }));
       this.assetRows = normalized;
       this.assetCount = res.data.count ?? normalized.length;
+      this.memberType = res.data.member_type;
       console.log("[authStore] assetRows length:", this.assetRows.length);
       return { status: true, data: res.data };
     } catch (error: any) {
@@ -1102,6 +1103,48 @@ export const useAuthStore = defineStore("auth", {
       return {
         status: false,
         message: error.response?.data?.detail || "Failed to unhold asset",
+      };
+    }
+  },
+
+  // Get support requests by host for assets page
+  async getSupportRequestsByHost(host: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/adminasset/support-requests/host/${host}/`
+      );
+
+      return {
+        status: true,
+        data: res.data.results || [],
+        count: res.data.count || 0
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        data: [],
+        count: 0
+      };
+    }
+  },
+
+  // Get closed fix vulnerabilities by host
+  async getClosedFixVulnerabilitiesByHost(host: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/adminasset/fix-vulnerabilities/host/${host}/closed/`
+      );
+
+      return {
+        status: true,
+        data: res.data.results || [],
+        count: res.data.count || 0
+      };
+    } catch (error) {
+      return {
+        status: false,
+        data: [],
+        count: 0
       };
     }
   },

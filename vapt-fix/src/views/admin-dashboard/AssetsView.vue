@@ -29,10 +29,13 @@
                 <div class="d-flex justify-content-between align-items-center ms-3">
                   <div class="d-flex gap-2 my-3">
                     <form>
-                      <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
-                        <option value="" selected disabled>Sort by</option>
-                        <option value="internal">Internal</option>
-                        <option value="external">External</option>
+                      <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;"  v-model="selectedSeverity" @change="currentPage = 1">
+                     
+                        <option value="all">All</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
                       </select>
                     </form>
                     <!-- <div class="filter-dropdown d-inline">
@@ -194,8 +197,8 @@
                                 style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"></i>
                             </div>
                             <div>
-                              <p @click.stop="toggleExposure(asset)" style="cursor: pointer;">
-                                {{ asset.isInternal ? 'Internal' : 'External' }}
+                              <p v-if="authStore.memberType">
+                                {{ authStore.memberType.charAt(0).toUpperCase() + authStore.memberType.slice(1) }}
                               </p>
                             </div>
                           </div>
@@ -271,7 +274,7 @@
                   </div>
                 </div>
 
-                <!-- hold mitigation -->
+                <!-- hold mitigation modal -->
                 <div class="modal fade" id="holdConfirmModal" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -290,7 +293,7 @@
                   </div>
                 </div>
 
-                <!-- Held Vulnerabilities List -->
+                <!-- Hold Vulnerabilities List -->
                 <div v-if="showHeld && heldAssets.length" class=" py-1 px-2 mt-5">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="mb-0">Mitigation on hold</h4>
@@ -348,8 +351,8 @@
                                 style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"></i>
                             </div>
                             <div>
-                              <p class="mb-0">
-                                {{ held.isInternal ? 'Internal' : 'External' }}
+                              <p class="mb-0" style="text-transform: capitalize;">
+                                {{ held.member_type }}
                               </p>
 
                             </div>
@@ -441,7 +444,7 @@
                   <div class="d-flex justify-content-start gap-5">
                     <div class="d-flex flex-column">
                       <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Exposure</p>
-                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{
+                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;text-transform: capitalize;">{{
                         authStore.selectedAssetDetail?.exposure }}</p>
                     </div>
                     <!-- <div class="d-flex flex-column">
@@ -467,13 +470,22 @@
                       </button>
                     </li>
                     <li class="nav-item">
-                      <button class="nav-link" :class="{ active: activeTab === 'exceptions' }"
-                        @click="activeTab = 'exceptions'">
-                        Support Requests <span class="badge rounded-circle bg-danger ms-1"
-                          style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">
-                          2
-                        </span>
-                      </button>
+                      <button
+  class="nav-link"
+  :class="{ active: activeTab === 'exceptions' }"
+  @click="activeTab = 'exceptions'"
+>
+  Support Requests
+  <span
+    v-if="supportRequestCount > 0"
+    class="badge rounded-circle bg-danger ms-1"
+    style="font-size: 12px; width: 20px; height: 20px;
+           display: inline-flex; align-items: center; justify-content: center;"
+  >
+    {{ supportRequestCount }}
+  </span>
+</button>
+
                     </li>
                     <li class="nav-item">
                       <button class="nav-link" :class="{ active: activeTab === 'related' }"
@@ -605,71 +617,134 @@
                       </div>
 
                       <div class="row mt-3 pt-3 px-3">
-                        <div class="card p-2 my-3">
-                          <h4>Fixed</h4>
-                          <div class="d-flex justify-content-start align-items-center gap-2 mt-2">
-                            <p
-                              style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">
-                              1</p>
-                            <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">
-                              VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                            <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1"
-                                style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                              <span>High</span>
-                            </span>
-                            <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1"
-                                style="width: 6px; height: 6px; background-color: white;"></span>
-                              <span>Close</span>
-                            </span>
-                            <router-link to="/vulnerabilitycard"
-                              class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3"
-                              style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
-                          </div>
+                        <div v-if="closedFixVulnerabilities.length" class="card p-2 my-3">
+  <h4>Fixed</h4>
 
-                          <div class="d-flex justify-content-start align-items-center gap-2">
-                            <p
-                              style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">
-                              5</p>
-                            <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">
-                              VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                            <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1"
-                                style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                              <span>High</span>
-                            </span>
-                            <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1"
-                                style="width: 6px; height: 6px; background-color: white;"></span>
-                              <span>Close</span>
-                            </span>
-                            <router-link to="/vulnerabilitycard"
-                              class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3"
-                              style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
-                          </div>
-                        </div>
+  <div
+    v-for="(item, i) in closedFixVulnerabilities"
+    :key="item.fix_vulnerability_id"
+    class="d-flex justify-content-between align-items-center py-2"
+  >
+    <!-- LEFT -->
+    <div class="d-flex align-items-center gap-3">
+      <!-- index -->
+      <div
+        class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
+        style="width:30px;height:30px;font-size:14px;"
+      >
+        {{ i + 1 }}
+      </div>
+
+      <!-- name -->
+      <p class="mb-0 fw-semibold" style="font-size:15px;">
+        {{ item.plugin_name }}
+      </p>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="d-flex align-items-center gap-3">
+      <!-- severity -->
+<span
+  class="badge d-flex align-items-center gap-1"
+  :style="{
+    background: getSeverityBg(item.risk_factor),
+    color: getSeverityColor(item.risk_factor),
+    fontSize: '12px'
+  }"
+>
+  <span
+    class="rounded-circle"
+    :style="{
+      width: '6px',
+      height: '6px',
+      backgroundColor: getSeverityColor(item.risk_factor)
+    }"
+  ></span>
+  {{ item.risk_factor }}
+</span>
+
+
+      <!-- close -->
+      <span
+        class="badge d-flex align-items-center gap-1"
+        style="background:#0a7d00;color:#fff;font-size:12px;"
+      >
+        <span
+          class="rounded-circle"
+          style="width:6px;height:6px;background:#fff;"
+        ></span>
+        Close
+      </span>
+
+      <!-- view -->
+      <button
+        class="btn btn-sm rounded-pill text-light px-3"
+        style="background-color: rgba(49, 33, 177, 1);"
+        @click="viewFixDetail(item)"
+      >
+        View detail
+      </button>
+    </div>
+  </div>
+</div>
                       </div>
                     </div>
 
                     <!-- Exception Requests -->
                     <div v-if="activeTab === 'exceptions'">
-                      <div class="d-flex justify-content-start align-items-center gap-3">
-                        <p
-                          style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">
-                          1</p>
-                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0
-                          Sandbox Escape (CVE - 2025-22225)</p>
-                        <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                          <span class="rounded-circle me-1"
-                            style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                          <span>High</span>
-                        </span>
-                        <button class="btn btn-sm fixes-btn" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
-                          View raised requests
-                        </button>
-                      </div>
+                      
+                      <div
+  v-for="(req, i) in supportRequestsByHost"
+  :key="req._id"
+  class="d-flex justify-content-between align-items-center py-2 border-bottom"
+>
+  <!-- LEFT -->
+  <div class="d-flex align-items-center gap-3">
 
+    <!-- index -->
+    <div
+      class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
+      style="width:30px;height:30px;font-size:14px;"
+    >
+      {{ i + 1 }}
+    </div>
+
+    <!-- name -->
+    <div>
+      <p class="mb-0 fw-semibold" style="font-size:15px;">
+        {{ req.vul_name }}
+      </p>
+    </div>
+
+    
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="d-flex align-items-center gap-3">
+    <!-- severity -->
+    <span
+      class="badge d-flex align-items-center gap-1"
+      style="background:#fdeaea;color:#8b0000;font-size:12px;"
+    >
+      <span
+        class="rounded-circle"
+        style="width:6px;height:6px;background:#8b0000;"
+      ></span>
+      High
+    </span>
+
+    <!-- button -->
+    <button
+      class="btn btn-sm fixes-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#viewRequestsModal"
+      @click="openSupportRequestModal(req)"
+    >
+      View raised requests
+    </button>
+  </div>
+</div>
                       <!-- view Requests Modal -->
                       <div class="modal fade" id="viewRequestsModal" tabindex="-1"
                         aria-labelledby="viewRequestsModalLabel" aria-hidden="true">
@@ -685,20 +760,26 @@
 
                             <!-- Modal Body -->
                             <div class="modal-body">
-                              <div class="row g-2">
-                                <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary"
-                                    style="cursor: pointer; font-size: 12px;">Step 2: Code review</span>
-                                </div>
-                                <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary"
-                                    style="cursor: pointer; font-size: 12px;">Step 4: Code review</span>
-                                </div>
+                              <div v-if="selectedSupportRequest && selectedSupportRequest.step_requested" class="row g-2">
+                                <div
+    class="col-4"
+    v-for="(step, i) in selectedSupportRequest.step_requested.split(',')"
+    :key="i"
+  >
+    <span class="badge rounded-pill w-100 py-2 text-center bg-primary"
+      style="font-size:12px;">
+      {{ step.trim() }}: Code review
+    </span>
+  </div>
                               </div>
 
                               <h6 class="mt-3 fw-semibold">Description</h6>
-                              <textarea class="form-control rounded-0" rows="4" readonly>The issue has been reviewed, but the current explanation is not sufficient. Please provide additional justification to proceed further.
-                              </textarea>
+                              <textarea
+  class="form-control rounded-0"
+  rows="4"
+  :value="selectedSupportRequest?.description || ''"
+  readonly
+></textarea>
                             </div>
 
                             <!-- Modal Footer -->
@@ -710,21 +791,10 @@
                         </div>
                       </div>
 
-                      <div class="d-flex justify-content-start align-items-center gap-3">
-                        <p
-                          style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">
-                          5</p>
-                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0
-                          Sandbox Escape (CVE - 2025-22225)</p>
-                        <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                          <span class="rounded-circle me-1"
-                            style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                          <span>High</span>
-                        </span>
-                        <button class="btn btn-sm fixes-btn" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
-                          View raised requests
-                        </button>
-                      </div>
+                      <div v-if="!supportRequestsByHost.length" class="text-muted py-3">
+  No support requests raised for this asset.
+</div>
+
                     </div>
 
                     <!-- Related -->
@@ -877,8 +947,12 @@ export default {
   data() {
     return {
       authStore: useAuthStore(),
+      supportRequestsByHost: [],   // 👈 ADD
+      supportRequestCount: 0,      // 👈 ADD
+      loadingSupportRequests: false,
+      selectedSupportRequest: null,
       activeIndex: null,
-      selectedSeverity: "",
+      selectedSeverity: "all",
       ipAddress: "",
       activeTab: "vulnerabilities",
       showCheckboxes: false,
@@ -886,7 +960,7 @@ export default {
       showHoldCheckboxes: false,
       activeAction: "",
       showHeld: false,
-      isInternal: true,
+      // isInternal: true,
       showUnholdCheckboxes: false,
       currentPage: 1,
       pageSize: 5,
@@ -895,19 +969,22 @@ export default {
       reportId: localStorage.getItem("reportId"),
       selectedAsset: "",
       activeSeverity: 'All',
+      closedFixVulnerabilities: [],   // 👈 ADD
+      closedFixCount: 0,
+      loadingClosedFix: false
     };
   },
   computed: {
-    filterLabel() {
-      if (this.selectedSeverity && this.ipAddress) {
-        return `Filter: ${this.selectedSeverity}, ${this.ipAddress}`;
-      } else if (this.selectedSeverity) {
-        return `Filter: ${this.selectedSeverity}`;
-      } else if (this.ipAddress) {
-        return `Filter: ${this.ipAddress}`;
-      }
-      return "Filter";
-    },
+    // filterLabel() {
+    //   if (this.selectedSeverity && this.ipAddress) {
+    //     return `Filter: ${this.selectedSeverity}, ${this.ipAddress}`;
+    //   } else if (this.selectedSeverity) {
+    //     return `Filter: ${this.selectedSeverity}`;
+    //   } else if (this.ipAddress) {
+    //     return `Filter: ${this.ipAddress}`;
+    //   }
+    //   return "Filter";
+    // },
     pagedAssets() {
       const start = (this.currentPage - 1) * this.pageSize;
 
@@ -922,6 +999,15 @@ export default {
         );
       }
 
+      // 🔥 STEP 1.5: filter by severity (FIXED)
+if (this.selectedSeverity && this.selectedSeverity !== "all") {
+  list = list.filter(a => {
+    const priority = this.getPrioritySeverity(a);
+    return priority?.toLowerCase() === this.selectedSeverity;
+  });
+}
+
+
       // 🔥 STEP 2: sort by severity
       const sorted = [...list].sort((a, b) => {
         return (
@@ -934,20 +1020,42 @@ export default {
       return sorted.slice(start, start + this.pageSize);
     },
     totalPages() {
-      const list = this.query
-        ? this.authStore.assetRows.filter(a =>
-          a.asset.toLowerCase().includes(this.query.toLowerCase())
-        )
-        : this.authStore.assetRows;
+  let list = this.authStore.assetRows;
 
-      return Math.max(1, Math.ceil(list.length / this.pageSize));
-    },
+  // 🔍 search filter (existing logic kept)
+  if (this.query && this.query.trim()) {
+    const q = this.query.trim().toLowerCase();
+    list = list.filter(a =>
+      a.asset.toLowerCase().includes(q)
+    );
+  }
+
+  // 🔥 severity filter (ADDED)
+  if (this.selectedSeverity && this.selectedSeverity !== "all") {
+    list = list.filter(a => {
+      // const count = a.severity_counts?.[this.selectedSeverity] || 0;
+      // return count > 0;
+      const priority = this.getPrioritySeverity(a);
+      return priority?.toLowerCase() === this.selectedSeverity;
+    });
+  }
+   return Math.ceil(list.length / this.pageSize);
+  // return Math.max(1, Math.ceil(list.length / this.pageSize));
+},
+    // totalPages() {
+    //   const list = this.query
+    //     ? this.authStore.assetRows.filter(a =>
+    //       a.asset.toLowerCase().includes(this.query.toLowerCase())
+    //     )
+    //     : this.authStore.assetRows;
+
+    //   return Math.max(1, Math.ceil(list.length / this.pageSize));
+    // },
     pageNumbers() {
       const pages = [];
       for (let i = 1; i <= this.totalPages; i++) pages.push(i);
       return pages;
     },
-
     filteredVulnerabilities() {
       const list =
         this.activeSeverity === "All"
@@ -1025,12 +1133,12 @@ export default {
 
       return "";
     },
-    applyFilters() {
-      console.log("Filters applied:", {
-        severity: this.selectedSeverity,
-        ip: this.ipAddress,
-      });
-    },
+    // applyFilters() {
+    //   console.log("Filters applied:", {
+    //     severity: this.selectedSeverity,
+    //     ip: this.ipAddress,
+    //   });
+    // },
     validateIPInput(event) {
       const char = String.fromCharCode(event.which);
       // Allow only digits and dots
@@ -1082,13 +1190,37 @@ export default {
       this.showCheckboxes = false;
       this.activeAction = "";
     },
-    setActive(asset) {
+  async setActive(asset) {
       if (!asset?.asset) return;
       this.activeIndex = asset.asset;
       this.authStore.fetchSingleAssetVulnerabilities(
         this.reportId,
         asset.asset
       );
+      // 🔥 NEW: fetch support requests for this asset
+  this.loadingSupportRequests = true;
+
+  const res = await this.authStore.getSupportRequestsByHost(asset.asset);
+
+  this.loadingSupportRequests = false;
+
+  if (res.status) {
+    this.supportRequestsByHost = res.data;
+    this.supportRequestCount = res.count;
+  } else {
+    this.supportRequestsByHost = [];
+    this.supportRequestCount = 0;
+  }
+  // 🔥 NEW: closed fix vulnerabilities
+  this.loadingClosedFix = true;
+
+  const fixRes =
+    await this.authStore.getClosedFixVulnerabilitiesByHost(asset.asset);
+
+  this.loadingClosedFix = false;
+
+  this.closedFixVulnerabilities = fixRes.status ? fixRes.data : [];
+  this.closedFixCount = fixRes.status ? fixRes.count : 0;
     },
     toggleHoldMode() {
       // Prevent if delete is already active
@@ -1250,10 +1382,11 @@ export default {
         this.heldAssets = res.assets.map(a => ({
           asset: a.asset,
           ip: a.asset,
+          member_type: a.member_type, 
           name: a.host_information?.["DNS Name"] || "",
           severity_counts: a.severity_counts,
           host_information: a.host_information,
-          isInternal: true,
+          // isInternal: true,
           held: true,
           selected: false,
         }));
@@ -1329,7 +1462,26 @@ export default {
 
     setSeverity(sev) {
       this.activeSeverity = sev;
+    },
+    openSupportRequestModal(req) {
+    this.selectedSupportRequest = req;
+  },
+  async viewFixDetail(item) {
+    // payload is optional here, send empty object
+    const res = await this.authStore.createFixVulnerability(
+      this.reportId,
+      item.host_name,
+      {}
+    );
+
+    if (res.status) {
+      this.$router.push(
+        `/vulnerabilitycard/${this.reportId}/${item.host_name}`
+      );
+    } else {
+      console.error("Fix vulnerability create failed:", res.message);
     }
+  },
   },
   mounted() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');

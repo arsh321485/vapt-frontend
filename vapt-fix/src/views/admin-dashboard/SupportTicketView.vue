@@ -96,7 +96,7 @@
     <td
       style="cursor: pointer;"
       data-bs-toggle="modal"
-      data-bs-target="#viewRequestsModal"
+      data-bs-target="#viewRequestsModal"  @click="openTicketModal(ticket)"
     >
       {{ ticket.description }}
     </td>
@@ -252,19 +252,20 @@
                 </div>
               </div>
 
-                        <!-- view Requests Modal -->
+                        <!-- view support Ticket Modal -->
                       <div class="modal fade" id="viewRequestsModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
           <div class="modal-header">
-            <h5 class="modal-title">Issues Raised for Support</h5>
+            <h5 class="modal-title">Issues Raised for Support Ticket</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
 
           <div class="modal-body">
+           
             <h6 class="fw-semibold">Description</h6>
-            <textarea class="form-control rounded-0" rows="4" readonly>
+            <textarea v-model="selectedDescription" class="form-control rounded-0" rows="4" readonly>
               {{ selectedDescription }}
             </textarea>
           </div>
@@ -345,6 +346,9 @@ computed: {
     } else {
       console.error("❌ Failed to load tickets");
     }
+  },
+  openTicketModal(ticket) {
+    this.selectedDescription = ticket.description || "";
   },
     
     toggleChat() {
