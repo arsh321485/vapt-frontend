@@ -765,27 +765,32 @@ export const useAuthStore = defineStore("auth", {
 
   // Fetch locations by upload report id
   async fetchLocationsByReportId(reportId: string) {
-    try {
-      const res = await endpoint.get(
-        `/admin/upload_report/upload/locations/${reportId}/`
-      );
+  try {
+    const res = await endpoint.get(
+      `/admin/upload_report/upload/locations/${reportId}/`
+    );
 
-      if (res.data?.success) {
-        this.reportLocations = res.data.locations || [];
-        this.selectedReportLocation = res.data.selected_location || null;
+    if (res.data?.success) {
+      // ✅ ALL locations for dropdown
+      this.reportLocations = res.data.locations || [];
 
-        return { status: true, data: res.data };
-      }
+      // ✅ Only selected location stored separately
+      this.selectedReportLocation = res.data.selected_location || null;
 
-      return { status: false, message: "No locations found" };
-    } catch (error: any) {
-      return {
-        status: false,
-        message:
-          error.response?.data?.message ||
-          "Failed to fetch locations by report",
-      };
+      console.log("📦 reportLocations:", this.reportLocations);
+      console.log("📍 selectedReportLocation:", this.selectedReportLocation);
+
+      return { status: true };
     }
+
+    return { status: false };
+  } catch (error: any) {
+    console.error(
+      "❌ fetchLocationsByReportId error:",
+      error.response?.data || error.message
+    );
+    return { status: false };
+  }
   },
 
   // FETCH Vulnerability Register

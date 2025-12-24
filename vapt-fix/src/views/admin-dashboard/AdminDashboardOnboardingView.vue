@@ -159,7 +159,7 @@
   </div>
 
   <div class="dropdown-content" v-if="showDropdown">
-    <a
+    <!-- <a
       href="#"
       v-for="(loc, index) in authStore.reportLocations"
       :key="loc.id || index"
@@ -167,7 +167,14 @@
       :class="{ active: loc.id === selectedLocation }"
     >
       {{ loc.name }}
-    </a>
+    </a> -->
+    <a
+  v-for="(loc, index) in authStore.reportLocations"
+  :key="loc.id || index"
+>
+  {{ loc.name }}
+</a>
+
   </div>
 </div>
 
@@ -356,7 +363,7 @@
                   <div class="d-flex flex-row justify-content-center gap-2 py-3">
                     <!-- <h1 class="text-78">2d 11 hrs</h1> -->
                      
-<h1 class="text-78">{{ meanRemediateHuman }}</h1>
+<h1 class="">{{ meanRemediateHuman }}</h1>
 
 
                   </div>
@@ -653,16 +660,28 @@ export default {
     authStore() {
       return useAuthStore();
     },
-    meanRemediateHuman() {
+  //   meanRemediateHuman() {
+  //   const mttr =
+  //     this.authStore.meanTimeToRemediate?.mean_time_to_remediate;
+
+  //   if (!mttr) return "0d 0 hrs";
+
+  //   const days = mttr.days ?? 0;
+  //   const hours = mttr.hours_remaining ?? 0;
+
+  //   return `${days}d ${hours} hrs`;
+  // },
+  meanRemediateHuman() {
     const mttr =
       this.authStore.meanTimeToRemediate?.mean_time_to_remediate;
 
-    if (!mttr) return "0d 0 hrs";
+    if (!mttr) return "0w 0d 0hrs";
 
+    const weeks = mttr.weeks ?? 0;
     const days = mttr.days ?? 0;
     const hours = mttr.hours_remaining ?? 0;
 
-    return `${days}d ${hours} hrs`;
+    return `${weeks}w ${days}d ${hours}hrs`;
   },
   },
    methods: {
@@ -820,13 +839,10 @@ export default {
       this.authStore.fetchMeanTimeToRemediate(reportId);
 
       this.authStore.fetchLocationsByReportId(reportId).then(() => {
-    if (this.authStore.selectedReportLocation) {
-      // 👇 preselect from API
-      this.selectedLocation =
-        this.authStore.selectedReportLocation.id;
-
-      this.locationName =
-        this.authStore.selectedReportLocation.name;
+    const selected = this.authStore.selectedReportLocation;
+    if (selected) {
+      this.selectedLocation = selected.id;
+      this.locationName = selected.name;
     }
   });
     },
