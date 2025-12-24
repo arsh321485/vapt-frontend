@@ -536,6 +536,10 @@
   {{ buttonLabel }}
   <i class="bi bi-arrow-right-circle-fill ms-1"></i>
 </router-link>
+<!-- <button class="btn stepper-btn mt-5" @click="handleNext">
+  {{ buttonLabel }} <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+</button> -->
+
 
 
               </div>
@@ -647,6 +651,15 @@ export default {
   },
   },
   methods: {
+    // handleNext() {
+    //   const authStore = useAuthStore(); // ✅ Options API way
+
+    //   // ✅ Mark onboarding step completed
+    //   authStore.completeOnboardingStep("location");
+
+    //   // ✅ Navigate using your existing logic
+    //   this.$router.push(this.nextPath);
+    // },
     onLocationInput() {
       this.showDropdown = true;
       this.filterCountries();

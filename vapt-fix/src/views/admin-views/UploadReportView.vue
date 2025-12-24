@@ -155,6 +155,16 @@
                     {{ buttonLabel }}
                     <i class="bi bi-arrow-right-circle-fill ms-1"></i>
                   </router-link>
+                  <!-- <button
+  type="button"
+  class="btn stepper-btn mt-5"
+  :class="{ disabled: !canGoNext }"
+  @click="handleNext"
+>
+  {{ buttonLabel }}
+  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+</button> -->
+
                 </div>
 
               </div>
@@ -224,6 +234,19 @@ export default {
     }
   },
   methods: {
+    handleNext() {
+      if (!this.canGoNext) {
+        this.blockNext && this.blockNext();
+        return;
+      }
+
+      const authStore = useAuthStore();
+
+      // ✅ mark upload report as completed
+      authStore.completeOnboardingStep("uploadreport");
+
+      this.$router.push(this.nextPath);
+    },
     checkLocation() {
       if (this.selectedLocation === "ALL") {
         this.selectedLocations = this.authStore.locations.map(

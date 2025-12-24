@@ -116,15 +116,14 @@ export default {
         });
 
         if (result.status) {
-          // Swal.fire("Success", result.data.message || "Login successful ✅", "success");
-
-          // 🔎 Show tokens and user in console
+          
           console.log("✅ Access Token:", localStorage.getItem("authorization"));
           console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
           console.log("✅ User:", localStorage.getItem("user"));
           console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
 
           this.$router.push("/home");
+          
         } else {
           Swal.fire("Error", result.message || "Login failed ❌", "error");
           grecaptcha.reset();
@@ -167,6 +166,7 @@ export default {
       if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
       if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
       if (user) localStorage.setItem("user", JSON.stringify(user));
+      
       this.$router.push("/home");
     } else {
       Swal.fire("Error", result.message || "Google login failed ❌", "error");
@@ -177,43 +177,6 @@ export default {
   }
     },
   },
-  // mounted() {
-  // const script = document.createElement("script");
-  // script.src = "https://accounts.google.com/gsi/client";
-  // script.async = true;
-  // script.defer = true;
-  // script.onload = () => {
-  //   google.accounts.id.initialize({
-  //     client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
-  //     callback: this.handleGoogleResponse,
-  //   });
-
-  //   const buttonContainer = document.getElementById("googleButton");
-  //   if (buttonContainer) {
-  //     google.accounts.id.renderButton(buttonContainer, {
-  //       theme: "outline",
-  //       size: "large",
-  //       text: "signin_with",
-  //       shape: "rectangular",
-  //     });
-  //   } 
-  // };
-
-  // document.head.appendChild(script);
-
-  // if (window.grecaptcha) {
-  //   window.grecaptcha.ready(() => {
-  //     window.grecaptcha.render("recaptcha-container", {
-  //       // sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
-  //       sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
-  //     });
-  //   });
-  // }
-  // const isAuthenticated = localStorage.getItem("authenticated");
-  // if (isAuthenticated === "true") {
-  //   this.$router.push("/home");
-  // }
-  // },
   beforeUnmount() {
   if (window.grecaptcha) {
     try {
@@ -234,14 +197,14 @@ mounted() {
     });
 
     const btn = document.getElementById("googleButton");
-if (btn) {
-  google.accounts.id.renderButton(btn, {
-    theme: "outline",
-    size: "large",
-    text: "signin_with",
-    shape: "rectangular",
-  });
-}
+    if (btn) {
+      google.accounts.id.renderButton(btn, {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "rectangular",
+      });
+    }
 
   };
 

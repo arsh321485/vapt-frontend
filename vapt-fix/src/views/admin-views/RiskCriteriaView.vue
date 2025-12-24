@@ -271,8 +271,8 @@ export default {
         timerProgressBar: true 
       });
 
-      // ✅ Redirect to next page after user clicks OK
       this.$router.push("/uploadreport");
+
     } else {
       this.message = res.message || "Something went wrong";
 

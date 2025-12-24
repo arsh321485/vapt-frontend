@@ -63,10 +63,14 @@ export const useAuthStore = defineStore("auth", {
       low: number;
       };
     },
-    // meanTimeToRemediate: null as any,
-  }),
+    reportLocations: [] as { id: string; name: string }[],
+    selectedReportLocation: null as
+      | { id: string; name: string }
+      | null,
+    }),
 
   actions: {
+
   // ✅ Restore session on reload
   restoreFromStorage() {
       const access = localStorage.getItem("accessToken");
@@ -757,6 +761,31 @@ export const useAuthStore = defineStore("auth", {
         "Failed to fetch mean time to remediate",
     };
   }
+  },
+
+  // Fetch locations by upload report id
+  async fetchLocationsByReportId(reportId: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/upload_report/upload/locations/${reportId}/`
+      );
+
+      if (res.data?.success) {
+        this.reportLocations = res.data.locations || [];
+        this.selectedReportLocation = res.data.selected_location || null;
+
+        return { status: true, data: res.data };
+      }
+
+      return { status: false, message: "No locations found" };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch locations by report",
+      };
+    }
   },
 
   // FETCH Vulnerability Register

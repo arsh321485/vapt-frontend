@@ -125,7 +125,9 @@ export default {
           console.log("✅ User:", localStorage.getItem("user"));
           console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
 
+          //  authStore.initOnboarding();
           this.$router.push("/home");
+          
         } else {
           console.error("Signup failed details:", result.details);
           Swal.fire("Error", result.message, "error");
@@ -154,12 +156,6 @@ export default {
         callback: this.handleGoogleResponse,
       });
     },
-//   async handleGoogleResponse(response) {
-//   const result = await this.authStore.googleLogin(response.credential);
-//   if (result.status) {
-//     this.$router.push("/home");
-//   }
-// },
 async handleGoogleResponse(response) {
   const res = await this.authStore.googleLogin(response.credential);
 
@@ -172,52 +168,16 @@ async handleGoogleResponse(response) {
   if (user) {
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("authenticated", "true");
+
+  //    const authStore = useAuthStore();
+  // authStore.initOnboarding(); 
+  // this.$router.push("/home"); 
     this.$router.push("/profile");
   }
   console.log("Google login response:", res);
 
 },
   },
-//   mounted() {
-//   const script = document.createElement("script");
-//   script.src = "https://accounts.google.com/gsi/client";
-//   script.async = true;
-//   script.defer = true;
-//   script.onload = () => { 
-//     google.accounts.id.initialize({
-//       client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
-//       callback: this.handleGoogleResponse,
-//     });
-
-//     const buttonContainer = document.getElementById("googleButton");
-//     if (buttonContainer) {
-//       google.accounts.id.renderButton(buttonContainer, {
-//         theme: "outline",
-//         size: "large",
-//         text: "signup_with",
-//         shape: "rectangular",
-//       });
-//     }   
-//   };
-
-//   document.head.appendChild(script);
-
-//   // ✅ reCAPTCHA setup (keep your existing)
-//   if (window.grecaptcha) {
-//     window.grecaptcha.ready(() => {
-//       window.grecaptcha.render("recaptcha-container", {
-//         // sitekey: "6LfFQ7srAAAAAGK73MKmO08VjWPjBQDjyw7fY9Lr",
-//         sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
-//       });
-//     });
-//   }
-
-//   // ✅ Redirect if already authenticated
-//   const isAuthenticated = localStorage.getItem("authenticated");
-//   if (isAuthenticated === "true") {
-//     this.$router.push("/home");
-//   }
-// },
 beforeUnmount() {
   if (window.grecaptcha) {
     try {

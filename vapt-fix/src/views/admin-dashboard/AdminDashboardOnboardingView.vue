@@ -154,13 +154,33 @@
                     </div>
                     </div>
                     <div class="dropdown">
-                      <div class="dropdown-btn"> Select location</div>
+  <div class="dropdown-btn" @click="showDropdown = !showDropdown">
+    {{ locationName || "Select location" }}
+  </div>
+
+  <div class="dropdown-content" v-if="showDropdown">
+    <a
+      href="#"
+      v-for="(loc, index) in authStore.reportLocations"
+      :key="loc.id || index"
+      @click.prevent="selectLocation(loc)"
+      :class="{ active: loc.id === selectedLocation }"
+    >
+      {{ loc.name }}
+    </a>
+  </div>
+</div>
+
+
+                    <!-- <div class="dropdown">
+                      <div  class="dropdown-btn"> Select location</div>
                         <div class="dropdown-content">
-                        <a href="#">Greece</a>
-                        <a href="#">Germany</a>
-                        <a href="#">Bahrain</a>
+                        <a href="" v-for="(loc, index) in authStore.locations"
+                              :key="loc._id || index"
+                              :value="loc._id">{{ loc.location_name }}</a>
+                        
                         </div>
-                    </div>
+                    </div> -->
                   <NotificationPanel />
 
                 </div>
@@ -249,40 +269,42 @@
                     <div class="mb-2">
                       <p class="assets-para">Mitigation Timeline<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
+                    
+                  
                     <div class="d-flex justify-content-between align-items-end mb-1">
-                      <div class="text-center">
-                        <!-- <div id="highCount" class="fs-4 fw-semibold">1d 10hrs</div> -->
-                         <div id="highCount" class="fs-5 fw-semibold">
-  {{ authStore.mitigationTimeline?.critical_days }}D
+  <div class="text-center">
+    <div class="fs-5 fw-semibold">
+      {{ formatTimeline(authStore.mitigationTimeline?.critical) }}
+    </div>
+    <div class="bar maroon w-100 mt-1"></div>
+    <small style="color: maroon;">● Critical</small>
+  </div>
+
+  <div class="text-center">
+    <div class="fs-5 fw-semibold">
+      {{ formatTimeline(authStore.mitigationTimeline?.high) }}
+    </div>
+    <div class="bar red w-100 mt-1"></div>
+    <small style="color: red;">● High</small>
+  </div>
+
+  <div class="text-center">
+    <div class="fs-5 fw-semibold">
+      {{ formatTimeline(authStore.mitigationTimeline?.medium) }}
+    </div>
+    <div class="bar yellow w-100 mt-1"></div>
+    <small class="text-warning">● Medium</small>
+  </div>
+
+  <div class="text-center">
+    <div class="fs-5 fw-semibold">
+      {{ formatTimeline(authStore.mitigationTimeline?.low) }}
+    </div>
+    <div class="bar green w-100 mt-1"></div>
+    <small class="text-success">● Low</small>
+  </div>
 </div>
-                        <div class="bar maroon w-100 mt-1"></div>
-                        <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
-                      </div>
-                      <div class="text-center">
-                        <!-- <div id="highCount" class="fs-4 fw-semibold">2d 11hrs</div> -->
-                         <div id="highCount" class="fs-5 fw-semibold">
-  {{ authStore.mitigationTimeline?.high_days }}D
-</div>
-                        <div class="bar red w-100 mt-1"></div>
-                        <small class="mt-1 d-block" style="color: red;">● High</small>
-                      </div>
-                      <div class="text-center">
-                        <!-- <div id="mediumCount" class="fs-4 fw-semibold">3d 4hrs</div> -->
-                         <div id="mediumCount" class="fs-5 fw-semibold">
-  {{ authStore.mitigationTimeline?.medium_days }}D
-</div>
-                        <div class="bar yellow w-100 mt-1"></div>
-                        <small class="text-warning mt-1 d-block">● Medium</small>
-                      </div>
-                      <div class="text-center">
-                        <!-- <div id="lowCount" class="fs-4 fw-semibold">2d 2hrs</div> -->
-                         <div id="lowCount" class="fs-5 fw-semibold">
-  {{ authStore.mitigationTimeline?.low_days }}D
-</div>
-                        <div class="bar green w-100 mt-1"></div>
-                        <small class="text-success mt-1 d-block">● Low</small>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -333,9 +355,7 @@
                   </div>
                   <div class="d-flex flex-row justify-content-center gap-2 py-3">
                     <!-- <h1 class="text-78">2d 11 hrs</h1> -->
-                     <!-- <h1 class="text-78">
-  {{ meanRemediateDays }}d {{ meanRemediateHours }} hrs
-</h1> -->
+                     
 <h1 class="text-78">{{ meanRemediateHuman }}</h1>
 
 
@@ -606,6 +626,10 @@ export default {
       addDays: "",           // input: additional days
       reason: ""  ,
       mitigationTimeline: null,
+      selectedLocation: "",
+      locationName: "",
+      showDropdown: false,
+      filteredCountries: [],
     };
   },
   computed: {
@@ -626,12 +650,68 @@ export default {
       });
     
     },
-    
+    authStore() {
+      return useAuthStore();
+    },
     meanRemediateHuman() {
-  return this.authStore.meanTime?.mean_time_simple_human || "0d 0 hrs";
-},
+    const mttr =
+      this.authStore.meanTimeToRemediate?.mean_time_to_remediate;
+
+    if (!mttr) return "0d 0 hrs";
+
+    const days = mttr.days ?? 0;
+    const hours = mttr.hours_remaining ?? 0;
+
+    return `${days}d ${hours} hrs`;
+  },
   },
    methods: {
+    toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
+  },
+
+  selectLocation(loc) {
+    this.selectedLocation = loc.id;
+    this.locationName = loc.name;
+    this.showDropdown = false;
+  },
+    formatTimeline(value) {
+    if (!value || !value.raw) return "--";
+
+    const raw = value.raw.toLowerCase();
+
+    if (raw.includes("week")) {
+      return `${value.days / 7}W`;
+    }
+
+    if (raw.includes("day")) {
+      return `${value.days}D`;
+    }
+
+    return `${value.days}D`;
+  },
+    onLocationInput() {
+      this.showDropdown = true;
+      this.filterCountries();
+    },
+    filterCountries() {
+      const input = this.locationName.toLowerCase().trim();
+
+      if (!input) {
+        this.filteredCountries = [];
+        return;
+      }
+
+      const allCountries = this.authStore.countries || [];
+
+      this.filteredCountries = allCountries.filter((country) =>
+        country.toLowerCase().includes(input)
+      );
+    },
+    selectCountry(country) {
+      this.locationName = country;
+      this.showDropdown = false;
+    },
     toggleCalendar() {
       this.showCalendar = !this.showCalendar;
     },
@@ -711,9 +791,25 @@ export default {
       }
     });
     
-    // this.authStore.fetchTotalAssets(
-    //   "6939141e2fe47c715e4b6212"
-    // );
+    this.authStore.fetchCountries();
+    // 🟡 3️⃣ Fetch locations by admin id instead of old fetchLocations()
+      const user =
+        this.authStore.user ||
+        JSON.parse(localStorage.getItem("user") || "null");
+
+      if (user) {
+        this.authStore.user = user; // keep store in sync
+        const adminId =
+          user.admin_id || user.id || user._id;
+
+        if (adminId) {
+          this.authStore.fetchLocationsByAdminId(adminId);
+        }
+      }
+       // 🟡 4️⃣ Fetch locations if not loaded
+      if (!this.authStore.locations.length) {
+        this.authStore.fetchLocations();
+      }
 
     const reportId = localStorage.getItem("reportId");
       if (!reportId) return;
@@ -722,6 +818,17 @@ export default {
       this.authStore.fetchVulnerabilities(reportId);
       this.authStore.fetchMitigationTimeline(reportId);
       this.authStore.fetchMeanTimeToRemediate(reportId);
+
+      this.authStore.fetchLocationsByReportId(reportId).then(() => {
+    if (this.authStore.selectedReportLocation) {
+      // 👇 preselect from API
+      this.selectedLocation =
+        this.authStore.selectedReportLocation.id;
+
+      this.locationName =
+        this.authStore.selectedReportLocation.name;
+    }
+  });
     },
 };
 </script>

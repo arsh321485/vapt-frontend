@@ -367,6 +367,7 @@
 <script>
 import Header from '@/components/admin-component/Header.vue';
 import Footer from '@/components/admin-component/Footer.vue';
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: 'HomeView',
@@ -375,17 +376,45 @@ export default {
     Footer
   },
 methods: {
+//   async handleFixNow() {
+//   const authStore = useAuthStore();
+//   const user = authStore.user;
+
+//   // 1️⃣ LOCATION CHECK (real data)
+//   await authStore.fetchLocationsByAdminId(user._id);
+
+//   if (!authStore.locations || authStore.locations.length === 0) {
+//     this.$router.push("/location");
+//     return;
+//   }
+
+//   // 2️⃣ RISK CRITERIA CHECK
+//   const reportId = localStorage.getItem("reportId");
+
+//   if (!reportId) {
+//     // No report means risk/upload not done yet
+//     this.$router.push("/riskcriteria");
+//     return;
+//   }
+
+//   // 3️⃣ UPLOAD REPORT CHECK (TEMP – until GET API exists)
+//   if (!localStorage.getItem("reportId")) {
+//     this.$router.push("/uploadreport");
+//     return;
+//   }
+
+//   // ✅ ALL DATA EXISTS
+//   this.$router.push("/admindashboardonboarding");
+// },
   handleFixNow() {
     const isNewUser = localStorage.getItem("isNewUser");
-
-    // ✅ DEBUG LOG (ADD HERE)
     console.log("isNewUser =", isNewUser);
 
     if (isNewUser === "true") {
-      // NEW USER
+    
       this.$router.push("/location");
     } else {
-      // OLD USER
+      
       this.$router.push("/admindashboardonboarding");
     }
   }
