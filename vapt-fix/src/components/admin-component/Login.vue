@@ -76,13 +76,11 @@ export default {
         .then((response) => {
           this.message = "✅ Login successful!";
           console.log("Login Response:", response.data);
-
+          localStorage.setItem("authenticated", "true");
           // Save token if API provides one
           if (response.data.token) {
             localStorage.setItem("authToken", response.data.token);
           }
-
-          // Redirect to /home
           this.$router.push("/home");
         })
         .catch((error) => {

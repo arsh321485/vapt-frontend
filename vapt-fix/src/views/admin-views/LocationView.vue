@@ -5,8 +5,8 @@
         <div class="row">
           <div class="col-lg-12 my-3  welcome-bg">
             <div class="col-lg-10 offset-lg-2">
-            <div class="container-fluid py-2">
-              <div class="row">  
+              <div class="container-fluid py-2">
+                <!-- <div class="row">  
                 <div class="d-flex flex-row">
                   <div class="mt-2">
                     <img src="@/assets/images/waving-hand.png" alt="" class="me-3">
@@ -22,376 +22,358 @@
                     </div>
                   </div>
                 </div>
-              </div>
-          
-              <div class="row">
-                <Stepper />
-              </div>
-
-              <div class="row mt-5 mb-4" v-if="showPlatforms">
-              <div class="col-9 location-card py-4 px-4 ms-3">
+              </div> -->
                 <div class="row">
-                  <div class="d-flex justify-content-start">
-                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-ui-checks-grid fs-5"></i>
+                  <div class="d-flex flex-row align-items-start justify-content-between w-100">
+
+                    <!-- LEFT (UNCHANGED) -->
+                    <div class="d-flex flex-row">
+                      <div class="mt-2">
+                        <img src="@/assets/images/waving-hand.png" alt="" class="me-3">
+                      </div>
+
+                      <div>
+                        <h1 class="fw-semibold welcome-head">Welcome to vaptfix!</h1>
+                        <p class="welcome-subhead">Before we fix your information assets, ....</p>
+                      </div>
                     </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Choose your communication platform</h5>
+
+                    
+
                   </div>
                 </div>
-                <div class="card ps-2 py-4 border-0"> 
-                    <!-- First row: 4 cards -->
-                    <div class="row g-4">
-                      <!-- Teams -->
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                         :style="{
-        backgroundColor: notUsingPlatform 
-          ? '#d3d3d3' 
-          : (activePlatform === 'teams' ? 'aquamarine' : '')}"
-                        style="aspect-ratio:1/1; cursor:pointer;">
-                          <button class="btn border-0" @click="activatePlatform('teams')" :disabled="notUsingPlatform">
-                          <div>
-                            <img src="@/assets/images/teams.png" alt="Teams" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Teams</p>
-                          </div>
-                          </button>
-                        </div>
-                      </div>
 
-                      <!-- Slack -->
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
-                        :style="{ backgroundColor: notUsingPlatform ? '#d3d3d3' : (activePlatform === 'slack' ? 'aquamarine' : '')}"
-                            style="aspect-ratio:1/1; cursor:pointer;">
-                          <button class="btn border-0"  v-if="!user" @click="startSlackLogin" :disabled="notUsingPlatform">
-                            <div>
-                            <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Slack</p>
-                          </div>
-                          </button>
-                        </div>
-                      </div>
+                <div class="row">
+                  <Stepper />
+                </div>
 
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4" style="aspect-ratio:1/1; cursor:pointer;">
-                          <div>
-                            <!-- <button class="btn mt-2 mb-2 fw-semibold border-0" style="font-size: 12px;" @click="togglePlatformStatus"> {{ notUsingPlatform ? "I am using a platform" : "I'm not using any platform." }}</button> -->
-                             <button class="btn mt-2 mb-2 fw-semibold border-0 fs-5"  @click="togglePlatformStatus"> {{ notUsingPlatform ? "select" : "None" }}</button>
-                          </div>
-                        </div>
-                        
-                      </div>
-                      
-                    </div>
-
-                    <!-- Second row: 3 cards -->
-                    <div class="row g-4 mt-2">
+                <div class="row mt-5 mb-4" v-if="showPlatforms">
+                  <div class="col-9 location-card py-4 px-4 ms-3">
+                    <div class="row">
                       <div class="d-flex justify-content-start">
-                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-ui-checks-grid fs-5"></i>
+                        <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                          <i class="bi bi-ui-checks-grid fs-5"></i>
+                        </div>
+                        <h5 class="fw-semibold ms-2 mt-2">Choose your communication platform</h5>
+                      </div>
                     </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Choose your Project Management platform</h5>
-                    </div>
-                      <!-- Jira -->
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"  :class="{
-          'bg-aqua text-dark': selectedJiraAsana === 'jira' && !notUsingJiraAsana,
-          'bg-grey': notUsingJiraAsana
-        }"
-                            style="aspect-ratio:1/1; cursor:pointer;" @click="handleJiraAsanaClick('jira')">
-                          <div>
-                            <img src="@/assets/images/jira.png" alt="Jira" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Jira</p>
+                    <div class="card ps-2 py-4 border-0">
+                      <!-- First row: 4 cards -->
+                      <div class="row g-4">
+                        <!-- Teams -->
+                        <div class="col-2">
+                          <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2" :style="{
+                            backgroundColor: notUsingPlatform
+                              ? '#d3d3d3'
+                              : (activePlatform === 'teams' ? 'aquamarine' : '')
+                          }" style="aspect-ratio:1/1; cursor:pointer;">
+                            <button class="btn border-0" @click="activatePlatform('teams')"
+                              :disabled="notUsingPlatform">
+                              <div>
+                                <img src="@/assets/images/teams.png" alt="Teams" style="width:40px; height:40px;">
+                                <p class="mt-2 fw-semibold mb-0">Teams</p>
+                              </div>
+                            </button>
                           </div>
                         </div>
-                      </div>
 
-                      <!-- Asana -->
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"  :class="{
-          'bg-aqua text-dark': selectedJiraAsana === 'asana' && !notUsingJiraAsana,
-          'bg-grey': notUsingJiraAsana
-        }"
-                            style="aspect-ratio:1/1; cursor:pointer;" @click="handleJiraAsanaClick('asana')">
-                          <div>
-                            <img src="@/assets/images/asana.png" alt="Asana" style="width:40px; height:40px;">
-                            <p class="mt-2 fw-semibold mb-0">Asana</p>
+                        <!-- Slack -->
+                        <div class="col-2">
+                          <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
+                            :style="{ backgroundColor: notUsingPlatform ? '#d3d3d3' : (activePlatform === 'slack' ? 'aquamarine' : '') }"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                            <button class="btn border-0" v-if="!user" @click="startSlackLogin"
+                              :disabled="notUsingPlatform">
+                              <div>
+                                <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
+                                <p class="mt-2 fw-semibold mb-0">Slack</p>
+                              </div>
+                            </button>
                           </div>
                         </div>
+
+                        <div class="col-2">
+                          <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                            <div>
+                              <!-- <button class="btn mt-2 mb-2 fw-semibold border-0" style="font-size: 12px;" @click="togglePlatformStatus"> {{ notUsingPlatform ? "I am using a platform" : "I'm not using any platform." }}</button> -->
+                              <button class="btn mt-2 mb-2 fw-semibold border-0 fs-5" @click="togglePlatformStatus"> {{
+                                notUsingPlatform ? "select" : "None" }}</button>
+                            </div>
+                          </div>
+
+                        </div>
+
                       </div>
 
-                      <div class="col-2">
-                        <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4" style="aspect-ratio:1/1; cursor:pointer;">
-                          <div>
-                             <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="toggleJiraAsanaUsage">
-            {{ notUsingJiraAsana ? 'Select' : 'None' }}
-          </button>
+                      <!-- Second row: 3 cards -->
+                      <div class="row g-4 mt-2">
+                        <div class="d-flex justify-content-start">
+                          <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                            <i class="bi bi-ui-checks-grid fs-5"></i>
+                          </div>
+                          <h5 class="fw-semibold ms-2 mt-2">Choose your Project Management platform</h5>
+                        </div>
+                        <!-- Jira -->
+                        <div class="col-2">
+                          <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2" :class="{
+                            'bg-aqua text-dark': selectedJiraAsana === 'jira' && !notUsingJiraAsana,
+                            'bg-grey': notUsingJiraAsana
+                          }" style="aspect-ratio:1/1; cursor:pointer;" @click="handleJiraAsanaClick('jira')">
+                            <div>
+                              <img src="@/assets/images/jira.png" alt="Jira" style="width:40px; height:40px;">
+                              <p class="mt-2 fw-semibold mb-0">Jira</p>
+                            </div>
                           </div>
                         </div>
-                        
+
+                        <!-- Asana -->
+                        <div class="col-2">
+                          <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2" :class="{
+                            'bg-aqua text-dark': selectedJiraAsana === 'asana' && !notUsingJiraAsana,
+                            'bg-grey': notUsingJiraAsana
+                          }" style="aspect-ratio:1/1; cursor:pointer;" @click="handleJiraAsanaClick('asana')">
+                            <div>
+                              <img src="@/assets/images/asana.png" alt="Asana" style="width:40px; height:40px;">
+                              <p class="mt-2 fw-semibold mb-0">Asana</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-2">
+                          <div class="card shadow border-0 d-flex align-items-center justify-content-center p-4"
+                            style="aspect-ratio:1/1; cursor:pointer;">
+                            <div>
+                              <button class="btn mt-2 mb-2 fw-semibold fs-5 border-0" @click="toggleJiraAsanaUsage">
+                                {{ notUsingJiraAsana ? 'Select' : 'None' }}
+                              </button>
+                            </div>
+                          </div>
+
+                        </div>
+
                       </div>
 
                     </div>
-
-                </div>
-              </div>
-              </div>
-
-              <!-- add location -->
-              <div class="row">
-                <div class="col-lg-9 location-card py-4 px-4 ms-3">
-                  <div class="row">
-                    <div class="d-flex justify-content-start">
-                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-geo-alt-fill fs-5"></i>
-                    </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Add location <span class="text-danger">*</span></h5>
-                    </div> 
                   </div>
-                  <div class="row mt-2">
-                    <!-- <div class="col-5">
+                </div>
+
+                <!-- add location -->
+                <div class="row">
+                  <div class="col-lg-9 location-card py-4 px-4 ms-3">
+                    <div class="row">
+                      <div class="d-flex justify-content-start">
+                        <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                          <i class="bi bi-geo-alt-fill fs-5"></i>
+                        </div>
+                        <h5 class="fw-semibold ms-2 mt-2">Add location <span class="text-danger">*</span></h5>
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <!-- <div class="col-5">
                       <input type="text" class="form-control rounded-0 uniform-input" id="locationName" v-model="locationName"
                         placeholder="Enter the name of the location..." />
                     </div> -->
-                    <div class="col-5 location-dropdown-wrapper" style="position: relative;">
-                      <input
-                        type="text"
-                        class="form-control rounded-0 uniform-input"
-                        id="locationName"
-                        v-model="locationName"
-                        placeholder="Enter the name of the location..."
-                        @input="onLocationInput"
-                        @focus="onLocationInput"
-                      />
-                      <!-- Dropdown -->
-                      <ul
-                        v-if="showDropdown && filteredCountries.length"
-                        class="list-group"
-                        style="position: absolute; top: 100%; left: 12; right: 10; z-index: 10; max-height: 200px; overflow-y: auto;width: 95%;"
-                      >
-                        <li
-                          v-for="country in filteredCountries"
-                          :key="country"
-                          class="list-group-item list-group-item-action"
-                          @click="selectCountry(country)"
-                          style="cursor: pointer;"
-                        >
-                          {{ country }}
-                        </li>
-                      </ul>
-                    </div>
+                      <div class="col-5 location-dropdown-wrapper" style="position: relative;">
+                        <input type="text" class="form-control rounded-0 uniform-input" id="locationName"
+                          v-model="locationName" placeholder="Enter the name of the location..."
+                          @input="onLocationInput" @focus="onLocationInput" />
+                        <!-- Dropdown -->
+                        <ul v-if="showDropdown && filteredCountries.length" class="list-group"
+                          style="position: absolute; top: 100%; left: 12; right: 10; z-index: 10; max-height: 200px; overflow-y: auto;width: 95%;">
+                          <li v-for="country in filteredCountries" :key="country"
+                            class="list-group-item list-group-item-action" @click="selectCountry(country)"
+                            style="cursor: pointer;">
+                            {{ country }}
+                          </li>
+                        </ul>
+                      </div>
 
 
-                    <div class="col-3">
-                      <button class="btn btn-sm mt-2 add-location-btn text-light" type="button" @click="handleAddLocation"><i
-                          class="bi bi-plus me-2"></i>Add location </button>
-                    </div>
-                    <div class="col-4 pt-1">
-                      <div class="avatar-container">
-                        <div
-                          v-for="(loc, index) in authStore.locations"
-                          :key="loc._id || index"
-                          class="avatar"
-                          :class="getAvatarClass(index)"
-                          :title="loc.location_name">
-                          {{ getInitials(loc.location_name) }}
+                      <div class="col-3">
+                        <button class="btn btn-sm mt-2 add-location-btn text-light" type="button"
+                          @click="handleAddLocation"><i class="bi bi-plus me-2"></i>Add location </button>
+                      </div>
+                      <div class="col-4 pt-1">
+                        <div class="avatar-container">
+                          <div v-for="(loc, index) in authStore.locations" :key="loc._id || index" class="avatar"
+                            :class="getAvatarClass(index)" :title="loc.location_name">
+                            {{ getInitials(loc.location_name) }}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- add users -->
-              <div class="row mt-4">
-                <div class="col-lg-12 add-users py-4 px-4 ms-3">
-                  <div class="row mb-3">
-                    <div class="d-flex justify-content-start">
-                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-person-fill fs-5"></i>
-                    </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Add users</h5>
-                    </div>
-                  </div>
-                  <form>
-                    <div class="row px-3 g-3 mb-4">
-                      <table class="table align-middle table-borderless">
-                      <thead class="table-light">
-                      <tr>
-                        <th class="text-center" style="width: 15%;">User Type</th>
-                        <th class="text-center" style="width: 15%;">First Name</th>
-                        <th class="text-center" style="width: 15%;">Last Name</th>
-                        <th class="text-center" style="width: 25%;">Email</th> 
-                        <th class="text-center" style="width: 15%;">Location</th> 
-                        <th class="text-center" style="width: 15%;">Member Role</th>
-                      </tr>
-                      </thead>    
-                      <tbody>
-                      <tr>
-                        <td>
-                          <select  v-model="form.user_type" class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
-                            <option selected disabled value="">Select</option>
-                            <option value="internal">Internal</option>
-                            <option value="external">External</option>
-                          </select>
-                        </td>
-                        <td>
-                          <input v-model="form.first_name" id="firstname" type="text" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
-                        </td>
-                        <td>
-                          <input  v-model="form.last_name" type="text" id="lastname" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
-                        </td>
-                        <td>
-                          <input  v-model="form.email" id="email" type="email" class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
-                        </td>
-                        <td>
-                          <select
-                            v-model="selectedLocation"
-                            class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6"
-                          >
-                            <option disabled value="">Select</option>
-                            <option
-                              v-for="(loc, index) in authStore.locations"
-                              :key="loc._id || index"
-                              :value="loc._id"
-                            >
-                              {{ loc.location_name }}
-                            </option>
-                          </select>
-                        </td>
-                        <td>
-                        <div class="multi-select-dropdown" ref="roleDropdown1">
-                          <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown1')">
-                                  <!-- <span>{{ selectedRoleText1 }}</span> -->
-                                   <span>
-        <!-- Display short forms only -->
-        {{ selectedRolesShortDisplay }}
-      </span>
-                                  <span><i class="bi bi-chevron-down"></i></span>
-                                </div>
-                                <div class="dropdown-list" v-show="isOpen.dropdown1">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input
-                                      type="checkbox"
-                                      :value="option.short"
-                                      v-model="selectedRoles1"
-                                    />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
-                        </div>
-                        </td>
-                      </tr>
-                      </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-2">
-                          <button class="btn btn-sm px-3 add-location-btn text-light" type="button"  @click="addUser"><i
-                              class="bi bi-plus me-2"></i>Add user </button>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-
-                  
-                </div>
-              </div>
-              
-              <!-- create invite link -->
-              <div class="row mt-4">
-                <div class="col-lg-12 add-users py-4 px-4 ms-3">
+                <!-- add users -->
+                <div class="row mt-4">
+                  <div class="col-lg-12 add-users py-4 px-4 ms-3">
                     <div class="row mb-3">
-                    <div class="d-flex justify-content-start">
-                      <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-link-45deg fs-5"></i>
+                      <div class="d-flex justify-content-start">
+                        <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                          <i class="bi bi-person-fill fs-5"></i>
+                        </div>
+                        <h5 class="fw-semibold ms-2 mt-2">Add users</h5>
+                      </div>
                     </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Create invite link for external member</h5>
-                    </div>
+                    <form>
+                      <div class="row px-3 g-3 mb-4">
+                        <table class="table align-middle table-borderless">
+                          <thead class="table-light">
+                            <tr>
+                              <th class="text-center" style="width: 15%;">User Type</th>
+                              <th class="text-center" style="width: 15%;">First Name</th>
+                              <th class="text-center" style="width: 15%;">Last Name</th>
+                              <th class="text-center" style="width: 25%;">Email</th>
+                              <th class="text-center" style="width: 15%;">Location</th>
+                              <th class="text-center" style="width: 15%;">Member Role</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <select v-model="form.user_type"
+                                  class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                                  <option selected disabled value="">Select</option>
+                                  <option value="internal">Internal</option>
+                                  <option value="external">External</option>
+                                </select>
+                              </td>
+                              <td>
+                                <input v-model="form.first_name" id="firstname" type="text"
+                                  class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                              </td>
+                              <td>
+                                <input v-model="form.last_name" type="text" id="lastname"
+                                  class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                              </td>
+                              <td>
+                                <input v-model="form.email" id="email" type="email"
+                                  class="form-control form-control-sm border-bottom rounded-0 uniform-input fs-6" />
+                              </td>
+                              <td>
+                                <select v-model="selectedLocation"
+                                  class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                                  <option disabled value="">Select</option>
+                                  <option v-for="(loc, index) in authStore.locations" :key="loc._id || index"
+                                    :value="loc._id">
+                                    {{ loc.location_name }}
+                                  </option>
+                                </select>
+                              </td>
+                              <td>
+                                <div class="multi-select-dropdown" ref="roleDropdown1">
+                                  <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown1')">
+                                    <!-- <span>{{ selectedRoleText1 }}</span> -->
+                                    <span>
+                                      <!-- Display short forms only -->
+                                      {{ selectedRolesShortDisplay }}
+                                    </span>
+                                    <span><i class="bi bi-chevron-down"></i></span>
+                                  </div>
+                                  <div class="dropdown-list" v-show="isOpen.dropdown1">
+                                    <label v-for="option in roleOptions" :key="option.short">
+                                      <input type="checkbox" :value="option.short" v-model="selectedRoles1" />
+                                      {{ option.full }}
+                                    </label>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <div class="row">
+                          <div class="col-2">
+                            <button class="btn btn-sm px-3 add-location-btn text-light" type="button"
+                              @click="addUser"><i class="bi bi-plus me-2"></i>Add user </button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+
+
+                  </div>
+                </div>
+
+                <!-- create invite link -->
+                <div class="row mt-4">
+                  <div class="col-lg-12 add-users py-4 px-4 ms-3">
+                    <div class="row mb-3">
+                      <div class="d-flex justify-content-start">
+                        <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                          <i class="bi bi-link-45deg fs-5"></i>
+                        </div>
+                        <h5 class="fw-semibold ms-2 mt-2">Create invite link for external member</h5>
+                      </div>
                     </div>
                     <table class="table align-middle table-borderless">
-                        <thead class="table-light">
-                          <tr>
-                            <th class="col-2 text-center">Location</th>
-                            <th class="col-2 text-center">Member Role</th>
-                            <th class="col-6 text-center">Copy Link</th>
-                          </tr>
-                        </thead>    
-                        <tbody>
-                          <tr>
-                            <td class="col-2">
-                              <select
-                            v-model="selectedLocation"
-                            class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6"
-                          >
-                            <option disabled value="">Select</option>
-                            <option
-                              v-for="(loc, index) in authStore.locations"
-                              :key="loc._id || index"
-                              :value="loc._id"
-                            >
-                              {{ loc.location_name }}
-                            </option>
-                          </select>
-                            </td>
-                            <td class="col-2">
-                             <div class="multi-select-dropdown" ref="roleDropdown2">
-                                <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
-                                  <span>{{ selectedRoleText2 }}</span>
-                                  <span><i class="bi bi-chevron-down"></i></span>
-                                </div>
-                                <div class="dropdown-list" v-show="isOpen.dropdown2">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input
-                                      type="checkbox"
-                                      :value="option.short"
-                                      v-model="selectedRoles2"
-                                    />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
+                      <thead class="table-light">
+                        <tr>
+                          <th class="col-2 text-center">Location</th>
+                          <th class="col-2 text-center">Member Role</th>
+                          <th class="col-6 text-center">Copy Link</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td class="col-2">
+                            <select v-model="selectedLocation"
+                              class="form-select form-select-sm border-bottom rounded-0 uniform-input fs-6">
+                              <option disabled value="">Select</option>
+                              <option v-for="(loc, index) in authStore.locations" :key="loc._id || index"
+                                :value="loc._id">
+                                {{ loc.location_name }}
+                              </option>
+                            </select>
+                          </td>
+                          <td class="col-2">
+                            <div class="multi-select-dropdown" ref="roleDropdown2">
+                              <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
+                                <span>{{ selectedRoleText2 }}</span>
+                                <span><i class="bi bi-chevron-down"></i></span>
                               </div>
-                            </td>
-                            <td class="col-6">
-                              <div class="position-relative w-100">
-                            <textarea
-                              id="shareLink"
-                              class="form-control form-control-sm border-bottom rounded-0"
-                              rows="2"
-                              readonly
-                              @click="copyLink"
-                              style="resize: none; overflow: hidden;white-space: normal;height: 42px;padding: 0 8px;"
-                            >
+                              <div class="dropdown-list" v-show="isOpen.dropdown2">
+                                <label v-for="option in roleOptions" :key="option.short">
+                                  <input type="checkbox" :value="option.short" v-model="selectedRoles2" />
+                                  {{ option.full }}
+                                </label>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="col-6">
+                            <div class="position-relative w-100">
+                              <textarea id="shareLink" class="form-control form-control-sm border-bottom rounded-0"
+                                rows="2" readonly @click="copyLink"
+                                style="resize: none; overflow: hidden;white-space: normal;height: 42px;padding: 0 8px;">
                       https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=e16G1P
                             </textarea>
 
-                            <!-- Popup message -->
-                            <div
-                              id="copyPopup"
-                              class="position-absolute px-2 py-1 rounded small text-white"
-                              style="background: grey; top: -40px; left: 50px; display: none;"
-                            >
-                              Link Copied!
-                            </div>
+                              <!-- Popup message -->
+                              <div id="copyPopup" class="position-absolute px-2 py-1 rounded small text-white"
+                                style="background: grey; top: -40px; left: 50px; display: none;">
+                                Link Copied!
                               </div>
-                            </td>
-                          </tr>
-                        </tbody>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
                     </table>
-                    
-                </div>
-              </div>
 
-              <!-- slack users -->
-              <div class="row mt-4" v-if="user">
-                <div class="col-lg-12 add-users py-4 px-4 ms-3">
-                  <div class="row pb-4 pt-2 px-2" >
-                  <div class="d-flex justify-content-start mb-3">
-                    <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                      <i class="bi bi-slack fs-5"></i>
-                    </div>
-                    <h5 class="fw-semibold ms-2 mt-2">Slack</h5>
-                    <p class="ms-3 fw-semibold" style="font-size: 13px;margin-top: 12px;">(Add Internal Users)</p>
                   </div>
+                </div>
+
+                <!-- slack users -->
+                <div class="row mt-4" v-if="user">
+                  <div class="col-lg-12 add-users py-4 px-4 ms-3">
+                    <div class="row pb-4 pt-2 px-2">
+                      <div class="d-flex justify-content-start mb-3">
+                        <div class="col-1 d-flex justify-content-center align-items-center location-icon">
+                          <i class="bi bi-slack fs-5"></i>
+                        </div>
+                        <h5 class="fw-semibold ms-2 mt-2">Slack</h5>
+                        <p class="ms-3 fw-semibold" style="font-size: 13px;margin-top: 12px;">(Add Internal Users)</p>
+                      </div>
                       <div class="card border-0">
                         <table class="table table-striped table-hover align-middle">
                           <thead class="table-light">
@@ -405,7 +387,7 @@
                             </tr>
                           </thead>
                           <!-- <tbody> -->
-                            <!-- <tr>
+                          <!-- <tr>
                               <td>1</td>
                               <td>
                                 <img src="https://randomuser.me/api/portraits/men/11.jpg" class="rounded-circle me-2" width="40" height="40" />
@@ -505,12 +487,8 @@
                             <tr>
                               <td>{{ index + 1 }}</td>
                               <td>
-                                <img
-                                  :src="user.image || defaultImage"
-                                  class="rounded-circle me-2"
-                                  width="40"
-                                  height="40"
-                                />
+                                <img :src="user.image || defaultImage" class="rounded-circle me-2" width="40"
+                                  height="40" />
                                 {{ user.name }}
                               </td>
                               <td>{{ user.email }}</td>
@@ -523,28 +501,25 @@
                           </tbody>
                         </table>
                       </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="text-end">
-                
-                <router-link
-  :to="nextPath"
-  class="btn stepper-btn mt-5"
->
-  {{ buttonLabel }}
-  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-</router-link>
-<!-- <button class="btn stepper-btn mt-5" @click="handleNext">
+                <div class="text-end">
+
+                  <router-link :to="nextPath" class="btn stepper-btn mt-5">
+                    {{ buttonLabel }}
+                    <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+                  </router-link>
+                  <!-- <button class="btn stepper-btn mt-5" @click="handleNext">
   {{ buttonLabel }} <i class="bi bi-arrow-right-circle-fill ms-1"></i>
 </button> -->
 
 
 
-              </div>
+                </div>
 
-            </div>
+              </div>
             </div>
           </div>
 
@@ -561,11 +536,11 @@ import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
 
 export default {
-    name: 'LocationView',
-    components: {
-      Stepper
-    },
-    data() {
+  name: 'LocationView',
+  components: {
+    Stepper
+  },
+  data() {
     return {
       showPlatforms: true,
       selectedLocation: "",
@@ -601,7 +576,7 @@ export default {
       filteredCountries: [],
       authStore: useAuthStore(),
       form: {
-        admin_id: "", 
+        admin_id: "",
         location_id: "",
         first_name: "",
         last_name: "",
@@ -619,17 +594,17 @@ export default {
       userShown: false,
       defaultImage:
         "https://a.slack-edge.com/80588/img/avatars/ava_0001-512.png",
-        popupPollInterval: null,
+      popupPollInterval: null,
       popupWindow: null,
-      backendBase: "https://vapt-backend.onrender.com", 
+      backendBase: "https://vapt-backend.onrender.com",
     };
   },
   computed: {
     selectedRolesShortDisplay() {
-    return this.selectedRoles1.length > 0
-      ? this.selectedRoles1.join(", ")
-      : "Select Roles";
-  },
+      return this.selectedRoles1.length > 0
+        ? this.selectedRoles1.join(", ")
+        : "Select Roles";
+    },
     selectedRoleText2() {
       return this.selectedRoles2.length > 0 ? this.selectedRoles2.join(', ') : 'Select';
     },
@@ -640,17 +615,18 @@ export default {
       return useAuthStore();
     },
     nextPath() {
-    return this.$route.query.from === "dashboard"
-      ? "/admindashboardonboarding"
-      : "/riskcriteria";
-  },
-   buttonLabel() {
-    return this.$route.query.from === "dashboard"
-      ? "Back to dashboard"
-      : "Next";
-  },
+      return this.$route.query.from === "dashboard"
+        ? "/admindashboardonboarding"
+        : "/riskcriteria";
+    },
+    buttonLabel() {
+      return this.$route.query.from === "dashboard"
+        ? "Back to dashboard"
+        : "Next";
+    },
   },
   methods: {
+    
     // handleNext() {
     //   const authStore = useAuthStore(); // ✅ Options API way
 
@@ -695,8 +671,8 @@ export default {
       });
     },
     toggleDropdown(drop) {
-    this.isOpen[drop] = !this.isOpen[drop];
-  },
+      this.isOpen[drop] = !this.isOpen[drop];
+    },
     onClickOutside(event) {
       const isClickInsideDropdown1 = this.$refs.roleDropdown1.contains(event.target);
       const isClickInsideDropdown2 = this.$refs.roleDropdown2.contains(event.target);
@@ -733,10 +709,10 @@ export default {
     },
     toggleTeams() {
       if (this.notUsingPlatform) return;
-      this.showTeams = true;       
+      this.showTeams = true;
       this.isTeamsActive = true;
     },
-     activateTeams() {
+    activateTeams() {
       if (this.notUsingPlatform) return;
       this.isTeamsActive = true;
       this.isSlackActive = false;
@@ -779,49 +755,49 @@ export default {
       }
     },
     async activatePlatform(platform) {
-    if (this.notUsingPlatform) return;
+      if (this.notUsingPlatform) return;
 
-    // First-time selection
-    if (!this.activePlatform) {
-      this.activePlatform = platform;
-      this.showData = true;
-
-      // Call respective login
-      if (platform === "slack") {
-        await this.startSlackLogin();
-      } else if (platform === "teams") {
-        await this.startTeamsLogin();
-      }
-      return;
-    }
-
-    // If same platform clicked again, do nothing
-    if (this.activePlatform === platform) return;
-
-    // If switching
-    Swal.fire({
-      title: "Switch Platform?",
-      text: `Do you want to switch to ${platform === "teams" ? "Teams" : "Slack"}?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-      reverseButtons: true,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
+      // First-time selection
+      if (!this.activePlatform) {
         this.activePlatform = platform;
         this.showData = true;
 
+        // Call respective login
         if (platform === "slack") {
           await this.startSlackLogin();
         } else if (platform === "teams") {
           await this.startTeamsLogin();
         }
+        return;
       }
-    });
+
+      // If same platform clicked again, do nothing
+      if (this.activePlatform === platform) return;
+
+      // If switching
+      Swal.fire({
+        title: "Switch Platform?",
+        text: `Do you want to switch to ${platform === "teams" ? "Teams" : "Slack"}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        reverseButtons: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          this.activePlatform = platform;
+          this.showData = true;
+
+          if (platform === "slack") {
+            await this.startSlackLogin();
+          } else if (platform === "teams") {
+            await this.startTeamsLogin();
+          }
+        }
+      });
     },
-   // ✅ Teams OAuth flow (new)
-  async startTeamsLogin() {
+    // ✅ Teams OAuth flow (new)
+    async startTeamsLogin() {
       try {
         console.log("🚀 Starting Microsoft Teams login...");
 
@@ -872,114 +848,114 @@ export default {
         console.error("❌ Teams login error:", err);
         Swal.fire("Error", "Microsoft Teams login failed.", "error");
       }
-  },
+    },
     // 🧠 Slack OAuth flow
-  async startSlackLogin() {
-    const authStore = useAuthStore();
+    async startSlackLogin() {
+      const authStore = useAuthStore();
 
-    try {
-      // 1️⃣ Get Slack OAuth URL
-      const { data: slackData } = await authStore.getSlackOAuthUrl(this.backendBase);
-      const authUrl = slackData.auth_url;
-      console.log("🔗 Slack Auth URL:", authUrl);
+      try {
+        // 1️⃣ Get Slack OAuth URL
+        const { data: slackData } = await authStore.getSlackOAuthUrl(this.backendBase);
+        const authUrl = slackData.auth_url;
+        console.log("🔗 Slack Auth URL:", authUrl);
 
-      // 2️⃣ Listen BEFORE opening popup
-      const handler = (event) => {
-        if (!event.data || event.data.type !== "slack-auth-success") return;
+        // 2️⃣ Listen BEFORE opening popup
+        const handler = (event) => {
+          if (!event.data || event.data.type !== "slack-auth-success") return;
 
-        const payload = event.data.payload;
-        console.log("✅ Slack OAuth Payload:", payload);
+          const payload = event.data.payload;
+          console.log("✅ Slack OAuth Payload:", payload);
 
-        if (!payload.success) {
-          Swal.fire("Error", payload.error || "Slack login failed", "error");
-          return;
-        }
+          if (!payload.success) {
+            Swal.fire("Error", payload.error || "Slack login failed", "error");
+            return;
+          }
 
-        // ✅ Store Slack user info
-        localStorage.setItem("slack_user_login", payload.bot_access_token);
-        localStorage.setItem("slack_user_email", payload.user_email);
-        localStorage.setItem("slack_user_name", payload.user_name);
+          // ✅ Store Slack user info
+          localStorage.setItem("slack_user_login", payload.bot_access_token);
+          localStorage.setItem("slack_user_email", payload.user_email);
+          localStorage.setItem("slack_user_name", payload.user_name);
 
-        // ✅ Show Slack success popup
-        Swal.fire({
-          title: "🎉 Slack Login Successful!",
-          html: `
+          // ✅ Show Slack success popup
+          Swal.fire({
+            title: "🎉 Slack Login Successful!",
+            html: `
             <b>Welcome, ${payload.user_name}!</b><br>
             <small>Logged in as <i>${payload.user_email}</i></small>
           `,
-          icon: "success",
-          confirmButtonText: "OK",
-          background: "#fff",
-          color: "#333",
-          timer: 4000,
-          timerProgressBar: true,
-        });
+            icon: "success",
+            confirmButtonText: "OK",
+            background: "#fff",
+            color: "#333",
+            timer: 4000,
+            timerProgressBar: true,
+          });
 
-        console.log("👤 Slack User Saved:", payload.user_name, payload.user_email);
+          console.log("👤 Slack User Saved:", payload.user_name, payload.user_email);
 
-        // ✅ Remove listener
-        window.removeEventListener("message", handler);
-      };
+          // ✅ Remove listener
+          window.removeEventListener("message", handler);
+        };
 
-      window.addEventListener("message", handler, { once: true });
+        window.addEventListener("message", handler, { once: true });
 
-      // 3️⃣ Open popup after listener
-      const popup = window.open(authUrl, "SlackAuth", "width=700,height=800");
+        // 3️⃣ Open popup after listener
+        const popup = window.open(authUrl, "SlackAuth", "width=700,height=800");
 
-      // 4️⃣ Fallback: check every 2s if user logged in
-      const fallbackTimer = setInterval(() => {
-        if (popup.closed) {
-          clearInterval(fallbackTimer);
-          console.log("Popup closed");
-        }
-      }, 2000);
-    } catch (error) {
-      console.error("Slack login error:", error);
-      Swal.fire("Error", "Something went wrong during Slack login.", "error");
-    }
-  },
-  async handleJiraAsanaClick(platform) {
-  if (this.notUsingJiraAsana) return;
-
-  this.selectedJiraAsana = platform;
-
-  if (platform === "jira") {
-    try {
-      const authStore = useAuthStore();
-      const res = await authStore.getJiraAuthUrl();
-
-      if (res.status && res.url) {
-        // ✅ Open Jira auth in a popup (like Google)
-        const popup = window.open(res.url, "_blank", "width=700,height=800");
-
-        if (!popup || popup.closed || typeof popup.closed === "undefined") {
-          Swal.fire("Popup Blocked", "Please allow popups for Jira login.", "info");
-          return;
-        }
-
-        // 🕒 (Optional) Poll to detect callback success (if backend updates session)
-        const checkLogin = setInterval(() => {
+        // 4️⃣ Fallback: check every 2s if user logged in
+        const fallbackTimer = setInterval(() => {
           if (popup.closed) {
-            clearInterval(checkLogin);
-            Swal.fire(
-              "Success",
-              "Jira authorization completed ✅",
-              "success"
-            );
-            // You can now call your backend `/jira/login/` if needed
+            clearInterval(fallbackTimer);
+            console.log("Popup closed");
           }
-        }, 1000);
-      } else {
-        Swal.fire("Error", res.message || "Failed to start Jira login ❌", "error");
+        }, 2000);
+      } catch (error) {
+        console.error("Slack login error:", error);
+        Swal.fire("Error", "Something went wrong during Slack login.", "error");
       }
-    } catch (err) {
-      console.error("⚠️ Jira login error:", err);
-      Swal.fire("Error", "Something went wrong during Jira login.", "error");
-    }
-  } else {
-    Swal.fire("Info", "This button is for Jira login.", "info");
-  }
-  },
+    },
+    async handleJiraAsanaClick(platform) {
+      if (this.notUsingJiraAsana) return;
+
+      this.selectedJiraAsana = platform;
+
+      if (platform === "jira") {
+        try {
+          const authStore = useAuthStore();
+          const res = await authStore.getJiraAuthUrl();
+
+          if (res.status && res.url) {
+            // ✅ Open Jira auth in a popup (like Google)
+            const popup = window.open(res.url, "_blank", "width=700,height=800");
+
+            if (!popup || popup.closed || typeof popup.closed === "undefined") {
+              Swal.fire("Popup Blocked", "Please allow popups for Jira login.", "info");
+              return;
+            }
+
+            // 🕒 (Optional) Poll to detect callback success (if backend updates session)
+            const checkLogin = setInterval(() => {
+              if (popup.closed) {
+                clearInterval(checkLogin);
+                Swal.fire(
+                  "Success",
+                  "Jira authorization completed ✅",
+                  "success"
+                );
+                // You can now call your backend `/jira/login/` if needed
+              }
+            }, 1000);
+          } else {
+            Swal.fire("Error", res.message || "Failed to start Jira login ❌", "error");
+          }
+        } catch (err) {
+          console.error("⚠️ Jira login error:", err);
+          Swal.fire("Error", "Something went wrong during Jira login.", "error");
+        }
+      } else {
+        Swal.fire("Info", "This button is for Jira login.", "info");
+      }
+    },
     toggleJiraAsanaUsage() {
       this.notUsingJiraAsana = !this.notUsingJiraAsana;
 
@@ -993,7 +969,7 @@ export default {
       const res = await this.authStore.addLocation(this.locationName.trim());
 
       if (res.status) {
-        this.locationName = ""; 
+        this.locationName = "";
       } else {
         console.error("Error:", res.message);
       }
@@ -1007,115 +983,115 @@ export default {
       return classes[index % classes.length];
     },
     async addUser() {
-  try {
-    // ✅ 1️⃣ Get admin_id from logged-in user (stored in authStore)
-    const adminId = this.authStore.user?._id || this.authStore.user?.id;
-    if (!adminId) {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Admin ID",
-        text: "Please log in again.",
-        timer: 3000,
-        showConfirmButton: false,
-      });
-      return;
-    }
+      try {
+        // ✅ 1️⃣ Get admin_id from logged-in user (stored in authStore)
+        const adminId = this.authStore.user?._id || this.authStore.user?.id;
+        if (!adminId) {
+          Swal.fire({
+            icon: "error",
+            title: "Missing Admin ID",
+            text: "Please log in again.",
+            timer: 3000,
+            showConfirmButton: false,
+          });
+          return;
+        }
 
-    // ✅ 2️⃣ Prepare form data according to your backend structure
-    this.form.admin_id = adminId;
-    this.form.location_id = this.selectedLocation;
+        // ✅ 2️⃣ Prepare form data according to your backend structure
+        this.form.admin_id = adminId;
+        this.form.location_id = this.selectedLocation;
 
-    // find location name
-    const selectedLoc = this.authStore.locations.find(
-      (loc) => loc._id === this.selectedLocation
-    );
-    this.form.select_location = selectedLoc ? selectedLoc.location_name : "";
-    this.form.Member_role = this.selectedRoles1.map(
-        (short) =>
-          this.roleOptions.find((opt) => opt.short === short)?.full || short
-      );
+        // find location name
+        const selectedLoc = this.authStore.locations.find(
+          (loc) => loc._id === this.selectedLocation
+        );
+        this.form.select_location = selectedLoc ? selectedLoc.location_name : "";
+        this.form.Member_role = this.selectedRoles1.map(
+          (short) =>
+            this.roleOptions.find((opt) => opt.short === short)?.full || short
+        );
 
-    // ✅ 3️⃣ Validate all required fields before API call
-    if (
-      !this.form.first_name ||
-      !this.form.last_name ||
-      !this.form.email ||
-      !this.form.user_type ||
-      !this.form.location_id ||
-      this.form.Member_role.length === 0
-    ) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing Fields",
-        text: "Please fill all required fields.",
-        timer: 2500,
-        showConfirmButton: false,
-      });
-      return;
-    }
+        // ✅ 3️⃣ Validate all required fields before API call
+        if (
+          !this.form.first_name ||
+          !this.form.last_name ||
+          !this.form.email ||
+          !this.form.user_type ||
+          !this.form.location_id ||
+          this.form.Member_role.length === 0
+        ) {
+          Swal.fire({
+            icon: "warning",
+            title: "Missing Fields",
+            text: "Please fill all required fields.",
+            timer: 2500,
+            showConfirmButton: false,
+          });
+          return;
+        }
 
-    // ✅ 3️⃣ Call API
-    const response = await this.authStore.createUserDetail(this.form);
+        // ✅ 3️⃣ Call API
+        const response = await this.authStore.createUserDetail(this.form);
 
-    if (response.status) {
-      console.log("✅ User Added Successfully:", response.data);
+        if (response.status) {
+          console.log("✅ User Added Successfully:", response.data);
 
-      Swal.fire({
-        icon: "success",
-        title: "User Added Successfully",
-        text: response.message,
-        timer: 3000,
-        showConfirmButton: false,
-      });
+          Swal.fire({
+            icon: "success",
+            title: "User Added Successfully",
+            text: response.message,
+            timer: 3000,
+            showConfirmButton: false,
+          });
 
-      // ✅ 4️⃣ Save user to localStorage
-      const existingUsers = JSON.parse(localStorage.getItem("addedUsers") || "[]");
+          // ✅ 4️⃣ Save user to localStorage
+          const existingUsers = JSON.parse(localStorage.getItem("addedUsers") || "[]");
 
-      // prevent duplicate by email
-      const userExists = existingUsers.some(
-        (u) => u.email === response.data.email
-      );
-      if (!userExists) {
-        existingUsers.push(response.data);
+          // prevent duplicate by email
+          const userExists = existingUsers.some(
+            (u) => u.email === response.data.email
+          );
+          if (!userExists) {
+            existingUsers.push(response.data);
+          }
+
+          this.usersList = existingUsers;
+          localStorage.setItem("addedUsers", JSON.stringify(this.usersList));
+
+          // ✅ 5️⃣ Reset form
+          this.form = {
+            admin_id: "",
+            location_id: "",
+            first_name: "",
+            last_name: "",
+            user_type: "",
+            email: "",
+            select_location: "",
+            // Member_role: "",
+            Member_role: [],
+          };
+          this.selectedLocation = "";
+          this.selectedRoles1 = [];
+        } else {
+          console.error("❌ Error:", response.message);
+          Swal.fire({
+            icon: "error",
+            title: "Error Adding User",
+            text: response.message,
+            timer: 3000,
+            showConfirmButton: false,
+          });
+        }
+      } catch (error) {
+        console.error("❌ Add user failed:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Request Failed",
+          text: "Something went wrong. Please try again.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
       }
-
-      this.usersList = existingUsers;
-      localStorage.setItem("addedUsers", JSON.stringify(this.usersList));
-
-      // ✅ 5️⃣ Reset form
-      this.form = {
-        admin_id: "",
-        location_id: "",
-        first_name: "",
-        last_name: "",
-        user_type: "",
-        email: "",
-        select_location: "",
-        // Member_role: "",
-        Member_role: [],
-      };
-      this.selectedLocation = "";
-      this.selectedRoles1 = [];
-    } else {
-      console.error("❌ Error:", response.message);
-      Swal.fire({
-        icon: "error",
-        title: "Error Adding User",
-        text: response.message,
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    }
-  } catch (error) {
-    console.error("❌ Add user failed:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Request Failed",
-      text: "Something went wrong. Please try again.",
-      timer: 3000,
-      showConfirmButton: false,
-    });
-  }
     },
   },
   mounted() {
@@ -1126,19 +1102,19 @@ export default {
       console.log("📌 Loaded users from localStorage:", this.usersList);
     }
     // 🟡 3️⃣ Fetch locations by admin id instead of old fetchLocations()
-      const user =
-        this.authStore.user ||
-        JSON.parse(localStorage.getItem("user") || "null");
+    const user =
+      this.authStore.user ||
+      JSON.parse(localStorage.getItem("user") || "null");
 
-      if (user) {
-        this.authStore.user = user; // keep store in sync
-        const adminId =
-          user.admin_id || user.id || user._id;
+    if (user) {
+      this.authStore.user = user; // keep store in sync
+      const adminId =
+        user.admin_id || user.id || user._id;
 
-        if (adminId) {
-          this.authStore.fetchLocationsByAdminId(adminId);
-        }
+      if (adminId) {
+        this.authStore.fetchLocationsByAdminId(adminId);
       }
+    }
     this.initTooltips();
     document.addEventListener('click', this.onClickOutside);
     try {
@@ -1186,7 +1162,7 @@ export default {
             document.body.innerHTML = "<h2>Login error</h2>";
           });
 
-        return; 
+        return;
       }
 
       // 🟠 2️⃣ Handle Slack OAuth redirect
@@ -1208,7 +1184,7 @@ export default {
     } catch (err) {
       console.error("Redirect page error:", err);
     }
-     document.addEventListener("click", this.handleOutsideClick);
+    document.addEventListener("click", this.handleOutsideClick);
   },
   beforeUnmount() {
     document.removeEventListener('click', this.onClickOutside);
@@ -1221,82 +1197,87 @@ export default {
 </script>
 
 <style scoped>
-  .location-autocomplete {
+.location-autocomplete {
   position: relative;
 }
 
 .location-autocomplete .country-dropdown {
   position: absolute;
-  top: 100%;          /* just below input */
+  top: 100%;
+  /* just below input */
   left: 0;
-  right: 0;           /* => same width as input */
+  right: 0;
+  /* => same width as input */
   z-index: 20;
   max-height: 200px;
   overflow-y: auto;
-  border-top: none;   /* optional: so it looks attached to input */
+  border-top: none;
+  /* optional: so it looks attached to input */
 }
 
 .multi-select-dropdown {
-    position: relative;
-    width: 160px;
+  position: relative;
+  width: 160px;
 }
 
 .dropdown-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .dropdown-input span {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .dropdown-list {
-    position: absolute;
-    font-size: 13px;
-    width: 100%;
-    border: 1px solid #ccc;
-    border-top: none;
-    background-color: #fff;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
+  position: absolute;
+  font-size: 13px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-top: none;
+  background-color: #fff;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
 }
 
 .dropdown-list label {
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
 }
 
 .dropdown-list label:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .dropdown-list input[type="checkbox"] {
-    margin-right: 10px;
+  margin-right: 10px;
 }
+
 .uniform-input {
-  height: 42px; 
+  height: 42px;
   line-height: 32px;
-  padding: 0 8px; 
-   
+  padding: 0 8px;
+
 }
 
 .bg-aqua {
   background-color: aquamarine !important;
 }
+
 .bg-grey {
   background-color: #e0e0e0 !important;
   pointer-events: none;

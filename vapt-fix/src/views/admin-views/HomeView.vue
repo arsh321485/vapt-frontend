@@ -25,6 +25,15 @@
     Fix your vulnerabilities now
     <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
   </button>
+  <!-- <button
+  type="button"
+  class="btn hero-btn"
+  @click.prevent.stop="handleFixNow"
+>
+  Fix your vulnerabilities now
+  <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
+</button> -->
+
 </div>
 
         </div>
@@ -376,47 +385,16 @@ export default {
     Footer
   },
 methods: {
-//   async handleFixNow() {
-//   const authStore = useAuthStore();
-//   const user = authStore.user;
-
-//   // 1️⃣ LOCATION CHECK (real data)
-//   await authStore.fetchLocationsByAdminId(user._id);
-
-//   if (!authStore.locations || authStore.locations.length === 0) {
-//     this.$router.push("/location");
-//     return;
-//   }
-
-//   // 2️⃣ RISK CRITERIA CHECK
-//   const reportId = localStorage.getItem("reportId");
-
-//   if (!reportId) {
-//     // No report means risk/upload not done yet
-//     this.$router.push("/riskcriteria");
-//     return;
-//   }
-
-//   // 3️⃣ UPLOAD REPORT CHECK (TEMP – until GET API exists)
-//   if (!localStorage.getItem("reportId")) {
-//     this.$router.push("/uploadreport");
-//     return;
-//   }
-
-//   // ✅ ALL DATA EXISTS
-//   this.$router.push("/admindashboardonboarding");
-// },
+  // handleFixNow() {
+  //   const isAuthenticated = localStorage.getItem("authenticated") === "true";
+  //   if (isAuthenticated) {
+  //     this.$router.push("/signin");
+  //   } else {
+  //     this.$router.push("/signup");
+  //   }
+  // }
   handleFixNow() {
-    const isNewUser = localStorage.getItem("isNewUser");
-    console.log("isNewUser =", isNewUser);
-
-    if (isNewUser === "true") {
-    
-      this.$router.push("/location");
-    } else {
-      
-      this.$router.push("/admindashboardonboarding");
-    }
+    this.$router.push("/choose-account");
   }
 }
 

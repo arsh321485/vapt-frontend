@@ -67,6 +67,7 @@ export const useAuthStore = defineStore("auth", {
     selectedReportLocation: null as
       | { id: string; name: string }
       | null,
+    uploadedReportDetails: null as any,
     }),
 
   actions: {
@@ -97,7 +98,6 @@ export const useAuthStore = defineStore("auth", {
         this.user = JSON.parse(savedUser);
         console.log("♻️ Restored user from storage:", this.user);
       }
-
       // 2️⃣ Restore locations quickly (so UI shows instantly)
       const savedLocations = localStorage.getItem("locations");
       if (savedLocations) {
@@ -118,34 +118,64 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // signup
-  async signup(payload: any) {
-    try {
-      const res = await endpoint.post(
-        "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
-        payload
-      );
+  // async signup(payload: any) {
+  //   try {
+  //     const res = await endpoint.post(
+  //       "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
+  //       payload
+  //     );
 
-      const data = res.data;
+  //     const data = res.data;
 
-      if (data.tokens?.access) {
-        this.setAuth(data.tokens.access, data.user);
-        if (data.tokens.refresh) {
-          localStorage.setItem("refreshToken", data.tokens.refresh);
-        }
+  //     if (data.tokens?.access) {
+  //       this.setAuth(data.tokens.access, data.user);
+  //       if (data.tokens.refresh) {
+  //         localStorage.setItem("refreshToken", data.tokens.refresh);
+  //       }
+  //     }
+  //     localStorage.setItem("isNewUser", "true");
+
+  //     return { status: true, data };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       message: error.response?.data?.message || "Signup failed",
+  //       details: error.response?.data || null,
+  //     };
+  //   }
+  // },
+  // signup
+async signup(payload: any) {
+  try {
+    const res = await endpoint.post(
+      "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
+      payload
+    );
+
+    const data = res.data;
+
+    if (data.tokens?.access && data.user) {
+      // ✅ SAME AS LOGIN
+      this.setAuth(data.tokens.access, data.user);
+
+      if (data.tokens.refresh) {
+        localStorage.setItem("refreshToken", data.tokens.refresh);
       }
 
-      // ✅ NEW USER
+      // ✅ REQUIRED
+      localStorage.setItem("authenticated", "true");
       localStorage.setItem("isNewUser", "true");
-
-      return { status: true, data };
-    } catch (error: any) {
-      return {
-        status: false,
-        message: error.response?.data?.message || "Signup failed",
-        details: error.response?.data || null,
-      };
     }
-  },
+
+    return { status: true, data };
+  } catch (error: any) {
+    return {
+      status: false,
+      message: error.response?.data?.message || "Signup failed",
+      details: error.response?.data || null,
+    };
+  }
+},
 
   // ✅ Login (signin)
   async login(payload: any) {
@@ -197,7 +227,7 @@ export const useAuthStore = defineStore("auth", {
 
   console.log("Google login → isNewUser =", localStorage.getItem("isNewUser"));
 
-  return { status: true };
+  return { status: true, user: data.user, tokens: data.tokens };
   },
 
   // ✅ Forgot Password
@@ -507,6 +537,10 @@ export const useAuthStore = defineStore("auth", {
       const res = await endpoint.post("/admin/risk_criteria/add-risk/", body);
 
       if (res.status === 200 || res.status === 201) {
+      const riskCriteria = res.data.risk_criteria;
+      if (riskCriteria?._id) {
+        localStorage.setItem("riskCriteriaId", riskCriteria._id);
+      }
         console.log("✅ Risk Criteria created successfully:", res.data);
         return { status: true, message: res.data.message, data: res.data.risk_criteria };
       }
@@ -515,6 +549,89 @@ export const useAuthStore = defineStore("auth", {
     } catch (error: any) {
       console.error("❌ Error adding Risk Criteria:", error);
       return { status: false, message: error?.response?.data?.message || error.message || "Failed to add Risk Criteria" };
+    }
+  },
+
+  // ✅ GET Risk Criteria (from localStorage)
+  async getRiskCriteriaById() {
+    try {
+      const riskCriteriaId = localStorage.getItem("riskCriteriaId");
+
+      if (!riskCriteriaId) {
+        return {
+          status: false,
+          message: "Risk Criteria ID not found",
+          isNotFound: true,
+        };
+      }
+
+      const res = await endpoint.get(
+        `/admin/risk_criteria/risks/${riskCriteriaId}/`
+      );
+
+      return {
+        status: true,
+        data: res.data,
+      };
+    } catch (error: any) {
+      const is404 = error?.response?.status === 404;
+
+      if (is404) {
+        console.log("ℹ️ No risk criteria found (404) - user can create new");
+      } else {
+        console.error("❌ Error fetching risk criteria:", error);
+      }
+
+      return {
+        status: false,
+        message: error?.response?.data?.message || "Failed to fetch risk criteria",
+        isNotFound: is404,
+      };
+    }
+  },
+
+  // ✅ GET Upload Report by ID
+  async getUploadReportById(reportId: string) {
+    try {
+      if (!reportId) {
+        return {
+          status: false,
+          message: "Report ID not found",
+          isNotFound: true,
+        };
+      }
+
+      const res = await endpoint.get(`/admin/upload_report/upload/${reportId}/`);
+
+      if (res.data?.success && res.data?.upload_report) {
+        this.uploadedReportDetails = res.data.upload_report;
+
+        return {
+          status: true,
+          message: res.data.message || "Upload report retrieved successfully",
+          data: res.data,
+        };
+      }
+
+      return {
+        status: false,
+        message: "No upload report data found",
+        isNotFound: true,
+      };
+    } catch (error: any) {
+      const is404 = error?.response?.status === 404;
+
+      if (is404) {
+        console.log("ℹ️ No upload report found (404) - user can upload new");
+      } else {
+        console.error("❌ Error fetching upload report:", error);
+      }
+
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message || "Failed to fetch upload report",
+        isNotFound: is404,
+      };
     }
   },
 

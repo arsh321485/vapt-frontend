@@ -116,14 +116,15 @@ export default {
         });
 
         if (result.status) {
-          
+
           console.log("✅ Access Token:", localStorage.getItem("authorization"));
           console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
           console.log("✅ User:", localStorage.getItem("user"));
           console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
 
-          this.$router.push("/home");
-          
+          // Check if user has uploaded report and redirect accordingly
+          await this.checkAndRedirect();
+
         } else {
           Swal.fire("Error", result.message || "Login failed ❌", "error");
           grecaptcha.reset();
@@ -150,32 +151,98 @@ export default {
         { theme: "outline", size: "large", text: "signin_with" }
       );
     },
-    async handleGoogleResponse(response) {
+  //   async handleGoogleResponse(response) {
+  // try {
+  //   const id_token = response.credential;
+  //   console.log("🧠 Received Google ID Token:", id_token);
+
+  //   localStorage.setItem("google_id_token", id_token);
+
+  //   const authStore = useAuthStore();
+  //   const result = await authStore.googleLogin(id_token);
+
+  //   console.log("📦 Google login result:", result);
+  //   if (result.status) {
+  //     const { user, tokens } = result;
+  //     if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
+  //     if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
+  //     if (user) localStorage.setItem("user", JSON.stringify(user));
+      
+  //     this.$router.push("/location");
+  //   } else {
+  //     Swal.fire("Error", result.message || "Google login failed ❌", "error");
+  //   }
+  // } catch (error) {
+  //   console.error("Google login API error:", error);
+  //   Swal.fire("Error", "Something went wrong during Google login ❌", "error");
+  // }
+  //   },
+  async handleGoogleResponse(response) {
   try {
     const id_token = response.credential;
-    console.log("🧠 Received Google ID Token:", id_token);
-
-    localStorage.setItem("google_id_token", id_token);
+    console.log("🧠 Google ID Token received");
 
     const authStore = useAuthStore();
     const result = await authStore.googleLogin(id_token);
 
-    console.log("📦 Google login result:", result);
-    if (result.status) {
-      const { user, tokens } = result;
-      if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
-      if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
-      if (user) localStorage.setItem("user", JSON.stringify(user));
-      
-      this.$router.push("/home");
-    } else {
-      Swal.fire("Error", result.message || "Google login failed ❌", "error");
+    if (!result.status) {
+      Swal.fire(
+        "Error",
+        result.message || "Google login failed ❌",
+        "error"
+      );
+      return;
     }
+
+    // ✅ Auth is already set in store
+    // ✅ authenticated = true
+    // ✅ user saved
+    // ✅ tokens saved
+
+    // 🔁 Check if user has uploaded report and redirect accordingly
+    await this.checkAndRedirect();
+
   } catch (error) {
-    console.error("Google login API error:", error);
-    Swal.fire("Error", "Something went wrong during Google login ❌", "error");
+    console.error("Google login error:", error);
+    Swal.fire(
+      "Error",
+      "Something went wrong during Google login ❌",
+      "error"
+    );
   }
-    },
+},
+    async checkAndRedirect() {
+      const reportId = localStorage.getItem("reportId");
+      console.log("📍 reportId:", reportId);
+
+      if (!reportId) {
+        // No report uploaded yet
+        console.log("➡️ No reportId, redirecting to /location");
+        this.$router.push("/location");
+        return;
+      }
+
+      // Check if report exists
+      const authStore = useAuthStore();
+      console.log("🔍 Checking if report exists...");
+      const res = await authStore.getUploadReportById(reportId);
+      console.log("📊 API response:", res);
+
+      if (res.status && res.data?.upload_report) {
+        // Report exists, go to dashboard
+        console.log("✅ Report exists, redirecting to /admindashboardonboarding");
+        this.$router.push("/admindashboardonboarding");
+      } else if (res.isNotFound) {
+        // 404 - Report doesn't exist, go to location (expected for new users)
+        console.log("➡️ No report found (404), redirecting to /location");
+        this.$router.push("/location");
+      } else {
+        // Real error occurred, show error but still redirect to location
+        console.error("❌ Error checking report:", res.message);
+        Swal.fire("Error", res.message || "Failed to verify report status", "error");
+        this.$router.push("/location");
+      }
+    }
   },
   beforeUnmount() {
   if (window.grecaptcha) {
@@ -226,13 +293,7 @@ mounted() {
   });
 };
 
-
   document.head.appendChild(recaptchaScript);
-
-  const isAuthenticated = localStorage.getItem("authenticated");
-  if (isAuthenticated === "true") {
-    this.$router.push("/home");
-  }
 }
 
 };

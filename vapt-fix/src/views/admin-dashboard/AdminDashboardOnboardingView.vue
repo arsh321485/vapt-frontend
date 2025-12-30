@@ -360,12 +360,8 @@
                     </div>
                     <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
-                  <div class="d-flex flex-row justify-content-center gap-2 py-3">
-                    <!-- <h1 class="text-78">2d 11 hrs</h1> -->
-                     
-<h1 class="">{{ meanRemediateHuman }}</h1>
-
-
+                  <div class="d-flex flex-row justify-content-center gap-2 py-3">  
+                <h1 class="">{{ meanRemediateHuman }}</h1>
                   </div>
                 </div>
               </div>

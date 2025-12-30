@@ -3,30 +3,28 @@
     <section class="bg-light">
       <div class="container-fluid">
         <div class="row">
-          <!-- <div class="col-lg-2">
-            <Stepper />
-        </div> -->
+          
           <div class="col-lg-12  welcome-bg">
             <div class="col-lg-10 offset-lg-2">
               <div class="container-fluid py-4">
                 <div class="row">
-                  <div class="d-flex flex-row">
-                    <div class="mt-2">
-                      <img src="@/assets/images/waving-hand.png" alt="" class="me-3">
-                    </div>
-                    <div>
-                      <div class="d-flex justify-content-between">
-                        <div>
-                          <h1 class="fw-semibold welcome-head"> Welcome to vaptfix!</h1>
-                          <p class="welcome-subhead">Before we fix your information assets, ....</p>
-                        </div>
-                        <div>
-                        </div>
+                  <div class="d-flex flex-row align-items-start justify-content-between w-100">
+
+                    <!-- LEFT (UNCHANGED) -->
+                    <div class="d-flex flex-row">
+                      <div class="mt-2">
+                        <img src="@/assets/images/waving-hand.png" alt="" class="me-3">
+                      </div>
+
+                      <div>
+                        <h1 class="fw-semibold welcome-head">Welcome to vaptfix!</h1>
+                        <p class="welcome-subhead">Before we fix your information assets, ....</p>
                       </div>
                     </div>
 
-                  </div>
+                    
 
+                  </div>
                 </div>
 
                 <div class="row">
@@ -47,9 +45,9 @@
                     </div>
                     <div class="d-flex justify-content-start gap-3">
                       <div>
-                        <select v-model="selectedLocation" class="form-select" @change="checkLocation">
+                        <select v-model="selectedLocation" class="form-select" @change="checkLocation" :disabled="!!reportDetails">
                           <option selected disabled value="">Select Location</option>
-                          <option  v-if="authStore.locations && authStore.locations.length > 0" value="ALL">
+                          <option v-if="authStore.locations && authStore.locations.length > 0" value="ALL">
                             Apply for all locations
                           </option>
                           <option v-for="loc in authStore.locations" :key="loc._id" :value="loc._id"
@@ -59,7 +57,7 @@
                         </select>
                       </div>
                       <div>
-                        <select v-model="selectedType" class="form-select">
+                        <select v-model="selectedType" class="form-select" :disabled="!!reportDetails">
                           <option selected disabled value="">Select type</option>
                           <option value="internal" :disabled="isTypeDisabled('internal')">Internal</option>
                           <option value="external" :disabled="isTypeDisabled('external')">External</option>
@@ -77,12 +75,9 @@
                       <div v-if="!uploadingStarted">
                         <input type="file" ref="pdfFileInput" accept=".nessus,.html,text/html,application/octet-stream"
                           @change="handleFileUpload" style="display: none" />
-                        <!-- <button class="btn upload-report-btn" @click="triggerFileInput"
-                          :disabled="!selectedLocation || !selectedType">
-                          <i class="bi bi-arrow-up-circle fs-5"></i>
-                        </button> -->
+                        
                         <button class="btn upload-report-btn" @click="triggerFileInput"
-                          :disabled="!selectedLocation || !selectedType || uploadedFiles.length >= 1">
+                          :disabled="!selectedLocation || !selectedType || uploadedFiles.length >= 1 || !!reportDetails">
                           <i class="bi bi-arrow-up-circle fs-5"></i>
                         </button>
                         <h4 class="fw-bold mt-3">Upload vulnerability report</h4>
@@ -98,7 +93,7 @@
                         </div>
                         <p class="text-muted mt-2">
                           {{ uploadProgress < 100 ? 'Uploading... (' + uploadProgress + '%)' : 'Uploaded ✅' }} </p>
-                            <h5 class="fw-bold mt-1">{{ uploadedFileName }}</h5>
+                            <p class="fw-bold mt-1 small">{{ uploadedFileName }}</p>
                             <p class="text-muted">{{ uploadedFileSize }}</p>
                             <div v-if="uploadProgress === 100" class="d-flex justify-content-center gap-2 mt-3">
 
@@ -106,7 +101,7 @@
                                 @click="viewFile(uploadedFiles[uploadedFiles.length - 1])">
                                 <i class="bi bi-eye"></i> View
                               </button>
-                              <button class="btn btn-sm btn-danger"
+                              <button v-if="!reportDetails" class="btn btn-sm btn-danger"
                                 @click="deleteProgressFile(uploadedFiles.length - 1)">
                                 <i class="bi bi-trash"></i> Delete
                               </button>
@@ -130,7 +125,7 @@
                         </thead>
                         <tbody>
                           <tr v-for="(file, index) in uploadedFiles" :key="index">
-                            <td><strong>{{ file.fileName }}</strong></td>
+                            <td style="word-break: break-all; max-width: 200px;"><strong class="small">{{ file.fileName }}</strong></td>
                             <td>{{ file.type }}</td>
                             <td>{{ file.location }}</td>
                             <!-- <td>
@@ -147,7 +142,6 @@
 
                   <div v-if="toastMessage" class="toast-message"> {{ toastMessage }}</div>
                 </div>
-
 
                 <div class="text-end">
                   <router-link :to="nextPath" class="btn stepper-btn mt-5" :class="{ disabled: !canGoNext }"
@@ -202,7 +196,9 @@ export default {
       uploadedFileName: "",
       uploadedFileSize: "",
       uploadedFiles: [],
-      toastMessage: ""
+      toastMessage: "",
+      loadingReportDetails: false,
+      reportDetails: null
     };
   },
   computed: {
@@ -232,8 +228,12 @@ export default {
     if (adminId && !this.authStore.locations.length) {
       this.authStore.fetchLocationsByAdminId(adminId);
     }
+
+    // ✅ Fetch uploaded report details if reportId exists
+    this.fetchUploadedReportDetails();
   },
   methods: {
+    
     handleNext() {
       if (!this.canGoNext) {
         this.blockNext && this.blockNext();
@@ -321,10 +321,10 @@ export default {
       this.uploadProgress = 20;
       const formData = new FormData();
       const locationToSend =
-        this.selectedLocation === "ALL" ? "all" : this.selectedLocation; 
-      formData.append("location", locationToSend);   
-      formData.append("member_type", this.selectedType); 
-      formData.append("file", file); 
+        this.selectedLocation === "ALL" ? "all" : this.selectedLocation;
+      formData.append("location", locationToSend);
+      formData.append("member_type", this.selectedType);
+      formData.append("file", file);
       const res = await this.authStore.uploadReport(formData);
 
       if (!res.status) {
@@ -389,7 +389,16 @@ export default {
       return loc ? loc.location_name : id;
     },
     viewFile(file) {
-      window.open(file.fileURL, "_blank");
+      let url = file.fileURL;
+
+      // If fileURL is a backend path (starts with /), construct full URL
+      if (url && url.startsWith('/')) {
+        // Backend base URL without /api suffix
+        const backendBase = 'https://vaptbackend.secureitlab.com';
+        url = backendBase + url;
+      }
+
+      window.open(url, "_blank");
     },
     deleteProgressFile(index) {
       Swal.fire({
@@ -429,6 +438,68 @@ export default {
         text: "Please complete report upload before proceeding.",
       });
     },
+    extractFileName(filePath) {
+      if (!filePath) return "Unknown file";
+      // Extract filename from path like "/media/reports/filename.html"
+      const parts = filePath.split('/');
+      return parts[parts.length - 1] || "Report file";
+    },
+    async fetchUploadedReportDetails() {
+      try {
+        const reportId = localStorage.getItem("reportId");
+
+        if (!reportId) {
+          console.log("ℹ️ No reportId found in localStorage");
+          return;
+        }
+
+        this.loadingReportDetails = true;
+        const res = await this.authStore.getUploadReportById(reportId);
+
+        if (res.status && res.data?.upload_report) {
+          this.reportDetails = res.data.upload_report;
+          console.log("✅ Upload report details loaded:", this.reportDetails);
+
+          // ✅ Pre-fill dropdowns with existing data
+          this.selectedLocation = this.reportDetails.location;
+          this.selectedType = this.reportDetails.member_type;
+
+          // ✅ Populate uploadedFiles array to show in table
+          this.uploadedFiles = [{
+            locationId: this.reportDetails.location,
+            location: this.reportDetails.location_name,
+            type: this.reportDetails.member_type,
+            fileName: this.extractFileName(this.reportDetails.file),
+            fileURL: this.reportDetails.file, // Backend file path
+            reportId: this.reportDetails._id
+          }];
+
+          // ✅ Mark as uploaded to show in UI
+          this.uploadingStarted = true;
+          this.uploadProgress = 100;
+          this.uploadedFileName = this.extractFileName(this.reportDetails.file);
+
+          console.log("🔒 Form locked with existing report data");
+        } else if (!res.isNotFound) {
+          // Only show error if it's NOT a 404 (real error occurred)
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: res.message || 'Failed to load upload report',
+          });
+        }
+        // If it's a 404 (isNotFound = true), silently allow user to upload new
+      } catch (error) {
+        console.error("❌ Unexpected error fetching upload report:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An unexpected error occurred',
+        });
+      } finally {
+        this.loadingReportDetails = false;
+      }
+    }
   }
 
 };

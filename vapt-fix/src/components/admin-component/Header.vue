@@ -33,24 +33,23 @@
                 Vulnerability Explorer
               </router-link>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <router-link to="/usersignup" class="nav-link text-white text-decoration-none">
                 Dashboard screen
               </router-link>
-            </li>
+            </li> -->
             
         </ul>
 
         
-        <div class="d-flex justify-content-start gap-2">
-          <!-- Show Signup/Signin if no user -->
+        <!-- <div class="d-flex justify-content-start gap-2">
+          
   <template v-if="!user">
     <router-link to="/signup" class="text-white text-decoration-none" tag="button">Signup /</router-link>
     <router-link to="/signin" class="text-white text-decoration-none" tag="button">Signin</router-link>
   </template>
 
-          <!-- Static User Icon -->
-          <!-- Show profile avatar if user is logged in -->
+         
   <template v-else>
     <router-link to="/profile" class="text-center text-decoration-none d-flex flex-column align-items-center">
       <img 
@@ -65,7 +64,7 @@
 </p>
     </router-link>
   </template>
-        </div>
+        </div> -->
 
         </div>
     </div>

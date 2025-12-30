@@ -118,15 +118,11 @@ export default {
         const result = await authStore.signup(this.form);
 
         if (result.status) {
-          
-          // 🔎 Debug logs (tokens & user)
           console.log("✅ Access Token:", localStorage.getItem("authorization"));
           console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
           console.log("✅ User:", localStorage.getItem("user"));
           console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
-
-          //  authStore.initOnboarding();
-          this.$router.push("/home");
+          this.$router.replace("/location");
           
         } else {
           console.error("Signup failed details:", result.details);
@@ -169,14 +165,51 @@ async handleGoogleResponse(response) {
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("authenticated", "true");
 
-  //    const authStore = useAuthStore();
-  // authStore.initOnboarding(); 
-  // this.$router.push("/home"); 
-    this.$router.push("/profile");
+    // Check if user has uploaded report and redirect accordingly
+    try {
+      console.log("🔄 Calling checkAndRedirect...");
+      await this.checkAndRedirect();
+    } catch (error) {
+      console.error("❌ checkAndRedirect error:", error);
+      // Fallback to location page if error
+      this.$router.push("/location");
+    }
   }
   console.log("Google login response:", res);
 
 },
+    async checkAndRedirect() {
+      const reportId = localStorage.getItem("reportId");
+      console.log("📍 reportId:", reportId);
+
+      if (!reportId) {
+        // No report uploaded yet
+        console.log("➡️ No reportId, redirecting to /location");
+        this.$router.push("/location");
+        return;
+      }
+
+      // Check if report exists
+      const authStore = useAuthStore();
+      console.log("🔍 Checking if report exists...");
+      const res = await authStore.getUploadReportById(reportId);
+      console.log("📊 API response:", res);
+
+      if (res.status && res.data?.upload_report) {
+        // Report exists, go to dashboard
+        console.log("✅ Report exists, redirecting to /admindashboardonboarding");
+        this.$router.push("/admindashboardonboarding");
+      } else if (res.isNotFound) {
+        // 404 - Report doesn't exist, go to location (expected for new users)
+        console.log("➡️ No report found (404), redirecting to /location");
+        this.$router.push("/location");
+      } else {
+        // Real error occurred, show error but still redirect to location
+        console.error("❌ Error checking report:", res.message);
+        Swal.fire("Error", res.message || "Failed to verify report status", "error");
+        this.$router.push("/location");
+      }
+    }
   },
 beforeUnmount() {
   if (window.grecaptcha) {
@@ -227,13 +260,8 @@ if (btn) {
   });
 };
 
-
   document.head.appendChild(recaptchaScript);
 
-  const isAuthenticated = localStorage.getItem("authenticated");
-  if (isAuthenticated === "true") {
-    this.$router.push("/home");
-  }
 }
 
 };

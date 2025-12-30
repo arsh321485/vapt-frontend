@@ -40,6 +40,7 @@ import PendingvulnerabilitycardView from '../views/user-views/Pendingvulnerabili
 import UserVulnerabilityregisterView from '../views/user-views/UserVulnerabilityregisterView.vue'
 import UserDashboard1View from '../views/user-views/UserDashboard1View.vue'
 import UserSignupView from '../views/user-views/UserSignupView.vue'
+import ChooseAccountView from '../views/admin-views/ChooseAccountView.vue'
 
 
 const router = createRouter({
@@ -56,6 +57,11 @@ const router = createRouter({
       path: '/home',
       name: 'home',
       component: HomeView,
+    },
+    {
+      path: "/choose-account",
+      name: "choose-account",
+      component: ChooseAccountView
     },
     {
       path: '/pricingplan',
