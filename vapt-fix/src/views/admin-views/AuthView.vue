@@ -17,32 +17,38 @@
           <h1 class="form-heading mb-2 text-center">{{ headingText }}</h1>
           <p class="form-subheading mb-4 text-center">{{ subheadingText }}</p>
 
-          <!-- Main Tabs: Admin | User -->
-          <ul class="nav nav-pills nav-fill mb-4 main-tabs">
-            <li class="nav-item">
-              <a
-                class="nav-link admin-tab"
-                :class="{ active: activeMainTab === 'admin' }"
-                @click.prevent="switchMainTab('admin')"
-                href="#"
-              >
-                Admin
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link user-tab"
-                :class="{ active: activeMainTab === 'user' }"
-                @click.prevent="switchMainTab('user')"
-                href="#"
-              >
-                User
-              </a>
-            </li>
-          </ul>
+          <!-- Main Tabs: Admin | User with Profile Icons -->
+          <div class="main-tabs-container mb-2">
+            <div class="row">
+              <div class="col-6">
+                <div
+                  class="profile-tab"
+                  :class="{ active: activeMainTab === 'admin' }"
+                  @click="switchMainTab('admin')"
+                >
+                  <div class="profile-icon-wrapper">
+                    <i class="bi bi-person-badge-fill profile-icon"></i>
+                  </div>
+                  <p class="profile-label">Admin</p>
+                </div>
+              </div>
+              <div class="col-6">
+                <div
+                  class="profile-tab"
+                  :class="{ active: activeMainTab === 'user' }"
+                  @click="switchMainTab('user')"
+                >
+                  <div class="profile-icon-wrapper">
+                    <i class="bi bi-person-fill profile-icon"></i>
+                  </div>
+                  <p class="profile-label">User</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Sub Tabs: Signup | Signin -->
-          <ul class="nav nav-pills nav-fill mb-4 sub-tabs">
+          <ul class="nav nav-pills nav-fill mb-3 sub-tabs">
             <li class="nav-item">
               <a
                 class="nav-link"
@@ -50,7 +56,7 @@
                 @click.prevent="switchSubTab('signup')"
                 href="#"
               >
-                Signup
+                Sign-up
               </a>
             </li>
             <li class="nav-item">
@@ -60,7 +66,7 @@
                 @click.prevent="switchSubTab('signin')"
                 href="#"
               >
-                Signin
+                Sign-in
               </a>
             </li>
           </ul>
@@ -89,6 +95,14 @@
               <div class="mb-3 mt-4">
                 <label class="form-label">Organisation URL</label>
                 <input type="url" class="form-control" v-model="currentForm.organisation_url" placeholder="Enter your organisation URL" required />
+              </div>
+            </template>
+
+            <!-- User Signup Fields -->
+            <template v-if="!isAdmin && isSignup">
+              <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" v-model="currentForm.name" placeholder="Enter your name" required />
               </div>
             </template>
 
@@ -144,7 +158,7 @@
             </template>
 
             <!-- reCAPTCHA -->
-            <div :id="recaptchaContainerId" class="mb-3"></div>
+            <div :id="recaptchaContainerId" :key="recaptchaContainerId" class="mb-3"></div>
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3" :disabled="loading">
@@ -160,8 +174,16 @@
             <hr class="flex-grow-1">
           </div>
 
-          <!-- Google OAuth Button -->
-          <div :id="googleButtonId" class="mt-3">
+          <!-- Google OAuth Button - Admin -->
+          <div v-if="isAdmin" :id="googleButtonId" class="mt-3">
+            <button type="button" class="btn btn-outline-dark rounded-pill mb-2 w-100">
+              <img src="@/assets/images/google-icon.png" style="height: 23px; width: 23px; margin-top: -1px;" />
+              {{ googleButtonText }}
+            </button>
+          </div>
+
+          <!-- Google OAuth Button - User -->
+          <div v-else :id="googleButtonId" class="mt-3">
             <button type="button" class="btn btn-outline-dark rounded-pill mb-2 w-100">
               <img src="@/assets/images/google-icon.png" style="height: 23px; width: 23px; margin-top: -1px;" />
               {{ googleButtonText }}
@@ -169,7 +191,7 @@
           </div>
 
           <!-- Toggle Link (Signup ↔ Signin) -->
-          <p class="text-center pt-3 mt-2">
+          <!-- <p class="text-center pt-3 mt-2">
             <template v-if="isSignup">
               Already have an account?
               <a href="#" @click.prevent="switchSubTab('signin')" class="text-decoration-none" style="color: #422CE9;">
@@ -182,7 +204,7 @@
                 Signup
               </a>
             </template>
-          </p>
+          </p> -->
         </div>
 
         <!-- Right Image Section -->
@@ -224,6 +246,7 @@ export default {
         password: ''
       },
       userSignupForm: {
+        name: '',
         email: '',
         password: '',
         confirm_password: ''
@@ -242,6 +265,7 @@ export default {
 
       loading: false,
       recaptchaReady: false,
+      recaptchaWidgetId: null,
       authStore: useAuthStore()
     };
   },
@@ -358,9 +382,9 @@ export default {
         }
       }
 
-      // reCAPTCHA validation (only for admin)
-      if (this.isAdmin && window.grecaptcha) {
-        const recaptchaResponse = window.grecaptcha.getResponse();
+      // reCAPTCHA validation (for all forms)
+      if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+        const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
         if (!recaptchaResponse) {
           Swal.fire('Error', 'Please verify you are not a robot', 'error');
           return false;
@@ -422,8 +446,10 @@ export default {
           }
         }
 
-        Swal.fire('Error', errorMessage, 'error');
-        if (window.grecaptcha) window.grecaptcha.reset();
+        Swal.fire(errorMessage);
+        if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+          window.grecaptcha.reset(this.recaptchaWidgetId);
+        }
       }
     },
 
@@ -442,7 +468,9 @@ export default {
         await this.checkAndRedirect();
       } else {
         Swal.fire('Error', result.message || 'Login failed', 'error');
-        if (window.grecaptcha) window.grecaptcha.reset();
+        if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+          window.grecaptcha.reset(this.recaptchaWidgetId);
+        }
       }
     },
 
@@ -457,7 +485,13 @@ export default {
           return;
         }
 
-        await this.checkAndRedirect();
+        // Redirect based on user type
+        if (this.isAdmin) {
+          await this.checkAndRedirect();
+        } else {
+          // User Google OAuth - redirect to user dashboard
+          this.$router.push('/userdashboard');
+        }
       } catch (error) {
         console.error('Google login error:', error);
         Swal.fire('Error', 'Something went wrong during Google login', 'error');
@@ -512,26 +546,47 @@ export default {
 
     // Initialize reCAPTCHA
     initializeRecaptcha() {
-      if (!window.grecaptcha || !this.isAdmin) return;
+      if (!window.grecaptcha || !window.grecaptcha.render) return;
 
-      const container = document.getElementById(this.recaptchaContainerId);
-      if (!container) return;
+      this.$nextTick(() => {
+        const container = document.getElementById(this.recaptchaContainerId);
+        if (!container) {
+          console.warn('⚠️ reCAPTCHA container not found:', this.recaptchaContainerId);
+          return;
+        }
 
-      // Clear existing reCAPTCHA if any
-      container.innerHTML = '';
+        // Clear existing reCAPTCHA if any
+        container.innerHTML = '';
 
-      try {
-        window.grecaptcha.render(container, {
-          sitekey: '6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny'
-        });
+        try {
+          // Render new reCAPTCHA widget and store the widget ID
+          this.recaptchaWidgetId = window.grecaptcha.render(container, {
+            sitekey: '6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny'
+          });
 
-        this.recaptchaReady = true;
-      } catch (error) {
-        console.error('reCAPTCHA render error:', error);
-      }
+          this.recaptchaReady = true;
+          console.log('✅ reCAPTCHA rendered for:', this.recaptchaContainerId, 'Widget ID:', this.recaptchaWidgetId);
+        } catch (error) {
+          console.error('❌ reCAPTCHA render error:', error);
+        }
+      });
     },
 
     reinitializeRecaptcha() {
+      // Reset and destroy previous reCAPTCHA widget if it exists
+      if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+        try {
+          window.grecaptcha.reset(this.recaptchaWidgetId);
+          console.log('🔄 reCAPTCHA reset');
+        } catch (e) {
+          console.warn('⚠️ reCAPTCHA reset error:', e);
+        }
+      }
+
+      // Clear widget ID
+      this.recaptchaWidgetId = null;
+
+      // Reinitialize with new container
       this.$nextTick(() => {
         this.initializeRecaptcha();
       });
@@ -572,9 +627,9 @@ export default {
   },
 
   beforeUnmount() {
-    if (window.grecaptcha) {
+    if (window.grecaptcha && this.recaptchaWidgetId !== null) {
       try {
-        window.grecaptcha.reset();
+        window.grecaptcha.reset(this.recaptchaWidgetId);
       } catch (e) {
         console.error('Error resetting reCAPTCHA:', e);
       }
@@ -584,47 +639,63 @@ export default {
 </script>
 
 <style scoped>
-/* Main Tabs - Compact colorful badges */
-.main-tabs .nav-link {
-  border-radius: 25px;
-  padding: 8px 18px;
-  font-weight: 600;
-  border: 2px solid transparent;
+/* Profile Tabs with Icons */
+.main-tabs-container {
+  margin-bottom: 0.5rem;
+}
+
+.profile-tab {
+  text-align: center;
+  cursor: pointer;
+  padding: 10px;
   transition: all 0.3s ease;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  border-radius: 12px;
 }
 
-.main-tabs .admin-tab {
-  background: #F0F0FF;
-  color: #422CE9;
-  border-color: #E0E0FF;
+.profile-tab:hover {
+  background-color: #f8f9fa;
 }
 
-.main-tabs .admin-tab.active {
+.profile-icon-wrapper {
+  margin-bottom: 6px;
+  width: 70px;
+  height: 70px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.profile-icon {
+  font-size: 32px;
+  color: #6c757d;
+  transition: all 0.3s ease;
+}
+
+.profile-tab.active .profile-icon {
+  color: #fff;
+}
+
+.profile-tab.active .profile-icon-wrapper {
   background: linear-gradient(135deg, #422CE9, #6C63FF);
-  color: #fff;
-  border-color: #422CE9;
-  box-shadow: 0 3px 8px rgba(66, 44, 233, 0.25);
+  box-shadow: 0 4px 12px rgba(66, 44, 233, 0.3);
 }
 
-.main-tabs .user-tab {
-  background: #F0FFF4;
-  color: #10B981;
-  border-color: #D1FAE5;
+.profile-tab:not(.active) .profile-icon-wrapper {
+  background: #f8f9fa;
 }
 
-.main-tabs .user-tab.active {
-  background: linear-gradient(135deg, #10B981, #14B8A6);
-  color: #fff;
-  border-color: #10B981;
-  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
+.profile-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  color: #6c757d;
+  transition: color 0.3s ease;
 }
 
-.main-tabs .nav-link:hover:not(.active) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+.profile-tab.active .profile-label {
+  color: #422CE9;
 }
 
 /* Sub Tabs - Simple underline style */

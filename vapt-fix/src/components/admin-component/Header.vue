@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
         
-    <img src="@/assets/images/logo-capital-smallsize.png" alt="logo" class="me-5">
+    <img src="@/assets/images/vaptfix_white.png" alt="logo" class="me-5">
      <!-- <div class="browser-bar" style="height: 40px;">
         <img src="@/assets/images/logo-capital.png" alt="">
       </div>  -->
