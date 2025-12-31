@@ -596,7 +596,8 @@ export default {
         "https://a.slack-edge.com/80588/img/avatars/ava_0001-512.png",
       popupPollInterval: null,
       popupWindow: null,
-      backendBase: "https://vapt-backend.onrender.com",
+      // backendBase: "https://vapt-backend.onrender.com",
+      backendBase: "https://vaptbackend.secureitlab.com",
     };
   },
   computed: {
@@ -813,7 +814,7 @@ export default {
 
         const frontendRedirect = window.location.origin;
         const res = await fetch(
-          `https://vapt-backend.onrender.com/api/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(frontendRedirect)}`
+          `https://vaptbackend.secureitlab.com/api/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(frontendRedirect)}`
         );
 
         const data = await res.json();
@@ -1127,7 +1128,7 @@ export default {
         console.log("📩 Received Teams code:", code);
 
         // ✅ Exchange code with backend for tokens & user info
-        fetch("https://vapt-backend.onrender.com/api/admin/users/microsoft-oauth", {
+        fetch("https://vaptbackend.secureitlab.com/api/admin/users/microsoft-oauth", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, state }),

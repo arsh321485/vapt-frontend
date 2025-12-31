@@ -22,7 +22,7 @@
           <!-- Replace your existing hero button block with this -->
 <div class="hero-div-btn">
   <button type="button" class="btn hero-btn" @click="handleFixNow">
-    Fix your vulnerabilities now
+    Get Started
     <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
   </button>
   <!-- <button
@@ -133,8 +133,8 @@
           <div class="col-lg-6 col-md-6 mt-lg-5 mt-md-5">
           <div class="result-box text-center p-4 mt-5">
             <p class="mb-3">Start for free, no obligations.</p>
-            <button type="button" class="btn fw-semibold">
-              Fix your vulnerabilities now 
+            <button type="button" class="btn fw-semibold" @click="handleFixNow">
+              Fix your vulnerabilities now
               <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
             </button>
           </div>
@@ -353,8 +353,8 @@
             <div class="col-lg-6 col-md-6 mb-3">
               <h1 class="mb-3">Start Fixing Critical Bugs Instantly.</h1>
                 <p class="my-4">Identify, prioritize, and fix security flaws fast. Reduce risk with zero-friction setup and smart automation.</p>
-                <button type="button" class="btn btn-light rounded-pill fw-semibold mt-4">
-              Fix your vulnerabilities now 
+                <button type="button" class="btn btn-light rounded-pill fw-semibold mt-4" @click="handleFixNow">
+              Fix your vulnerabilities now
               <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
             </button>
             </div>
@@ -394,7 +394,7 @@ methods: {
   //   }
   // }
   handleFixNow() {
-    this.$router.push("/choose-account");
+    this.$router.push("/auth");
   }
 }
 

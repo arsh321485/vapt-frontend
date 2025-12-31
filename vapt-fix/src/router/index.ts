@@ -41,6 +41,7 @@ import UserVulnerabilityregisterView from '../views/user-views/UserVulnerability
 import UserDashboard1View from '../views/user-views/UserDashboard1View.vue'
 import UserSignupView from '../views/user-views/UserSignupView.vue'
 import ChooseAccountView from '../views/admin-views/ChooseAccountView.vue'
+import AuthView from '../views/admin-views/AuthView.vue'
 
 
 const router = createRouter({
@@ -60,8 +61,12 @@ const router = createRouter({
     },
     {
       path: "/choose-account",
-      name: "choose-account",
-      component: ChooseAccountView
+      redirect: "/auth"
+    },
+    {
+      path: '/auth',
+      name: 'auth',
+      component: AuthView,
     },
     {
       path: '/pricingplan',
@@ -121,13 +126,11 @@ const router = createRouter({
     },
     {
       path: '/signup',
-      name: 'signup',
-      component: SignupView,
+      redirect: '/auth'
     },
     {
       path: '/signin',
-      name: 'signin',
-      component: SignInView,
+      redirect: '/auth'
     },
     {
       path: '/forgotpassword',
@@ -219,8 +222,7 @@ const router = createRouter({
     // user path
     {
       path: '/usersignup',
-      name: 'usersignup',
-      component: UserSignupView,
+      redirect: '/auth'
     },
     {
       path: '/userdashboard',
