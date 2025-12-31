@@ -1,8 +1,8 @@
 <template>
   <div class="container py-5">
     <div class="text-center mb-5">
-      <h2 class="fw-semibold">Create your account</h2>
-      <p class="text-muted">Select how you would like to proceed by choosing your role.</p>
+      <h2 class="fw-semibold">Create Your Account</h2>
+      <p class="text-muted">Select How You Would Like To Proceed By Choosing Your Role.</p>
     </div>
 
     <div class="row justify-content-center g-4">
@@ -10,10 +10,10 @@
       <!-- Admin -->
       <div class="col-md-4">
         <div class="account-card admin-card">
-          <h4 class="card-title">Admin</h4>
+          <h4 class="card-title">ADMIN</h4>
 
           <div class="inner-card">
-            Access comprehensive controls to view system activity, track progress, and stay informed with real-time insights.
+            Access Comprehensive Controls To View System Activity, Track Progress, And Stay Informed With Real-Time Insights.
           </div>
 
           <button class="btn signup-btn admin-btn" @click="goAdmin">
@@ -25,10 +25,10 @@
       <!-- User -->
       <div class="col-md-4">
         <div class="account-card user-card">
-          <h4 class="card-title">User</h4>
+          <h4 class="card-title">USER</h4>
 
           <div class="inner-card">
-            Efficiently manage assets and perform scans with ease.
+            Efficiently Manage Assets And Perform Scans With Ease.
           </div>
 
           <button class="btn signup-btn user-btn" @click="goUser">
