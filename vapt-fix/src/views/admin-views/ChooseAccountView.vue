@@ -2,7 +2,7 @@
   <div class="container py-5">
     <div class="text-center mb-5">
       <h2 class="fw-semibold">Create your account</h2>
-      <p class="text-muted">Choose how you want to continue</p>
+      <p class="text-muted">Select how you would like to proceed by choosing your role.</p>
     </div>
 
     <div class="row justify-content-center g-4">
@@ -13,7 +13,7 @@
           <h4 class="card-title">Admin</h4>
 
           <div class="inner-card">
-            Manage assets, users & reports
+            Access comprehensive controls to view system activity, track progress, and stay informed with real-time insights.
           </div>
 
           <button class="btn signup-btn admin-btn" @click="goAdmin">
@@ -28,7 +28,7 @@
           <h4 class="card-title">User</h4>
 
           <div class="inner-card">
-            Scan, view & track vulnerabilities
+            Efficiently manage assets and perform scans with ease.
           </div>
 
           <button class="btn signup-btn user-btn" @click="goUser">
