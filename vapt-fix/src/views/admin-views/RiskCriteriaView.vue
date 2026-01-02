@@ -276,6 +276,77 @@ export default {
   },
 
   methods: {
+    // Convert time period string to days (for comparison)
+    convertToDays(value) {
+      if (!value) return 0;
+
+      // Extract number from string (e.g., "2 Days" -> 2)
+      const match = value.match(/^(\d+)/);
+      if (!match) return 0;
+
+      const num = parseInt(match[1]);
+
+      // Convert weeks to days
+      if (value.includes('Week')) {
+        return num * 7;
+      }
+
+      // Already in days
+      return num;
+    },
+
+    // Validate risk criteria order
+    validateRiskCriteria() {
+      const criticalDays = this.convertToDays(this.form.critical);
+      const highDays = this.convertToDays(this.form.high);
+      const mediumDays = this.convertToDays(this.form.medium);
+      const lowDays = this.convertToDays(this.form.low);
+
+      // Check if all fields are filled
+      if (!this.form.critical || !this.form.high || !this.form.medium || !this.form.low) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Fields',
+          text: 'Please select values for all risk criteria fields.',
+          confirmButtonText: 'OK'
+        });
+        return false;
+      }
+
+      // Validate: Critical <= High <= Medium <= Low (remediation time)
+      if (criticalDays > highDays) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Risk Criteria',
+          text: 'Critical remediation time must be less than or equal to High. Critical issues need faster resolution.',
+          confirmButtonText: 'OK'
+        });
+        return false;
+      }
+
+      if (highDays > mediumDays) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Risk Criteria',
+          text: 'High remediation time must be less than or equal to Medium.',
+          confirmButtonText: 'OK'
+        });
+        return false;
+      }
+
+      if (mediumDays > lowDays) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Risk Criteria',
+          text: 'Medium remediation time must be less than or equal to Low.',
+          confirmButtonText: 'OK'
+        });
+        return false;
+      }
+
+      return true;
+    },
+
     // async submitRiskCriteria() {
     //   try {
     //     this.loading = true;
@@ -338,6 +409,11 @@ export default {
   // 🔒 CASE 2: Already exists → just move next
   if (this.isLocked) {
     this.$router.push("/uploadreport");
+    return;
+  }
+
+  // ✅ Validate risk criteria order before submission
+  if (!this.validateRiskCriteria()) {
     return;
   }
 

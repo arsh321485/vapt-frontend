@@ -47,7 +47,7 @@
                       <div>
                         <select v-model="selectedLocation" class="form-select" @change="checkLocation" :disabled="!!reportDetails">
                           <option selected disabled value="">Select Location</option>
-                          <option v-if="authStore.locations && authStore.locations.length > 0" value="ALL">
+                          <option v-if="authStore.locations && authStore.locations.length > 1" value="ALL">
                             Apply for all locations
                           </option>
                           <option v-for="loc in authStore.locations" :key="loc._id" :value="loc._id"
@@ -144,20 +144,24 @@
                 </div>
 
                 <div class="text-end">
-                  <router-link :to="nextPath" class="btn stepper-btn mt-5" :class="{ disabled: !canGoNext }"
+                  <!-- <router-link :to="nextPath" class="btn stepper-btn mt-5" :class="{ disabled: !canGoNext }"
                     @click.prevent="!canGoNext && blockNext()">
                     {{ buttonLabel }}
                     <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-                  </router-link>
-                  <!-- <button
-  type="button"
+                  </router-link> -->
+                  <router-link
+  :to="canGoNext ? nextPath : ''"
   class="btn stepper-btn mt-5"
   :class="{ disabled: !canGoNext }"
-  @click="handleNext"
+  @click.prevent="!canGoNext && blockNext()"
 >
   {{ buttonLabel }}
-  <i class="bi bi-arrow-right-circle-fill ms-1"></i>
-</button> -->
+  <i
+    v-if="canGoNext"
+    class="bi bi-arrow-right-circle-fill ms-1"
+  ></i>
+</router-link>
+
 
                 </div>
 
@@ -192,6 +196,7 @@ export default {
       selectedType: "",
       uploadedFiles: [],
       uploadingStarted: false,
+      uploadCompleted: false, 
       uploadProgress: 0,
       uploadedFileName: "",
       uploadedFileSize: "",
@@ -203,20 +208,27 @@ export default {
   },
   computed: {
     canGoNext() {
-      return (
-        this.uploadedFiles.length > 0 &&
-        this.uploadProgress === 100 &&
-        !!localStorage.getItem("reportId")
-      );
+      // return (
+      //   this.uploadedFiles.length > 0 &&
+      //   this.uploadProgress === 100 &&
+      //   !!localStorage.getItem("reportId")
+      // );
+      return this.uploadCompleted === true;
     },
     nextPath() {
       return "/admindashboardonboarding";
     },
 
     buttonLabel() {
-      return this.$route.query.from === "dashboard"
-        ? "Back to dashboard"
-        : "Next";
+      // return this.$route.query.from === "dashboard"
+      //   ? "Back to dashboard"
+      //   : "Next";
+      if (this.uploadingStarted && !this.uploadCompleted) {
+      return "Please wait...";
+    }
+    return this.$route.query.from === "dashboard"
+      ? "Back to dashboard"
+      : "Next";
     }
   },
   mounted() {
@@ -316,6 +328,7 @@ export default {
       }
 
       this.uploadingStarted = true;
+       this.uploadCompleted = false;
       this.uploadedFileName = file.name;
       this.uploadedFileSize = (file.size / 1024).toFixed(2) + " KB";
       this.uploadProgress = 20;
@@ -342,8 +355,11 @@ export default {
         }
         return;
       }
+
       console.log("✅ Final upload response:", res.data);
       this.uploadProgress = 100;
+
+      // Keep uploadingStarted = true so upload section stays visible
 
       const reportId = res.reportId || res.data?.upload_report?._id || res.data?.upload_report?.id || null;
 
@@ -383,6 +399,9 @@ export default {
       if (this.$refs.pdfFileInput) {
         this.$refs.pdfFileInput.value = "";
       }
+
+      // ✅ Enable Next button AFTER table and toast are shown
+      this.uploadCompleted = true;
     },
     getLocationName(id) {
       const loc = this.authStore.locations.find((l) => l._id === id);

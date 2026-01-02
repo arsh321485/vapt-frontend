@@ -342,13 +342,27 @@
                             </div>
                           </td>
                           <td class="col-6">
-                            <div class="position-relative w-100">
-                              <textarea id="shareLink" class="form-control form-control-sm border-bottom rounded-0"
-                                rows="2" readonly @click="copyLink"
-                                style="resize: none; overflow: hidden;white-space: normal;height: 42px;padding: 0 8px;">
-                      https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=e16G1P
+                            <div class="position-relative w-100"> 
+                            <textarea
+                              id="shareLink"
+                              class="form-control form-control-sm border-bottom rounded-0 text-center"
+                              rows="2"
+                              readonly
+                              @click="copyLink"
+                              style="
+                                resize: none;
+                                overflow: hidden;
+                                height: 42px;
+                                padding: 0px 0px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                text-align: center;
+                                
+                              "
+                            >
+                            https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=e16G1P
                             </textarea>
-
                               <!-- Popup message -->
                               <div id="copyPopup" class="position-absolute px-2 py-1 rounded small text-white"
                                 style="background: grey; top: -40px; left: 50px; display: none;">
@@ -648,9 +662,7 @@ export default {
         this.filteredCountries = [];
         return;
       }
-
       const allCountries = this.authStore.countries || [];
-
       this.filteredCountries = allCountries.filter((country) =>
         country.toLowerCase().includes(input)
       );
