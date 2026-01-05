@@ -197,6 +197,7 @@ export default {
       uploadedFiles: [],
       uploadingStarted: false,
       uploadCompleted: false, 
+      reportExists: false,
       uploadProgress: 0,
       uploadedFileName: "",
       uploadedFileSize: "",
@@ -208,27 +209,27 @@ export default {
   },
   computed: {
     canGoNext() {
-      // return (
-      //   this.uploadedFiles.length > 0 &&
-      //   this.uploadProgress === 100 &&
-      //   !!localStorage.getItem("reportId")
-      // );
-      return this.uploadCompleted === true;
+      if (this.$route.query.from === "dashboard") {
+        return true;
+      }
+      return this.uploadCompleted;
     },
     nextPath() {
       return "/admindashboardonboarding";
     },
 
     buttonLabel() {
-      // return this.$route.query.from === "dashboard"
-      //   ? "Back to dashboard"
-      //   : "Next";
-      if (this.uploadingStarted && !this.uploadCompleted) {
-      return "Please wait...";
-    }
-    return this.$route.query.from === "dashboard"
-      ? "Back to dashboard"
-      : "Next";
+      
+
+    if (this.$route.query.from === "dashboard") {
+    return "Back to dashboard";
+  }
+  // 2️⃣ Upload in progress
+  if (this.uploadingStarted && !this.uploadCompleted) {
+    return "Please wait...";
+  }
+  // 3️⃣ Default (normal flow)
+  return "Next";
     }
   },
   mounted() {
@@ -236,27 +237,19 @@ export default {
       this.authStore.user?.admin_id ||
       this.authStore.user?.id ||
       this.authStore.user?._id;
-
     if (adminId && !this.authStore.locations.length) {
       this.authStore.fetchLocationsByAdminId(adminId);
     }
-
-    // ✅ Fetch uploaded report details if reportId exists
     this.fetchUploadedReportDetails();
   },
   methods: {
-    
     handleNext() {
       if (!this.canGoNext) {
         this.blockNext && this.blockNext();
         return;
       }
-
       const authStore = useAuthStore();
-
-      // ✅ mark upload report as completed
       authStore.completeOnboardingStep("uploadreport");
-
       this.$router.push(this.nextPath);
     },
     checkLocation() {
@@ -494,7 +487,8 @@ export default {
           }];
 
           // ✅ Mark as uploaded to show in UI
-          this.uploadingStarted = true;
+          this.uploadingStarted = true;   
+          this.uploadCompleted = true;
           this.uploadProgress = 100;
           this.uploadedFileName = this.extractFileName(this.reportDetails.file);
 

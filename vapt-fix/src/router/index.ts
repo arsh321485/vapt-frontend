@@ -271,6 +271,14 @@ const router = createRouter({
     },
 
   ],
+  scrollBehavior(to, from, savedPosition) {
+    // Scroll to top only when navigating to admin dashboard onboarding
+    if (to.path === '/admindashboardonboarding') {
+      return { top: 0 }
+    }
+    // For other routes, preserve default behavior
+    return false
+  }
 })
 
 export default router

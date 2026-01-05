@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4 position-relative">
-    <label class="form-label">{{ label }}</label>
+    <label class="form-label required">{{ label }}</label>
     <input
       :type="showPasswordLocal ? 'text' : 'password'"
       class="form-control"
@@ -125,5 +125,16 @@ export default {
 
 .hint-item span {
   font-size: 13px;
+}
+.form-label.required::after {
+  content: " *";
+  color: #dc3545; /* Bootstrap danger red */
+  /* font-weight: 600; */
+}
+.form-label {
+  
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
 }
 </style>

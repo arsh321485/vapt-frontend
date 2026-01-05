@@ -1,0 +1,103 @@
+1. Fix Vulnerability create
+	Method: post	
+Url:http://127.0.0.1:8000/api/admin/adminregister/fix-vulnerability/report/694257cb85b8092ea19552b3/asset/192.168.0.2/create/
+	Body:
+{
+  "plugin_name": "SSL Certificate Cannot Be Trusted -",
+  "risk_factor": "Medium"
+}
+	Response:
+{
+    "message": "Fix vulnerability created successfully",
+    "data": {
+        "report_id": "694257cb85b8092ea19552b3",
+        "host_name": "192.168.0.2",
+        "plugin_name": "SSL Certificate Cannot Be Trusted -",
+        "risk_factor": "Medium",
+        "description_points": "The server's X.509 certificate cannot be trusted. This situation can occur in three different ways, in which the chain of trust can be broken, as stated below :\n- First, the top of the certificate chain sent by the     server might not be descended from a known public     certificate authority. This can occur either when the     top of the chain is an unrecognized, self-signed     certificate, or when intermediate certificates are     missing that would connect the top of the certificate     chain to a known public certificate authority.\n- Second, the certificate chain may contain a certificate     that is not valid at the time of the scan. This can     occur either when the scan occurs before one of the     certificate's 'notBefore' dates, or after one of the     certificate's 'notAfter' dates.\n- Third, the certificate chain may contain a signature     that either didn't match the certificate's information     or could not be verified. Bad signatures can be fixed by     getting the certificate with the bad signature to be     re-signed by its issuer. Signatures that could not be     verified are the result of the certificate's issuer     using a signing algorithm that Nessus either does not     support or does not recognize.\nIf the remote host is a public host in production, any break in the chain makes it more difficult for users to verify the authenticity and identity of the web server. This could make it easier to carry out man-in-the-middle attacks against the remote host.",
+        "vulnerability_type": "Network Vulnerability",
+        "affected_ports_ranges": "6379/tcp",
+        "file_path": "N/A",
+        "vendor_fix_available": true,
+        "assigned_team": "Patch Management",
+        "assigned_team_members": [
+            {
+                "user_id": "694cfe5919b9b50c67911949",
+                "name": "sona mali",
+                "email": "sona12@gmail.com"
+            }
+        ],
+        "status": "open",
+        "created_at": "2025-12-26T11:59:50.942108",
+        "created_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560",
+        "_id": "694e78b632d5ad1ab946287a"
+    }
+}
+
+
+2. Fix Vulnerability Steps (get /create/update) Same url
+(Create/update)
+	Method: post
+Url:http://127.0.0.1:8000/api/admin/adminregister/fix-vulnerability/694e769696d5ae257dce8822/step-complete/
+	Body:
+{
+  "step_number":1,
+  "comment": "Code review completed"
+}
+Response:
+{
+    "message": "Step 1 saved successfully",
+    "status": "open",
+    "completed_steps": 1
+}
+    (get)
+	Method: get
+Url:http://127.0.0.1:8000/api/admin/adminregister/fix-vulnerability/694e7cf832d5ad1ab9462885/step-complete/
+	Body:
+Response:
+{
+    "fix_vulnerability_id": "694e7cf832d5ad1ab9462885",
+    "status": "open",
+    "steps": [
+        {
+            "step_number": 1,
+            "fix_vulnerability_id": "694e7cf832d5ad1ab9462885",
+            "comment": "Code review completed",
+            "created_at": "2025-12-26T12:18:55.918000",
+            "created_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560",
+            "status": "completed",
+            "updated_at": "2025-12-26T12:18:55.918000",
+            "updated_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560"
+        },
+        {
+            "fix_vulnerability_id": "694e7cf832d5ad1ab9462885",
+            "step_number": 2,
+            "comment": "Code review completed",
+            "created_at": "2025-12-26T12:21:05.863000",
+            "created_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560",
+            "status": "completed",
+            "updated_at": "2025-12-26T12:21:05.863000",
+            "updated_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560"
+        },
+        {
+            "fix_vulnerability_id": "694e7cf832d5ad1ab9462885",
+            "step_number": 3,
+            "comment": "Code review completed",
+            "created_at": "2025-12-26T12:21:12.138000",
+            "created_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560",
+            "status": "completed",
+            "updated_at": "2025-12-26T12:21:12.138000",
+            "updated_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560"
+        },
+        {
+            "fix_vulnerability_id": "694e7cf832d5ad1ab9462885",
+            "step_number": 4,
+            "comment": "Code review completed",
+            "created_at": "2025-12-26T12:21:19.260000",
+            "created_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560",
+            "status": "completed",
+            "updated_at": "2025-12-26T12:21:19.260000",
+            "updated_by": "bbf8e3d0-d6aa-4d0e-82a5-dbfd71770560"
+        }
+    ]
+}

@@ -555,11 +555,12 @@
 
                                 <!-- Severity + Status (fixed position) -->
                                 <div class="d-flex align-items-center gap-2 me-4">
-                                  <span class="d-flex align-items-center badge-critical" :style="{
+                                  <span class="d-flex align-items-center justify-content-center badge-critical" :style="{
                                     color: getSeverityColor(v.severity),
                                     backgroundColor: getSeverityBg(v.severity),
                                     padding: '2px 8px',
-                                    borderRadius: '12px'
+                                    borderRadius: '12px',
+                                    minWidth: '80px'
                                   }">
                                     <span class="rounded-circle me-1" :style="{
                                       width: '6px',
@@ -570,7 +571,7 @@
                                     <span>{{ v.severity }}</span>
                                   </span>
 
-                                  <span class="d-flex align-items-center badge-open">
+                                  <span class="d-flex align-items-center justify-content-center badge-open" style="min-width: 70px;">
                                     <span class="rounded-circle me-1"
                                       style="width:6px;height:6px;background-color:white"></span>
                                     <span>Open</span>

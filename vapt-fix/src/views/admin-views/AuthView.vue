@@ -3,195 +3,200 @@
     <div class="container d-flex align-items-center justify-content-center min-vh-100">
       <div class="row overflow-hidden w-100">
 
+
         <!-- Left Form Section -->
-        <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
+        <!-- <div class="col-lg-12 col-md-12 px-5 pt-4 pb-4 form-section"> -->
+        <div class="col-12 d-flex justify-content-center">
 
-          <!-- Logo (centered, col-6) -->
-          <div class="row justify-content-center mb-4">
-            <div class="col-6 text-center">
-              <img src="@/assets/images/logo-capital.png" alt="VaptFix Logo" style="height: 40px;">
-            </div>
-          </div>
+          <!-- <div class="text-center">
+                <img src="@/assets/images/logo-capital.png" alt="VaptFix Logo" style="height: 40px;">
+              </div> -->
 
-          <!-- Heading -->
-          <h1 class="form-heading mb-2 text-center">{{ headingText }}</h1>
-          <p class="form-subheading mb-4 text-center">{{ subheadingText }}</p>
-
-          <!-- Main Tabs: Admin | User with Profile Icons -->
-          <div class="main-tabs-container mb-2">
+          <div class="container">
             <div class="row">
-              <div class="col-6">
-                <div
-                  class="profile-tab"
-                  :class="{ active: activeMainTab === 'admin' }"
-                  @click="switchMainTab('admin')"
-                >
-                  <div class="profile-icon-wrapper">
-                    <i class="bi bi-person-badge-fill profile-icon"></i>
-                  </div>
-                  <p class="profile-label">Admin</p>
-                </div>
-              </div>
-              <div class="col-6">
-                <div
-                  class="profile-tab"
-                  :class="{ active: activeMainTab === 'user' }"
-                  @click="switchMainTab('user')"
-                >
-                  <div class="profile-icon-wrapper">
-                    <i class="bi bi-person-fill profile-icon"></i>
-                  </div>
-                  <p class="profile-label">User</p>
-                </div>
+            <div class="col-2">
+              <div class="auth-logo">
+              
+                 <router-link to="/home"><img src="@/assets/images/logo-capital.png" alt="VaptFix Logo"></router-link>
               </div>
             </div>
-          </div>
+            <div class="col-10 ">
+              <div class="">
+                <div class="form-wrapper px-4 py-4 w-100">
+                  <div class="form-card">
+                    
+                    <!-- Heading -->
+                    <h1 class="form-heading mb-2 text-center">{{ headingText }}</h1>
+                    <p class="form-subheading mb-2 text-center">{{ subheadingText }}</p>
 
-          <!-- Sub Tabs: Signup | Signin -->
-          <ul class="nav nav-pills nav-fill mb-3 sub-tabs">
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeSubTab === 'signup' }"
-                @click.prevent="switchSubTab('signup')"
-                href="#"
-              >
-                Sign-up
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeSubTab === 'signin' }"
-                @click.prevent="switchSubTab('signin')"
-                href="#"
-              >
-                Sign-in
-              </a>
-            </li>
-          </ul>
+                    <!-- Main Tabs: Admin | User with Profile Icons -->
+                    <div class="main-tabs-container mb-2">
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="profile-tab" :class="{ active: activeMainTab === 'admin' }"
+                            @click="switchMainTab('admin')">
+                            <div class="profile-icon-wrapper">
+                              <i class="bi bi-person-badge-fill profile-icon"></i>
+                            </div>
+                            <p class="profile-label">Admin</p>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="profile-tab" :class="{ active: activeMainTab === 'user' }"
+                            @click="switchMainTab('user')">
+                            <div class="profile-icon-wrapper">
+                              <i class="bi bi-person-fill profile-icon"></i>
+                            </div>
+                            <p class="profile-label">User</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-          <!-- Dynamic Form -->
-          <form @submit.prevent="handleSubmit" class="mt-3">
+                    <!-- Sub Tabs: Signup | Signin -->
+                    <ul class="nav nav-pills nav-fill mb-3 sub-tabs">
+                      <li class="nav-item">
+                        <a class="nav-link" :class="{ active: activeSubTab === 'signup' }"
+                          @click.prevent="switchSubTab('signup')" href="#">
+                          Sign-up
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" :class="{ active: activeSubTab === 'signin' }"
+                          @click.prevent="switchSubTab('signin')" href="#">
+                          Sign-in
+                        </a>
+                      </li>
+                    </ul>
 
-            <!-- Admin Signup Fields -->
-            <template v-if="isAdmin && isSignup">
-              <div class="row mb-3">
-                <div class="col-12 col-md-6 mb-2 mb-md-0">
-                  <label class="form-label">First name</label>
-                  <input type="text" class="form-control" v-model="currentForm.firstname" placeholder="Enter your first name" required />
-                </div>
-                <div class="col-12 col-md-6">
-                  <label class="form-label">Last name</label>
-                  <input type="text" class="form-control" v-model="currentForm.lastname" placeholder="Enter your last name" required />
-                </div>
-              </div>
+                    <!-- Dynamic Form -->
+                    <form @submit.prevent="handleSubmit" class="mt-3">
 
-              <div class="mb-3 mt-4">
-                <label class="form-label">Organisation name</label>
-                <input type="text" class="form-control" v-model="currentForm.organisation_name" placeholder="Enter your organisation name" required />
-              </div>
+                      <!-- Admin Signup Fields -->
+                      <template v-if="isAdmin && isSignup">
+                        <div class="row mb-3">
+                          <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <label class="form-label required">First name</label>
+                            <input type="text" class="form-control" v-model="currentForm.firstname"
+                              placeholder="Enter your first name" required />
+                          </div>
+                          <div class="col-12 col-md-6">
+                            <label class="form-label required">Last name</label>
+                            <input type="text" class="form-control" v-model="currentForm.lastname"
+                              placeholder="Enter your last name" required />
+                          </div>
+                        </div>
 
-              <div class="mb-3 mt-4">
-                <label class="form-label">Organisation URL</label>
-                <input type="url" class="form-control" v-model="currentForm.organisation_url" placeholder="Enter your organisation URL" required />
-              </div>
-            </template>
+                        <div class="row mb-3">
+                          <div class="col-12 col-md-6 mb-2 mb-md-0">
+                            <label class="form-label required">Organisation name</label>
+                            <input type="text" class="form-control" v-model="currentForm.organisation_name"
+                              placeholder="Enter your organisation name" required />
+                          </div>
 
-            <!-- User Signup Fields -->
-            <template v-if="!isAdmin && isSignup">
-              <div class="mb-3">
-                <label class="form-label">Name</label>
-                <input type="text" class="form-control" v-model="currentForm.name" placeholder="Enter your name" required />
-              </div>
-            </template>
+                          <div class="col-12 col-md-6">
+                            <label class="form-label required">Organisation URL</label>
+                            <input type="url" class="form-control" v-model="currentForm.organisation_url"
+                              placeholder="Enter your organisation URL" required />
+                          </div>
+                        </div>
 
-            <!-- Email Field (Common for all forms) -->
-            <div class="mb-4 mt-4">
-              <label class="form-label">Email</label>
-              <input
-                type="email"
-                class="form-control"
-                v-model="currentForm.email"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
 
-            <!-- Password Field with Validation -->
-            <PasswordInput
-              v-model="currentForm.password"
-              :label="'Your password'"
-              :placeholder="isSignup ? 'Pick a password' : 'Enter your password'"
-              :show-validation="isSignup"
-              :required="true"
-              @validation-change="updatePasswordValidation"
-            />
+                      </template>
 
-            <!-- Confirm Password (Signup only) -->
-            <template v-if="isSignup">
-              <div class="mb-4 position-relative">
-                <label class="form-label">Confirm password</label>
-                <input
-                  :type="showConfirmPassword ? 'text' : 'password'"
-                  class="form-control"
-                  v-model="currentForm.confirm_password"
-                  placeholder="Re-enter your password"
-                  required
-                />
-                <i
-                  class="bi"
-                  :class="showConfirmPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"
-                  @click="toggleConfirmPassword"
-                  style="position:absolute; top:42px; right:20px; cursor:pointer;"
-                ></i>
-              </div>
-            </template>
+                      <div class="row">
 
-            <!-- Forgot Password Link (Signin only) -->
-            <template v-if="!isSignup">
-              <div class="text-end mt-1 mb-3">
-                <router-link to="/forgotpassword" class="text-primary" style="font-size: 14px; text-decoration: none;">
-                  Forgot Password?
-                </router-link>
-              </div>
-            </template>
+                        <!-- User Signup Fields -->
+                        <template v-if="!isAdmin && isSignup">
+                          <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label required">Name</label>
+                            <input type="text" class="form-control" v-model="currentForm.name"
+                              placeholder="Enter your name" required />
+                          </div>
+                        </template>
 
-            <!-- reCAPTCHA -->
-            <div :id="recaptchaContainerId" :key="recaptchaContainerId" class="mb-3"></div>
+                        <!-- Email -->
+                        <div class=" mb-3">
+                          <label class="form-label required">Email</label>
+                          <input type="email" class="form-control" v-model="currentForm.email"
+                            placeholder="Enter your email" required />
+                        </div>
 
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-3" :disabled="loading">
-              <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ submitButtonText }} <i class="bi bi-arrow-right-circle-fill"></i>
-            </button>
-          </form>
+                        <!-- Password -->
+                        <div class=" mb-3">
+                          <PasswordInput v-model="currentForm.password" :label="'Your password'"
+                            :placeholder="isSignup ? 'Pick a password' : 'Enter your password'"
+                            :show-validation="isSignup" :required="true"
+                            @validation-change="updatePasswordValidation" />
+                        </div>
 
-          <!-- Divider -->
-          <div class="d-flex align-items-center mt-3">
-            <hr class="flex-grow-1">
-            <span class="mx-2 text-muted">or</span>
-            <hr class="flex-grow-1">
-          </div>
+                        <!-- Confirm Password -->
+                        <template v-if="isSignup">
+                          <div class=" mb-3 position-relative">
+                            <label class="form-label required">Confirm password</label>
+                            <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control"
+                              v-model="currentForm.confirm_password" placeholder="Re-enter your password" required />
+                            <i class="bi" :class="showConfirmPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"
+                              @click="toggleConfirmPassword"
+                              style="position:absolute; top:40px; right:30px; cursor:pointer;"></i>
+                          </div>
+                        </template>
 
-          <!-- Google OAuth Button - Admin -->
-          <div v-if="isAdmin" :id="googleButtonId" class="mt-3">
-            <button type="button" class="btn btn-outline-dark rounded-pill mb-2 w-100">
-              <img src="@/assets/images/google-icon.png" style="height: 23px; width: 23px; margin-top: -1px;" />
-              {{ googleButtonText }}
-            </button>
-          </div>
+                        <!-- Forgot Password -->
+                        <template v-if="!isSignup">
+                          <div class="col-12 text-end mb-3">
+                            <router-link to="/forgotpassword" class="text-primary"
+                              style="font-size: 14px; text-decoration: none;">
+                              Forgot Password?
+                            </router-link>
+                          </div>
+                        </template>
 
-          <!-- Google OAuth Button - User -->
-          <div v-else :id="googleButtonId" class="mt-3">
-            <button type="button" class="btn btn-outline-dark rounded-pill mb-2 w-100">
-              <img src="@/assets/images/google-icon.png" style="height: 23px; width: 23px; margin-top: -1px;" />
-              {{ googleButtonText }}
-            </button>
-          </div>
+                        <!-- reCAPTCHA -->
+                        <div class="col-12 mb-3 d-flex justify-content-center align-items-center">
+                          <div :id="recaptchaContainerId" :key="recaptchaContainerId"></div>
+                        </div>
 
-          <!-- Toggle Link (Signup ↔ Signin) -->
-          <!-- <p class="text-center pt-3 mt-2">
+                        <!-- Submit Button -->
+                        <div class="col-12 mb-3">
+                          <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-2" :disabled="loading">
+                            <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                            {{ submitButtonText }}
+                            <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+                          </button>
+                        </div>
+
+                      </div>
+
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="d-flex align-items-center mt-3">
+                      <hr class="flex-grow-1">
+                      <span class="mx-2 text-muted">or</span>
+                      <hr class="flex-grow-1">
+                    </div>
+
+                    <!-- Google OAuth Button - Admin -->
+                    <div v-if="isAdmin" :id="googleButtonId" class="mt-3">
+                      <button type="button" class="btn btn-outline-dark rounded-pill mb-2 w-100">
+                        <img src="@/assets/images/google-icon.png"
+                          style="height: 23px; width: 23px; margin-top: -1px;" />
+                        {{ googleButtonText }}
+                      </button>
+                    </div>
+
+                    <!-- Google OAuth Button - User -->
+                    <div v-else :id="googleButtonId" class="mt-3">
+                      <button type="button" class="btn btn-outline-dark rounded-pill mb-2 w-100">
+                        <img src="@/assets/images/google-icon.png"
+                          style="height: 23px; width: 23px; margin-top: -1px;" />
+                        {{ googleButtonText }}
+                      </button>
+                    </div>
+
+                    <!-- Toggle Link (Signup ↔ Signin) -->
+                    <!-- <p class="text-center pt-3 mt-2">
             <template v-if="isSignup">
               Already have an account?
               <a href="#" @click.prevent="switchSubTab('signin')" class="text-decoration-none" style="color: #422CE9;">
@@ -205,13 +210,24 @@
               </a>
             </template>
           </p> -->
-        </div>
+                  </div>
 
-        <!-- Right Image Section -->
-        <div class="col-lg-6 image-section d-none d-lg-block pt-5">
+                  <!-- Right Image Section -->
+                  <!-- <div class="col-lg-6 image-section d-none d-lg-block pt-5">
           <img src="@/assets/images/signin.jpg" alt="" style="width: 455px; height: 700px; border-radius: 15px;">
-        </div>
+        </div> -->
 
+                </div>
+              </div>
+
+            </div>
+            </div>
+          </div>
+
+          <!-- <div class="auth-container">
+           
+          </div> -->
+        </div>
       </div>
     </div>
   </main>
@@ -364,8 +380,8 @@ export default {
       // Password validation for signup
       if (this.isSignup) {
         if (!this.passwordValidation.minLength ||
-            !this.passwordValidation.hasUppercase ||
-            !this.passwordValidation.hasSpecialChar) {
+          !this.passwordValidation.hasUppercase ||
+          !this.passwordValidation.hasSpecialChar) {
           Swal.fire('Error', 'Password must be at least 8 characters with 1 uppercase and 1 special character', 'error');
           return false;
         }
@@ -732,14 +748,14 @@ export default {
 }
 
 /* Password toggle icon */
-.position-relative input + i {
+/* .position-relative input+i {
   font-size: 1.2rem;
-}
+} */
 
 /* Form section styling */
-.form-section {
+/* .form-section {
   max-width: 600px;
-}
+} */
 
 /* Image section */
 .image-section {
@@ -753,5 +769,169 @@ export default {
   .image-section {
     display: none !important;
   }
+}
+
+
+.form-wrapper {
+  max-width: 760px;
+  /* 👈 controls form width */
+  margin: 0 auto;
+}
+
+/* Improve vertical rhythm */
+.form-wrapper .form-label {
+  font-weight: 500;
+}
+
+.form-wrapper .form-control {
+  height: 46px;
+  border-radius: 999px;
+}
+
+/* Button polish */
+.btn-vaptfix {
+  height: 48px;
+  border-radius: 999px;
+}
+
+
+/* Page background */
+main {
+  background: linear-gradient(180deg, #fafbff 0%, #ffffff 100%);
+}
+
+/* Form wrapper */
+.form-wrapper {
+  max-width: 760px;
+  margin: 0 0px;
+}
+
+/* Card surface */
+.form-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 26px;
+  box-shadow: 0 10px 35px rgba(66, 44, 233, 0.08);
+}
+
+/* Headings */
+.form-heading {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.form-subheading {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Inputs */
+.form-wrapper .form-control {
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  padding: 0 18px;
+  transition: all 0.2s ease;
+}
+
+.form-wrapper .form-control:focus {
+  border-color: #422CE9;
+  box-shadow: 0 0 0 3px rgba(66, 44, 233, 0.12);
+}
+
+/* Labels */
+.form-wrapper .form-label {
+  /* font-size: 13px; */
+  /* font-weight: 600; */
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+/* Tabs separation */
+.main-tabs-container {
+  margin-bottom: 1.2rem;
+}
+
+.sub-tabs {
+  margin-top: 10px;
+  margin-bottom: 22px !important;
+}
+
+/* Profile tabs polish */
+.profile-tab {
+  border-radius: 14px;
+}
+
+.profile-tab:hover {
+  background: rgba(66, 44, 233, 0.06);
+}
+
+/* Password rules spacing */
+.password-rules {
+  margin-top: 6px;
+}
+
+/* Button */
+.btn-vaptfix {
+  height: 50px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #422CE9, #6C63FF);
+  border: none;
+  transition: all 0.25s ease;
+}
+
+.btn-vaptfix:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(66, 44, 233, 0.3);
+}
+
+/* Divider */
+hr {
+  opacity: 0.15;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 🔥 ensures true center */
+}
+
+/* Logo styling */
+.auth-logo {
+  /* display: flex;
+  justify-content: center; */
+  width: 100%;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.auth-logo img {
+  height: 42px;
+  object-fit: contain;
+}
+
+/* Form wrapper */
+/* .form-wrapper {
+  width: 100%;
+} */
+
+/* Card */
+.form-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+
+.form-label.required::after {
+  content: " *";
+  color: #dc3545;
+  /* Bootstrap danger red */
+  font-weight: 600;
 }
 </style>

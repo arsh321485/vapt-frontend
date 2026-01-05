@@ -719,38 +719,28 @@ export default {
   },
   },
   async mounted() {
-    document.addEventListener('click', this.onClickOutside);
+  document.addEventListener("click", this.onClickOutside);
 
-    const storedUsers = JSON.parse(localStorage.getItem('users'));
-    if (storedUsers && storedUsers.length > 0) {
-      this.users = storedUsers;
-      this.users.forEach(user => {
-        this.selectedRoles[user._id] = user.Member_role?.map(
-          full => this.roleMapping[full]   
-        ) || [];
+  const res = await this.authStore.fetchUsersByAdmin();
 
-        this.selectedRoleText[user._id] = this.selectedRoles[user._id].join(", ");
-        this.isOpen[user._id] = false;
-      });
+  if (res.status) {
+    this.users = res.data;
 
-      console.log("Initial roles", this.selectedRoles);
-      return;
-    }
-    const res = await this.authStore.fetchAllUsers();
-    if (res.status) {
-      this.users = res.data;
-      this.users.forEach(user => {
-        this.selectedRoles[user._id] = user.Member_role?.map(
-          full => this.roleMapping[full]
-        ) || [];
+    this.users.forEach(user => {
+      this.selectedRoles[user._id] =
+        user.Member_role?.map(full => this.roleMapping[full]) || [];
 
-        this.selectedRoleText[user._id] = this.selectedRoles[user._id].join(", ");
-        this.isOpen[user._id] = false;
-      });
+      this.selectedRoleText[user._id] =
+        this.selectedRoles[user._id].join(", ");
 
-      console.log("Initial Roles", this.selectedRoles);
-    }
-  },
+      this.isOpen[user._id] = false;
+    });
+
+    console.log("✅ Users loaded for admin:", this.users);
+  } else {
+    console.error("❌ Failed to load users:", res.message);
+  }
+},
   beforeUnmount() {
     document.removeEventListener('click', this.onClickOutside);
   }

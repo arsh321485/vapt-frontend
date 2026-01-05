@@ -43,12 +43,24 @@
               <div class="d-flex justify-content-start gap-3">
                 <button class="btn rounded-pill border px-4"
                   style="background-color: rgba(230, 227, 255, 1);color: rgba(49, 33, 177, 1);">All</button>
-                <!-- <button class="btn rounded-pill border px-4" style="color: rgba(0, 115, 12, 1);">Approved</button>
-                                <button class="btn rounded-pill border px-4" style="color: rgba(170, 0, 0, 1);">Declined</button> -->
-                <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i
-                    class="bi bi-arrow-down-up me-1"></i>Sort by</button>
-                <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i
-                    class="bi bi-funnel me-1"></i>Filter</button>
+                <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);" @click="toggleSort">
+                  <i class="bi bi-arrow-down-up me-1"></i>Sort by Date
+                  <i :class="sortOrder === 'desc' ? 'bi bi-arrow-down ms-1' : 'bi bi-arrow-up ms-1'"></i>
+                </button>
+                <!-- <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i
+                    class="bi bi-funnel me-1"></i>Filter</button> -->
+                    <div class="">
+                    <form>
+                      <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
+                        <option value="all">All</option>
+                        <option value="patch management">Patch Management</option>
+                        <option value="configuration management">Configuration Management</option>
+                        <option value="network management">Network Management</option>
+                        <option value="architectural management">Architectural Management</option>
+                      </select>
+                    </form>
+                    </div>
+            
               </div>
             </div>
 
@@ -68,7 +80,7 @@
                     </tr>
                   </thead>
                   <tbody class="raised-tbody">
-                    <tr v-for="(req, index) in supportRequests" :key="req._id">
+                    <tr v-for="(req, index) in sortedSupportRequests" :key="req._id">
                       <!-- SR NO -->
                       <td>{{ index + 1 }}</td>
 
@@ -311,6 +323,7 @@ export default {
       ],
       showBox: false,
       selectedLocation: "greece",
+      sortOrder: 'desc' // 'asc' for oldest first, 'desc' for newest first
     };
   },
   computed: {
@@ -325,6 +338,22 @@ export default {
     return this.selectedSupportRequest.step_requested
       .split(",")
       .map(s => s.trim());
+  },
+  sortedSupportRequests() {
+    const sorted = [...this.supportRequests];
+
+    sorted.sort((a, b) => {
+      const dateA = new Date(a.requested_at);
+      const dateB = new Date(b.requested_at);
+
+      if (this.sortOrder === 'asc') {
+        return dateA - dateB;  // Oldest first
+      } else {
+        return dateB - dateA;  // Newest first (default)
+      }
+    });
+
+    return sorted;
   }
 },
   created() {
@@ -332,6 +361,9 @@ export default {
     this.fetchSupportRequests();
   },
   methods: {
+    toggleSort() {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    },
     openViewRequestModal(req) {
     this.selectedSupportRequest = req;
   },

@@ -461,32 +461,37 @@ async signup(payload: any) {
       }
   },
 
-  // ✅ Fetch All Users
-  async fetchAllUsers() {
+  // ✅ Fetch  UsersByAdminid
+  async fetchUsersByAdmin() {
     try {
-      const res = await endpoint.get("/admin/users_details/list-user-details/");
-      const data = res.data;
+      const adminId = this.user?._id || this.user?.id;
 
-      console.log("✅ All users fetched successfully:", data);
-    // const users = Array.isArray(data.data) ? data.data : [];
-    const users = Array.isArray(data) ? data : [];
+      if (!adminId) {
+        throw new Error("Admin ID not found");
+      }
+
+      const res = await endpoint.get(
+        `/admin/users_details/admin/${adminId}/user-details/`
+      );
+
+      const data = res.data;
 
       return {
         status: true,
-        message: "All users fetched successfully",
-        data: users,
+        message: "Users fetched successfully",
+        data: Array.isArray(data.results) ? data.results : [],
+        count: data.count || 0,
       };
-    } catch (error : unknown) {
-      const err = error as any;
-      console.error("❌ Failed to fetch users:", err);
+    } catch (error: any) {
+      console.error("❌ Failed to fetch users:", error);
 
       return {
         status: false,
         message:
-          err.response?.data?.message ||
-          err.message ||
+          error.response?.data?.message ||
+          error.message ||
           "Failed to fetch users",
-        details: err.response?.data || null,
+        details: error.response?.data || null,
       };
     }
   },
@@ -988,6 +993,63 @@ async signup(payload: any) {
       details: err.response?.data || null
     };
   }
+  },
+
+  // Get step completion status for fix vulnerability
+  async getFixVulnerabilitySteps(fixVulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`
+      );
+
+      return {
+        status: true,
+        data: {
+          fix_vulnerability_id: res.data.fix_vulnerability_id,
+          vulnerability_status: res.data.status,
+          steps: res.data.steps || []
+        }
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch step completion data",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Mark a step as complete
+  async completeFixVulnerabilityStep(
+    fixVulnerabilityId: string,
+    payload: {
+      step_number: number;
+      comment: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`,
+        payload
+      );
+
+      return {
+        status: true,
+        data: {
+          message: res.data.message,
+          vulnerability_status: res.data.status,
+          completed_steps: res.data.completed_steps
+        }
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to complete step",
+        details: err.response?.data || null
+      };
+    }
   },
 
   // create Raise Support Request (UPDATED API)

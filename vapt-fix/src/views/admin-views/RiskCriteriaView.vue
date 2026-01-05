@@ -87,17 +87,9 @@
                               <select v-model="form.critical" id="Critical" name="Critical" :disabled="isLocked" class="p-2"
                                 style="border-color: rgba(0, 0, 0, 0.16);margin-left: 8px;">
                                 <option disabled value="">Select</option>
-                                <option value="1 Day">1 Day</option>
-                                <option value="2 Days">2 Days</option>
-                                <option value="3 Days">3 Days</option>
-                                <option value="4 Days">4 Days</option>
-                                <option value="5 Days">5 Days</option>
-                                <option value="6 Days">6 Days</option>
-                                <option value="1 Week">1 Week</option>
-                                <option value="2 Weeks">2 Weeks</option>
-                                <option value="3 Weeks">3 Weeks</option>
-                                <option value="4 Weeks">4 Weeks</option>
-                                <option value="5 Weeks">5 Weeks</option>
+                                <option v-for="option in timeOptions" :key="option" :value="option">
+                                  {{ option }}
+                                </option>
                               </select>
                             </div>
                           </div>
@@ -122,17 +114,9 @@
                               <select v-model="form.high" id="High" :disabled="isLocked" name="High" class="p-2"
                                 style="border-color: rgba(0, 0, 0, 0.16);">
                                 <option disabled value="">Select</option>
-                                <option value="1 Day">1 Day</option>
-                                <option value="2 Days">2 Days</option>
-                                <option value="3 Days">3 Days</option>
-                                <option value="4 Days">4 Days</option>
-                                <option value="5 Days">5 Days</option>
-                                <option value="6 Days">6 Days</option>
-                                <option value="1 Week">1 Week</option>
-                                <option value="2 Weeks">2 Weeks</option>
-                                <option value="3 Weeks">3 Weeks</option>
-                                <option value="4 Weeks">4 Weeks</option>
-                                <option value="5 Weeks">5 Weeks</option>
+                                <option v-for="option in timeOptions" :key="option" :value="option" :disabled="isHighOptionDisabled(option)">
+                                  {{ option }}
+                                </option>
                               </select>
                             </div>
                           </div>
@@ -160,17 +144,9 @@
                               <select v-model="form.medium" :disabled="isLocked" id="Medium" name="Medium" class="p-2"
                                 style="border-color: rgba(0, 0, 0, 0.16);">
                                 <option disabled value="">Select</option>
-                                <option value="1 Day">1 Day</option>
-                                <option value="2 Days">2 Days</option>
-                                <option value="3 Days">3 Days</option>
-                                <option value="4 Days">4 Days</option>
-                                <option value="5 Days">5 Days</option>
-                                <option value="6 Days">6 Days</option>
-                                <option value="1 Week">1 Week</option>
-                                <option value="2 Weeks">2 Weeks</option>
-                                <option value="3 Weeks">3 Weeks</option>
-                                <option value="4 Weeks">4 Weeks</option>
-                                <option value="5 Weeks">5 Weeks</option>
+                                <option v-for="option in timeOptions" :key="option" :value="option" :disabled="isMediumOptionDisabled(option)">
+                                  {{ option }}
+                                </option>
                               </select>
                             </div>
                           </div>
@@ -195,17 +171,9 @@
                               <select v-model="form.low" :disabled="isLocked" id="Low" name="Low" class="p-2"
                                 style="border-color: rgba(0, 0, 0, 0.16);margin-left: 5px;">
                                 <option disabled value="">Select</option>
-                                <option value="1 Day">1 Day</option>
-                                <option value="2 Days">2 Days</option>
-                                <option value="3 Days">3 Days</option>
-                                <option value="4 Days">4 Days</option>
-                                <option value="5 Days">5 Days</option>
-                                <option value="6 Days">6 Days</option>
-                                <option value="1 Week">1 Week</option>
-                                <option value="2 Weeks">2 Weeks</option>
-                                <option value="3 Weeks">3 Weeks</option>
-                                <option value="4 Weeks">4 Weeks</option>
-                                <option value="5 Weeks">5 Weeks</option>
+                                <option v-for="option in timeOptions" :key="option" :value="option" :disabled="isLowOptionDisabled(option)">
+                                  {{ option }}
+                                </option>
                               </select>
                             </div>
                           </div>
@@ -267,11 +235,24 @@ export default {
         high: '',
         medium: '',
         low: '',
-        isLocked: false 
+        isLocked: false
       },
       loading: false,
       message: '',
-      isLocked: false
+      isLocked: false,
+      timeOptions: [
+        '1 Day',
+        '2 Days',
+        '3 Days',
+        '4 Days',
+        '5 Days',
+        '6 Days',
+        '1 Week',
+        '2 Weeks',
+        '3 Weeks',
+        '4 Weeks',
+        '5 Weeks'
+      ]
     };
   },
 
@@ -293,6 +274,30 @@ export default {
 
       // Already in days
       return num;
+    },
+
+    // Check if High option should be disabled
+    isHighOptionDisabled(option) {
+      if (!this.form.critical) return false;
+      const criticalDays = this.convertToDays(this.form.critical);
+      const optionDays = this.convertToDays(option);
+      return optionDays < criticalDays;
+    },
+
+    // Check if Medium option should be disabled
+    isMediumOptionDisabled(option) {
+      if (!this.form.high) return false;
+      const highDays = this.convertToDays(this.form.high);
+      const optionDays = this.convertToDays(option);
+      return optionDays < highDays;
+    },
+
+    // Check if Low option should be disabled
+    isLowOptionDisabled(option) {
+      if (!this.form.medium) return false;
+      const mediumDays = this.convertToDays(this.form.medium);
+      const optionDays = this.convertToDays(option);
+      return optionDays < mediumDays;
     },
 
     // Validate risk criteria order

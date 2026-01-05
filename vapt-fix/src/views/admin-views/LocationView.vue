@@ -82,13 +82,19 @@
                           <div class="card shadow border-0 d-flex align-items-center justify-content-center p-2"
                             :style="{ backgroundColor: notUsingPlatform ? '#d3d3d3' : (activePlatform === 'slack' ? 'aquamarine' : '') }"
                             style="aspect-ratio:1/1; cursor:pointer;">
-                            <button class="btn border-0" v-if="!user" @click="startSlackLogin"
+                            <!-- <button class="btn border-0" v-if="!user" @click="startSlackLogin"
                               :disabled="notUsingPlatform">
                               <div>
                                 <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
                                 <p class="mt-2 fw-semibold mb-0">Slack</p>
                               </div>
-                            </button>
+                            </button> -->
+                            <button class="btn border-0" v-if="!user" @click="activatePlatform('slack')"
+                              :disabled="notUsingPlatform">
+                             <div>
+                                <img src="@/assets/images/slack.png" alt="Slack" style="width:40px; height:40px;">
+                                <p class="mt-2 fw-semibold mb-0">Slack</p>
+                              </div></button>
                           </div>
                         </div>
 
@@ -1086,13 +1092,39 @@ export default {
           this.selectedLocation = "";
           this.selectedRoles1 = [];
         } else {
-          console.error("❌ Error:", response.message);
+          console.error("❌ Error:", response);
+
+          // Extract error message from backend response
+          let errorMessage = response.message || "Failed to add user";
+
+          // Check for 'details.detail' field (backend validation errors)
+          if (response.details && response.details.detail) {
+            errorMessage = response.details.detail;
+
+            // Extract clean message from Python ErrorDetail format
+            // Format: "{'email': [ErrorDetail(string='message here', code='unique')]}"
+            const match = errorMessage.match(/string='([^']+)'/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          }
+          // Check for 'details.error' field
+          else if (response.details && response.details.error) {
+            errorMessage = response.details.error;
+          }
+          // Check for nested 'details.errors' structure
+          else if (response.details && response.details.errors) {
+            const errors = response.details.errors;
+            const firstErrorKey = Object.keys(errors)[0];
+            if (firstErrorKey && Array.isArray(errors[firstErrorKey]) && errors[firstErrorKey].length > 0) {
+              errorMessage = errors[firstErrorKey][0];
+            }
+          }
+
+          // Show simple alert without icon
           Swal.fire({
-            icon: "error",
-            title: "Error Adding User",
-            text: response.message,
-            timer: 3000,
-            showConfirmButton: false,
+            text: errorMessage,
+            confirmButtonText: "OK"
           });
         }
       } catch (error) {
