@@ -538,17 +538,46 @@ select.form-select:focus {
   font-weight: 700;
 }
 
-
-@media (max-width: 992px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-
-
+/* iPad Mini */
+@media (max-width: 768px) {
   .content {
-    padding: 32px 24px;
+    margin-left: 0px;
+    margin-top: 200px;
+    height: auto;
   }
+  .risk-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .cta {
+    margin-top: 35px;
+    margin-bottom: 0;
+  }
+}
 
+/* iPad Air */
+@media (max-width: 992px) {
+  .risk-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .content {
+    margin-left: 0px;
+    margin-top: 200px;
+    height: auto;
+    padding: 20px 40px;
+  }
+  .cta {
+    margin-top: 190px;
+    margin-bottom: 0;
+  }
+  /* .app {
+    grid-template-columns: 1fr;
+  } */
   .risk-grid {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -558,10 +587,43 @@ select.form-select:focus {
       "low"
       "security";
   }
-
   .security-right {
     grid-column: auto;
     grid-row: auto;
   }
+}
+
+/* iPad Pro */
+@media (max-width: 1200px) {
+  .risk-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .content {
+    margin-left: 0px;
+    margin-top: 200px;
+    height: auto;
+    padding: 45px 55px;
+  }
+  .cta {
+    margin-top: 385px;
+    margin-bottom: 0;
+  }
+}
+
+/* larger screen */
+@media screen and (min-width: 1920px) {
+  .content {
+    height: auto;
+  }
+  .cta {
+    margin-top: 480px;
+    margin-bottom: 0;
+  }
+  .security-card p {
+    font-size: 18px;
+}
 }
 </style>

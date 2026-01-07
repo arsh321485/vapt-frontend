@@ -161,23 +161,41 @@ export default {
 }
 
 @media (max-width: 992px) {
-  /* .step-rail {
+  .step-rail {
     display: flex;
     justify-content: center;
-    gap: 32px;
+    gap: 150px;
     border-right: none;
     border-bottom: 1px solid #e6e9f2;
-  } */
-
-  .step-rail {
-    position: relative;
     width: 100%;
     height: auto;
-    top: 0;
+  }
+  .step-rail {
+    top: 55px;              
+    height: 150px;
   }
   .step-line {
     display: none;
   }
 }
 
+/* iPad Pro */
+@media (max-width: 1200px) {
+  .step-rail {
+    display: flex;
+    justify-content: center;
+    gap: 150px;
+    border-right: none;
+    border-bottom: 1px solid #e6e9f2;
+    width: 100%;
+    height: auto;
+  }
+  .step-rail {
+    top: 55px;              
+    height: 150px;
+  }
+  .step-line {
+    display: none;
+  }
+}
 </style>

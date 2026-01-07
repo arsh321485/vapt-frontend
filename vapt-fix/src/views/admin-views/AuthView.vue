@@ -2,7 +2,7 @@
   <main>
     <div class="container-fluid vh-100">
       <div class="row h-100">
-        <div class="col-md-5 form-section">
+        <div class="col-xl-5 col-lg-12 col-md-12 col-12 form-section">
 
           <!-- LOGO (FIXED POSITION) -->
           <div class="logo-wrapper">
@@ -208,7 +208,7 @@
 
 
         <!-- RIGHT SECTION -->
-        <div class="col-md-7 d-flex flex-column justify-content-center align-items-center info-section p-5">
+        <div class="col-xl-7 col-lg-12 col-md-12 col-12 d-flex flex-column justify-content-center align-items-center info-section p-5">
 
           <h2 class="testimonial-headline text-center mb-2">
           <span class="text-white">VAPTFIX — Scan Smart. Fix Fast. Stay Secure.</span><br />
@@ -613,13 +613,13 @@ export default {
 <style scoped>
 .form-section {
   background-color: rgb(9, 9, 35);
-  min-height: 100vh;
+  /* min-height: 100vh; */
   position: relative;
 }
 
 .logo-wrapper {
   position: absolute;
-  top: 22px;
+  top: 28px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -633,17 +633,29 @@ export default {
   padding-top: 40px;
 }
 
+/* .form-area {
+  align-items: flex-start;
+} */
+
+.form-area {
+  width: 100%;
+}
+
 .form-wrapper {
   background: transparent;
   max-height: 100vh;
   position: relative;
   padding-top: 140px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ===== MAIN TABS ===== */
 .main-tabs {
   display: flex;
   gap: 12px;
+  margin-bottom: 10px;
+  min-height: 44px;
   margin-bottom: 10px;
 }
 
@@ -673,8 +685,16 @@ export default {
   gap: 32px;
   margin-bottom: 14px;
   border-bottom: 1px solid #1f2937;
+  min-height: 46px;
+  margin-bottom: 14px;
 }
-
+#authForm {
+  flex-grow: 1;
+}
+/* Prevent password confirm toggle shift */
+.password-confirm {
+  min-height: 78px;
+}
 .sub-tab {
   padding: 10px 0;
   cursor: pointer;
@@ -792,17 +812,10 @@ export default {
   max-width: 100%;
 }
 
-
-
-/* ===============================
-   STATIC AUTH HEADER FIX
-   =============================== */
-
 /* Stop vertical re-centering jump */
-.form-area {
+/* .form-area {
   align-items: flex-start;
-  /* 👈 KEY FIX */
-}
+} */
 
 /* Lock visible auth header height */
 .form-wrapper {
@@ -817,15 +830,15 @@ export default {
 }
 
 /* Ensure form area adjusts smoothly */
-#authForm {
+/* #authForm {
   width: 100%;
-}
+} */
 
 /* Prevent layout shift on mode switch */
-.password-confirm {
+/* .password-confirm {
   min-height: 78px;
-  /* reserves space even when hidden */
-}
+  
+} */
 
 /* ===============================
        DASHBOARD IMAGE SLIDER
@@ -889,5 +902,113 @@ export default {
   height: 120px;
   border-radius: 8px;
   border: 3px solid rgb(90, 68, 255);
+}
+
+/* Left form column */
+.form-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+/* Form container */
+/* .form-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+} */
+
+/* Optical centering (NOT true center) */
+.form-wrapper {
+  width: 100%;
+  max-width: 420px;
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+
+@media (min-width: 1600px) {
+  .form-wrapper {
+    padding-top: 80px;
+    padding-bottom: 60px;
+  }
+
+ 
+
+}
+
+/* monitor size */
+@media screen and (min-width: 1920px){
+ .form-wrapper {
+    padding-top: 50px;
+    padding-bottom: 40px;
+  }
+
+    .logo-wrapper {
+  
+  top: 180px;
+ 
+}
+
+.dashboard-slider{
+    margin: 80px auto 60px;
+}
+}
+
+@media (max-width: 1200px) {
+ .form-wrapper {
+    padding-top: 50px;
+    padding-bottom: 40px;
+  }
+
+   .logo-wrapper {
+  
+  top: 40px;
+ 
+}
+}
+
+
+
+/* Laptops */
+@media (max-width: 1366px) {
+  .form-wrapper {
+    padding-top: 50px;
+    padding-bottom: 40px;
+  }
+
+ 
+}
+
+/* Tablets */
+@media (max-width: 992px) {
+  .form-wrapper {
+    padding-top: 40px;
+    padding-bottom: 32px;
+  }
+
+   .logo-wrapper {
+  top: 20px;
+ 
+}
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .form-section {
+    min-height: auto;
+  }
+
+  .form-wrapper {
+    padding-top: 32px;
+    padding-bottom: 24px;
+  }
+
+   .logo-wrapper {
+  top: 20px;
+ 
+}
+  
 }
 </style>

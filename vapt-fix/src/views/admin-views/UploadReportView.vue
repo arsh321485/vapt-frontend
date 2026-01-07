@@ -462,4 +462,52 @@ export default {
   transform: scale(1.1);
   opacity: 0.9;
 }
+
+/* larger screen */
+@media screen and (min-width: 1920px) {
+  .app {
+    display: block;
+  }
+  .cta {
+    margin-top: 300px;
+  }
+}
+
+/* iPad Pro */
+@media (max-width: 1200px) {
+  .content {
+    margin-left: 0px;
+    margin-top: 200px;
+    height: auto;
+    padding: 38px 55px;
+  }
+  .cta {
+    margin-top: 430px;
+  }
+}
+
+/* iPad Air */
+@media (max-width: 992px) {
+  .main-row {
+    flex-direction: row;
+    gap: 10px;
+  }
+  .left-column {
+    gap: 0;
+  }
+  .cta {
+    margin-top: 245px;
+  }
+}
+
+/* iPad Mini */
+@media (max-width: 768px) {
+  .content {
+    padding: 32px 32px;
+  }
+  .cta {
+    margin-top: 140px;
+    margin-bottom: 0;
+  }
+}
 </style>

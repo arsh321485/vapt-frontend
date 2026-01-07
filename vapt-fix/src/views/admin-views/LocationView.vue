@@ -75,7 +75,7 @@
             </button>
 
             <!-- AVATAR CIRCLES -->
-            <div class="d-flex gap-2 align-items-center flex-wrap mt-2">
+            <div class="d-flex gap-2 align-items-center flex-wrap location-circle">
               <div v-for="(loc, index) in authStore.locations" :key="loc._id || index"
                 class="rounded-circle d-flex align-items-center justify-content-center" :style="{
                   width: '42px',
@@ -717,6 +717,10 @@ export default {
   height: 22px;
 }
 
+.location-circle {
+  margin-top: 4px;
+}
+
 /* ===== FORMS ===== */
 .form-control,
 .form-select {
@@ -767,30 +771,6 @@ export default {
   box-shadow: 0 10px 22px rgba(90, 68, 255, 0.38);
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 992px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-
-  /* .content {
-    padding: 32px 24px;
-  } */
-  .content {
-    margin-left: 0;
-    margin-top: 64px;
-    height: auto;
-  }
-
-  .row-users,
-  .row-invite {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-
-/* ===== Smooth transitions ===== */
 .chip,
 .form-control,
 .form-select,
@@ -800,10 +780,73 @@ export default {
     transform 0.25s ease,
     border-color 0.25s ease;
 }
-
-/* ===== Chip hover & active polish ===== */
 .chip:hover {
-  /* box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08); */
   transform: translateY(-2px);
 }
+
+/* ===== RESPONSIVE ===== */
+/* iPad Air */
+@media (max-width: 992px) {
+  .app {
+    grid-template-columns: 720px;
+    justify-content: center;
+  }
+  .content {
+    margin-left: 0;
+    margin-top: 180px;
+    height: auto;
+    padding: 20px 40px;
+  }
+  .row-invite {
+    grid-template-columns: 1fr;
+  }
+  .row-users {
+    grid-template-columns:
+      minmax(95px, 2fr)
+      minmax(70px, 2fr)
+      minmax(70px, 2fr)
+      minmax(125px, 3fr)
+      minmax(118px, 3fr)
+      minmax(110px, 2.5fr);
+    gap: 5px;
+  }
+  .btn-primary {
+    padding: 13px 29px;
+  }
+  .row-invite[data-v-9a2bf7bb] {
+    grid-template-columns: 1fr 1fr 2fr;
+    gap: 5px;
+  }
+  .location-circle {
+    margin-top: 3px;
+  }
+}
+
+/* iPad Pro */
+@media (max-width: 1200px) {
+  .chip-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .content {
+    margin-left: 10px;
+    margin-top: 210px;
+    height: auto;
+  }
+  .cta {
+    margin-top: 174px;
+  }
+}
+
+
+/* iPad Mini */
+@media (max-width: 768px) {
+  .chip-group {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+}
+
 </style>
