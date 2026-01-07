@@ -13,8 +13,6 @@ interface Location {
 interface CreateUserPayload {
   admin_id: string;
   location_id: string;
-  first_name: string;
-  last_name: string;
   user_type: string;
   email: string;
   select_location: string;
@@ -118,94 +116,73 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // signup
-  // async signup(payload: any) {
-  //   try {
-  //     const res = await endpoint.post(
-  //       "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
-  //       payload
-  //     );
+  async signup(payload: {
+      email: string;
+      password: string;
+      confirm_password: string;
+      recaptcha: string;
+    }) {
+      try {
+        const res = await endpoint.post(
+          "/admin/users/signup/",
+          payload
+        );
 
-  //     const data = res.data;
+        const data = res.data;
 
-  //     if (data.tokens?.access) {
-  //       this.setAuth(data.tokens.access, data.user);
-  //       if (data.tokens.refresh) {
-  //         localStorage.setItem("refreshToken", data.tokens.refresh);
-  //       }
-  //     }
-  //     localStorage.setItem("isNewUser", "true");
+        if (data.tokens?.access && data.user) {
+          this.setAuth(data.tokens.access, data.user);
 
-  //     return { status: true, data };
-  //   } catch (error: any) {
-  //     return {
-  //       status: false,
-  //       message: error.response?.data?.message || "Signup failed",
-  //       details: error.response?.data || null,
-  //     };
-  //   }
-  // },
-  // signup
-async signup(payload: any) {
-  try {
-    const res = await endpoint.post(
-      "https://vaptbackend.secureitlab.com/api/admin/users/signup/",
-      payload
-    );
+          if (data.tokens.refresh) {
+            localStorage.setItem("refreshToken", data.tokens.refresh);
+          }
 
-    const data = res.data;
-
-    if (data.tokens?.access && data.user) {
-      // ✅ SAME AS LOGIN
-      this.setAuth(data.tokens.access, data.user);
-
-      if (data.tokens.refresh) {
-        localStorage.setItem("refreshToken", data.tokens.refresh);
-      }
-
-      // ✅ REQUIRED
-      localStorage.setItem("authenticated", "true");
-      localStorage.setItem("isNewUser", "true");
-    }
-
-    return { status: true, data };
-  } catch (error: any) {
-    return {
-      status: false,
-      message: error.response?.data?.message || "Signup failed",
-      details: error.response?.data || null,
-    };
-  }
-},
-
-  // ✅ Login (signin)
-  async login(payload: any) {
-    try {
-      const res = await endpoint.post(
-        "https://vaptbackend.secureitlab.com/api/admin/users/login/",
-        payload
-      );
-
-      const data = res.data;
-
-      if (data.tokens?.access) {
-        this.setAuth(data.tokens.access, data.user, data.locations || []);
-        if (data.tokens.refresh) {
-          localStorage.setItem("refreshToken", data.tokens.refresh);
+          localStorage.setItem("authenticated", "true");
+          localStorage.setItem("isNewUser", "true");
         }
+
+        return { status: true, data };
+      } catch (error: any) {
+        return {
+          status: false,
+          message: error.response?.data?.message || "Signup failed",
+          details: error.response?.data || null,
+        };
       }
+    },
 
-      // ✅ OLD USER
-      localStorage.setItem("isNewUser", "false");
+    // ✅ LOGIN
+    async login(payload: {
+      email: string;
+      password: string;
+      recaptcha: string;
+    }) {
+      try {
+        const res = await endpoint.post(
+          "/admin/users/login/",
+          payload
+        );
 
-      return { status: true, data };
-    } catch (error: any) {
-      return {
-        status: false,
-        message: error.response?.data?.message || "Login failed",
-        details: error.response?.data || null,
-      };
-    }
-  },
+        const data = res.data;
+
+        if (data.tokens?.access) {
+          this.setAuth(data.tokens.access, data.user);
+          if (data.tokens.refresh) {
+            localStorage.setItem("refreshToken", data.tokens.refresh);
+          }
+        }
+
+        localStorage.setItem("isNewUser", "false");
+
+        return { status: true, data };
+      } catch (error: any) {
+        return {
+          status: false,
+          message: error.response?.data?.message || "Login failed",
+          details: error.response?.data || null,
+        };
+      }
+    },
 
   // ✅ Google login
   async googleLogin(id_token: string) {
@@ -259,20 +236,6 @@ async signup(payload: any) {
         console.error("Profile fetch error:", error);
         return { status: false, message: "Unable to fetch profile" };
       }
-  },
-  
-  // ✅ Update User Profile
-  async updateUserProfile(payload: { firstname: string; lastname: string; organisation_name: string; organisation_url: string }) {
-    try {
-      const res = await endpoint.put("/admin/users/profile/update/", payload);
-      return { status: true, data: res.data };
-    } catch (error: any) {
-      return {
-        status: false,
-        message: error.response?.data?.message || error.message || "Failed to update profile",
-        details: error.response?.data || null,
-      };
-    }
   },
 
   // ✅ Change Password

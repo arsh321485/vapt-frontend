@@ -797,6 +797,25 @@ html, body {
   border-radius: 50%;
 }
 
+/* make button a positioning context */
+.sidebar .btn {
+  position: relative;
+  padding-bottom: 10px; /* space for underline */
+}
+
+/* underline for active menu */
+.sidebar .btn.activeBtn::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;               /* underline width */
+  height: 3px;               /* underline thickness */
+  background-color: rgba(49, 33, 177, 1);
+  border-radius: 2px;
+}
+
 .fixed-browser-bar {
   position: fixed;
   top: 0;

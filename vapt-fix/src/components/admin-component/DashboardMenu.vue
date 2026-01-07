@@ -2,7 +2,7 @@
   <main>
    
     <div class="d-flex"> 
-    <div class="sidebar d-flex flex-column align-items-center my-5 py-4">
+    <div class="sidebar d-flex flex-column align-items-center my-5 py-2">
       <!-- Navigation Icons -->
       <div class="flex-grow-1 d-flex flex-column align-items-center  text-center gap-1">
          <div>

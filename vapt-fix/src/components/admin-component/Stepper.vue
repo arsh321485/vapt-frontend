@@ -1,176 +1,183 @@
 <template>
-    <main>
-    <section class="bg-light">
-    <div class="container-fluid">
-    <div class="row">
-    <div class="d-flex justify-content-start align-items-center welcome-bg">
-      
-    <div class="stepper text-center mt-5">
-
-    <!-- Step 1 -->
+  <div class="step-rail">
+    <!-- STEP 1 -->
     <div
-      class="step text-decoration-none position-relative" style="cursor: pointer;"
-      :class="{ active: isCompletedOrActive(1), disabled: currentStep < 1 }"
-      @click="goToStep(1)"
+      class="step"
+      :class="{ active: isActive('/location') }"
+      @click="go('/location')"
     >
-    <img src="@/assets/images/logo-capital.png" alt="logo" class="step-logo">
       <div class="step-circle">1</div>
-      <div class="label">Add location and users</div>
+      <div class="step-label">
+        Add location<br />and users
+      </div>
+      <div
+        class="step-line"
+        :class="{ active: isLineActive(2) }"
+      ></div>
     </div>
 
-    <div class="line" :class="{ active: currentStep >= 2 }"></div>
-
-    <!-- Step 2 -->
+    <!-- STEP 2 -->
     <div
-      class="step text-decoration-none " style="cursor: pointer;"
-      :class="{ active: isCompletedOrActive(2) }"
-      @click="goToStep(2)"
+      class="step"
+      :class="{ active: isActive('/riskcriteria') }"
+      @click="go('/riskcriteria')"
     >
-
       <div class="step-circle">2</div>
-      <div class="label">Risk Criteria</div>
+      <div class="step-label">
+        Risk<br />Criteria
+      </div>
+      <div
+        class="step-line"
+        :class="{ active: isLineActive(3) }"
+      ></div>
     </div>
 
-    <div class="line" :class="{ active: currentStep >= 3 }"></div>
-
-    <!-- Step 3 -->
+    <!-- STEP 3 -->
     <div
-      class="step text-decoration-none" style="cursor: pointer;"
-      :class="{ active: isCompletedOrActive(3) }"
-      @click="goToStep(3)"
+      class="step"
+      :class="{ active: isActive('/uploadreport') }"
+      @click="go('/uploadreport')"
     >
       <div class="step-circle">3</div>
-      <div class="label">Vulnerability report</div>
-    </div>
-    </div>
-      </div>
+      <div class="step-label">
+        Vulnerability<br />Report
       </div>
     </div>
-    </section>
-    </main>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'Stepper',
-   data() {
-    return {
-      steps: ["/location", "/riskcriteria", "/uploadreport"],
-    };
-  },
-  computed: {
-    currentStep() {
-      return this.steps.indexOf(this.$route.path) + 1;
+  name: "Stepper",
+
+  methods: {
+    go(path) {
+      if (this.$route.path !== path) {
+        this.$router.push(path);
+      }
     },
-    isFromDashboard() {
-    return this.$route.query.from === "dashboard";
-  }
-  },
- methods: {
-  // isCompletedOrActive(step) {
-  //   return step <= this.currentStep;
-  // },
-  // goToStep(step) {
-  //   const currentIndex = this.currentStep;
-  //   if (step === currentIndex - 1) {
-  //     this.$router.push(this.steps[step - 1]);
-  //   }
-  // }
-  isCompletedOrActive(step) {
-    return step <= this.currentStep;
-  },
-  goToStep(step) {
-    if (this.isFromDashboard && step === 2) return;
 
-    const currentIndex = this.currentStep;
-    if (step === currentIndex - 1) {
-      this.$router.push(this.steps[step - 1]);
-    }
-  }
-}
+    isActive(path) {
+      return this.$route.path === path;
+    },
 
-  }
+    // stepNumber = 2 or 3
+    isLineActive(stepNumber) {
+      if (stepNumber === 2) {
+        return (
+          this.$route.path === "/riskcriteria" ||
+          this.$route.path === "/uploadreport"
+        );
+      }
+
+      if (stepNumber === 3) {
+        return this.$route.path === "/uploadreport";
+      }
+
+      return false;
+    },
+  },
+};
 </script>
 
 
 <style scoped>
-.stepper {
-  gap: 1.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  .step {
+  cursor: pointer;
+}
+
+/* Active dotted line */
+.step-line.active {
+  border-left-color: #5a44ff;
+}
+
+/* Optional hover polish */
+.step:hover .step-circle {
+  transform: scale(1.05);
+}
+
+  .step-rail {
+  position: fixed;
+  top: 64px;              
+  left: 0;
+  width: 260px;
+  height: calc(100vh - 64px);
+  background: #E9EDF5;
+  border-right: 1px solid #e6e9f2;
+  padding: 40px 24px;
+  overflow-y: hidden;
+  overflow: hidden;
+}
+.step-rail {
+  scrollbar-width: none;        /* Firefox */
+}
+
+.step-rail::-webkit-scrollbar {
+  display: none;               /* Chrome, Edge, Safari */
 }
 
 .step {
-  display: flex;
-  flex-direction: column; /* Keep number above text */
-  align-items: center;
   text-align: center;
-  min-width: 150px;
-  position: relative; /* Ensures spacing between steps */
-}
-
-.step-logo {
-  position: absolute;
-  top: -140px;
-  left: -70%;
-  transform: translateX(-50%);
-  /* height: 70%;
-  width: 20%; */
-  height: 40px;
+  margin-bottom: 42px;
 }
 
 .step-circle {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
+  margin: 0 auto;
   border-radius: 50%;
-  background-color: #e4e4e4;
-  color: black;
+  background: #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  margin-bottom: 6px;
+  font-size: 14px;
+  transition: box-shadow 0.25s ease;
 }
 
 .step.active .step-circle {
-  background-color: #6c47ff;
-  color: white;
+  background: #5a44ff;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(90, 68, 255, 0.35);
 }
 
-.label {
-  font-size: 0.875rem;
-  color: #6c757d;
+.step-label {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #9ca3af;
+  line-height: 1.4;
 }
 
-.step.active .label {
-  color: #000;
+.step.active .step-label {
+  color: #0f172a;
   font-weight: 500;
 }
 
-.line {
-  flex-grow: 1;
-  height: 2px; /* thin horizontal line */
-  min-width: 130px; /* 👈 ensures line is visible */
-  background-image: repeating-linear-gradient(
-    to right,
-    #6c757d,
-    #6c757d 4px,
-    transparent 4px,
-    transparent 8px
-  );
+.step-line {
+  width: 2px;
+  height: 36px;
+  margin: 10px auto 0;
+  border-left: 2px dashed #d1d5db;
 }
 
-.line.active {
-  background-image: repeating-linear-gradient(
-    to right,
-    #6c47ff,   
-    #6c47ff 4px,
-    transparent 4px,
-    transparent 8px
-  );
-}
+@media (max-width: 992px) {
+  /* .step-rail {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    border-right: none;
+    border-bottom: 1px solid #e6e9f2;
+  } */
 
+  .step-rail {
+    position: relative;
+    width: 100%;
+    height: auto;
+    top: 0;
+  }
+  .step-line {
+    display: none;
+  }
+}
 
 </style>
