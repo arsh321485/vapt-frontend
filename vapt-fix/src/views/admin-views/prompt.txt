@@ -1,7 +1,12 @@
-on mail belo link is coming 
-https://vapt-frontend-liart.vercel.app/set-password/NGZmZDVkZDgtNDY3ZS00NmViLThkM2UtZGI5YTQ1MjE4ODBk/d22uty-e336d742570529d4f332eebdd70a46fc/
+on click received link on mail pages shows
 
-but my project is running on http://localhost:5173/ 
-but i push project on https://vapt-frontend-liart.vercel.app/
+404: NOT_FOUND
+Code: NOT_FOUND
+ID: bom1::k45hn-1767885205277-2764e0c675ca
 
-so when i click reset password page not opens why check 
+Read our documentation to learn more about this error.
+
+in header shows 
+https://vapt-frontend-liart.vercel.app/set-password/NGZmZDVkZDgtNDY3ZS00NmViLThkM2UtZGI5YTQ1MjE4ODBk/d22xj7-037c5716b594cf9601af37689aac50a5/
+GET with 404 NOT FOUND
+check why this 
