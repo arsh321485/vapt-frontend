@@ -28,20 +28,12 @@
                   </span>
                 </span>
               </div>
-              <select class="form-select">
+              
+              <select class="form-select" v-model="form.critical" :disabled="isLocked">
                 <option>Select</option>
-                <option>1 Day</option>
-                <option>2 Days</option>
-                <option>3 Days</option>
-                <option>4 Days</option>
-                <option>5 Days</option>
-                <option>6 Days</option>
-                <option>1 Week</option>
-                <option>2 Weeks</option>
-                <option>3 Weeks</option>
-                <option>4 Weeks</option>
-                <option>5 Weeks</option>
+                <option v-for="opt in timeOptions" :key="opt">{{ opt }}</option>
               </select>
+
             </div>
             <div class="risk-card area-high risk-card-bg">
               <div class="risk-header">
@@ -54,20 +46,17 @@
                   </span>
                 </span>
               </div>
-              <select class="form-select">
+             
+
+
+              <select class="form-select" v-model="form.high" :disabled="isLocked">
                 <option>Select</option>
-                <option>1 Day</option>
-                <option>2 Days</option>
-                <option>3 Days</option>
-                <option>4 Days</option>
-                <option>5 Days</option>
-                <option>6 Days</option>
-                <option>1 Week</option>
-                <option>2 Weeks</option>
-                <option>3 Weeks</option>
-                <option>4 Weeks</option>
-                <option>5 Weeks</option>
+
+                <option v-for="opt in timeOptions" :key="opt" :disabled="isOptionDisabled(form.critical, opt)">
+                  {{ opt }}
+                </option>
               </select>
+
             </div>
             <div class="risk-card area-medium risk-card-bg">
               <div class="risk-header">
@@ -80,20 +69,16 @@
                   </span>
                 </span>
               </div>
-              <select class="form-select">
+             
+
+              <select class="form-select" v-model="form.medium" :disabled="isLocked">
                 <option>Select</option>
-                <option>1 Day</option>
-                <option>2 Days</option>
-                <option>3 Days</option>
-                <option>4 Days</option>
-                <option>5 Days</option>
-                <option>6 Days</option>
-                <option>1 Week</option>
-                <option>2 Weeks</option>
-                <option>3 Weeks</option>
-                <option>4 Weeks</option>
-                <option>5 Weeks</option>
+
+                <option v-for="opt in timeOptions" :key="opt" :disabled="isOptionDisabled(form.high, opt)">
+                  {{ opt }}
+                </option>
               </select>
+
             </div>
             <div class="risk-card area-low risk-card-bg">
               <div class="risk-header">
@@ -106,81 +91,84 @@
                   </span>
                 </span>
               </div>
-              <select class="form-select">
+              
+              <select class="form-select" v-model="form.low" :disabled="isLocked">
                 <option>Select</option>
-                <option>1 Day</option>
-                <option>2 Days</option>
-                <option>3 Days</option>
-                <option>4 Days</option>
-                <option>5 Days</option>
-                <option>6 Days</option>
-                <option>1 Week</option>
-                <option>2 Weeks</option>
-                <option>3 Weeks</option>
-                <option>4 Weeks</option>
-                <option>5 Weeks</option>
+
+                <option v-for="opt in timeOptions" :key="opt" :disabled="isOptionDisabled(form.medium, opt)">
+                  {{ opt }}
+                </option>
               </select>
+
             </div>
           </div>
 
           <div class="risk-card security-card area-security">
-  <h5 class="mb-2">Security Level</h5>
+            <h5 class="mb-2">Security Level</h5>
 
-  <div class="security-grid">
+            <div class="security-grid">
 
-    <div class="security-item">
-      <div class="security-title critical">
-        <span class="dot"></span>
-        <strong class="critical-text">Critical</strong>
-      </div>
-      <p>
-        Assets essential for the organisation to operate; their loss can cause
-        severe operational, legal, or financial damage.
-      </p>
-    </div>
+              <div class="security-item">
+                <div class="security-title critical">
+                  <span class="dot"></span>
+                  <strong class="critical-text">Critical</strong>
+                </div>
+                <p>
+                  Assets essential for the organisation to operate; their loss can cause
+                  severe operational, legal, or financial damage.
+                </p>
+              </div>
 
-    <div class="security-item">
-      <div class="security-title high">
-        <span class="dot"></span>
-        <strong class="high-text">High</strong>
-      </div>
-      <p>
-        Important assets whose compromise would significantly disrupt operations
-        or result in financial loss.
-      </p>
-    </div>
+              <div class="security-item">
+                <div class="security-title high">
+                  <span class="dot"></span>
+                  <strong class="high-text">High</strong>
+                </div>
+                <p>
+                  Important assets whose compromise would significantly disrupt operations
+                  or result in financial loss.
+                </p>
+              </div>
 
-    <div class="security-item">
-      <div class="security-title medium">
-        <span class="dot"></span>
-        <strong class="medium-text">Medium</strong>
-      </div>
-      <p>
-        Assets with moderate importance that may cause inconvenience or delays if
-        lost or exposed.
-      </p>
-    </div>
+              <div class="security-item">
+                <div class="security-title medium">
+                  <span class="dot"></span>
+                  <strong class="medium-text">Medium</strong>
+                </div>
+                <p>
+                  Assets with moderate importance that may cause inconvenience or delays if
+                  lost or exposed.
+                </p>
+              </div>
 
-    <div class="security-item">
-      <div class="security-title low">
-        <span class="dot"></span>
-        <strong class="low-text">Low</strong>
-      </div>
-      <p>
-        Assets whose loss or exposure has little to no impact on business
-        operations.
-      </p>
-    </div>
+              <div class="security-item">
+                <div class="security-title low">
+                  <span class="dot"></span>
+                  <strong class="low-text">Low</strong>
+                </div>
+                <p>
+                  Assets whose loss or exposure has little to no impact on business
+                  operations.
+                </p>
+              </div>
 
-  </div>
-</div>
+            </div>
+          </div>
 
 
         </div>
+
+        <!-- <div class="cta">
+          <router-link to="/uploadreport" class="btn btn-primary text-decoration-none">Continue to Vulnerability Report
+            →</router-link>
+        </div> -->
 
         <div class="cta">
-          <router-link to="/uploadreport" class="btn btn-primary text-decoration-none">Continue to Vulnerability Report →</router-link>
+          <button class="btn btn-primary" :disabled="loading" @click="submitRiskCriteria">
+            {{ loading ? "Saving..." : "Continue to Vulnerability Report →" }}
+          </button>
         </div>
+
 
       </div>
 
@@ -188,19 +176,146 @@
   </main>
 </template>
 
+
+
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
+import { useAuthStore } from "@/stores/authStore";
+import Swal from "sweetalert2";
 
 export default {
   name: "RiskCriteriaView",
-  components: {
-    Stepper,
+  components: { Stepper },
+
+  data() {
+
+    return {
+
+      
+    timeOptions: [
+  "1 Day",
+  "2 Days",
+  "3 Days",
+  "4 Days",
+  "5 Days",
+  "6 Days",
+  "1 Week",
+  "2 Weeks",
+  "3 Weeks",
+  "4 Weeks",
+  "5 Weeks",
+],
+
+      form: {
+        critical: "",
+        high: "",
+        medium: "",
+        low: "",
+      },
+      loading: false,
+      isLocked: false,
+    };
+
+    
+  },
+
+  methods: {
+    convertToDays(value) {
+      if (!value) return 0;
+      const match = value.match(/^(\d+)/);
+      if (!match) return 0;
+      const num = parseInt(match[1]);
+      return value.includes("Week") ? num * 7 : num;
+    },
+
+    // 🔽 ADD THIS METHOD HERE
+    isOptionDisabled(selectedValue, optionValue) {
+      if (!selectedValue) return false;
+      return this.convertToDays(optionValue) < this.convertToDays(selectedValue);
+    },
+    validateRiskCriteria() {
+      if (!this.form.critical || !this.form.high || !this.form.medium || !this.form.low) {
+        Swal.fire("Missing Fields", "Please select all risk criteria values.", "warning");
+        return false;
+      }
+
+      const c = this.convertToDays(this.form.critical);
+      const h = this.convertToDays(this.form.high);
+      const m = this.convertToDays(this.form.medium);
+      const l = this.convertToDays(this.form.low);
+
+      if (c > h || h > m || m > l) {
+        Swal.fire(
+          "Invalid Order",
+          "Critical ≤ High ≤ Medium ≤ Low remediation time must be maintained.",
+          "error"
+        );
+        return false;
+      }
+      return true;
+    },
+
+    async submitRiskCriteria() {
+      if (this.isLocked) {
+        this.$router.push("/uploadreport");
+        return;
+      }
+
+      if (!this.validateRiskCriteria()) return;
+
+      try {
+        this.loading = true;
+        const auth = useAuthStore();
+
+        const res = await auth.addRiskCriteria(this.form);
+
+        if (res.status) {
+          await Swal.fire({
+            icon: "success",
+            title: "Saved!",
+            text: res.message,
+            timer: 1800,
+            showConfirmButton: false,
+          });
+          this.$router.push("/uploadreport");
+        } else {
+          Swal.fire("Error", res.message || "Failed to save risk criteria", "error");
+        }
+      } catch (err) {
+        Swal.fire("Error", "Something went wrong", "error");
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getRiskCriteria() {
+      try {
+        const auth = useAuthStore();
+        const res = await auth.getRiskCriteriaById();
+
+        if (res.status && res.data?.risk_criteria) {
+          const d = res.data.risk_criteria;
+          this.form.critical = d.critical;
+          this.form.high = d.high;
+          this.form.medium = d.medium;
+          this.form.low = d.low;
+          this.isLocked = true;
+        }
+      } catch (err) {
+        console.error("Risk criteria fetch error", err);
+      }
+    },
+  },
+
+  mounted() {
+    this.getRiskCriteria();
   },
 };
 </script>
 
+
 <style scoped>
-  .security-title {
+.security-title {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -215,19 +330,23 @@ export default {
 
 /* COLORS – SAME AS LEFT */
 .security-title.critical .dot {
-  background: maroon; /* maroon */
+  background: maroon;
+  /* maroon */
 }
 
 .security-title.high .dot {
-  background: red; /* red/orange */
+  background: red;
+  /* red/orange */
 }
 
 .security-title.medium .dot {
-  background: orange; /* yellow */
+  background: orange;
+  /* yellow */
 }
 
 .security-title.low .dot {
-  background: #22c55e; /* green */
+  background: #22c55e;
+  /* green */
 }
 
 .security-item p {
@@ -493,7 +612,7 @@ select.form-select {
 
 /* ===== Risk card hover ===== */
 .risk-card:hover {
- 
+
   transform: translateY(-3px);
 }
 
@@ -545,12 +664,14 @@ select.form-select:focus {
     margin-top: 200px;
     height: auto;
   }
+
   .risk-layout {
     display: grid;
     grid-template-columns: 1fr;
     gap: 28px;
     align-items: start;
   }
+
   .cta {
     margin-top: 35px;
     margin-bottom: 0;
@@ -565,16 +686,19 @@ select.form-select:focus {
     gap: 28px;
     align-items: start;
   }
+
   .content {
     margin-left: 0px;
     margin-top: 200px;
     height: auto;
     padding: 20px 40px;
   }
+
   .cta {
     margin-top: 190px;
     margin-bottom: 0;
   }
+
   /* .app {
     grid-template-columns: 1fr;
   } */
@@ -587,6 +711,7 @@ select.form-select:focus {
       "low"
       "security";
   }
+
   .security-right {
     grid-column: auto;
     grid-row: auto;
@@ -601,12 +726,14 @@ select.form-select:focus {
     gap: 28px;
     align-items: start;
   }
+
   .content {
     margin-left: 0px;
     margin-top: 200px;
     height: auto;
     padding: 45px 55px;
   }
+
   .cta {
     margin-top: 385px;
     margin-bottom: 0;
@@ -618,12 +745,14 @@ select.form-select:focus {
   .content {
     height: auto;
   }
+
   .cta {
     margin-top: 480px;
     margin-bottom: 0;
   }
+
   .security-card p {
     font-size: 18px;
-}
+  }
 }
 </style>
