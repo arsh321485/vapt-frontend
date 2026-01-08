@@ -210,11 +210,11 @@ const router = createRouter({
       name: 'set-password',
       component: ResetPasswordView
     },
-    {
-      path: '/reset-password',
-      name: 'reset-password',
-      component: ResetPasswordView
-    },
+    // {
+    //   path: '/reset-password',
+    //   name: 'reset-password',
+    //   component: ResetPasswordView
+    // },
     {
       path: '/notification',
       name: 'notification',
