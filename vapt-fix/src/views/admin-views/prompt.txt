@@ -1,1 +1,13 @@
-ok now reset page opens but that design not match to my currect authview so like you create realted modal for forgot password on same page can we do something like this for reset page also or design same page acc to colour combination and design of authview or open modal on authview what you prefer is correct 
+integrate my correct set new password api 
+method : put 
+url : http://127.0.0.1:8000/api/admin/users/set-password/
+body: 
+{
+  "new_password": "bharti@1234",
+  "confirm_password": "bharti@1234"
+}
+
+Response :
+{
+    "message": "Password set successfully"
+}

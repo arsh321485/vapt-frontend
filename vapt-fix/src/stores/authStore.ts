@@ -224,6 +224,33 @@ export const useAuthStore = defineStore("auth", {
       }
   },
 
+  // ✅ Set New Password (FINAL STEP)
+  async setNewPassword(payload: {
+    new_password: string;
+    confirm_password: string;
+  }) {
+    try {
+      const res = await endpoint.put(
+        "/admin/users/set-password/",
+        payload
+      );
+
+      return {
+        status: true,
+        data: res.data
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to reset password",
+        details: error.response?.data || null
+      };
+    }
+  },
+
   // ✅ Reset Password
   async resetPassword(payload: { token: string; new_password: string; userId?: string; email?: string }) {
       try {
