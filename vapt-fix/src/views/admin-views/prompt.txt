@@ -1,12 +1,1 @@
-on click received link on mail pages shows
-
-404: NOT_FOUND
-Code: NOT_FOUND
-ID: bom1::k45hn-1767885205277-2764e0c675ca
-
-Read our documentation to learn more about this error.
-
-in header shows 
-https://vapt-frontend-liart.vercel.app/set-password/NGZmZDVkZDgtNDY3ZS00NmViLThkM2UtZGI5YTQ1MjE4ODBk/d22xj7-037c5716b594cf9601af37689aac50a5/
-GET with 404 NOT FOUND
-check why this 
+ok now reset page opens but that design not match to my currect authview so like you create realted modal for forgot password on same page can we do something like this for reset page also or design same page acc to colour combination and design of authview or open modal on authview what you prefer is correct 
