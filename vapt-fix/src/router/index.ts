@@ -205,16 +205,16 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
     },
-    {
-      path: '/set-password/:userId/:token',
-      name: 'set-password',
-      component: ResetPasswordView
-    },
     // {
-    //   path: '/reset-password',
-    //   name: 'reset-password',
+    //   path: '/set-password/:userId/:token',
+    //   name: 'set-password',
     //   component: ResetPasswordView
     // },
+    {
+      path: '/reset-password/:userId/:token',
+      name: 'reset-password',
+      component: ResetPasswordView
+    },
     {
       path: '/notification',
       name: 'notification',
