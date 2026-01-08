@@ -152,129 +152,129 @@ export default {
       this.rules.uppercase = /[A-Z]/.test(pwd);
       this.rules.special = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
     },
+  //   async handleResetPassword() {
+  // if (this.form.new_password !== this.form.confirm_password) {
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Password Mismatch",
+  //     text: "Passwords do not match.",
+  //     confirmButtonColor: "#5a44ff"
+  //   });
+  //   return;
+  // }
+
+  // if (!this.isPasswordValid) {
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Invalid Password",
+  //     text: "Password must meet all requirements.",
+  //     confirmButtonColor: "#5a44ff"
+  //   });
+  //   return;
+  // }
+
+  // this.loading = true;
+
+  // try {
+  //   const authStore = useAuthStore();
+
+  //   const response = await authStore.setNewPassword({
+  //     new_password: this.form.new_password,
+  //     confirm_password: this.form.confirm_password
+  //   });
+
+  //   if (response.status) {
+  //     await Swal.fire({
+  //       icon: "success",
+  //       title: "Password Reset Successful",
+  //       text: "You can now sign in with your new password.",
+  //       confirmButtonColor: "#5a44ff"
+  //     });
+
+  //     this.$router.push("/auth");
+  //   } else {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Reset Failed",
+  //       text: response.message,
+  //       confirmButtonColor: "#5a44ff"
+  //     });
+  //   }
+  // } catch (err) {
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Error",
+  //     text: "Something went wrong. Please try again.",
+  //     confirmButtonColor: "#5a44ff"
+  //   });
+  // } finally {
+  //   this.loading = false;
+  // }
+  //   },
     async handleResetPassword() {
-  if (this.form.new_password !== this.form.confirm_password) {
-    Swal.fire({
-      icon: "error",
-      title: "Password Mismatch",
-      text: "Passwords do not match.",
-      confirmButtonColor: "#5a44ff"
-    });
-    return;
-  }
-
-  if (!this.isPasswordValid) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Password",
-      text: "Password must meet all requirements.",
-      confirmButtonColor: "#5a44ff"
-    });
-    return;
-  }
-
-  this.loading = true;
-
-  try {
-    const authStore = useAuthStore();
-
-    const response = await authStore.setNewPassword({
-      new_password: this.form.new_password,
-      confirm_password: this.form.confirm_password
-    });
-
-    if (response.status) {
-      await Swal.fire({
-        icon: "success",
-        title: "Password Reset Successful",
-        text: "You can now sign in with your new password.",
-        confirmButtonColor: "#5a44ff"
-      });
-
-      this.$router.push("/auth");
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Reset Failed",
-        text: response.message,
-        confirmButtonColor: "#5a44ff"
-      });
-    }
-  } catch (err) {
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "Something went wrong. Please try again.",
-      confirmButtonColor: "#5a44ff"
-    });
-  } finally {
-    this.loading = false;
-  }
-    },
-    // async handleResetPassword() {
    
-    //   if (this.form.new_password !== this.form.confirm_password) {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Password Mismatch",
-    //       text: "Passwords do not match. Please try again.",
-    //       confirmButtonColor: '#5a44ff'
-    //     });
-    //     return;
-    //   }
-    //   if (!this.isPasswordValid) {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Invalid Password",
-    //       text: "Password must meet all requirements.",
-    //       confirmButtonColor: '#5a44ff'
-    //     });
-    //     return;
-    //   }
+      if (this.form.new_password !== this.form.confirm_password) {
+        Swal.fire({
+          icon: "error",
+          title: "Password Mismatch",
+          text: "Passwords do not match. Please try again.",
+          confirmButtonColor: '#5a44ff'
+        });
+        return;
+      }
+      if (!this.isPasswordValid) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Password",
+          text: "Password must meet all requirements.",
+          confirmButtonColor: '#5a44ff'
+        });
+        return;
+      }
 
-    //   this.loading = true;
+      this.loading = true;
 
-    //   try {
-    //     const authStore = useAuthStore();
+      try {
+        const authStore = useAuthStore();
 
        
-    //     const payload = {
-    //       token: this.token,
-    //       new_password: this.form.new_password,
-    //       ...(this.userId ? { userId: this.userId } : {}),
-    //       ...(this.email ? { email: this.email } : {})
-    //     };
+        const payload = {
+          token: this.token,
+          new_password: this.form.new_password,
+          ...(this.userId ? { userId: this.userId } : {}),
+          ...(this.email ? { email: this.email } : {})
+        };
 
-    //     const response = await authStore.resetPassword(payload);
+        const response = await authStore.resetPassword(payload);
 
-    //     if (response.status) {
-    //       await Swal.fire({
-    //         icon: "success",
-    //         title: "Password Reset Successful!",
-    //         text: "Your password has been reset. You can now sign in with your new password.",
-    //         confirmButtonColor: '#5a44ff'
-    //       });
-    //       this.$router.push("/auth");
-    //     } else {
-    //       Swal.fire({
-    //         icon: "error",
-    //         title: "Reset Failed",
-    //         text: response.message || "Something went wrong. Please try again.",
-    //         confirmButtonColor: '#5a44ff'
-    //       });
-    //     }
-    //   } catch (err) {
-    //     console.error("Reset error:", err);
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Error",
-    //       text: "Failed to reset password. Please try again.",
-    //       confirmButtonColor: '#5a44ff'
-    //     });
-    //   } finally {
-    //     this.loading = false;
-    //   }
-    // }
+        if (response.status) {
+          await Swal.fire({
+            icon: "success",
+            title: "Password Reset Successful!",
+            text: "Your password has been reset. You can now sign in with your new password.",
+            confirmButtonColor: '#5a44ff'
+          });
+          this.$router.push("/auth");
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Reset Failed",
+            text: response.message || "Something went wrong. Please try again.",
+            confirmButtonColor: '#5a44ff'
+          });
+        }
+      } catch (err) {
+        console.error("Reset error:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to reset password. Please try again.",
+          confirmButtonColor: '#5a44ff'
+        });
+      } finally {
+        this.loading = false;
+      }
+    }
   }
 };
 </script>
