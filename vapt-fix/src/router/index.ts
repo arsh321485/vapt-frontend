@@ -206,12 +206,14 @@ const router = createRouter({
       component: Profile,
     },
     {
+      path: '/set-password/:userId/:token',
+      name: 'set-password',
+      component: ResetPasswordView
+    },
+    {
       path: '/reset-password',
       name: 'reset-password',
-      component: ResetPasswordView,
-      // path: "/set-password/:userId/:token(.*)",
-      // name: "ResetPassword",
-      // component: () => import("@/views/admin-views/ResetPasswordView.vue")
+      component: ResetPasswordView
     },
     {
       path: '/notification',

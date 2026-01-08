@@ -9,88 +9,22 @@
             <img src="@/assets/images/vaptfix_white.png" height="28">
           </div>
 
-          <!-- FORM AREA (CENTERED) -->
-          <!-- <div class="form-area text-white">
-            <div class="form-wrapper w-75 pt-4">
-
-             
-              <div class="main-tabs">
-                <div class="main-tab active" @click="switchRole('admin')"><i class="bi bi-person-square"></i> Admin
-                </div>
-                <div class="main-tab" @click="switchRole('user')"><i class="bi bi-people"></i> User</div>
-              </div>
-
-              
-              <div class="sub-tabs">
-                <div class="sub-tab active" @click="switchMode('signup')">Sign Up</div>
-                <div class="sub-tab" @click="switchMode('signin')">Sign In</div>
-              </div>
-
-              <form id="authForm">
-
-                <div class="mb-2">
-                  <label class="form-label">Email</label>
-                  <input type="email" class="form-control custom-input" placeholder="name@work.com">
-                </div>
-
-                <div class="mb-2 password-field">
-                  <label class="form-label">Password</label>
-                  <div class="position-relative">
-                    <input type="password" class="form-control custom-input" placeholder="Password">
-                    <span class="password-toggle" @click="togglePassword(this)">👁️</span>
-                  </div>
-                </div>
-
-                <div class="mb-3 password-confirm">
-                  <label class="form-label">Confirm Password</label>
-                  <div class="position-relative">
-                    <input type="password" class="form-control custom-input" placeholder="Confirm Password">
-                    <span class="password-toggle" @click="togglePassword(this)">👁️</span>
-                  </div>
-                </div>
-
-                <div class="mb-3 captcha-box">
-                  reCAPTCHA placeholder
-                </div>
-
-                <button type="submit" class="btn signup-btn w-100 mb-2">
-                  Continue
-                </button>
-
-                <div class="text-center">
-
-                  <p class="small toggle-text" v-if="currentMode === 'signup'">
-                    Already have an account?
-                    <a href="#" @click.prevent="switchMode('signin')" class="fw-bold text-primary">Sign In</a>
-                  </p>
-
-                  <p class="small toggle-text" v-else>
-                    Don’t have an account?
-                    <a href="#" @click.prevent="switchMode('signup')" class="fw-bold text-primary">Sign Up</a>
-                  </p>
-
-                </div>
-
-              </form>
-            </div>
-          </div> -->
-
           <div class="form-area text-white">
             <div class="form-wrapper w-75 pt-4">
 
               <!-- MAIN TABS -->
               <div class="main-tabs">
                 <div class="main-tab" :class="{ active: currentRole === 'admin' }" @click="switchRole('admin')">
-                  <i class="bi bi-person-square"></i> Admin
+                  <i class="bi bi-person-square me-1"></i> Admin
                 </div>
                 <div class="main-tab" :class="{ active: currentRole === 'user' }" @click="switchRole('user')">
-                  <i class="bi bi-people"></i> User
+                  <i class="bi bi-people me-1"></i> User
                 </div>
               </div>
 
               <!-- SUB TABS -->
               <div class="sub-tabs">
-                <div class="sub-tab" :class="{ active: currentMode === 'signup' }" @click="switchMode('signup')">
+                <div class="sub-tab" :class="{ active: currentMode === 'signup' }" @click="switchMode('signup')" v-if="currentRole === 'admin'">
                   Sign Up
                 </div>
                 <div class="sub-tab" :class="{ active: currentMode === 'signin' }" @click="switchMode('signin')">
@@ -104,46 +38,42 @@
                 <input type="text" style="display:none" aria-hidden="true">
                 <input type="password" style="display:none" aria-hidden="true">
 
-                <!-- EMAIL -->
-                <div class="mb-2">
+                <!-- EMAIL (Hidden for User when OTP is sent) -->
+                <div class="mb-2" v-if="currentRole === 'admin' || !otpSent">
                   <label class="form-label">Email</label>
-                  <!-- <input 
-                    type="email" 
-                    class="form-control custom-input" 
-                    placeholder="name@work.com" 
-                    v-model="formData.email"
-                    :autocomplete="isSignup ? 'new-email' : 'username'"
-                    :name="isSignup ? 'new-email-' + formKey : 'email'"
-                    required 
-                  /> -->
-
-                  <!-- <input type="email" class="form-control custom-input" placeholder="name@work.com"
-                    v-model="formData.email" autocomplete="off" :name="'email-' + formKey" required /> -->
-
                   <input type="email" class="form-control custom-input" placeholder="name@work.com"
                     v-model="formData.email" autocomplete="new-email" autocorrect="off" autocapitalize="off"
                     spellcheck="false" :name="'email_' + formKey" required />
-
-
                 </div>
 
-                <!-- PASSWORD -->
-                <div class="mb-2 password-field">
+                <!-- OTP FIELD (Only for User when OTP is sent) -->
+                <div class="mb-3" v-if="currentRole === 'user' && otpSent">
+                  <label class="form-label">Enter OTP</label>
+                  <div class="otp-inputs d-flex justify-content-between gap-2">
+                    <input
+                      v-for="(digit, index) in 6"
+                      :key="index"
+                      type="text"
+                      class="form-control otp-box text-center"
+                      maxlength="1"
+                      v-model="otpDigits[index]"
+                      @input="handleOtpInput($event, index)"
+                      @keydown="handleOtpKeydown($event, index)"
+                      :ref="el => otpRefs[index] = el"
+                      autocomplete="off"
+                      required
+                    />
+                  </div>
+                  <small class="text-light d-block mt-2">OTP has been sent to your email</small>
+                </div>
+
+                <!-- PASSWORD (Hidden for User role) -->
+                <div class="mb-2 password-field" v-if="currentRole === 'admin'">
                   <label class="form-label">Password</label>
                   <div class="position-relative">
-                    <!-- <input :type="showPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Password" v-model="formData.password"
-                      :autocomplete="isSignup ? 'new-password' : 'current-password'"
-                      :name="isSignup ? 'new-password-' + formKey : 'password'" required /> -->
-
-                    <!-- <input :type="showPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Password" v-model="formData.password" autocomplete="off"
-                      :name="'password-' + formKey" required /> -->
-
                     <input :type="showPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Password" v-model="formData.password" autocomplete="new-password" autocorrect="off"
+                      placeholder="Password" v-model="formData.password" @input="validatePassword" autocomplete="new-password" autocorrect="off"
                       autocapitalize="off" spellcheck="false" :name="'password_' + formKey" required />
-
 
                     <span class="password-toggle" @click="showPassword = !showPassword">
                       <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
@@ -151,8 +81,14 @@
                   </div>
                 </div>
 
-                <!-- CONFIRM PASSWORD (Signup only) -->
-                <div class="mb-2 password-confirm" v-if="currentMode === 'signup'">
+                <ul v-if="showPasswordRules" class="password-rules mt-2 mb-1">
+                  <li :class="{ valid: rules.minLength }">At least 8 characters</li>
+                  <li :class="{ valid: rules.uppercase }">At least 1 uppercase letter</li>
+                  <li :class="{ valid: rules.special }">At least 1 special character</li>
+                </ul>
+
+                <!-- CONFIRM PASSWORD (Signup only, Admin only) -->
+                <div class="mb-2 password-confirm" v-if="currentMode === 'signup' && currentRole === 'admin'">
                   <label class="form-label">Confirm Password</label>
                   <div class="position-relative">
                     <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control custom-input"
@@ -164,15 +100,15 @@
                   </div>
                 </div>
 
-                <!-- FORGOT PASSWORD (Signin only) -->
-                <div class="text-end mb-2" v-if="currentMode === 'signin'">
-                  <router-link to="/forgotpassword" class="forgot-link">
+                <!-- FORGOT PASSWORD (Signin only, Admin only) -->
+                <div class="text-end mb-2" v-if="currentMode === 'signin' && currentRole === 'admin'">
+                  <a href="#" @click.prevent="openForgotPasswordModal" class="forgot-link">
                     Forgot Password?
-                  </router-link>
+                  </a>
                 </div>
 
-                <!-- reCAPTCHA -->
-                <div class="mb-2 d-flex justify-content-center">
+                <!-- reCAPTCHA (Admin only) -->
+                <div class="mb-2 d-flex justify-content-center" v-if="currentRole === 'admin'">
                   <div :id="recaptchaContainerId" :key="recaptchaKey"></div>
                 </div>
 
@@ -182,23 +118,7 @@
                   {{ submitButtonText }}
                 </button>
 
-                <!-- TOGGLE -->
-                <div class="text-center">
-                  <p class="small toggle-text" v-if="currentMode === 'signup'">
-                    Already have an account?
-                    <a href="#" @click.prevent="switchMode('signin')" class="fw-bold text-primary">
-                      Sign In
-                    </a>
-                  </p>
-
-                  <p class="small toggle-text" v-else>
-                    Don't have an account?
-                    <a href="#" @click.prevent="switchMode('signup')" class="fw-bold text-primary">
-                      Sign Up
-                    </a>
-                  </p>
-                </div>
-
+                
               </form>
 
             </div>
@@ -231,6 +151,35 @@
 
       </div>
     </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div v-if="showForgotPasswordModal" class="modal-backdrop" @click="closeForgotPasswordModal">
+      <div class="forgot-modal" @click.stop>
+        <div class="forgot-modal-header">
+          <h4>Reset Password</h4>
+          <button class="modal-close" @click="closeForgotPasswordModal">&times;</button>
+        </div>
+        <div class="forgot-modal-body">
+          <p class="text-light mb-3">Enter your registered email address and we'll send you a reset link.</p>
+          <form @submit.prevent="handleForgotPassword">
+            <div class="mb-3">
+              <label class="form-label text-light">Email</label>
+              <input
+                type="email"
+                class="form-control custom-input"
+                placeholder="name@work.com"
+                v-model="forgotEmail"
+                required
+              />
+            </div>
+            <button type="submit" class="btn signup-btn w-100" :disabled="forgotLoading">
+              <span v-if="forgotLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ forgotLoading ? "Sending..." : "Send Reset Link" }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
@@ -245,23 +194,34 @@ export default {
     return {
       currentRole: "admin",
       currentMode: "signup",
-
       formData: {
         email: "",
         password: "",
         confirm_password: ""
       },
-
       showPassword: false,
       showConfirmPassword: false,
       loading: false,
-
       recaptchaWidgetId: null,
       recaptchaKey: 0,
       recaptchaSiteKey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
-
       authStore: null,
-      formKey: Date.now() // Unique key to prevent autofill
+      formKey: Date.now(), 
+      otpSent: false,
+      otp: "",
+      otpDigits: ['', '', '', '', '', ''],
+      otpRefs: [],
+      currentSlide: 0,
+      sliderInterval: null,
+      showPasswordRules: false,
+      rules: {
+        minLength: false,
+        uppercase: false,
+        special: false
+      },
+      showForgotPasswordModal: false,
+      forgotEmail: "",
+      forgotLoading: false,
     };
   },
 
@@ -278,6 +238,12 @@ export default {
     },
 
     submitButtonText() {
+      // User role OTP flow
+      if (this.currentRole === 'user') {
+        return this.otpSent ? "Sign In" : "Send OTP";
+      }
+
+      // Admin role
       if (this.currentMode === "signup") {
         return "Continue";
       }
@@ -298,11 +264,16 @@ export default {
   },
 
   methods: {
-    // ===============================
-    // TAB SWITCHING
-    // ===============================
     switchRole(role) {
       this.currentRole = role;
+
+      // Auto-select Sign In for User role
+      if (role === 'user') {
+        this.currentMode = 'signin';
+        this.otpSent = false;
+        this.otp = '';
+      }
+
       this.resetForm();
       this.formKey = Date.now(); // Generate new key to prevent autofill
 
@@ -333,9 +304,10 @@ export default {
       };
       this.showPassword = false;
       this.showConfirmPassword = false;
+      this.otpSent = false;
+      this.otp = "";
+      this.otpDigits = ['', '', '', '', '', ''];
     },
-
-
     clearAutofill() {
       requestAnimationFrame(() => {
         this.formData.email = "";
@@ -343,12 +315,62 @@ export default {
         this.formData.confirm_password = "";
       });
     },
+    handleOtpInput(event, index) {
+      const value = event.target.value;
 
+      // Only allow digits
+      if (!/^\d*$/.test(value)) {
+        this.otpDigits[index] = '';
+        return;
+      }
 
-    // ===============================
-    // FORM VALIDATION
-    // ===============================
+      // Update the digit
+      this.otpDigits[index] = value;
+
+      // Combine all digits into otp string
+      this.otp = this.otpDigits.join('');
+
+      // Auto-focus next input if digit entered
+      if (value && index < 5) {
+        this.otpRefs[index + 1]?.focus();
+      }
+    },
+
+    handleOtpKeydown(event, index) {
+      // Handle backspace
+      if (event.key === 'Backspace' && !this.otpDigits[index] && index > 0) {
+        this.otpRefs[index - 1]?.focus();
+      }
+
+      // Handle arrow keys
+      if (event.key === 'ArrowLeft' && index > 0) {
+        this.otpRefs[index - 1]?.focus();
+      }
+      if (event.key === 'ArrowRight' && index < 5) {
+        this.otpRefs[index + 1]?.focus();
+      }
+    },
     validateForm() {
+      // User role validation
+      if (this.currentRole === 'user') {
+        if (!this.otpSent) {
+          // Validate email before sending OTP
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(this.formData.email)) {
+            Swal.fire('Error', 'Please enter a valid email', 'error');
+            return false;
+          }
+        } else {
+          // Validate OTP
+          if (!this.otp || this.otp.trim() === '') {
+            Swal.fire('Error', 'Please enter the OTP', 'error');
+            return false;
+          }
+        }
+        return true;
+      }
+
+      // Admin role validation
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.formData.email)) {
@@ -386,48 +408,94 @@ export default {
 
       return true;
     },
-
-    // ===============================
-    // FORM SUBMISSION
-    // ===============================
     async handleSubmit() {
-      if (!this.validateForm()) return;
+  if (!this.validateForm()) return;
 
-      // If User auth, show coming soon message
-      if (!this.isAdmin) {
-        Swal.fire({
-          icon: 'info',
-          title: 'Coming Soon',
-          text: 'User authentication will be available soon!',
-          confirmButtonColor: '#5a44ff'
-        });
-        return;
-      }
-
+  /* ================= USER ROLE (OTP FLOW) ================= */
+  if (this.currentRole === 'user') {
+    if (!this.otpSent) {
+      Swal.fire({
+        icon: 'success',
+        title: 'OTP Sent',
+        text: `OTP has been sent to ${this.formData.email}`,
+        confirmButtonColor: '#5a44ff'
+      });
+      this.otpSent = true;
+      return;
+    } else {
       this.loading = true;
-
-      try {
-        // Get reCAPTCHA response
-        const recaptchaResponse = window.grecaptcha
-          ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
-          : "";
-
-        if (this.isSignup) {
-          await this.handleSignup(recaptchaResponse);
-        } else {
-          await this.handleSignin(recaptchaResponse);
-        }
-      } catch (error) {
-        console.error('Form submission error:', error);
-        Swal.fire('Error', error.message || 'Something went wrong', 'error');
-      } finally {
+      setTimeout(() => {
         this.loading = false;
-      }
-    },
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Sign in successful!',
+          confirmButtonColor: '#5a44ff',
+          timer: 1500,
+          showConfirmButton: false
+        });
 
-    // ===============================
-    // SIGNUP HANDLER
-    // ===============================
+        setTimeout(() => {
+          this.$router.push('/userdashboard');
+        }, 1500);
+      }, 500);
+      return;
+    }
+  }
+
+  /* ================= ADMIN ROLE ================= */
+
+  // 👉 PASSWORD VALIDATION (Signup only, Admin only)
+  if (this.currentRole === 'admin' && this.isSignup) {
+    if (
+      !this.rules.minLength ||
+      !this.rules.uppercase ||
+      !this.rules.special
+    ) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Password',
+        text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
+        confirmButtonColor: '#5a44ff'
+      });
+      return;
+    }
+
+    // 👉 Confirm password match (only on submit)
+    if (this.formData.password !== this.formData.confirm_password) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Password Mismatch',
+        text: 'Password and Confirm Password do not match.',
+        confirmButtonColor: '#5a44ff'
+      });
+      return;
+    }
+  }
+
+  this.loading = true;
+
+  try {
+    const recaptchaResponse = window.grecaptcha
+      ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
+      : "";
+
+    if (this.isSignup) {
+      await this.handleSignup(recaptchaResponse);
+    } else {
+      await this.handleSignin(recaptchaResponse);
+    }
+  } catch (error) {
+    console.error('Form submission error:', error);
+    Swal.fire(
+      'Error',
+      error.message || 'Something went wrong',
+      'error'
+    );
+  } finally {
+    this.loading = false;
+  }
+    },
     async handleSignup(recaptchaResponse) {
       const payload = {
         email: this.formData.email,
@@ -457,10 +525,6 @@ export default {
         this.resetRecaptcha();
       }
     },
-
-    // ===============================
-    // SIGNIN HANDLER
-    // ===============================
     async handleSignin(recaptchaResponse) {
       const payload = {
         email: this.formData.email,
@@ -478,10 +542,6 @@ export default {
         this.resetRecaptcha();
       }
     },
-
-    // ===============================
-    // REDIRECT LOGIC
-    // ===============================
     async checkAndRedirect() {
       const reportId = localStorage.getItem('reportId');
 
@@ -502,10 +562,6 @@ export default {
         this.$router.push('/location');
       }
     },
-
-    // ===============================
-    // reCAPTCHA METHODS
-    // ===============================
     loadRecaptchaScript() {
       // Check if script already loaded
       if (window.grecaptcha && window.grecaptcha.render) {
@@ -525,7 +581,6 @@ export default {
 
       document.head.appendChild(script);
     },
-
     initializeRecaptcha() {
       if (!window.grecaptcha || !window.grecaptcha.render) {
         console.warn('⚠️ reCAPTCHA not ready yet');
@@ -553,7 +608,6 @@ export default {
         }
       });
     },
-
     reinitializeRecaptcha() {
       // Increment key to force re-render
       this.recaptchaKey++;
@@ -563,7 +617,6 @@ export default {
         this.initializeRecaptcha();
       });
     },
-
     resetRecaptcha() {
       if (window.grecaptcha && this.recaptchaWidgetId !== null) {
         try {
@@ -573,10 +626,116 @@ export default {
         }
       }
     },
+    startSlider() {
+      this.sliderInterval = setInterval(() => {
+        this.nextSlide();
+      }, 4000); // Change slide every 4 seconds
+    },
+
+    nextSlide() {
+      const slides = document.querySelectorAll('.dashboard-slide');
+      if (!slides || slides.length === 0) return;
+
+      // Remove active class from current slide
+      slides[this.currentSlide].classList.remove('active');
+      slides[this.currentSlide].classList.add('prev');
+
+      // Move to next slide
+      this.currentSlide = (this.currentSlide + 1) % slides.length;
+
+      // Add active class to new slide
+      slides[this.currentSlide].classList.add('active');
+      slides[this.currentSlide].classList.remove('prev');
+
+      // Remove prev class from other slides after animation
+      setTimeout(() => {
+        slides.forEach((slide, index) => {
+          if (index !== this.currentSlide && index !== (this.currentSlide - 1 + slides.length) % slides.length) {
+            slide.classList.remove('prev');
+          }
+        });
+      }, 1000);
+    },
+
+    stopSlider() {
+      if (this.sliderInterval) {
+        clearInterval(this.sliderInterval);
+        this.sliderInterval = null;
+      }
+    },
+     validatePassword() {
+    const pwd = this.formData.password;
+
+    this.showPasswordRules = pwd.length > 0;
+
+    this.rules.minLength = pwd.length >= 8;
+    this.rules.uppercase = /[A-Z]/.test(pwd);
+    this.rules.special = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+  },
 
     // ===============================
-    // CLEAR AUTOFILL ON MOUNT
+    // FORGOT PASSWORD MODAL
     // ===============================
+    openForgotPasswordModal() {
+      this.showForgotPasswordModal = true;
+      this.forgotEmail = "";
+    },
+
+    closeForgotPasswordModal() {
+      this.showForgotPasswordModal = false;
+      this.forgotEmail = "";
+      this.forgotLoading = false;
+    },
+
+    async handleForgotPassword() {
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.forgotEmail)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Email',
+          text: 'Please enter a valid email address',
+          confirmButtonColor: '#5a44ff'
+        });
+        return;
+      }
+
+      this.forgotLoading = true;
+
+      try {
+        const response = await this.authStore.forgotPassword({ email: this.forgotEmail });
+
+        if (response.status) {
+          // Close modal
+          this.closeForgotPasswordModal();
+
+          // Show success message
+          await Swal.fire({
+            icon: "success",
+            title: "Reset Link Sent!",
+            text: "Check your email for the password reset link.",
+            confirmButtonColor: '#5a44ff'
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: response.message || "Something went wrong!",
+            confirmButtonColor: '#5a44ff'
+          });
+        }
+      } catch (error) {
+        console.error('Forgot password error:', error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to send reset link. Please try again.",
+          confirmButtonColor: '#5a44ff'
+        });
+      } finally {
+        this.forgotLoading = false;
+      }
+    },
 
   },
 
@@ -587,12 +746,20 @@ export default {
     // Load reCAPTCHA
     this.loadRecaptchaScript();
 
+    // Start image slider animation
+    this.$nextTick(() => {
+      this.startSlider();
+    });
+
     // Clear any autofilled data on signup
     // this.clearAutofill();
   },
 
   beforeUnmount() {
-    // Cleanup
+    // Stop slider
+    this.stopSlider();
+
+    // Cleanup reCAPTCHA
     if (window.grecaptcha && this.recaptchaWidgetId !== null) {
       try {
         window.grecaptcha.reset(this.recaptchaWidgetId);
@@ -611,16 +778,24 @@ export default {
 
 
 <style scoped>
-.form-section {
-  background-color: rgb(9, 9, 35);
-  /* min-height: 100vh; */
-  position: relative;
+  .password-rules {
+  list-style: none;
+  padding-left: 0;
+  font-size: 13px;
+}
+
+.password-rules li {
+  color: #dc3545;
+}
+
+.password-rules li.valid {
+  color: #28a745;
 }
 
 .logo-wrapper {
   position: absolute;
   top: 28px;
-  left: 50%;
+  left: 20%;
   transform: translateX(-50%);
   z-index: 10;
 }
@@ -628,16 +803,9 @@ export default {
 .form-area {
   height: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding-top: 40px;
-}
-
-/* .form-area {
-  align-items: flex-start;
-} */
-
-.form-area {
   width: 100%;
 }
 
@@ -648,6 +816,7 @@ export default {
   padding-top: 140px;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 /* ===== MAIN TABS ===== */
@@ -656,7 +825,8 @@ export default {
   gap: 12px;
   margin-bottom: 10px;
   min-height: 44px;
-  margin-bottom: 10px;
+  height: 44px;
+  flex-shrink: 0;
 }
 
 .main-tab {
@@ -669,6 +839,9 @@ export default {
   cursor: pointer;
   font-weight: 600;
   opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 
@@ -686,7 +859,8 @@ export default {
   margin-bottom: 14px;
   border-bottom: 1px solid #1f2937;
   min-height: 46px;
-  margin-bottom: 14px;
+  height: 46px;
+  flex-shrink: 0;
 }
 #authForm {
   flex-grow: 1;
@@ -701,6 +875,8 @@ export default {
   font-weight: 500;
   opacity: 0.6;
   position: relative;
+  min-width: 80px;
+  text-align: center;
 }
 
 .sub-tab.active {
@@ -753,6 +929,41 @@ export default {
   transform: translateY(-50%);
   cursor: pointer;
   opacity: 0.7;
+}
+
+/* ===== OTP INPUTS ===== */
+.otp-inputs {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.otp-box {
+  width: 50px;
+  height: 50px;
+  background: #020617;
+  border: 2px solid #1f2937;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  padding: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.otp-box:focus {
+  background: #020617;
+  border-color: rgb(90, 68, 255);
+  box-shadow: 0 0 0 3px rgba(90, 68, 255, 0.15);
+  outline: none;
+  color: #fff;
+}
+
+.otp-box::-webkit-outer-spin-button,
+.otp-box::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* ===== BUTTON ===== */
@@ -906,19 +1117,13 @@ export default {
 
 /* Left form column */
 .form-section {
+  background-color: rgb(9, 9, 35);
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
   padding: 0;
 }
-
-/* Form container */
-/* .form-area {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-} */
 
 /* Optical centering (NOT true center) */
 .form-wrapper {
@@ -1007,8 +1212,137 @@ export default {
 
    .logo-wrapper {
   top: 20px;
- 
+
 }
-  
+
+}
+
+/* ===================================
+   FORGOT PASSWORD MODAL STYLES
+   =================================== */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.forgot-modal {
+  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(90, 68, 255, 0.3);
+  border: 1px solid rgba(90, 68, 255, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.forgot-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.forgot-modal-header h4 {
+  color: #fff;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 32px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.modal-close:hover {
+  transform: scale(1.1);
+  color: #5a44ff;
+}
+
+.forgot-modal-body {
+  padding: 28px;
+}
+
+.forgot-modal .custom-input {
+  background: #020617;
+  border: 2px solid #1f2937;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.forgot-modal .custom-input:focus {
+  background: #020617;
+  border-color: #5a44ff;
+  box-shadow: 0 0 0 3px rgba(90, 68, 255, 0.15);
+  color: #fff;
+  outline: none;
+}
+
+.forgot-modal .form-label {
+  color: #e5e7eb;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.forgot-modal .text-light {
+  color: #9ca3af !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+  .forgot-modal {
+    width: 95%;
+    margin: 0 16px;
+  }
+
+  .forgot-modal-header {
+    padding: 20px 20px;
+  }
+
+  .forgot-modal-body {
+    padding: 20px;
+  }
 }
 </style>

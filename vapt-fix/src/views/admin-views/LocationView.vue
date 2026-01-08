@@ -141,49 +141,10 @@
           </div>
         </div>
 
-        <!-- External -->
-        <div class="section">
-          <div class="section-title">External member access</div>
-          <div class="row-invite">
-            <select v-model="externalLocation" class="form-select">
-              <option disabled value="">Location</option>
-              <option v-for="loc in authStore.locations" :key="loc._id" :value="loc._id">
-                {{ loc.location_name }}
-              </option>
-            </select>
-
-            <!-- Secondary Role (Multi Select) -->
-            <div class="position-relative" ref="secondaryRoleDropdown">
-              <div class="form-select" @click="isSecondaryRoleOpen = !isSecondaryRoleOpen">
-                {{
-                  selectedSecondaryRoles.length
-                    ? selectedSecondaryRoles.join(", ")
-                    : "Role"
-                }}
-              </div>
-
-              <div v-if="isSecondaryRoleOpen" class="dropdown-list">
-                <label v-for="role in roleOptions" :key="role.short + '-secondary'">
-                  <input type="checkbox" :value="role.short" v-model="selectedSecondaryRoles" />
-                  {{ role.full }}
-                </label>
-              </div>
-            </div>
-
-            <input
-  class="form-control invite-link"
-  :value="generatedInviteLink"
-  readonly
-  :class="{ disabled: !canCopyInviteLink }"
-  @click="copyInviteLink"
-/>
-
-          </div>
-        </div>
-
         <div class="cta">
-          <router-link to="/riskcriteria" class="btn btn-primary text-decoration-none">Continue to Risk Criteria
-            →</router-link>
+          <button class="btn btn-primary" @click="handleContinue">
+            Continue to Risk Criteria →
+          </button>
         </div>
       </div>
     </div>
@@ -249,50 +210,9 @@ export default {
         { value: "jira", label: "Jira", icon: jiraIcon },
         { value: "asana", label: "Asana", icon: asanaIcon },
         { value: "none", label: "None" }
-      ],
+      ]
     };
   },
-  computed: {
-  generatedInviteLink() {
-    const base = "https://vaptbackend.secureitlab.com";
-
-    // default: show base url
-    if (!this.externalLocation) {
-      return base;
-    }
-
-    const locationObj = this.authStore.locations.find(
-      loc => loc._id === this.externalLocation
-    );
-
-    if (!locationObj) return base;
-
-    const locationSlug = locationObj.location_name
-      .toLowerCase()
-      .replace(/\s+/g, "");
-
-    // only location selected
-    if (!this.selectedSecondaryRoles.length) {
-      return `${base}/${locationSlug}`;
-    }
-
-    // location + roles
-    const roleSlugs = this.selectedSecondaryRoles
-      .map(role =>
-        this.roleOptions.find(r => r.short === role)?.full
-          .toLowerCase()
-          .replace(/\s+/g, "")
-      )
-      .join("/");
-
-    return `${base}/${locationSlug}/${roleSlugs}`;
-  },
-
-  // 👇 helper for enabling copy & cursor
-  canCopyInviteLink() {
-    return !!this.externalLocation || this.selectedSecondaryRoles.length > 0;
-  }
-},
   methods: {
     initChipSelection() {
       document
@@ -437,28 +357,6 @@ export default {
         this.isSecondaryRoleOpen = false;
       }
     },
-    copyInviteLink() {
-  if (!this.canCopyInviteLink) {
-    Swal.fire({
-      icon: "info",
-      title: "Select details first",
-      text: "Please select a location or role to generate the invite link.",
-      timer: 1800,
-      showConfirmButton: false
-    });
-    return;
-  }
-
-  navigator.clipboard.writeText(this.generatedInviteLink);
-
-  Swal.fire({
-    icon: "success",
-    title: "Copied!",
-    text: "Invite link copied to clipboard",
-    timer: 1500,
-    showConfirmButton: false
-  });
-},
     async handleCommunicationClick(value) {
       // NONE logic
       if (value === "none") {
@@ -538,6 +436,28 @@ export default {
 
       // Cleanup
       this.pendingProject = null;
+    },
+
+    // ===============================
+    // HANDLE CONTINUE TO NEXT STEP
+    // ===============================
+    handleContinue() {
+      // Check if at least 1 location exists
+      if (!this.authStore.locations || this.authStore.locations.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No Location Added',
+          text: 'Please add at least one location before proceeding to Risk Criteria.',
+          confirmButtonColor: '#5a44ff'
+        });
+        return;
+      }
+
+      // Mark step 1 as completed
+      this.authStore.markStepCompleted(1);
+
+      // Navigate to next page
+      this.$router.push('/riskcriteria');
     },
   },
 

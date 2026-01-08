@@ -1,6 +1,6 @@
-<template>
+<!-- <template>
   <div class="step-rail">
-    <!-- STEP 1 -->
+   
     <div
       class="step"
       :class="{ active: isActive('/location') }"
@@ -16,7 +16,7 @@
       ></div>
     </div>
 
-    <!-- STEP 2 -->
+
     <div
       class="step"
       :class="{ active: isActive('/riskcriteria') }"
@@ -32,7 +32,6 @@
       ></div>
     </div>
 
-    <!-- STEP 3 -->
     <div
       class="step"
       :class="{ active: isActive('/uploadreport') }"
@@ -44,51 +43,172 @@
       </div>
     </div>
   </div>
+</template> -->
+
+<template>
+  <div class="step-rail">
+
+    <!-- STEP 1 -->
+    <div
+      class="step"
+      :class="{
+        active: isActive('/location'),
+        completed: isCompleted(1),
+        disabled: !canNavigate(1)
+      }"
+      @click="handleStepClick('/location', 1)"
+    >
+      <div class="step-circle">1</div>
+      <div class="step-label">Add location<br />and users</div>
+      <div class="step-line" :class="{ active: isLineActive(2), completed: isLineCompleted(1) }"></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div
+      class="step"
+      :class="{
+        active: isActive('/riskcriteria'),
+        completed: isCompleted(2),
+        disabled: !canNavigate(2)
+      }"
+      @click="handleStepClick('/riskcriteria', 2)"
+    >
+      <div class="step-circle">2</div>
+      <div class="step-label">Risk<br />Criteria</div>
+      <div class="step-line" :class="{ active: isLineActive(3), completed: isLineCompleted(2) }"></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div
+      class="step"
+      :class="{
+        active: isActive('/uploadreport'),
+        completed: isCompleted(3),
+        disabled: !canNavigate(3)
+      }"
+      @click="handleStepClick('/uploadreport', 3)"
+    >
+      <div class="step-circle">3</div>
+      <div class="step-label">Vulnerability<br />Report</div>
+    </div>
+
+  </div>
 </template>
 
+
 <script>
+import { useAuthStore } from "@/stores/authStore";
+
 export default {
   name: "Stepper",
 
+  data() {
+    return {
+      authStore: null
+    };
+  },
+
+  computed: {
+    currentStep() {
+      const map = {
+        "/location": 1,
+        "/riskcriteria": 2,
+        "/uploadreport": 3,
+      };
+      return map[this.$route.path] || 1;
+    }
+  },
+
+  mounted() {
+    this.authStore = useAuthStore();
+  },
   methods: {
-    go(path) {
+     handleStepClick(path, step) {
+      if (!this.canNavigate(step)) return;
+
       if (this.$route.path !== path) {
         this.$router.push(path);
       }
+    },
+
+    canNavigate(targetStep) {
+      const current = this.currentStep;
+
+      // SAME STEP → allow (no-op)
+      if (targetStep === current) return true;
+
+      // BACKWARD only by 1 step
+      if (targetStep === current - 1) return true;
+
+      // everything else blocked
+      return false;
     },
 
     isActive(path) {
       return this.$route.path === path;
     },
 
-    // stepNumber = 2 or 3
     isLineActive(stepNumber) {
       if (stepNumber === 2) {
-        return (
-          this.$route.path === "/riskcriteria" ||
-          this.$route.path === "/uploadreport"
-        );
+        return this.currentStep >= 2;
       }
-
       if (stepNumber === 3) {
-        return this.$route.path === "/uploadreport";
+        return this.currentStep >= 3;
       }
-
       return false;
     },
+
+    isCompleted(step) {
+      if (!this.authStore) return false;
+      // A step is completed if it's in the completedSteps array
+      // OR if it's the current active step (always show blue for current)
+      return this.authStore.completedSteps.includes(step) || this.currentStep === step;
+    },
+
+    isLineCompleted(step) {
+      if (!this.authStore) return false;
+      // Line is completed if the current step is completed
+      return this.authStore.completedSteps.includes(step);
+    }
+
+    // go(path) {
+    //   if (this.$route.path !== path) {
+    //     this.$router.push(path);
+    //   }
+    // },
+
+    // isActive(path) {
+    //   return this.$route.path === path;
+    // },
+
+    // isLineActive(stepNumber) {
+    //   if (stepNumber === 2) {
+    //     return (
+    //       this.$route.path === "/riskcriteria" ||
+    //       this.$route.path === "/uploadreport"
+    //     );
+    //   }
+
+    //   if (stepNumber === 3) {
+    //     return this.$route.path === "/uploadreport";
+    //   }
+
+    //   return false;
+    // },
   },
 };
 </script>
 
 
 <style scoped>
-  .step {
-  cursor: pointer;
+  .step.disabled {
+  pointer-events: none;
+  /* opacity: 0.45; */
+  cursor: not-allowed;
 }
 
-/* Active dotted line */
-.step-line.active {
-  border-left-color: #5a44ff;
+  .step {
+  cursor: pointer;
 }
 
 /* Optional hover polish */
@@ -135,7 +255,8 @@ export default {
   transition: box-shadow 0.25s ease;
 }
 
-.step.active .step-circle {
+.step.active .step-circle,
+.step.completed .step-circle {
   background: #5a44ff;
   color: #fff;
   box-shadow: 0 6px 14px rgba(90, 68, 255, 0.35);
@@ -148,7 +269,8 @@ export default {
   line-height: 1.4;
 }
 
-.step.active .step-label {
+.step.active .step-label,
+.step.completed .step-label {
   color: #0f172a;
   font-weight: 500;
 }
@@ -158,6 +280,11 @@ export default {
   height: 36px;
   margin: 10px auto 0;
   border-left: 2px dashed #d1d5db;
+}
+
+.step-line.active,
+.step-line.completed {
+  border-left-color: #5a44ff;
 }
 
 @media (max-width: 992px) {

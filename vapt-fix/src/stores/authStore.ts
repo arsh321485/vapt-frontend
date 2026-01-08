@@ -66,6 +66,9 @@ export const useAuthStore = defineStore("auth", {
       | { id: string; name: string }
       | null,
     uploadedReportDetails: null as any,
+    completedSteps: localStorage.getItem("completedSteps")
+      ? JSON.parse(localStorage.getItem("completedSteps")!)
+      : [] as number[],
     }),
 
   actions: {
@@ -216,6 +219,20 @@ export const useAuthStore = defineStore("auth", {
         return {
           status: false,
           message: error.response?.data?.message || error.message || "Request failed",
+          details: error.response?.data || null,
+        };
+      }
+  },
+
+  // ✅ Reset Password
+  async resetPassword(payload: { token: string; new_password: string; userId?: string; email?: string }) {
+      try {
+        const res = await endpoint.post("/admin/users/reset-password/", payload);
+        return { status: true, data: res.data, message: res.data.message };
+      } catch (error: any) {
+        return {
+          status: false,
+          message: error.response?.data?.message || error.message || "Reset failed",
           details: error.response?.data || null,
         };
       }
@@ -1383,9 +1400,11 @@ export const useAuthStore = defineStore("auth", {
       localStorage.removeItem("locations");
       localStorage.removeItem("google_id_token");
       localStorage.removeItem("isNewUser");
+      localStorage.removeItem("completedSteps");
       this.user = null;
       this.accessToken = null;
       this.refreshToken = null;
+      this.completedSteps = [];
       console.log("🚪 User logged out, localStorage cleared");
 
       return { status: true, data: res.data };
@@ -1424,6 +1443,31 @@ export const useAuthStore = defineStore("auth", {
 
   getAuthorization() {
     return this.token;
+  },
+
+  // ✅ Mark onboarding step as completed
+  markStepCompleted(stepNumber: number) {
+    if (!this.completedSteps.includes(stepNumber)) {
+      this.completedSteps.push(stepNumber);
+      localStorage.setItem('completedSteps', JSON.stringify(this.completedSteps));
+      console.log(`✅ Step ${stepNumber} marked as completed`);
+    }
+  },
+
+  // ✅ Initialize completed steps from localStorage
+  initCompletedSteps() {
+    const saved = localStorage.getItem('completedSteps');
+    if (saved) {
+      this.completedSteps = JSON.parse(saved);
+      console.log('♻️ Restored completed steps:', this.completedSteps);
+    }
+  },
+
+  // ✅ Reset completed steps (useful for testing or new onboarding)
+  resetCompletedSteps() {
+    this.completedSteps = [];
+    localStorage.removeItem('completedSteps');
+    console.log('🔄 Completed steps reset');
   },
 
   },

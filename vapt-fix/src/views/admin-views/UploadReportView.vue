@@ -21,7 +21,7 @@
         <div class="left-column">
           <!-- Pick Location -->
           <div class="card-box location-card">
-            <strong>📍 Pick location to upload report for</strong>
+            <strong>📍 Pick location to upload report</strong>
             <p class="mt-1">Pick a location and then add a vulnerability report for it.</p>
 
             <div class="d-flex gap-3 mt-3">
@@ -33,6 +33,7 @@
 
               <select v-model="type" class="form-select">
                 <option value="">Select Type</option>
+                <option>Both</option>
                 <option>External</option>
                 <option>Internal</option>
               </select>
@@ -110,7 +111,9 @@
       </div>
 
         <div class="cta">
-          <router-link to="/admindashboardonboarding" class="btn btn-primary text-decoration-none">Next →</router-link>
+          <button class="btn btn-primary" @click="handleContinue">
+            Continue to Dashboard →
+          </button>
         </div>
       </div>
     </div>
@@ -119,6 +122,7 @@
 
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: "UploadReportView",
@@ -131,6 +135,11 @@ export default {
       uploadedFiles: [],
       dragover: false,
     };
+  },
+
+  mounted() {
+    const authStore = useAuthStore();
+    authStore.markStepCompleted(3);
   },
 
   methods: {
@@ -182,6 +191,19 @@ export default {
     deleteFile(index) {
       this.uploadedFiles.splice(index, 1);
     },
+
+    // ===============================
+    // HANDLE CONTINUE TO DASHBOARD
+    // ===============================
+    handleContinue() {
+      const authStore = useAuthStore();
+
+      // Mark step 3 as completed
+      authStore.markStepCompleted(3);
+
+      // Navigate to dashboard
+      this.$router.push('/admindashboardonboarding');
+    },
   },
 };
 </script>
@@ -204,9 +226,9 @@ export default {
 }
 
 /* Upload box width = Pick location card */
-.left-column .upload-box {
+/* .left-column .upload-box {
   max-width: 100%;
-}
+} */
 
 /* ===== RIGHT COLUMN ===== */
 .info-cards {
@@ -233,34 +255,25 @@ export default {
   }
 }
 
-/*  
-.location-row {
-  display: flex;
-  gap: 24px;
-  max-width: 1200px;
-  margin-bottom: 28px;
-  align-items: flex-start; 
-}
-.location-card {
-  flex: 2;
-  align-self: flex-start;
-} */
-
 /* Right cards container */
 .info-cards {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 30px;
+  margin-top: 20px;
 }
 
 /* Individual info card */
 .info-card {
-  background: #fff;
+  /* background: #fff; */
+  box-shadow: 0 4px 20px rgba(90, 68, 255, 0.18);
+  border-left: 4px solid #5a44ff;
+  background: linear-gradient(135deg, rgba(117, 100, 248, 0.12) 0%, rgba(117, 100, 248, 0.08) 100%);
   border-radius: 16px;
   padding: 18px 20px;
-  border: 1px solid #e6e9f2;
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  /* border: 1px solid #e6e9f2; */
+  /* box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08); */
 }
 .info-card {
   transition: 
@@ -272,13 +285,13 @@ export default {
 }
 
 .info-card strong {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: #111827;
 }
 
 .info-card p {
-  font-size: 13px;
+  /* font-size: 15px; */
   color: #6b7280;
   margin: 6px 0 0;
   line-height: 1.5;
@@ -471,6 +484,16 @@ export default {
   .cta {
     margin-top: 300px;
   }
+  .main-row {
+    display: flex;
+    gap: 45px;
+    max-width: 1520px;
+    align-items: flex-start;
+  }
+  .info-cards {
+    gap: 30px;
+    margin-top: 40px;
+  }
 }
 
 /* iPad Pro */
@@ -484,6 +507,7 @@ export default {
   .cta {
     margin-top: 430px;
   }
+  
 }
 
 /* iPad Air */
@@ -498,6 +522,10 @@ export default {
   .cta {
     margin-top: 245px;
   }
+  .info-cards {
+  gap: 7px;
+  margin-top: 8px;
+}
 }
 
 /* iPad Mini */
@@ -509,5 +537,9 @@ export default {
     margin-top: 140px;
     margin-bottom: 0;
   }
+  .info-cards {
+  gap: 7px;
+  margin-top: 0px;
+}
 }
 </style>

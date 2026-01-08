@@ -30,7 +30,7 @@
               </div>
               
               <select class="form-select" v-model="form.critical" :disabled="isLocked">
-                <option>Select</option>
+                <option value="" disabled>Select</option>
                 <option v-for="opt in timeOptions" :key="opt">{{ opt }}</option>
               </select>
 
@@ -50,7 +50,7 @@
 
 
               <select class="form-select" v-model="form.high" :disabled="isLocked">
-                <option>Select</option>
+                <option value="" disabled>Select</option>
 
                 <option v-for="opt in timeOptions" :key="opt" :disabled="isOptionDisabled(form.critical, opt)">
                   {{ opt }}
@@ -72,7 +72,7 @@
              
 
               <select class="form-select" v-model="form.medium" :disabled="isLocked">
-                <option>Select</option>
+                <option value="" disabled>Select</option>
 
                 <option v-for="opt in timeOptions" :key="opt" :disabled="isOptionDisabled(form.high, opt)">
                   {{ opt }}
@@ -93,8 +93,7 @@
               </div>
               
               <select class="form-select" v-model="form.low" :disabled="isLocked">
-                <option>Select</option>
-
+                <option value="" disabled>Select</option>
                 <option v-for="opt in timeOptions" :key="opt" :disabled="isOptionDisabled(form.medium, opt)">
                   {{ opt }}
                 </option>
@@ -103,8 +102,11 @@
             </div>
           </div>
 
-          <div class="risk-card security-card area-security">
-            <h5 class="mb-2">Security Level</h5>
+          <div class="risk-card security-card area-security security-card-bg">
+            <div class="security-header-wrapper">
+              <i class="bi bi-shield-check security-icon"></i>
+              <h5 class="security-heading">Security Level</h5>
+            </div>
 
             <div class="security-grid">
 
@@ -256,7 +258,11 @@ export default {
     },
 
     async submitRiskCriteria() {
+      const auth = useAuthStore();
+
       if (this.isLocked) {
+        // Data already exists, mark step as completed and proceed
+        auth.markStepCompleted(2);
         this.$router.push("/uploadreport");
         return;
       }
@@ -265,11 +271,13 @@ export default {
 
       try {
         this.loading = true;
-        const auth = useAuthStore();
 
         const res = await auth.addRiskCriteria(this.form);
 
         if (res.status) {
+          // Mark step 2 as completed after successful save
+          auth.markStepCompleted(2);
+
           await Swal.fire({
             icon: "success",
             title: "Saved!",
@@ -323,9 +331,10 @@ export default {
 }
 
 .security-title .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
 /* COLORS – SAME AS LEFT */
@@ -380,14 +389,30 @@ export default {
 /* Security card fills empty vertical space */
 .security-card {
   width: 100%;
-  box-shadow: 8px 10px 28px rgba(117, 100, 248, 0.35);
+  box-shadow: 0 4px 20px rgba(90, 68, 255, 0.18);
+  border-left: 4px solid #5a44ff;
+  background: linear-gradient(135deg, rgba(117, 100, 248, 0.12) 0%, rgba(117, 100, 248, 0.08) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.security-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(90, 68, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+  pointer-events: none;
 }
 
 .security-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  /* gap: 14px; */
-  gap: 16px 24px;
+  gap: 14px 18px;
 }
 
 /* Each block aligns like left risk cards */
@@ -395,6 +420,16 @@ export default {
   font-size: 13px;
   line-height: 1.5;
   color: #374151;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.security-item:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateX(4px);
 }
 
 /* .security-item p {
@@ -450,8 +485,11 @@ export default {
 .content {
   margin-left: 260px;
   margin-top: 64px;
-  height: calc(100vh - 20px);
+  min-height: calc(100vh - 64px);
   padding: 48px 64px;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 
@@ -516,6 +554,11 @@ select.form-select {
   /* font-size: 14px; */
 }
 
+select.form-select:disabled {
+  background-color: white;
+}
+
+
 /* ===== INFO TOOLTIP ===== */
 .info-tooltip {
   position: relative;
@@ -572,11 +615,13 @@ select.form-select {
 
 /* ===== CTA ===== */
 .cta {
-  margin-top: 64px;
+  margin-top: auto;
+  padding-top: 40px;
+  padding-bottom: 24px;
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 50px;
+  align-items: center;
 }
 
 
@@ -603,17 +648,28 @@ select.form-select {
 .btn-secondary {
   transition:
     box-shadow 0.25s ease,
-    transform 0.25s ease;
+    transform 0.25s ease,
+    border-left-color 0.25s ease;
 }
 
 .risk-card-bg {
+  /* background-color: rgba(117, 100, 248, 0.10); */
+  background-color: rgb(236, 235, 235);
+}
+.security-card-bg {
   background-color: rgba(117, 100, 248, 0.10);
 }
 
 /* ===== Risk card hover ===== */
 .risk-card:hover {
-
   transform: translateY(-3px);
+}
+
+/* ===== Security card specific hover ===== */
+.security-card:hover {
+  box-shadow: 0 8px 32px rgba(90, 68, 255, 0.28);
+  transform: translateY(-3px);
+  border-left-color: #7c3aed;
 }
 
 /* ===== Select hover focus polish ===== */
@@ -653,106 +709,178 @@ select.form-select:focus {
   font-size: 13px;
 }
 
-.security-card h5 {
+/* ===== SECURITY CARD HEADER ===== */
+.security-header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.security-icon {
+  font-size: 20px;
+  color: #5a44ff;
+}
+
+.security-heading {
   font-weight: 700;
+  font-size: 18px;
+  color: #5a44ff;
+  margin: 0;
+  text-align: center;
 }
 
-/* iPad Mini */
-@media (max-width: 768px) {
+/* Mobile - Small screens */
+@media (max-width: 576px) {
   .content {
-    margin-left: 0px;
-    margin-top: 200px;
-    height: auto;
+    margin-left: 0;
+    margin-top: 180px;
+    padding: 20px;
   }
 
   .risk-layout {
-    display: grid;
     grid-template-columns: 1fr;
-    gap: 28px;
-    align-items: start;
+    gap: 20px;
+  }
+
+  .risk-left {
+    grid-template-columns: 1fr;
   }
 
   .cta {
-    margin-top: 35px;
-    margin-bottom: 0;
+    justify-content: center;
+    padding-top: 32px;
+  }
+
+  .btn-primary {
+    width: 100%;
   }
 }
 
-/* iPad Air */
-@media (max-width: 992px) {
+/* Tablets - Portrait / iPad Mini */
+@media (min-width: 577px) and (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    margin-top: 180px;
+    padding: 24px 32px;
+  }
+
   .risk-layout {
-    display: grid;
     grid-template-columns: 1fr;
-    gap: 28px;
-    align-items: start;
+    gap: 24px;
   }
 
-  .content {
-    margin-left: 0px;
-    margin-top: 200px;
-    height: auto;
-    padding: 20px 40px;
+  .risk-left {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 
   .cta {
-    margin-top: 190px;
-    margin-bottom: 0;
-  }
-
-  /* .app {
-    grid-template-columns: 1fr;
-  } */
-  .risk-grid {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "critical"
-      "high"
-      "medium"
-      "low"
-      "security";
-  }
-
-  .security-right {
-    grid-column: auto;
-    grid-row: auto;
+    padding-top: 36px;
   }
 }
 
-/* iPad Pro */
-@media (max-width: 1200px) {
+/* Tablets - Landscape / iPad Air */
+@media (min-width: 769px) and (max-width: 992px) {
+  .content {
+    margin-left: 0;
+    margin-top: 180px;
+    padding: 32px 48px;
+  }
+
   .risk-layout {
-    display: grid;
     grid-template-columns: 1fr;
-    gap: 28px;
-    align-items: start;
+    gap: 24px;
   }
 
-  .content {
-    margin-left: 0px;
-    margin-top: 200px;
-    height: auto;
-    padding: 45px 55px;
+  .risk-left {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .cta {
-    margin-top: 385px;
-    margin-bottom: 0;
+    padding-top: 40px;
   }
 }
 
-/* larger screen */
-@media screen and (min-width: 1920px) {
+/* Small Laptops / iPad Pro */
+@media (min-width: 993px) and (max-width: 1200px) {
   .content {
-    height: auto;
+    margin-left: 0;
+    margin-top: 180px;
+    padding: 40px 56px;
+  }
+
+  .risk-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
   }
 
   .cta {
-    margin-top: 480px;
-    margin-bottom: 0;
+    padding-top: 44px;
+  }
+}
+
+/* Standard Laptops */
+@media (min-width: 1201px) and (max-width: 1366px) {
+  .content {
+    padding: 40px 56px;
+  }
+
+  .risk-layout {
+    gap: 24px;
+  }
+}
+
+/* Large Laptops / Desktops */
+@media (min-width: 1367px) and (max-width: 1600px) {
+  .content {
+    padding: 48px 64px;
+  }
+
+  .risk-layout {
+    gap: 28px;
+  }
+}
+
+/* Full HD / Large Desktops (1920x1080) */
+@media (min-width: 1601px) and (max-width: 1920px) {
+  .content {
+    padding: 56px 80px;
+    max-width: 1600px;
+    /* margin-left: auto; */
+    margin-right: auto;
+  }
+
+  .risk-layout {
+    gap: 32px;
   }
 
   .security-card p {
-    font-size: 18px;
+    font-size: 14px;
+  }
+}
+
+/* Ultra-Wide / 4K */
+@media (min-width: 1921px) {
+  .content {
+    padding: 64px 100px;
+    max-width: 1800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .risk-layout {
+    gap: 36px;
+  }
+
+  .security-card p {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .security-heading {
+    font-size: 20px;
   }
 }
 </style>
