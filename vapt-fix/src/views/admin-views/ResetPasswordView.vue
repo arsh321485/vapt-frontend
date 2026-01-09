@@ -116,42 +116,23 @@ export default {
     }
   },
 
-  // mounted() {
-  //   if (this.$route.params.uidb64 && this.$route.params.token) {
-  //     this.uidb64 = this.$route.params.uidb64;
-  //     this.token = this.$route.params.token;
-  //   }
-  //   if (!this.token || !this.uidb64) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Invalid Link",
-  //       text: "This reset link is invalid or has expired. Please request a new one.",
-  //       confirmButtonColor: '#5a44ff'
-  //     }).then(() => {
-  //       this.$router.push("/auth");
-  //     });
-  //   }
-  // },
-mounted() {
-  // Support both uidb64 and userId (safety)
-  this.uidb64 =
-    this.$route.params.uidb64 ||
-    this.$route.params.userId ||
-    null;
+  mounted() {
+    if (this.$route.params.uidb64 && this.$route.params.token) {
+      this.uidb64 = this.$route.params.uidb64;
+      this.token = this.$route.params.token;
+    }
+    if (!this.token || !this.uidb64) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Link",
+        text: "This reset link is invalid or has expired. Please request a new one.",
+        confirmButtonColor: '#5a44ff'
+      }).then(() => {
+        this.$router.push("/auth");
+      });
+    }
+  },
 
-  this.token = this.$route.params.token || null;
-
-  if (!this.uidb64 || !this.token) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Link",
-      text: "This reset link is invalid or has expired. Please request a new one.",
-      confirmButtonColor: "#5a44ff"
-    }).then(() => {
-      this.$router.push("/auth");
-    });
-  }
-},
   methods: {
     validatePassword() {
       const pwd = this.form.password;
