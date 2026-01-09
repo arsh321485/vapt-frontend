@@ -118,8 +118,8 @@ export default {
 
   mounted() {
     // Extract uidb64 and token from URL params (format: /reset-password/:uidb64/:token)
-    if (this.$route.params.userId && this.$route.params.token) {
-      this.uidb64 = this.$route.params.userId;
+    if (this.$route.params.uidb64 && this.$route.params.token) {
+      this.uidb64 = this.$route.params.uidb64;
       this.token = this.$route.params.token;
     }
 

@@ -390,28 +390,73 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Upload report
-  async uploadReport(formData: FormData) {
-    try {
-      const res = await endpoint.post(
-        "https://vaptbackend.secureitlab.com/api/admin/upload_report/upload/",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
+  // async uploadReport(formData: FormData) {
+  //   try {
+  //     const res = await endpoint.post(
+  //       "https://vaptbackend.secureitlab.com/api/admin/upload_report/upload/",
+  //       formData,
+  //       {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       }
+  //     );
+
+  //     const data = res.data;
+  //     const reportId = data?.upload_report?._id || data?.upload_report?.id || null;
+
+  //     return { status: true, data, reportId };
+  //   } catch (error: any) {
+  //     console.error("Upload error:", error.response?.data || error.message);
+  //     return {
+  //       status: false,
+  //       message: error.response?.data?.message || error.message,
+  //       details: error.response?.data || null,
+  //     };
+  //   }
+  // },
+  async uploadVulnerabilityReport(payload: {
+      adminId: string;
+      locationIds: string[] | "all";
+      memberType: string;
+      files: File[];
+    }) {
+      try {
+        const formData = new FormData();
+
+        // location → backend expects "all" or array
+        if (payload.locationIds === "all") {
+          formData.append("location", "all");
+        } else {
+          payload.locationIds.forEach(id =>
+            formData.append("location", id)
+          );
         }
-      );
 
-      const data = res.data;
-      const reportId = data?.upload_report?._id || data?.upload_report?.id || null;
+        formData.append("member_type", payload.memberType);
 
-      return { status: true, data, reportId };
-    } catch (error: any) {
-      console.error("Upload error:", error.response?.data || error.message);
-      return {
-        status: false,
-        message: error.response?.data?.message || error.message,
-        details: error.response?.data || null,
-      };
-    }
+        payload.files.forEach(file => {
+          formData.append("file", file);
+        });
+
+        const res = await endpoint.post(
+          `/admin/upload_report/upload/`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        return { status: true, data: res.data };
+      } catch (error: any) {
+        console.error("❌ Upload failed", error);
+        return {
+          status: false,
+          message:
+            error.response?.data?.message ||
+            "Upload failed",
+        };
+      }
   },
 
   // ✅ Create User Detail

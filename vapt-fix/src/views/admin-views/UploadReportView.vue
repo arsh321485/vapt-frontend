@@ -27,8 +27,9 @@
             <div class="d-flex gap-3 mt-3">
               <select v-model="location" class="form-select">
                 <option value="">Select Location</option>
-                <option>Bahrain</option>
-                <option>UAE</option>
+                <option v-for="loc in locations" :key="loc._id" :value="loc._id">
+                    {{ loc.location_name }}
+                  </option>
               </select>
 
               <select v-model="type" class="form-select">
@@ -41,7 +42,7 @@
           </div>
 
           <!-- Upload Box (directly below) -->
-          <div
+          <!-- <div
             class="upload-box"
             :class="{ dragover }"
             @dragover.prevent="dragover = true"
@@ -54,7 +55,17 @@
             <button class="upload-btn" @click="openFilePicker">
               Choose files
             </button>
-          </div>
+          </div> -->
+
+          <div class="upload-box" :class="{ dragover }" @dragover.prevent="dragover = true"
+              @dragleave="dragover = false" @drop.prevent="onDrop">
+              <input ref="fileInput" type="file" multiple hidden @change="onFileChange" />
+              <h5>Upload vulnerability report</h5>
+              <p>You can upload multiple Nessus / HTML files</p>
+              <button class="upload-btn" @click="openFilePicker">
+                Choose files
+              </button>
+            </div>
 
           <!-- FILES TABLE -->
               <div class="files-card" v-if="uploadedFiles.length">
@@ -72,7 +83,7 @@
                     <tr v-for="(item, index) in uploadedFiles" :key="index">
                       <td>{{ item.file.name }}</td>
                       <td>{{ item.type }}</td>
-                      <td>{{ item.location }}</td>
+                      <td>{{ item.locationName }}</td>
                       <td>
                         <i
                           class="bi bi-eye action-btn view"
@@ -110,10 +121,23 @@
 
       </div>
 
-        <div class="cta">
+        <!-- <div class="cta">
           <button class="btn btn-primary" @click="handleContinue">
             Continue to Dashboard →
           </button>
+        </div> -->
+
+        <div class="cta">
+          <button type="button" class="btn btn-primary" :disabled="!uploadedFiles.length"
+            @click="handleUploadAndRedirect">
+            Next →
+          </button>
+
+          <p v-if="showSlowUploadMsg" class="upload-warning">
+            ⏳ Upload is taking longer than usual.
+            Large vulnerability reports may take a few minutes.
+            Please don’t refresh the page.
+          </p>
         </div>
       </div>
     </div>
@@ -123,6 +147,7 @@
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
 import { useAuthStore } from "@/stores/authStore";
+import Swal from "sweetalert2";
 
 export default {
   name: "UploadReportView",
@@ -134,55 +159,143 @@ export default {
       type: "",
       uploadedFiles: [],
       dragover: false,
+      locations: [],
+      authStore: null,
+      adminId: "",
+      isUploading: false,
     };
   },
 
-  mounted() {
-    const authStore = useAuthStore();
-    authStore.markStepCompleted(3);
+  // mounted() {
+  //   const authStore = useAuthStore();
+  //   authStore.markStepCompleted(3);
+  // },
+  async mounted() {
+    this.authStore = useAuthStore();
+    const user = JSON.parse(localStorage.getItem("user"));
+    this.adminId = user?.id;
+
+    await this.fetchLocations();
   },
 
   methods: {
-    openFilePicker() {
+    async fetchLocations() {
+      const res = await this.authStore.fetchLocationsByAdminId(this.adminId);
+      if (res.status) {
+        this.locations = this.authStore.locations;
+      }
+    },
+     openFilePicker() {
+      if (!this.location || !this.type) {
+        Swal.fire({
+          icon: "warning",
+          title: "Selection required",
+          text: "Please select location and type first",
+        });
+        return;
+      }
       this.$refs.fileInput.click();
     },
 
     onFileChange(e) {
-      this.handleFiles(e.target.files);
+      this.handleFiles([...e.target.files]);
       e.target.value = "";
     },
-
-    onDrop(e) {
+     onDrop(e) {
       this.dragover = false;
-      this.handleFiles(e.dataTransfer.files);
+      this.handleFiles([...e.dataTransfer.files]);
     },
 
-    handleFiles(files) {
-      if (!this.location || !this.type) {
-        alert("Please select location and type first");
-        return;
-      }
+    /* ---------------- HANDLE FILES (UPLOAD HERE) ---------------- */
+    async handleFiles(files) {
+      for (const file of files) {
+        const selectedLocation = this.locations.find(
+          loc => loc._id === this.location
+        );
 
-      [...files].forEach(file => {
-        this.uploadedFiles.push({
-          file,
-          location: this.location,
-          type: this.type,
+        this.isUploading = true;
+
+        Swal.fire({
+          title: "Uploading report...",
+          html: `
+        <p style="font-size:14px;color:#6b7280">
+          Large vulnerability reports may take a few minutes.<br/>
+          Please don’t refresh the page.
+        </p>
+      `,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => Swal.showLoading(),
         });
-      });
+
+        try {
+          const res = await this.authStore.uploadVulnerabilityReport({
+            adminId: this.adminId,
+            locationIds: [this.location],
+            memberType: this.type.toLowerCase(),
+            files: [file],
+          });
+
+          Swal.close();
+          this.isUploading = false;
+
+          const backendData = res.data;
+
+          // ✅ DUPLICATE HANDLING (FROM BACKEND)
+          if (
+            backendData &&
+            Array.isArray(backendData.errors) &&
+            backendData.errors.length > 0
+          ) {
+            Swal.fire({
+              icon: "info",
+              title: "Duplicate file",
+              text: backendData.errors[0].error,
+            });
+            return;
+          }
+
+          // ✅ SUCCESS → add to table
+          this.uploadedFiles.push({
+            file,
+            locationId: this.location,
+            locationName: selectedLocation?.location_name || "",
+            type: this.type,
+          });
+
+          // reset selection
+          this.location = "";
+          this.type = "";
+
+        } catch (err) {
+          Swal.close();
+          this.isUploading = false;
+
+          Swal.fire({
+            icon: "error",
+            title: "Upload failed",
+            text: "Something went wrong while uploading.",
+          });
+        }
+      }
     },
 
+
+
+    /* ---------------- FINAL CONTINUE BUTTON ---------------- */
+    handleUploadAndRedirect() {
+      this.$router.push("/admindashboardonboarding");
+    },
+
+    /* ---------------- FILE PREVIEW ---------------- */
     viewFile(index) {
       const file = this.uploadedFiles[index].file;
       const reader = new FileReader();
 
       reader.onload = e => {
-        const blob = new Blob([e.target.result], {
-          type: file.type || "text/html",
-        });
+        const blob = new Blob([e.target.result], { type: "text/html" });
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
       };
 
       reader.readAsText(file);
@@ -192,18 +305,15 @@ export default {
       this.uploadedFiles.splice(index, 1);
     },
 
-    // ===============================
-    // HANDLE CONTINUE TO DASHBOARD
-    // ===============================
-    handleContinue() {
-      const authStore = useAuthStore();
+    // handleContinue() {
+    //   const authStore = useAuthStore();
 
-      // Mark step 3 as completed
-      authStore.markStepCompleted(3);
+    //   // Mark step 3 as completed
+    //   authStore.markStepCompleted(3);
 
-      // Navigate to dashboard
-      this.$router.push('/admindashboardonboarding');
-    },
+    //   // Navigate to dashboard
+    //   this.$router.push('/admindashboardonboarding');
+    // },
   },
 };
 </script>
