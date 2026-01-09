@@ -1149,13 +1149,6 @@ export default {
     padding-top: 50px;
     padding-bottom: 40px;
   }
-
-    .logo-wrapper {
-  
-  top: 180px;
- 
-}
-
 .dashboard-slider{
     margin: 80px auto 60px;
 }
@@ -1166,12 +1159,6 @@ export default {
     padding-top: 50px;
     padding-bottom: 40px;
   }
-
-   .logo-wrapper {
-  
-  top: 40px;
- 
-}
 }
 
 

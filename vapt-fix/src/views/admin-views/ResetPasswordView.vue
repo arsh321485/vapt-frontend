@@ -24,7 +24,7 @@
                     <input
                       :type="showPassword ? 'text' : 'password'"
                       id="password"
-                      v-model="form.new_password"
+                      v-model="form.password"
                       class="form-control custom-input"
                       placeholder="Enter new password"
                       @input="validatePassword"
@@ -93,7 +93,7 @@ export default {
   data() {
     return {
       form: {
-        new_password: "",
+        password: "",
         confirm_password: ""
       },
       loading: false,
@@ -106,8 +106,7 @@ export default {
         special: false
       },
       token: "",
-      email: "",
-      userId: ""
+      uidb64: ""
     };
   },
 
@@ -118,19 +117,14 @@ export default {
   },
 
   mounted() {
-    // Check for URL params first (backend format: /set-password/:userId/:token)
+    // Extract uidb64 and token from URL params (format: /reset-password/:uidb64/:token)
     if (this.$route.params.userId && this.$route.params.token) {
-      this.userId = this.$route.params.userId;
+      this.uidb64 = this.$route.params.userId;
       this.token = this.$route.params.token;
-    }
-    // Fallback to query params (modal format: /reset-password?token=xxx&email=xxx)
-    else if (this.$route.query.token && this.$route.query.email) {
-      this.token = this.$route.query.token;
-      this.email = this.$route.query.email;
     }
 
     // Validate required params exist
-    if (!this.token || (!this.email && !this.userId)) {
+    if (!this.token || !this.uidb64) {
       Swal.fire({
         icon: "error",
         title: "Invalid Link",
@@ -144,7 +138,7 @@ export default {
 
   methods: {
     validatePassword() {
-      const pwd = this.form.new_password;
+      const pwd = this.form.password;
 
       this.showPasswordRules = pwd.length > 0;
 
@@ -212,8 +206,7 @@ export default {
   // }
   //   },
     async handleResetPassword() {
-   
-      if (this.form.new_password !== this.form.confirm_password) {
+      if (this.form.password !== this.form.confirm_password) {
         Swal.fire({
           icon: "error",
           title: "Password Mismatch",
@@ -237,12 +230,11 @@ export default {
       try {
         const authStore = useAuthStore();
 
-       
         const payload = {
+          uidb64: this.uidb64,
           token: this.token,
-          new_password: this.form.new_password,
-          ...(this.userId ? { userId: this.userId } : {}),
-          ...(this.email ? { email: this.email } : {})
+          password: this.form.password,
+          confirm_password: this.form.confirm_password
         };
 
         const response = await authStore.resetPassword(payload);

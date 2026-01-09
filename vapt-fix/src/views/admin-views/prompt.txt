@@ -1,13 +1,16 @@
-integrate my correct set new password api 
-method : put 
-url : http://127.0.0.1:8000/api/admin/users/set-password/
-body: 
+REset password correct api below 
+compare with my authstore and resetpassword index.ts page and correct my code on opening reset link received on mail sholud open https://vapt-frontend-liart.vercel.app/reset-password/NGZmZDVkZDgtNDY3ZS00NmViLThkM2UtZGI5YTQ1MjE4ODBk/d244c3-83533d7d7455a4fa13ee48971fce0d14/
+
+method : Post 
+url : http://127.0.0.1:8000/api/admin/users/reset-password/NWNmNGNmMzEtYTRkOS00NzE2LThlNGQtOGNjMTRkZDVhMDAx/d24zgk-aceb3ce9a3f837e79a04779271337cc1/
+
+Body :
 {
-  "new_password": "bharti@1234",
-  "confirm_password": "bharti@1234"
+  "password": "NewPassword@1234",
+  "confirm_password": "NewPassword@1234"
 }
 
 Response :
 {
-    "message": "Password set successfully"
+    "msg": "Password reset successfully"
 }

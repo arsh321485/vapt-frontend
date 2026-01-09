@@ -225,14 +225,18 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Reset Password
-  async resetPassword(payload: { token: string; new_password: string; userId?: string; email?: string }) {
+  async resetPassword(payload: { uidb64: string; token: string; password: string; confirm_password: string }) {
       try {
-        const res = await endpoint.post("/admin/users/reset-password/", payload);
-        return { status: true, data: res.data, message: res.data.message };
+        const { uidb64, token, password, confirm_password } = payload;
+        const res = await endpoint.post(`/admin/users/reset-password/${uidb64}/${token}/`, {
+          password,
+          confirm_password
+        });
+        return { status: true, data: res.data, message: res.data.msg };
       } catch (error: any) {
         return {
           status: false,
-          message: error.response?.data?.message || error.message || "Reset failed",
+          message: error.response?.data?.message || error.response?.data?.msg || error.message || "Reset failed",
           details: error.response?.data || null,
         };
       }
