@@ -116,26 +116,42 @@ export default {
     }
   },
 
-  mounted() {
-    // Extract uidb64 and token from URL params (format: /reset-password/:uidb64/:token)
-    if (this.$route.params.uidb64 && this.$route.params.token) {
-      this.uidb64 = this.$route.params.uidb64;
-      this.token = this.$route.params.token;
-    }
+  // mounted() {
+  //   if (this.$route.params.uidb64 && this.$route.params.token) {
+  //     this.uidb64 = this.$route.params.uidb64;
+  //     this.token = this.$route.params.token;
+  //   }
+  //   if (!this.token || !this.uidb64) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Invalid Link",
+  //       text: "This reset link is invalid or has expired. Please request a new one.",
+  //       confirmButtonColor: '#5a44ff'
+  //     }).then(() => {
+  //       this.$router.push("/auth");
+  //     });
+  //   }
+  // },
+mounted() {
+  // Support both uidb64 and userId (safety)
+  this.uidb64 =
+    this.$route.params.uidb64 ||
+    this.$route.params.userId ||
+    null;
 
-    // Validate required params exist
-    if (!this.token || !this.uidb64) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Link",
-        text: "This reset link is invalid or has expired. Please request a new one.",
-        confirmButtonColor: '#5a44ff'
-      }).then(() => {
-        this.$router.push("/auth");
-      });
-    }
-  },
+  this.token = this.$route.params.token || null;
 
+  if (!this.uidb64 || !this.token) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Link",
+      text: "This reset link is invalid or has expired. Please request a new one.",
+      confirmButtonColor: "#5a44ff"
+    }).then(() => {
+      this.$router.push("/auth");
+    });
+  }
+},
   methods: {
     validatePassword() {
       const pwd = this.form.password;
@@ -146,65 +162,7 @@ export default {
       this.rules.uppercase = /[A-Z]/.test(pwd);
       this.rules.special = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
     },
-  //   async handleResetPassword() {
-  // if (this.form.new_password !== this.form.confirm_password) {
-  //   Swal.fire({
-  //     icon: "error",
-  //     title: "Password Mismatch",
-  //     text: "Passwords do not match.",
-  //     confirmButtonColor: "#5a44ff"
-  //   });
-  //   return;
-  // }
-
-  // if (!this.isPasswordValid) {
-  //   Swal.fire({
-  //     icon: "error",
-  //     title: "Invalid Password",
-  //     text: "Password must meet all requirements.",
-  //     confirmButtonColor: "#5a44ff"
-  //   });
-  //   return;
-  // }
-
-  // this.loading = true;
-
-  // try {
-  //   const authStore = useAuthStore();
-
-  //   const response = await authStore.setNewPassword({
-  //     new_password: this.form.new_password,
-  //     confirm_password: this.form.confirm_password
-  //   });
-
-  //   if (response.status) {
-  //     await Swal.fire({
-  //       icon: "success",
-  //       title: "Password Reset Successful",
-  //       text: "You can now sign in with your new password.",
-  //       confirmButtonColor: "#5a44ff"
-  //     });
-
-  //     this.$router.push("/auth");
-  //   } else {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Reset Failed",
-  //       text: response.message,
-  //       confirmButtonColor: "#5a44ff"
-  //     });
-  //   }
-  // } catch (err) {
-  //   Swal.fire({
-  //     icon: "error",
-  //     title: "Error",
-  //     text: "Something went wrong. Please try again.",
-  //     confirmButtonColor: "#5a44ff"
-  //   });
-  // } finally {
-  //   this.loading = false;
-  // }
-  //   },
+  
     async handleResetPassword() {
       if (this.form.password !== this.form.confirm_password) {
         Swal.fire({

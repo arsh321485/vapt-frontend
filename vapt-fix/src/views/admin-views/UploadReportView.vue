@@ -165,7 +165,6 @@ export default {
       isUploading: false,
     };
   },
-
   // mounted() {
   //   const authStore = useAuthStore();
   //   authStore.markStepCompleted(3);
