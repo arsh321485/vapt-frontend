@@ -142,9 +142,13 @@
         </div>
 
         <div class="cta">
-          <button class="btn btn-primary" @click="handleContinue">
+          <!-- <button class="btn btn-primary" @click="handleContinue">
             Continue to Risk Criteria →
-          </button>
+          </button> -->
+           <button class="btn btn-primary" @click="handleContinue">
+    {{ returnTo ? 'Back to Previous Page →' : 'Continue to Risk Criteria →' }}
+  </button>
+
         </div>
       </div>
     </div>
@@ -213,6 +217,15 @@ export default {
       ]
     };
   },
+  computed: {
+  returnTo() {
+    return this.$route.query.returnTo || null;
+  },
+
+  isFromOnboarding() {
+    return !this.returnTo;
+  }
+},
   methods: {
     initChipSelection() {
       document
@@ -437,11 +450,12 @@ export default {
       // Cleanup
       this.pendingProject = null;
     },
-
-    // ===============================
-    // HANDLE CONTINUE TO NEXT STEP
-    // ===============================
     handleContinue() {
+      // 🟢 CASE 1: Came from dashboard / assets / tickets / etc
+  if (this.returnTo) {
+    this.$router.push(this.returnTo);
+    return;
+  }
       // Check if at least 1 location exists
       if (!this.authStore.locations || this.authStore.locations.length === 0) {
         Swal.fire({
@@ -463,7 +477,7 @@ export default {
 
   mounted() {
     document.addEventListener("click", this.closeOnOutside);
-
+    console.log("Route query:", this.$route.query);
     this.initChipSelection();
 
     // fetch countries for autocomplete

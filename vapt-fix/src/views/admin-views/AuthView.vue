@@ -804,6 +804,7 @@ export default {
   height: 100%;
   display: flex;
   align-items: flex-start;
+  /* align-items: center; */
   justify-content: center;
   padding-top: 40px;
   width: 100%;
@@ -1151,6 +1152,9 @@ export default {
   }
 .dashboard-slider{
     margin: 80px auto 60px;
+}
+.form-area {
+  padding-top: 230px;
 }
 }
 

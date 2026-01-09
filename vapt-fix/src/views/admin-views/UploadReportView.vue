@@ -26,14 +26,14 @@
 
             <div class="d-flex gap-3 mt-3">
               <select v-model="location" class="form-select">
-                <option value="">Select Location</option>
+                <option disabled value="">Select Location</option>
                 <option v-for="loc in locations" :key="loc._id" :value="loc._id">
                     {{ loc.location_name }}
                   </option>
               </select>
 
               <select v-model="type" class="form-select">
-                <option value="">Select Type</option>
+                <option disabled value="">Select Type</option>
                 <option>Both</option>
                 <option>External</option>
                 <option>Internal</option>
@@ -121,17 +121,20 @@
 
       </div>
 
-        <!-- <div class="cta">
-          <button class="btn btn-primary" @click="handleContinue">
-            Continue to Dashboard →
-          </button>
-        </div> -->
-
         <div class="cta">
-          <button type="button" class="btn btn-primary" :disabled="!uploadedFiles.length"
+          <!-- <button type="button" class="btn btn-primary" :disabled="!uploadedFiles.length"
             @click="handleUploadAndRedirect">
-            Next →
-          </button>
+            Continue to Dashboard →
+          </button> -->
+          <button
+  type="button"
+  class="btn btn-primary"
+  :disabled="!uploadedFiles.length"
+  @click="handleUploadAndRedirect"
+>
+  {{ returnTo ? 'Back to Previous Page →' : 'Continue to Dashboard →' }}
+</button>
+
 
           <p v-if="showSlowUploadMsg" class="upload-warning">
             ⏳ Upload is taking longer than usual.
@@ -169,6 +172,11 @@ export default {
   //   const authStore = useAuthStore();
   //   authStore.markStepCompleted(3);
   // },
+  computed: {
+  returnTo() {
+    return this.$route.query.returnTo || null;
+  }
+},
   async mounted() {
     this.authStore = useAuthStore();
     const user = JSON.parse(localStorage.getItem("user"));
@@ -176,7 +184,6 @@ export default {
 
     await this.fetchLocations();
   },
-
   methods: {
     async fetchLocations() {
       const res = await this.authStore.fetchLocationsByAdminId(this.adminId);
@@ -184,7 +191,7 @@ export default {
         this.locations = this.authStore.locations;
       }
     },
-     openFilePicker() {
+    openFilePicker() {
       if (!this.location || !this.type) {
         Swal.fire({
           icon: "warning",
@@ -195,25 +202,21 @@ export default {
       }
       this.$refs.fileInput.click();
     },
-
     onFileChange(e) {
       this.handleFiles([...e.target.files]);
       e.target.value = "";
     },
-     onDrop(e) {
+    onDrop(e) {
       this.dragover = false;
       this.handleFiles([...e.dataTransfer.files]);
     },
-
     /* ---------------- HANDLE FILES (UPLOAD HERE) ---------------- */
     async handleFiles(files) {
       for (const file of files) {
         const selectedLocation = this.locations.find(
           loc => loc._id === this.location
         );
-
         this.isUploading = true;
-
         Swal.fire({
           title: "Uploading report...",
           html: `
@@ -226,84 +229,74 @@ export default {
           allowEscapeKey: false,
           didOpen: () => Swal.showLoading(),
         });
-
         try {
-          const res = await this.authStore.uploadVulnerabilityReport({
-            adminId: this.adminId,
-            locationIds: [this.location],
-            memberType: this.type.toLowerCase(),
-            files: [file],
-          });
+      const res = await this.authStore.uploadVulnerabilityReport({
+        locationId: this.location,          // ✅ single location
+        memberType: this.type.toLowerCase(),// internal | external | both
+        file: file                           // ✅ single file
+      });
 
-          Swal.close();
-          this.isUploading = false;
+      Swal.close();
+      this.isUploading = false;
 
-          const backendData = res.data;
+      // ❌ backend rejected upload (duplicate / validation)
+      if (!res.status) {
+        Swal.fire({
+          icon: "info",
+          title: "Upload blocked",
+          text: res.message || "File already uploaded.",
+        });
+        return;
+      }
 
-          // ✅ DUPLICATE HANDLING (FROM BACKEND)
-          if (
-            backendData &&
-            Array.isArray(backendData.errors) &&
-            backendData.errors.length > 0
-          ) {
-            Swal.fire({
-              icon: "info",
-              title: "Duplicate file",
-              text: backendData.errors[0].error,
-            });
-            return;
-          }
+      // ✅ SUCCESS
+      this.uploadedFiles.push({
+        file,
+        locationId: this.location,
+        locationName: selectedLocation?.location_name || "",
+        type: this.type,
+      });
 
-          // ✅ SUCCESS → add to table
-          this.uploadedFiles.push({
-            file,
-            locationId: this.location,
-            locationName: selectedLocation?.location_name || "",
-            type: this.type,
-          });
+      // reset selection
+      this.location = "";
+      this.type = "";
 
-          // reset selection
-          this.location = "";
-          this.type = "";
+    } catch (err) {
+      Swal.close();
+      this.isUploading = false;
 
-        } catch (err) {
-          Swal.close();
-          this.isUploading = false;
-
-          Swal.fire({
-            icon: "error",
-            title: "Upload failed",
-            text: "Something went wrong while uploading.",
-          });
-        }
+      Swal.fire({
+        icon: "error",
+        title: "Upload failed",
+        text: "Something went wrong while uploading.",
+      });
+    }
       }
     },
-
-
-
     /* ---------------- FINAL CONTINUE BUTTON ---------------- */
     handleUploadAndRedirect() {
+      // 🟢 CASE 2: Came from another page
+  if (this.returnTo) {
+    this.$router.push(this.returnTo);
+    return;
+  }
+
       this.$router.push("/admindashboardonboarding");
     },
-
     /* ---------------- FILE PREVIEW ---------------- */
     viewFile(index) {
       const file = this.uploadedFiles[index].file;
       const reader = new FileReader();
-
       reader.onload = e => {
         const blob = new Blob([e.target.result], { type: "text/html" });
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
       };
-
       reader.readAsText(file);
     },
-
     deleteFile(index) {
       this.uploadedFiles.splice(index, 1);
     },
-
     // handleContinue() {
     //   const authStore = useAuthStore();
 
