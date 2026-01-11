@@ -41,22 +41,6 @@
             </div>
           </div>
 
-          <!-- Upload Box (directly below) -->
-          <!-- <div
-            class="upload-box"
-            :class="{ dragover }"
-            @dragover.prevent="dragover = true"
-            @dragleave="dragover = false"
-            @drop.prevent="onDrop"
-          >
-            <input ref="fileInput" type="file" multiple hidden @change="onFileChange" />
-            <h5>Upload vulnerability report</h5>
-            <p>You can upload multiple Nessus / HTML files</p>
-            <button class="upload-btn" @click="openFilePicker">
-              Choose files
-            </button>
-          </div> -->
-
           <div class="upload-box" :class="{ dragover }" @dragover.prevent="dragover = true"
               @dragleave="dragover = false" @drop.prevent="onDrop">
               <input ref="fileInput" type="file" multiple hidden @change="onFileChange" />
@@ -82,7 +66,7 @@
                   <tbody>
                     <tr v-for="(item, index) in uploadedFiles" :key="index">
                       <td>{{ item.file.name }}</td>
-                      <td>{{ item.type }}</td>
+                      <td class="text-capitalize">{{ item.type }}</td>
                       <td>{{ item.locationName }}</td>
                       <td>
                         <i
@@ -122,20 +106,15 @@
       </div>
 
         <div class="cta">
-          <!-- <button type="button" class="btn btn-primary" :disabled="!uploadedFiles.length"
-            @click="handleUploadAndRedirect">
-            Continue to Dashboard →
-          </button> -->
+          
           <button
-  type="button"
-  class="btn btn-primary"
-  :disabled="!uploadedFiles.length"
-  @click="handleUploadAndRedirect"
->
-  {{ returnTo ? 'Back to Previous Page →' : 'Continue to Dashboard →' }}
-</button>
-
-
+            type="button"
+            class="btn btn-primary"
+            :disabled="!uploadedFiles.length"
+            @click="handleUploadAndRedirect"
+          >
+            {{ returnTo ? 'Back to Previous Page →' : 'Continue to Dashboard →' }}
+          </button>
           <p v-if="showSlowUploadMsg" class="upload-warning">
             ⏳ Upload is taking longer than usual.
             Large vulnerability reports may take a few minutes.
@@ -168,10 +147,6 @@ export default {
       isUploading: false,
     };
   },
-  // mounted() {
-  //   const authStore = useAuthStore();
-  //   authStore.markStepCompleted(3);
-  // },
   computed: {
   returnTo() {
     return this.$route.query.returnTo || null;
@@ -183,6 +158,7 @@ export default {
     this.adminId = user?.id;
 
     await this.fetchLocations();
+    await this.fetchUploadedReports();
   },
   methods: {
     async fetchLocations() {
@@ -231,35 +207,48 @@ export default {
         });
         try {
       const res = await this.authStore.uploadVulnerabilityReport({
-        locationId: this.location,          // ✅ single location
-        memberType: this.type.toLowerCase(),// internal | external | both
-        file: file                           // ✅ single file
-      });
+  locationId: this.location,
+  memberType: this.type.toLowerCase(),
+  file
+});
 
-      Swal.close();
-      this.isUploading = false;
+Swal.close();
+this.isUploading = false;
 
-      // ❌ backend rejected upload (duplicate / validation)
-      if (!res.status) {
-        Swal.fire({
-          icon: "info",
-          title: "Upload blocked",
-          text: res.message || "File already uploaded.",
-        });
-        return;
-      }
+// ❌ DUPLICATE FILE
+if (!res.status && res.isDuplicate) {
+  Swal.fire({
+    icon: "warning",
+    title: "Duplicate File",
+    text: res.message, // 👈 backend message
+    confirmButtonColor: "#5a44ff"
+  });
+  continue; // 🔥 skip adding file
+}
 
-      // ✅ SUCCESS
-      this.uploadedFiles.push({
-        file,
-        locationId: this.location,
-        locationName: selectedLocation?.location_name || "",
-        type: this.type,
-      });
+// ❌ OTHER ERROR
+if (!res.status) {
+  Swal.fire({
+    icon: "error",
+    title: "Upload failed",
+    text: res.message || "Something went wrong while uploading.",
+  });
+  continue;
+}
 
-      // reset selection
-      this.location = "";
-      this.type = "";
+// ✅ SUCCESS ONLY
+this.uploadedFiles.push({
+  file,
+  reportId: res.data?.results?.[0]?._id || res.data?.id,
+  locationId: this.location,
+  locationName: selectedLocation?.location_name || "",
+  type: this.type,
+});
+
+// reset selection
+this.location = "";
+this.type = "";
+
 
     } catch (err) {
       Swal.close();
@@ -284,28 +273,112 @@ export default {
       this.$router.push("/admindashboardonboarding");
     },
     /* ---------------- FILE PREVIEW ---------------- */
-    viewFile(index) {
-      const file = this.uploadedFiles[index].file;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const blob = new Blob([e.target.result], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-      };
-      reader.readAsText(file);
-    },
-    deleteFile(index) {
-      this.uploadedFiles.splice(index, 1);
-    },
-    // handleContinue() {
-    //   const authStore = useAuthStore();
+    async viewFile(index) {
+  const item = this.uploadedFiles[index];
 
-    //   // Mark step 3 as completed
-    //   authStore.markStepCompleted(3);
+  try {
+    // 1️⃣ Call View API (this is already authenticated via Axios interceptor)
+    const res = await this.authStore.getUploadReportById(item.reportId);
 
-    //   // Navigate to dashboard
-    //   this.$router.push('/admindashboardonboarding');
-    // },
+    if (!res.status || !res.data?.file) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to retrieve report",
+      });
+      return;
+    }
+
+    // 2️⃣ Open file directly (NO TOKEN)
+    window.open(res.data.file, "_blank");
+
+  } catch (error) {
+    console.error("View file error:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Unable to open the report.",
+    });
+  }
+}
+
+
+
+,
+    async deleteFile(index) {
+  const report = this.uploadedFiles[index];
+
+  // 🔐 Safety check
+  if (!report?.reportId) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Report ID not found",
+    });
+    return;
+  }
+
+  // 🟡 Confirm delete
+  const confirm = await Swal.fire({
+    icon: "warning",
+    title: "Delete Report?",
+    text: "Are you sure you want to delete this uploaded report?",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#d33",
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  // 🔥 Call API
+  const res = await this.authStore.deleteUploadReport(report.reportId);
+
+  if (!res.status) {
+    Swal.fire({
+      icon: "error",
+      title: "Delete failed",
+      text: res.message,
+    });
+    return;
+  }
+
+  // ✅ Remove from table
+  this.uploadedFiles.splice(index, 1);
+
+  Swal.fire({
+    icon: "success",
+    title: "Deleted",
+    text: "Upload report deleted successfully",
+    timer: 1500,
+    showConfirmButton: false,
+  });
+    },
+    async fetchUploadedReports() {
+  const res = await this.authStore.getAllUploadReports();
+
+  if (!res.status) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Failed to fetch uploaded reports",
+    });
+    return;
+  }
+
+  // 🔁 Map backend response to table format
+  this.uploadedFiles = res.data.map(report => ({
+    reportId: report._id,               // 👈 REQUIRED for delete
+    fileUrl: report.file,               // backend file URL
+    file: { name: report.file.split("/").pop() }, // fake File name for table
+    locationId: report.location,
+    locationName: report.location_name,
+    type: report.member_type,
+    status: report.status,
+    parsedCount: report.parsed_count,
+    uploadedAt: report.uploaded_at,
+  }));
+},
   },
 };
 </script>

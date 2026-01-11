@@ -391,47 +391,116 @@ export const useAuthStore = defineStore("auth", {
 
   // ✅ Upload report
   async uploadVulnerabilityReport(payload: {
-  locationId: string;
-  memberType: "internal" | "external" | "both";
-  file: File;
-}) {
-  try {
-    const formData = new FormData();
+    locationId: string;
+    memberType: "internal" | "external" | "both";
+    file: File;
+  }) {
+    try {
+      const formData = new FormData();
 
-    // ✅ API expects single location ID
-    formData.append("location", payload.locationId);
+      formData.append("location", payload.locationId);
+      formData.append("member_type", payload.memberType);
+      formData.append("file", payload.file);
 
-    // ✅ role: internal | external | both
-    formData.append("member_type", payload.memberType);
+      const res = await endpoint.post(
+        "/admin/upload_report/upload/",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
-    // ✅ single file
-    formData.append("file", payload.file);
-
-    const res = await endpoint.post(
-      "/admin/upload_report/upload/",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // 🔥 IMPORTANT: detect duplicate from response
+      if (res.data?.errors?.length) {
+        return {
+          status: false,
+          isDuplicate: true,
+          message: res.data.errors[0].error,
+          data: res.data,
+        };
       }
-    );
 
-    return {
-      status: res.data?.success === true,
-      data: res.data,
-      message: res.data?.message,
-    };
-  } catch (error: any) {
-    console.error("❌ Upload failed", error);
-    return {
-      status: false,
-      message:
-        error.response?.data?.message ||
-        "Upload failed",
-      data: error.response?.data || null,
-    };
-  }
+      return {
+        status: true,
+        data: res.data,
+        message: res.data?.message,
+      };
+
+    } catch (error: any) {
+      return {
+        status: false,
+        isDuplicate: false,
+        message: error.response?.data?.message || "Upload failed",
+        data: error.response?.data || null,
+      };
+    }
+  },
+
+  // ✅ Delete uploaded report (Admin only)
+  async deleteUploadReport(reportId: string) {
+    try {
+      const res = await endpoint.delete(
+        `/admin/upload_report/upload/${reportId}/delete/`
+      );
+
+      return {
+        status: res.data?.success === true,
+        message: res.data?.message,
+        data: res.data,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to delete upload report",
+        data: error.response?.data || null,
+      };
+    }
+  },
+
+  // ✅ Get all uploaded reports (Admin only)
+  async getAllUploadReports() {
+    try {
+      const res = await endpoint.get(
+        "/admin/upload_report/upload/all/"
+      );
+
+      return {
+        status: res.data?.success === true,
+        data: res.data?.upload_reports || [],
+        count: res.data?.count || 0,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch upload reports",
+        data: [],
+      };
+    }
+  },
+
+  // ✅ Get upload report by ID (Admin only)
+  async getUploadReportById(reportId: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/upload_report/upload/${reportId}/`
+      );
+
+      return {
+        status: res.data?.success === true,
+        data: res.data?.upload_report,
+        message: res.data?.message,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch upload report",
+        data: null,
+      };
+    }
   },
 
   // ✅ Create User Detail
@@ -600,49 +669,49 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ GET Upload Report by ID
-  async getUploadReportById(reportId: string) {
-    try {
-      if (!reportId) {
-        return {
-          status: false,
-          message: "Report ID not found",
-          isNotFound: true,
-        };
-      }
+  // async getUploadReportById(reportId: string) {
+  //   try {
+  //     if (!reportId) {
+  //       return {
+  //         status: false,
+  //         message: "Report ID not found",
+  //         isNotFound: true,
+  //       };
+  //     }
 
-      const res = await endpoint.get(`/admin/upload_report/upload/${reportId}/`);
+  //     const res = await endpoint.get(`/admin/upload_report/upload/${reportId}/`);
 
-      if (res.data?.success && res.data?.upload_report) {
-        this.uploadedReportDetails = res.data.upload_report;
+  //     if (res.data?.success && res.data?.upload_report) {
+  //       this.uploadedReportDetails = res.data.upload_report;
 
-        return {
-          status: true,
-          message: res.data.message || "Upload report retrieved successfully",
-          data: res.data,
-        };
-      }
+  //       return {
+  //         status: true,
+  //         message: res.data.message || "Upload report retrieved successfully",
+  //         data: res.data,
+  //       };
+  //     }
 
-      return {
-        status: false,
-        message: "No upload report data found",
-        isNotFound: true,
-      };
-    } catch (error: any) {
-      const is404 = error?.response?.status === 404;
+  //     return {
+  //       status: false,
+  //       message: "No upload report data found",
+  //       isNotFound: true,
+  //     };
+  //   } catch (error: any) {
+  //     const is404 = error?.response?.status === 404;
 
-      if (is404) {
-        console.log("ℹ️ No upload report found (404) - user can upload new");
-      } else {
-        console.error("❌ Error fetching upload report:", error);
-      }
+  //     if (is404) {
+  //       console.log("ℹ️ No upload report found (404) - user can upload new");
+  //     } else {
+  //       console.error("❌ Error fetching upload report:", error);
+  //     }
 
-      return {
-        status: false,
-        message: error.response?.data?.message || error.message || "Failed to fetch upload report",
-        isNotFound: is404,
-      };
-    }
-  },
+  //     return {
+  //       status: false,
+  //       message: error.response?.data?.message || error.message || "Failed to fetch upload report",
+  //       isNotFound: is404,
+  //     };
+  //   }
+  // },
 
   // 🧠 Login with Microsoft Teams OAuth
   async microsoftLogin(authCode: string, state: string) {

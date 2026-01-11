@@ -108,7 +108,8 @@
                 </div>
 
                 <!-- reCAPTCHA (Admin only) -->
-                <div class="mb-2 d-flex justify-content-center" v-if="currentRole === 'admin'">
+                <div class="mb-2 d-flex justify-content-center" v-if="currentRole === 'admin' ||
+    (currentRole === 'user' && currentMode === 'signin' && !otpSent)">
                   <div :id="recaptchaContainerId" :key="recaptchaKey"></div>
                 </div>
 
@@ -350,54 +351,78 @@ export default {
         this.otpRefs[index + 1]?.focus();
       }
     },
-    validateForm() {
-      // User role validation
-      if (this.currentRole === 'user') {
-        if (!this.otpSent) {
-          // Validate email before sending OTP
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(this.formData.email)) {
-            Swal.fire('Error', 'Please enter a valid email', 'error');
-            return false;
-          }
-        } else {
-          // Validate OTP
-          if (!this.otp || this.otp.trim() === '') {
-            Swal.fire('Error', 'Please enter the OTP', 'error');
-            return false;
-          }
-        }
-        return true;
-      }
+    // validateForm() {
+      
+    //   if (this.currentRole === 'user') {
+    //     if (!this.otpSent) {
+         
+    //       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //       if (!emailRegex.test(this.formData.email)) {
+    //         Swal.fire('Error', 'Please enter a valid email', 'error');
+    //         return false;
+    //       }
+    //     } else {
+          
+    //       if (!this.otp || this.otp.trim() === '') {
+    //         Swal.fire('Error', 'Please enter the OTP', 'error');
+    //         return false;
+    //       }
+    //     }
+    //     return true;
+    //   }
 
-      // Admin role validation
-      // Email validation
+    //   // Admin role validation
+    //   // Email validation
+    //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //   if (!emailRegex.test(this.formData.email)) {
+    //     Swal.fire('Error', 'Please enter a valid email', 'error');
+    //     return false;
+    //   }
+
+    //   // Password validation for signup
+    //   if (this.isSignup) {
+    //     if (this.formData.password.length < 8) {
+    //       Swal.fire('Error', 'Password must be at least 8 characters', 'error');
+    //       return false;
+    //     }
+
+    //     if (this.formData.password !== this.formData.confirm_password) {
+    //       Swal.fire('Error', 'Passwords do not match', 'error');
+    //       return false;
+    //     }
+    //   } else {
+    //     // Signin validation
+    //     if (!this.formData.password || this.formData.password.trim() === '') {
+    //       Swal.fire('Error', 'Please enter your password', 'error');
+    //       return false;
+    //     }
+    //   }
+
+    //   // reCAPTCHA validation
+    //   if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+    //     const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
+    //     if (!recaptchaResponse) {
+    //       Swal.fire('Error', 'Please verify you are not a robot', 'error');
+    //       return false;
+    //     }
+    //   }
+
+    //   return true;
+    // },
+    validateForm() {
+
+  /* ================= USER ROLE ================= */
+  if (this.currentRole === 'user') {
+
+    // STEP 1: Email validation (Before sending OTP)
+    if (!this.otpSent) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.formData.email)) {
         Swal.fire('Error', 'Please enter a valid email', 'error');
         return false;
       }
 
-      // Password validation for signup
-      if (this.isSignup) {
-        if (this.formData.password.length < 8) {
-          Swal.fire('Error', 'Password must be at least 8 characters', 'error');
-          return false;
-        }
-
-        if (this.formData.password !== this.formData.confirm_password) {
-          Swal.fire('Error', 'Passwords do not match', 'error');
-          return false;
-        }
-      } else {
-        // Signin validation
-        if (!this.formData.password || this.formData.password.trim() === '') {
-          Swal.fire('Error', 'Please enter your password', 'error');
-          return false;
-        }
-      }
-
-      // reCAPTCHA validation
+      // ✅ reCAPTCHA validation (User → Sign In → Send OTP)
       if (window.grecaptcha && this.recaptchaWidgetId !== null) {
         const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
         if (!recaptchaResponse) {
@@ -407,7 +432,56 @@ export default {
       }
 
       return true;
-    },
+    }
+
+    // STEP 2: OTP validation (After OTP is sent)
+    if (!this.otp || this.otp.trim() === '') {
+      Swal.fire('Error', 'Please enter the OTP', 'error');
+      return false;
+    }
+
+    return true;
+  }
+
+  /* ================= ADMIN ROLE ================= */
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(this.formData.email)) {
+    Swal.fire('Error', 'Please enter a valid email', 'error');
+    return false;
+  }
+
+  // Password validation (Signup)
+  if (this.isSignup) {
+    if (this.formData.password.length < 8) {
+      Swal.fire('Error', 'Password must be at least 8 characters', 'error');
+      return false;
+    }
+
+    if (this.formData.password !== this.formData.confirm_password) {
+      Swal.fire('Error', 'Passwords do not match', 'error');
+      return false;
+    }
+  } else {
+    // Sign In validation
+    if (!this.formData.password || this.formData.password.trim() === '') {
+      Swal.fire('Error', 'Please enter your password', 'error');
+      return false;
+    }
+  }
+
+  // ✅ reCAPTCHA validation (Admin Sign In & Sign Up)
+  if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+    const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
+    if (!recaptchaResponse) {
+      Swal.fire('Error', 'Please verify you are not a robot', 'error');
+      return false;
+    }
+  }
+
+  return true;
+},
     async handleSubmit() {
   if (!this.validateForm()) return;
 
@@ -421,6 +495,8 @@ export default {
         confirmButtonColor: '#5a44ff'
       });
       this.otpSent = true;
+      // 👇 ADD THIS
+  this.resetRecaptcha();
       return;
     } else {
       this.loading = true;

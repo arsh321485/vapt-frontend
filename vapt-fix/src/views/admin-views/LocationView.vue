@@ -342,18 +342,60 @@ export default {
       this.locationName = country;
       this.showDropdown = false;
     },
+    // async handleAddLocation() {
+    //   if (!this.locationName.trim()) return;
+
+    //   const res = await this.authStore.addLocation(this.locationName.trim());
+
+    //   if (res.status) {
+    //     this.locationName = "";
+    //     this.filteredCountries = [];
+    //     this.showDropdown = false;
+    //   } else {
+    //     Swal.fire("Error", res.message || "Failed to add location", "error");
+    //   }
+    // },
     async handleAddLocation() {
-      if (!this.locationName.trim()) return;
+  if (!this.locationName.trim()) return;
 
-      const res = await this.authStore.addLocation(this.locationName.trim());
+  const res = await this.authStore.addLocation(this.locationName.trim());
 
-      if (res.status) {
-        this.locationName = "";
-        this.filteredCountries = [];
-        this.showDropdown = false;
-      } else {
-        Swal.fire("Error", res.message || "Failed to add location", "error");
-      }
+  // ❌ DUPLICATE LOCATION (Backend validation error)
+  if (
+    res.status === false &&
+    res.details?.location_name?.length
+  ) {
+    Swal.fire({
+      icon: "warning", // ⚠️ exclamation icon
+      title: "Duplicate Location",
+      text: res.details.location_name[0],
+      confirmButtonColor: "#5a44ff"
+    });
+    return;
+  }
+
+  // ❌ Other backend error
+  if (res.status === false) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: res.message || "Failed to add location",
+      confirmButtonColor: "#5a44ff"
+    });
+    return;
+  }
+
+  // ✅ SUCCESS (ONLY HERE)
+  this.locationName = "";
+  this.filteredCountries = [];
+  this.showDropdown = false;
+
+  Swal.fire({
+    icon: "success",
+    title: "Location added",
+    text: "Location has been added successfully",
+    confirmButtonColor: "#5a44ff"
+  });
     },
     getInitials(name) {
       if (!name) return "";
