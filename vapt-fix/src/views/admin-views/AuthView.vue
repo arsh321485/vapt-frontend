@@ -443,98 +443,15 @@ export default {
 
   return true;
     },
-  //   async handleSubmit() {
-  // if (!this.validateForm()) return;
-
-  // /* ================= USER ROLE (OTP FLOW) ================= */
-  // if (this.currentRole === 'user') {
-  //   if (!this.otpSent) {
-  //     Swal.fire({
-  //       icon: 'success',
-  //       title: 'OTP Sent',
-  //       text: `OTP has been sent to ${this.formData.email}`,
-  //       confirmButtonColor: '#5a44ff'
-  //     });
-  //     this.otpSent = true;
-  //     // 👇 ADD THIS
-  // this.resetRecaptcha();
-  //     return;
-  //   } else {
-  //     this.loading = true;
-  //     setTimeout(() => {
-  //       this.loading = false;
-  //       Swal.fire({
-  //         icon: 'success',
-  //         title: 'Success',
-  //         text: 'Sign in successful!',
-  //         confirmButtonColor: '#5a44ff',
-  //         timer: 1500,
-  //         showConfirmButton: false
-  //       });
-
-  //       setTimeout(() => {
-  //         this.$router.push('/userdashboard');
-  //       }, 1500);
-  //     }, 500);
-  //     return;
-  //   }
-  // }
-
-  // /* ================= ADMIN ROLE ================= */
-
-  // // 👉 PASSWORD VALIDATION (Signup only, Admin only)
-  // if (this.currentRole === 'admin' && this.isSignup) {
-  //   if (
-  //     !this.rules.minLength ||
-  //     !this.rules.uppercase ||
-  //     !this.rules.special
-  //   ) {
-  //     Swal.fire({
-  //       icon: 'error',
-  //       title: 'Invalid Password',
-  //       text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
-  //       confirmButtonColor: '#5a44ff'
-  //     });
-  //     return;
-  //   }
-
-  //   // 👉 Confirm password match (only on submit)
-  //   if (this.formData.password !== this.formData.confirm_password) {
-  //     Swal.fire({
-  //       icon: 'error',
-  //       title: 'Password Mismatch',
-  //       text: 'Password and Confirm Password do not match.',
-  //       confirmButtonColor: '#5a44ff'
-  //     });
-  //     return;
-  //   }
-  // }
-
-  // this.loading = true;
-
-  // try {
-  //   const recaptchaResponse = window.grecaptcha
-  //     ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
-  //     : "";
-
-  //   if (this.isSignup) {
-  //     await this.handleSignup(recaptchaResponse);
-  //   } else {
-  //     await this.handleSignin(recaptchaResponse);
-  //   }
-  // } catch (error) {
-  //   console.error('Form submission error:', error);
-  //   Swal.fire(
-  //     'Error',
-  //     error.message || 'Something went wrong',
-  //     'error'
-  //   );
-  // } finally {
-  //   this.loading = false;
-  // }
-  //   },
     async handleSubmit() {
-    if (!this.validateForm()) return;
+    // if (!this.validateForm()) return;
+    if (
+  !(this.currentRole === 'admin' &&
+    this.currentMode === 'signup' &&
+    this.adminOtpSent)
+) {
+  if (!this.validateForm()) return;
+}
 
     /* ================= USER ROLE (OTP FLOW) ================= */
     if (this.currentRole === 'user') {
