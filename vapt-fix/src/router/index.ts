@@ -42,6 +42,7 @@ import UserDashboard1View from '../views/user-views/UserDashboard1View.vue'
 import UserSignupView from '../views/user-views/UserSignupView.vue'
 import ChooseAccountView from '../views/admin-views/ChooseAccountView.vue'
 import AuthView from '../views/admin-views/AuthView.vue'
+import JiraCallbackView from '../views/admin-views/JiraCallbackView.vue'
 
 
 const router = createRouter({
@@ -219,6 +220,11 @@ const router = createRouter({
       path: '/notification',
       name: 'notification',
       component: NotificationPanel,
+    },
+    {
+      path: '/jira/callback',
+      name: 'jira-callback',
+      component: JiraCallbackView,
     },
 
     // user path

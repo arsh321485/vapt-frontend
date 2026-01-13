@@ -940,6 +940,58 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // 🧠 Jira OAuth - Handle Callback (exchange code for token)
+  async handleJiraCallback(code: string, state: string) {
+    try {
+      const res = await endpoint.get("/admin/users/jira/callback/", {
+        params: { code, state }
+      });
+      const data = res.data;
+
+      if (data?.access_token) {
+        localStorage.setItem("jira_access_token", data.access_token);
+        if (data.refresh_token) {
+          localStorage.setItem("jira_refresh_token", data.refresh_token);
+        }
+        return { status: true, data };
+      }
+
+      return { status: false, message: "No access token received" };
+    } catch (error: any) {
+      console.error("❌ Jira callback error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Jira authentication failed",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
+  // 🧠 Jira - Get Accessible Resources (Cloud IDs)
+  async getJiraResources() {
+    try {
+      const jiraToken = localStorage.getItem("jira_access_token");
+      if (!jiraToken) {
+        return { status: false, message: "No Jira access token found" };
+      }
+
+      const res = await endpoint.get("/admin/users/jira/resources/", {
+        headers: {
+          "Jira-Access-Token": jiraToken
+        }
+      });
+
+      return { status: true, data: res.data.resources || res.data };
+    } catch (error: any) {
+      console.error("❌ Jira resources error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Failed to fetch Jira resources",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
   // fetch total assets
   async fetchTotalAssets(reportId: string) {
   try {

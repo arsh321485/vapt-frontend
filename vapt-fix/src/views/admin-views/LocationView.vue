@@ -215,6 +215,8 @@ export default {
       slackChannels: [],
       teams: [],
       backendBase: "https://vaptbackend.secureitlab.com",
+      jiraResources: [],
+      jiraConnected: false,
     };
   },
   computed: {
@@ -515,6 +517,11 @@ export default {
       // First-time selection → apply immediately
       if (!this.selectedProject) {
         this.selectedProject = value;
+
+        // ✅ Start Jira OAuth when Jira is selected
+        if (value === "jira") {
+          await this.startJiraLogin();
+        }
         return;
       }
 
@@ -536,6 +543,11 @@ export default {
       if (res.isConfirmed) {
         // ✅ Apply active ONLY after Yes
         this.selectedProject = this.pendingProject;
+
+        // ✅ Start Jira OAuth when switching to Jira
+        if (this.pendingProject === "jira") {
+          await this.startJiraLogin();
+        }
       }
 
       // Cleanup
@@ -606,6 +618,48 @@ export default {
         );
       }
     },
+    // ✅ Jira OAuth Login
+    async startJiraLogin() {
+      try {
+        const res = await this.authStore.getJiraAuthUrl();
+
+        if (res.status && res.url) {
+          // Store state for verification
+          localStorage.setItem("jira_oauth_state", res.state);
+
+          // Open Jira OAuth in new tab (not popup)
+          window.open(res.url, "_blank");
+        } else {
+          Swal.fire("Error", res.message || "Failed to start Jira login", "error");
+        }
+      } catch (err) {
+        console.error("Jira login error:", err);
+        Swal.fire("Error", "Jira login failed", "error");
+      }
+    },
+    // ✅ Handle Jira Connected Event
+    onJiraConnected(event) {
+      if (event.data?.type === "JIRA_CONNECTED") {
+        this.jiraConnected = true;
+        this.fetchJiraResources();
+        Swal.fire({
+          icon: "success",
+          title: "Jira Connected",
+          text: "Jira has been connected successfully!",
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    },
+    // ✅ Fetch Jira Resources (Cloud IDs)
+    async fetchJiraResources() {
+      const res = await this.authStore.getJiraResources();
+      if (res.status) {
+        this.jiraResources = res.data;
+        this.jiraConnected = true;
+        console.log("Jira Resources:", this.jiraResources);
+      }
+    },
   },
 
   mounted() {
@@ -621,6 +675,17 @@ export default {
     const token = localStorage.getItem("slack_bot_token");
     if (token) {
       this.fetchSlackChannels();
+    }
+
+    // ✅ Jira event listener
+    window.addEventListener("message", this.onJiraConnected);
+
+    // Check if Jira already connected
+    const jiraToken = localStorage.getItem("jira_access_token");
+    if (jiraToken) {
+      this.jiraConnected = true;
+      this.selectedProject = "jira";
+      this.fetchJiraResources();
     }
 
     document.addEventListener("click", this.closeOnOutside);
@@ -648,6 +713,7 @@ export default {
     document.removeEventListener("click", this.closeOnOutside);
     window.removeEventListener("message", this.onSlackConnected);
     window.removeEventListener("message", this.onTeamsConnected);
+    window.removeEventListener("message", this.onJiraConnected);
   },
 
 };

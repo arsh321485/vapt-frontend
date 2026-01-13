@@ -34,9 +34,9 @@
 
               <select v-model="type" class="form-select">
                 <option disabled value="">Select Type</option>
-                <option>Both</option>
-                <option>External</option>
-                <option>Internal</option>
+                <option value="Both" :disabled="disabledTypes.includes('both')">Both</option>
+                <option value="External" :disabled="disabledTypes.includes('external')">External</option>
+                <option value="Internal" :disabled="disabledTypes.includes('internal')">Internal</option>
               </select>
             </div>
           </div>
@@ -57,21 +57,30 @@
                 <table class="mt-3">
                   <thead>
                     <tr>
+                      <th>S.No.</th>
                       <th>File Name</th>
                       <th>Type</th>
                       <th>Location</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in uploadedFiles" :key="index">
+                      <td>{{ index + 1 }}</td>
                       <td>{{ item.file.name }}</td>
                       <td class="text-capitalize">{{ item.type }}</td>
                       <td>{{ item.locationName }}</td>
                       <td>
+                        <span v-if="item.status === 'uploading'" class="loader"></span>
+                        <i v-else-if="item.status === 'success'" class="bi bi-check-circle-fill status-icon text-success"></i>
+                        <i v-else-if="item.status === 'error'" class="bi bi-x-circle-fill status-icon text-danger" :title="item.errorMsg"></i>
+                      </td>
+                      <td>
                         <i
                           class="bi bi-eye action-btn view"
-                          @click="viewFile(index)"
+                          :class="{ 'action-disabled': item.status === 'uploading' }"
+                          @click="item.status !== 'uploading' && viewFile(index)"
                         ></i>
                         <i
                           class="bi bi-trash action-btn delete"
@@ -106,19 +115,17 @@
       </div>
 
         <div class="cta">
-          
+
           <button
             type="button"
             class="btn btn-primary"
-            :disabled="!uploadedFiles.length"
+            :disabled="!allUploadsComplete"
             @click="handleUploadAndRedirect"
           >
             {{ returnTo ? 'Back to Previous Page →' : 'Continue to Dashboard →' }}
           </button>
-          <p v-if="showSlowUploadMsg" class="upload-warning">
-            ⏳ Upload is taking longer than usual.
-            Large vulnerability reports may take a few minutes.
-            Please don’t refresh the page.
+          <p v-if="hasAnyUploading" class="upload-warning">
+            ⏳ {{ uploadingCount }} file(s) still uploading... Please don't refresh the page.
           </p>
         </div>
       </div>
@@ -150,8 +157,68 @@ export default {
   computed: {
   returnTo() {
     return this.$route.query.returnTo || null;
+  },
+  // Map: locationId → Set of used types
+  usedTypesByLocation() {
+    const map = {};
+    for (const file of this.uploadedFiles) {
+      if (!map[file.locationId]) {
+        map[file.locationId] = new Set();
+      }
+      map[file.locationId].add(file.type.toLowerCase());
+    }
+    return map;
+  },
+  // Get disabled types for currently selected location
+  disabledTypes() {
+    if (!this.location) return [];
+    const used = this.usedTypesByLocation[this.location];
+    if (!used) return []; // First time - nothing disabled
+
+    // If "both" was selected, disable everything
+    if (used.has('both')) return ['both', 'external', 'internal'];
+
+    // If both internal AND external uploaded, disable all
+    if (used.has('internal') && used.has('external')) {
+      return ['both', 'external', 'internal'];
+    }
+
+    // Disable what's already used + "Both" (since partial exists)
+    const disabled = ['both']; // Can't select "Both" if any individual type exists
+    if (used.has('internal')) disabled.push('internal');
+    if (used.has('external')) disabled.push('external');
+
+    return disabled;
+  },
+  // Check if all uploads are complete (for enabling Continue button)
+  allUploadsComplete() {
+    if (this.uploadedFiles.length === 0) return false;
+    return this.uploadedFiles.every(f => f.status === 'success');
+  },
+  // Check if any file is currently uploading
+  hasAnyUploading() {
+    return this.uploadedFiles.some(f => f.status === 'uploading');
+  },
+  // Count of files currently uploading
+  uploadingCount() {
+    return this.uploadedFiles.filter(f => f.status === 'uploading').length;
   }
 },
+  watch: {
+    location() {
+      this.type = ''; // Reset type when location changes
+    },
+    // ✅ Mark step 3 as completed when table has successfully uploaded files
+    uploadedFiles: {
+      handler(files) {
+        const hasSuccessfulUploads = files.some(f => f.status === 'success');
+        if (hasSuccessfulUploads && this.authStore) {
+          this.authStore.markStepCompleted(3);
+        }
+      },
+      deep: true
+    }
+  },
   async mounted() {
     this.authStore = useAuthStore();
     const user = JSON.parse(localStorage.getItem("user"));
@@ -159,6 +226,11 @@ export default {
 
     await this.fetchLocations();
     await this.fetchUploadedReports();
+
+    // ✅ Check if step 3 should be marked completed on page load
+    if (this.uploadedFiles.some(f => f.status === 'success')) {
+      this.authStore.markStepCompleted(3);
+    }
   },
   methods: {
     async fetchLocations() {
@@ -186,80 +258,83 @@ export default {
       this.dragover = false;
       this.handleFiles([...e.dataTransfer.files]);
     },
-    /* ---------------- HANDLE FILES (UPLOAD HERE) ---------------- */
-    async handleFiles(files) {
+    /* ---------------- HANDLE FILES (NON-BLOCKING UPLOAD) ---------------- */
+    handleFiles(files) {
       for (const file of files) {
         const selectedLocation = this.locations.find(
           loc => loc._id === this.location
         );
-        this.isUploading = true;
-        Swal.fire({
-          title: "Uploading report...",
-          html: `
-        <p style="font-size:14px;color:#6b7280">
-          Large vulnerability reports may take a few minutes.<br/>
-          Please don’t refresh the page.
-        </p>
-      `,
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          didOpen: () => Swal.showLoading(),
+
+        // 1️⃣ Add to table IMMEDIATELY with 'uploading' status
+        const fileIndex = this.uploadedFiles.length;
+        this.uploadedFiles.push({
+          file,
+          reportId: null,
+          locationId: this.location,
+          locationName: selectedLocation?.location_name || "",
+          type: this.type,
+          status: 'uploading',
         });
-        try {
-      const res = await this.authStore.uploadVulnerabilityReport({
-  locationId: this.location,
-  memberType: this.type.toLowerCase(),
-  file
-});
 
-Swal.close();
-this.isUploading = false;
+        // 2️⃣ Store values before reset (for async upload)
+        const locationId = this.location;
+        const memberType = this.type.toLowerCase();
 
-// ❌ DUPLICATE FILE
-if (!res.status && res.isDuplicate) {
-  Swal.fire({
-    icon: "warning",
-    title: "Duplicate File",
-    text: res.message, // 👈 backend message
-    confirmButtonColor: "#5a44ff"
-  });
-  continue; // 🔥 skip adding file
-}
+        // 3️⃣ Reset dropdowns IMMEDIATELY (don't wait for upload)
+        this.location = "";
+        this.type = "";
 
-// ❌ OTHER ERROR
-if (!res.status) {
-  Swal.fire({
-    icon: "error",
-    title: "Upload failed",
-    text: res.message || "Something went wrong while uploading.",
-  });
-  continue;
-}
+        // 4️⃣ Upload in background (fire and forget - no await)
+        this.uploadFileAsync(file, locationId, memberType, fileIndex);
+      }
+    },
 
-// ✅ SUCCESS ONLY
-this.uploadedFiles.push({
-  file,
-  reportId: res.data?.results?.[0]?._id || res.data?.id,
-  locationId: this.location,
-  locationName: selectedLocation?.location_name || "",
-  type: this.type,
-});
+    /* ---------------- ASYNC UPLOAD (BACKGROUND) ---------------- */
+    async uploadFileAsync(file, locationId, memberType, fileIndex) {
+      try {
+        const res = await this.authStore.uploadVulnerabilityReport({
+          locationId,
+          memberType,
+          file
+        });
 
-// reset selection
-this.location = "";
-this.type = "";
+        // ❌ DUPLICATE FILE
+        if (!res.status && res.isDuplicate) {
+          this.uploadedFiles[fileIndex].status = 'error';
+          this.uploadedFiles[fileIndex].errorMsg = res.message;
+          Swal.fire({
+            icon: "warning",
+            title: "Duplicate File",
+            text: res.message,
+            confirmButtonColor: "#5a44ff"
+          });
+          return;
+        }
 
+        // ❌ OTHER ERROR
+        if (!res.status) {
+          this.uploadedFiles[fileIndex].status = 'error';
+          this.uploadedFiles[fileIndex].errorMsg = res.message || "Upload failed";
+          Swal.fire({
+            icon: "error",
+            title: "Upload failed",
+            text: res.message || "Something went wrong while uploading.",
+          });
+          return;
+        }
 
-    } catch (err) {
-      Swal.close();
-      this.isUploading = false;
+        // ✅ SUCCESS - update status and reportId
+        this.uploadedFiles[fileIndex].status = 'success';
+        this.uploadedFiles[fileIndex].reportId = res.data?.results?.[0]?._id || res.data?.id;
 
-      Swal.fire({
-        icon: "error",
-        title: "Upload failed",
-        text: "Something went wrong while uploading.",
-      });
-    }
+      } catch (err) {
+        this.uploadedFiles[fileIndex].status = 'error';
+        this.uploadedFiles[fileIndex].errorMsg = "Something went wrong";
+        Swal.fire({
+          icon: "error",
+          title: "Upload failed",
+          text: "Something went wrong while uploading.",
+        });
       }
     },
     /* ---------------- FINAL CONTINUE BUTTON ---------------- */
@@ -308,7 +383,27 @@ this.type = "";
     async deleteFile(index) {
   const report = this.uploadedFiles[index];
 
-  // 🔐 Safety check
+  // 🔄 If still uploading or errored without reportId, just remove from list
+  if (report.status === 'uploading' || report.status === 'error') {
+    const confirm = await Swal.fire({
+      icon: "warning",
+      title: report.status === 'uploading' ? "Cancel Upload?" : "Remove Entry?",
+      text: report.status === 'uploading'
+        ? "This file is still uploading. Remove it from the list?"
+        : "Remove this failed upload from the list?",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#d33",
+    });
+
+    if (confirm.isConfirmed) {
+      this.uploadedFiles.splice(index, 1);
+    }
+    return;
+  }
+
+  // 🔐 Safety check for completed uploads
   if (!report?.reportId) {
     Swal.fire({
       icon: "error",
@@ -374,7 +469,7 @@ this.type = "";
     locationId: report.location,
     locationName: report.location_name,
     type: report.member_type,
-    status: report.status,
+    status: 'success',                  // Already uploaded = success
     parsedCount: report.parsed_count,
     uploadedAt: report.uploaded_at,
   }));
@@ -649,6 +744,49 @@ this.type = "";
 .action-btn:hover {
   transform: scale(1.1);
   opacity: 0.9;
+}
+
+/* ===== Status icon styles ===== */
+.status-icon {
+  font-size: 18px;
+}
+
+.text-success {
+  color: #22c55e;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+/* ===== Loading spinner ===== */
+.loader {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #e6e9f2;
+  border-top: 3px solid #5a44ff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: loader-spin 0.8s linear infinite;
+}
+
+@keyframes loader-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Disabled action button ===== */
+.action-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ===== Upload warning message ===== */
+.upload-warning {
+  color: #f59e0b;
+  font-size: 14px;
+  margin-top: 12px;
 }
 
 /* larger screen */
