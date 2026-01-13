@@ -72,7 +72,6 @@ export const useAuthStore = defineStore("auth", {
     }),
 
   actions: {
-
   // ✅ Restore session on reload
   restoreFromStorage() {
       const access = localStorage.getItem("accessToken");
@@ -714,128 +713,207 @@ export const useAuthStore = defineStore("auth", {
   // },
 
   // 🧠 Login with Microsoft Teams OAuth
+  // async microsoftLogin(authCode: string, state: string) {
+  // try {
+  //   const response = await endpoint.post("/admin/users/microsoft-oauth/", {
+  //     code: authCode,
+  //     state,
+  //   });
+
+  //   const data = response.data;
+  //   console.log("✅ Microsoft Teams login success:", data);
+
+  //   if (data && data.tokens && data.user) {
+  //     // Save in localStorage
+  //     localStorage.setItem("teams_user", JSON.stringify(data.user));
+  //     localStorage.setItem("teams_access_token", data.tokens.access);
+  //     localStorage.setItem("teams_refresh_token", data.tokens.refresh);
+  //     localStorage.setItem("authenticated", "true");
+
+  //     return { status: true, data };
+  //   } else {
+  //     return { status: false, message: "Invalid Microsoft login response" };
+  //   }
+  // } catch (err: any) {
+  //   console.error("❌ Microsoft login API error:", err);
+  //   return {
+  //     status: false,
+  //     message:
+  //       err.response?.data?.message || "Microsoft login failed, please try again",
+  //   };
+  // }
+  // },
   async microsoftLogin(authCode: string, state: string) {
-  try {
-    const response = await endpoint.post("/admin/users/microsoft-oauth/", {
-      code: authCode,
-      state,
-    });
+      const response = await endpoint.post(
+        "/api/admin/users/microsoft-teams-oauth/",
+        {
+          code: authCode,
+          state,
+        }
+      );
 
-    const data = response.data;
-    console.log("✅ Microsoft Teams login success:", data);
+      const data = response.data;
 
-    if (data && data.tokens && data.user) {
-      // Save in localStorage
-      localStorage.setItem("teams_user", JSON.stringify(data.user));
-      localStorage.setItem("teams_access_token", data.tokens.access);
-      localStorage.setItem("teams_refresh_token", data.tokens.refresh);
-      localStorage.setItem("authenticated", "true");
+      if (data?.tokens && data?.user) {
+        localStorage.setItem("teams_access_token", data.tokens.access);
+        localStorage.setItem("teams_refresh_token", data.tokens.refresh);
+        localStorage.setItem("teams_user", JSON.stringify(data.user));
+        localStorage.setItem("teams_connected", "true");
 
-      return { status: true, data };
-    } else {
-      return { status: false, message: "Invalid Microsoft login response" };
-    }
-  } catch (err: any) {
-    console.error("❌ Microsoft login API error:", err);
-    return {
-      status: false,
-      message:
-        err.response?.data?.message || "Microsoft login failed, please try again",
-    };
+        return { status: true, data };
+      }
+
+      return { status: false };
+  },
+  async getMicrosoftOAuthUrl(redirectUri: string) {
+  const res = await endpoint.get(
+    `/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}`
+  );
+
+  if (res.data?.auth_url) {
+    return { status: true, data: res.data };
   }
+
+  return { status: false };
   },
 
   // 🧠 Login with Slack OAuth  
+  // async getSlackOAuthUrl(baseUrl: string) {
+  //     try {
+  //       const res = await endpoint.post("/admin/users/slack/oauth-url/", {
+  //         base_url: baseUrl,
+  //       });
+
+  //       if (res.data.success) {
+  //         console.log("✅ Slack OAuth URL received:", res.data.auth_url);
+  //         return { status: true, data: res.data };
+  //       } else {
+  //         return { status: false, message: "Failed to get Slack OAuth URL" };
+  //       }
+  //     } catch (error: any) {
+  //       console.error("Slack OAuth URL API error:", error);
+  //       return {
+  //         status: false,
+  //         message:
+  //           error.response?.data?.message ||
+  //           error.message ||
+  //           "Slack OAuth URL fetch failed",
+  //         details: error.response?.data || null,
+  //       };
+  //     }
+  // },
+  // async getSlackBotToken(code: string) {
+  //     try {
+  //       const res = await endpoint.get("/admin/users/slack/callback/", {
+  //         params: { code, state: "dummy_state" },
+  //       });
+
+  //       if (res.data.success && res.data.data?.bot?.access_token) {
+  //         const botToken = res.data.data.bot.access_token;
+  //         console.log("🤖 Bot Access Token:", botToken);
+
+  //         // Save it for later use
+  //         localStorage.setItem("slack_user_login", botToken);
+  //         return { status: true, botToken };
+  //       } else {
+  //         return { status: false, message: "Failed to get bot access token" };
+  //       }
+  //     } catch (error: any) {
+  //       console.error("Slack callback API error:", error);
+  //       return {
+  //         status: false,
+  //         message:
+  //           error.response?.data?.message ||
+  //           error.message ||
+  //           "Slack callback failed",
+  //       };
+  //     }
+  // },
+  // async loginWithSlack(botToken: string, code: string, redirectUri: string) {
+  //     try {
+  //       // Debug
+  //       console.log("🚀 Using bot token for login:", botToken);
+
+  //       const res = await endpoint.post("/admin/users/slack-oauth/", {
+  //         code,
+  //         redirect_uri: redirectUri,
+  //       });
+
+  //       const data = res.data;
+
+  //       if (data.success) {
+  //         const slackData = data.data;
+
+  //         // Save user data
+  //         if (slackData.user) {
+  //           this.user = slackData.user;
+  //           localStorage.setItem(
+  //             "slack_user_login_data",
+  //             JSON.stringify(this.user)
+  //           );
+  //           console.log("👤 Slack User Saved:", this.user);
+  //         }
+
+  //         return { status: true, data: slackData };
+  //       }
+  //       return { status: false, message: "Slack login failed" };
+  //     } catch (error: any) {
+  //       console.error("Slack login API error:", error);
+  //       return {
+  //         status: false,
+  //         message:
+  //           error.response?.data?.message ||
+  //           error.message ||
+  //           "Slack login failed",
+  //       };
+  //     }
+  // },
+
   async getSlackOAuthUrl(baseUrl: string) {
-      try {
-        const res = await endpoint.post("/admin/users/slack/oauth-url/", {
+      const res = await endpoint.post(
+        "/admin/users/slack/oauth-url/",
+        {
           base_url: baseUrl,
-        });
-
-        if (res.data.success) {
-          console.log("✅ Slack OAuth URL received:", res.data.auth_url);
-          return { status: true, data: res.data };
-        } else {
-          return { status: false, message: "Failed to get Slack OAuth URL" };
         }
-      } catch (error: any) {
-        console.error("Slack OAuth URL API error:", error);
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Slack OAuth URL fetch failed",
-          details: error.response?.data || null,
-        };
+      );
+
+      if (res.data.success) {
+        return { status: true, data: res.data };
       }
-  },
-  async getSlackBotToken(code: string) {
-      try {
-        const res = await endpoint.get("/admin/users/slack/callback/", {
-          params: { code, state: "dummy_state" },
-        });
+      return { status: false };
+    },
 
-        if (res.data.success && res.data.data?.bot?.access_token) {
-          const botToken = res.data.data.bot.access_token;
-          console.log("🤖 Bot Access Token:", botToken);
-
-          // Save it for later use
-          localStorage.setItem("slack_user_login", botToken);
-          return { status: true, botToken };
-        } else {
-          return { status: false, message: "Failed to get bot access token" };
-        }
-      } catch (error: any) {
-        console.error("Slack callback API error:", error);
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Slack callback failed",
-        };
-      }
-  },
-  async loginWithSlack(botToken: string, code: string, redirectUri: string) {
-      try {
-        // Debug
-        console.log("🚀 Using bot token for login:", botToken);
-
-        const res = await endpoint.post("/admin/users/slack-oauth/", {
+    // 🔑 Slack Login (THIS SAVES BOT TOKEN)
+    async loginWithSlack(code: string, redirectUri: string) {
+      const res = await endpoint.post(
+        "/admin/users/slack-oauth/",
+        {
           code,
           redirect_uri: redirectUri,
-        });
-
-        const data = res.data;
-
-        if (data.success) {
-          const slackData = data.data;
-
-          // Save user data
-          if (slackData.user) {
-            this.user = slackData.user;
-            localStorage.setItem(
-              "slack_user_login_data",
-              JSON.stringify(this.user)
-            );
-            console.log("👤 Slack User Saved:", this.user);
-          }
-
-          return { status: true, data: slackData };
         }
-        return { status: false, message: "Slack login failed" };
-      } catch (error: any) {
-        console.error("Slack login API error:", error);
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Slack login failed",
-        };
+      );
+
+      if (res.data.success) {
+        const data = res.data.data;
+
+        // ✅ SAVE BOT TOKEN
+        localStorage.setItem("slack_bot_token", data.bot_access_token);
+
+        if (data.user) {
+          this.user = data.user;
+          localStorage.setItem(
+            "slack_user_login_data",
+            JSON.stringify(data.user)
+          );
+        }
+
+        return { status: true };
       }
-  },
+
+      return { status: false };
+    },
 
   // 🧠 Jira OAuth - Get Authorization URL
   async getJiraAuthUrl() {

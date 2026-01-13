@@ -39,7 +39,7 @@
                 <input type="password" style="display:none" aria-hidden="true">
 
                 <!-- EMAIL (Hidden for User when OTP is sent) -->
-                <div class="mb-2" v-if="currentRole === 'admin' || !otpSent">
+                <div class="mb-2" v-if="(currentRole === 'admin' && !adminOtpSent) || (currentRole === 'user' && !otpSent)">
                   <label class="form-label">Email</label>
                   <input type="email" class="form-control custom-input" placeholder="name@work.com"
                     v-model="formData.email" autocomplete="new-email" autocorrect="off" autocapitalize="off"
@@ -67,8 +67,34 @@
                   <small class="text-light d-block mt-2">OTP has been sent to your email</small>
                 </div>
 
+                <!-- ADMIN OTP FIELD (Signup only - TEMP) -->
+                <div
+                  class="mb-3"
+                  v-if="currentRole === 'admin' && currentMode === 'signup' && adminOtpSent"
+                >
+                  <label class="form-label">Enter OTP</label>
+                  <div class="otp-inputs d-flex justify-content-between gap-2">
+                    <input
+                      v-for="(digit, index) in 6"
+                      :key="index"
+                      type="text"
+                      class="form-control otp-box text-center"
+                      maxlength="1"
+                      v-model="otpDigits[index]"
+                      @input="handleOtpInput($event, index)"
+                      @keydown="handleOtpKeydown($event, index)"
+                      :ref="el => otpRefs[index] = el"
+                      autocomplete="off"
+                      required
+                    />
+                  </div>
+                  <small class="text-light d-block mt-2">
+                    OTP has been sent to your email
+                  </small>
+                </div>
+
                 <!-- PASSWORD (Hidden for User role) -->
-                <div class="mb-2 password-field" v-if="currentRole === 'admin'">
+                <div class="mb-2 password-field" v-if="currentRole === 'admin' && !adminOtpSent">
                   <label class="form-label">Password</label>
                   <div class="position-relative">
                     <input :type="showPassword ? 'text' : 'password'" class="form-control custom-input"
@@ -81,14 +107,14 @@
                   </div>
                 </div>
 
-                <ul v-if="showPasswordRules" class="password-rules mt-2 mb-1">
+                <ul v-if="showPasswordRules && currentRole === 'admin' && !adminOtpSent" class="password-rules mt-2 mb-1">
                   <li :class="{ valid: rules.minLength }">At least 8 characters</li>
                   <li :class="{ valid: rules.uppercase }">At least 1 uppercase letter</li>
                   <li :class="{ valid: rules.special }">At least 1 special character</li>
                 </ul>
 
                 <!-- CONFIRM PASSWORD (Signup only, Admin only) -->
-                <div class="mb-2 password-confirm" v-if="currentMode === 'signup' && currentRole === 'admin'">
+                <div class="mb-2 password-confirm" v-if="currentMode === 'signup' && currentRole === 'admin' && !adminOtpSent">
                   <label class="form-label">Confirm Password</label>
                   <div class="position-relative">
                     <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control custom-input"
@@ -108,8 +134,8 @@
                 </div>
 
                 <!-- reCAPTCHA (Admin only) -->
-                <div class="mb-2 d-flex justify-content-center" v-if="currentRole === 'admin' ||
-    (currentRole === 'user' && currentMode === 'signin' && !otpSent)">
+                <div class="mb-2 d-flex justify-content-center"  v-if="(currentRole === 'admin' && !adminOtpSent) ||
+        (currentRole === 'user' && currentMode === 'signin' && !otpSent)">
                   <div :id="recaptchaContainerId" :key="recaptchaKey"></div>
                 </div>
 
@@ -208,6 +234,7 @@ export default {
       recaptchaSiteKey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
       authStore: null,
       formKey: Date.now(), 
+      adminOtpSent: false,
       otpSent: false,
       otp: "",
       otpDigits: ['', '', '', '', '', ''],
@@ -225,7 +252,6 @@ export default {
       forgotLoading: false,
     };
   },
-
   computed: {
     rightHeadline() {
       if (this.currentRole === "admin") {
@@ -237,33 +263,28 @@ export default {
         ? "Enter the Secure Zone. Sign up to take control"
         : "Welcome back!";
     },
-
     submitButtonText() {
       // User role OTP flow
       if (this.currentRole === 'user') {
         return this.otpSent ? "Sign In" : "Send OTP";
       }
 
-      // Admin role
-      if (this.currentMode === "signup") {
-        return "Continue";
-      }
+      // ADMIN SIGNUP TEMP OTP FLOW
+  if (this.currentRole === 'admin' && this.currentMode === 'signup') {
+    return this.adminOtpSent ? "Sign Up" : "Send OTP";
+  }
       return "Sign In";
     },
-
     recaptchaContainerId() {
       return `recaptcha-${this.currentRole}-${this.currentMode}`;
     },
-
     isSignup() {
       return this.currentMode === "signup";
     },
-
     isAdmin() {
       return this.currentRole === "admin";
     }
   },
-
   methods: {
     switchRole(role) {
       this.currentRole = role;
@@ -283,7 +304,6 @@ export default {
         this.reinitializeRecaptcha();
       });
     },
-
     switchMode(mode) {
       this.currentMode = mode;
       this.resetForm();
@@ -296,7 +316,6 @@ export default {
         this.reinitializeRecaptcha();
       });
     },
-
     resetForm() {
       this.formData = {
         email: "",
@@ -306,6 +325,7 @@ export default {
       this.showPassword = false;
       this.showConfirmPassword = false;
       this.otpSent = false;
+      this.adminOtpSent = false;
       this.otp = "";
       this.otpDigits = ['', '', '', '', '', ''];
     },
@@ -336,7 +356,6 @@ export default {
         this.otpRefs[index + 1]?.focus();
       }
     },
-
     handleOtpKeydown(event, index) {
       // Handle backspace
       if (event.key === 'Backspace' && !this.otpDigits[index] && index > 0) {
@@ -351,64 +370,6 @@ export default {
         this.otpRefs[index + 1]?.focus();
       }
     },
-    // validateForm() {
-      
-    //   if (this.currentRole === 'user') {
-    //     if (!this.otpSent) {
-         
-    //       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    //       if (!emailRegex.test(this.formData.email)) {
-    //         Swal.fire('Error', 'Please enter a valid email', 'error');
-    //         return false;
-    //       }
-    //     } else {
-          
-    //       if (!this.otp || this.otp.trim() === '') {
-    //         Swal.fire('Error', 'Please enter the OTP', 'error');
-    //         return false;
-    //       }
-    //     }
-    //     return true;
-    //   }
-
-    //   // Admin role validation
-    //   // Email validation
-    //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    //   if (!emailRegex.test(this.formData.email)) {
-    //     Swal.fire('Error', 'Please enter a valid email', 'error');
-    //     return false;
-    //   }
-
-    //   // Password validation for signup
-    //   if (this.isSignup) {
-    //     if (this.formData.password.length < 8) {
-    //       Swal.fire('Error', 'Password must be at least 8 characters', 'error');
-    //       return false;
-    //     }
-
-    //     if (this.formData.password !== this.formData.confirm_password) {
-    //       Swal.fire('Error', 'Passwords do not match', 'error');
-    //       return false;
-    //     }
-    //   } else {
-    //     // Signin validation
-    //     if (!this.formData.password || this.formData.password.trim() === '') {
-    //       Swal.fire('Error', 'Please enter your password', 'error');
-    //       return false;
-    //     }
-    //   }
-
-    //   // reCAPTCHA validation
-    //   if (window.grecaptcha && this.recaptchaWidgetId !== null) {
-    //     const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
-    //     if (!recaptchaResponse) {
-    //       Swal.fire('Error', 'Please verify you are not a robot', 'error');
-    //       return false;
-    //     }
-    //   }
-
-    //   return true;
-    // },
     validateForm() {
 
   /* ================= USER ROLE ================= */
@@ -481,97 +442,224 @@ export default {
   }
 
   return true;
-},
-    async handleSubmit() {
-  if (!this.validateForm()) return;
+    },
+  //   async handleSubmit() {
+  // if (!this.validateForm()) return;
 
-  /* ================= USER ROLE (OTP FLOW) ================= */
-  if (this.currentRole === 'user') {
-    if (!this.otpSent) {
-      Swal.fire({
-        icon: 'success',
-        title: 'OTP Sent',
-        text: `OTP has been sent to ${this.formData.email}`,
-        confirmButtonColor: '#5a44ff'
-      });
-      this.otpSent = true;
-      // 👇 ADD THIS
-  this.resetRecaptcha();
-      return;
-    } else {
-      this.loading = true;
-      setTimeout(() => {
-        this.loading = false;
+  // /* ================= USER ROLE (OTP FLOW) ================= */
+  // if (this.currentRole === 'user') {
+  //   if (!this.otpSent) {
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'OTP Sent',
+  //       text: `OTP has been sent to ${this.formData.email}`,
+  //       confirmButtonColor: '#5a44ff'
+  //     });
+  //     this.otpSent = true;
+  //     // 👇 ADD THIS
+  // this.resetRecaptcha();
+  //     return;
+  //   } else {
+  //     this.loading = true;
+  //     setTimeout(() => {
+  //       this.loading = false;
+  //       Swal.fire({
+  //         icon: 'success',
+  //         title: 'Success',
+  //         text: 'Sign in successful!',
+  //         confirmButtonColor: '#5a44ff',
+  //         timer: 1500,
+  //         showConfirmButton: false
+  //       });
+
+  //       setTimeout(() => {
+  //         this.$router.push('/userdashboard');
+  //       }, 1500);
+  //     }, 500);
+  //     return;
+  //   }
+  // }
+
+  // /* ================= ADMIN ROLE ================= */
+
+  // // 👉 PASSWORD VALIDATION (Signup only, Admin only)
+  // if (this.currentRole === 'admin' && this.isSignup) {
+  //   if (
+  //     !this.rules.minLength ||
+  //     !this.rules.uppercase ||
+  //     !this.rules.special
+  //   ) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Invalid Password',
+  //       text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
+  //       confirmButtonColor: '#5a44ff'
+  //     });
+  //     return;
+  //   }
+
+  //   // 👉 Confirm password match (only on submit)
+  //   if (this.formData.password !== this.formData.confirm_password) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Password Mismatch',
+  //       text: 'Password and Confirm Password do not match.',
+  //       confirmButtonColor: '#5a44ff'
+  //     });
+  //     return;
+  //   }
+  // }
+
+  // this.loading = true;
+
+  // try {
+  //   const recaptchaResponse = window.grecaptcha
+  //     ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
+  //     : "";
+
+  //   if (this.isSignup) {
+  //     await this.handleSignup(recaptchaResponse);
+  //   } else {
+  //     await this.handleSignin(recaptchaResponse);
+  //   }
+  // } catch (error) {
+  //   console.error('Form submission error:', error);
+  //   Swal.fire(
+  //     'Error',
+  //     error.message || 'Something went wrong',
+  //     'error'
+  //   );
+  // } finally {
+  //   this.loading = false;
+  // }
+  //   },
+    async handleSubmit() {
+    if (!this.validateForm()) return;
+
+    /* ================= USER ROLE (OTP FLOW) ================= */
+    if (this.currentRole === 'user') {
+      if (!this.otpSent) {
         Swal.fire({
           icon: 'success',
-          title: 'Success',
-          text: 'Sign in successful!',
-          confirmButtonColor: '#5a44ff',
-          timer: 1500,
+          title: 'OTP Sent',
+          text: `OTP has been sent to ${this.formData.email}`,
+          confirmButtonColor: '#5a44ff'
+        });
+        this.otpSent = true;
+        this.resetRecaptcha();
+        return;
+      } else {
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Sign in successful!',
+            confirmButtonColor: '#5a44ff',
+            timer: 1500,
+            showConfirmButton: false
+          });
+
+          setTimeout(() => {
+            this.$router.push('/userdashboard');
+          }, 1500);
+        }, 500);
+        return;
+      }
+    }
+
+    /* ================= ADMIN SIGNUP TEMP OTP FLOW ================= */
+    if (
+      this.currentRole === 'admin' &&
+      this.currentMode === 'signup'
+    ) {
+      // 👉 PASSWORD VALIDATION (same as before)
+      if (
+        !this.rules.minLength ||
+        !this.rules.uppercase ||
+        !this.rules.special
+      ) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Password',
+          text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
+          confirmButtonColor: '#5a44ff'
+        });
+        return;
+      }
+
+      if (this.formData.password !== this.formData.confirm_password) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Password Mismatch',
+          text: 'Password and Confirm Password do not match.',
+          confirmButtonColor: '#5a44ff'
+        });
+        return;
+      }
+
+      // STEP 1: SEND OTP (UI ONLY)
+      if (!this.adminOtpSent) {
+        Swal.fire({
+          icon: 'success',
+          title: 'OTP Sent',
+          text: `OTP has been sent to ${this.formData.email}`,
+          timer: 2000,
           showConfirmButton: false
         });
 
-        setTimeout(() => {
-          this.$router.push('/userdashboard');
-        }, 1500);
-      }, 500);
-      return;
-    }
-  }
+        this.adminOtpSent = true;
+        this.resetRecaptcha();
+        return;
+      }
 
-  /* ================= ADMIN ROLE ================= */
+      // STEP 2: VERIFY OTP (UI ONLY)
+      if (!this.otp || this.otp.length !== 6) {
+        Swal.fire('Error', 'Please enter valid OTP', 'error');
+        return;
+      }
 
-  // 👉 PASSWORD VALIDATION (Signup only, Admin only)
-  if (this.currentRole === 'admin' && this.isSignup) {
-    if (
-      !this.rules.minLength ||
-      !this.rules.uppercase ||
-      !this.rules.special
-    ) {
       Swal.fire({
-        icon: 'error',
-        title: 'Invalid Password',
-        text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
-        confirmButtonColor: '#5a44ff'
+        icon: 'success',
+        title: 'Signup Successful',
+        text: 'Redirecting...',
+        timer: 1500,
+        showConfirmButton: false
       });
+
+      setTimeout(() => {
+        this.$router.push('/location');
+      }, 1500);
+
       return;
     }
 
-    // 👉 Confirm password match (only on submit)
-    if (this.formData.password !== this.formData.confirm_password) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Password Mismatch',
-        text: 'Password and Confirm Password do not match.',
-        confirmButtonColor: '#5a44ff'
-      });
-      return;
+    /* ================= ADMIN SIGN IN / OLD FLOW ================= */
+
+    this.loading = true;
+
+    try {
+      const recaptchaResponse = window.grecaptcha
+        ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
+        : "";
+
+      if (this.isSignup) {
+        await this.handleSignup(recaptchaResponse);
+      } else {
+        await this.handleSignin(recaptchaResponse);
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      Swal.fire(
+        'Error',
+        error.message || 'Something went wrong',
+        'error'
+      );
+    } finally {
+      this.loading = false;
     }
-  }
-
-  this.loading = true;
-
-  try {
-    const recaptchaResponse = window.grecaptcha
-      ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
-      : "";
-
-    if (this.isSignup) {
-      await this.handleSignup(recaptchaResponse);
-    } else {
-      await this.handleSignin(recaptchaResponse);
-    }
-  } catch (error) {
-    console.error('Form submission error:', error);
-    Swal.fire(
-      'Error',
-      error.message || 'Something went wrong',
-      'error'
-    );
-  } finally {
-    this.loading = false;
-  }
-    },
+    },  
     async handleSignup(recaptchaResponse) {
       const payload = {
         email: this.formData.email,
@@ -707,7 +795,6 @@ export default {
         this.nextSlide();
       }, 4000); // Change slide every 4 seconds
     },
-
     nextSlide() {
       const slides = document.querySelectorAll('.dashboard-slide');
       if (!slides || slides.length === 0) return;
@@ -732,14 +819,13 @@ export default {
         });
       }, 1000);
     },
-
     stopSlider() {
       if (this.sliderInterval) {
         clearInterval(this.sliderInterval);
         this.sliderInterval = null;
       }
     },
-     validatePassword() {
+    validatePassword() {
     const pwd = this.formData.password;
 
     this.showPasswordRules = pwd.length > 0;
@@ -747,24 +833,17 @@ export default {
     this.rules.minLength = pwd.length >= 8;
     this.rules.uppercase = /[A-Z]/.test(pwd);
     this.rules.special = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
-  },
-
-    // ===============================
-    // FORGOT PASSWORD MODAL
-    // ===============================
+    },
     openForgotPasswordModal() {
       this.showForgotPasswordModal = true;
       this.forgotEmail = "";
     },
-
     closeForgotPasswordModal() {
       this.showForgotPasswordModal = false;
       this.forgotEmail = "";
       this.forgotLoading = false;
     },
-
     async handleForgotPassword() {
-      // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.forgotEmail)) {
         Swal.fire({
@@ -812,9 +891,7 @@ export default {
         this.forgotLoading = false;
       }
     },
-
   },
-
   mounted() {
     // Initialize auth store
     this.authStore = useAuthStore();
@@ -830,7 +907,6 @@ export default {
     // Clear any autofilled data on signup
     // this.clearAutofill();
   },
-
   beforeUnmount() {
     // Stop slider
     this.stopSlider();

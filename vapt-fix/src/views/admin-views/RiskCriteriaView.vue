@@ -20,13 +20,13 @@
               <div class="risk-header">
                 <span class="dot critical-bg"></span>
                 Critical<span class="text-danger">*</span>
-                <span class="info-tooltip">
+                <!-- <span class="info-tooltip">
                   <span class="info-icon">i</span>
                   <span class="tooltip-text">
                     Please choose the remediation timeframe corresponding to the assigned
                     Critical according to best practices (2 or 5 days).
                   </span>
-                </span>
+                </span> -->
               </div>
               
               <select class="form-select" v-model="form.critical" :disabled="isLocked">
@@ -39,12 +39,12 @@
               <div class="risk-header">
                 <span class="dot high-bg"></span>
                 High<span class="text-danger">*</span>
-                <span class="info-tooltip">
+                <!-- <span class="info-tooltip">
                   <span class="info-icon">i</span>
                   <span class="tooltip-text">
                     High-risk vulnerabilities should be remediated within defined SLA timelines.
                   </span>
-                </span>
+                </span> -->
               </div>
              
 
@@ -62,12 +62,12 @@
               <div class="risk-header">
                 <span class="dot medium-bg"></span>
                 Medium<span class="text-danger">*</span>
-                <span class="info-tooltip">
+                <!-- <span class="info-tooltip">
                   <span class="info-icon">i</span>
                   <span class="tooltip-text">
                     Medium vulnerabilities have moderate impact and flexible remediation windows.
                   </span>
-                </span>
+                </span> -->
               </div>
              
 
@@ -84,12 +84,12 @@
               <div class="risk-header">
                 <span class="dot low-bg"></span>
                 Low<span class="text-danger">*</span>
-                <span class="info-tooltip">
+                <!-- <span class="info-tooltip">
                   <span class="info-icon">i</span>
                   <span class="tooltip-text">
                     Low-risk vulnerabilities can be remediated during routine maintenance cycles.
                   </span>
-                </span>
+                </span> -->
               </div>
               
               <select class="form-select" v-model="form.low" :disabled="isLocked">

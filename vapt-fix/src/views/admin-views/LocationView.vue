@@ -24,7 +24,6 @@
               <img v-if="platform.icon" :src="platform.icon" />
               {{ platform.label }}
             </div>
-
           </div>
         </div>
 
@@ -142,9 +141,6 @@
         </div>
 
         <div class="cta">
-          <!-- <button class="btn btn-primary" @click="handleContinue">
-            Continue to Risk Criteria →
-          </button> -->
            <button class="btn btn-primary" @click="handleContinue">
     {{ returnTo ? 'Back to Previous Page →' : 'Continue to Risk Criteria →' }}
   </button>
@@ -205,7 +201,7 @@ export default {
       communicationPlatforms: [
         { value: "teams", label: "Microsoft Teams", icon: teamsIcon },
         { value: "slack", label: "Slack", icon: slackIcon },
-        { value: "none", label: "None" }
+        // { value: "none", label: "None" }
       ],
       selectedProject: null,
       pendingProject: null,
@@ -213,19 +209,59 @@ export default {
       projectPlatforms: [
         { value: "jira", label: "Jira", icon: jiraIcon },
         { value: "asana", label: "Asana", icon: asanaIcon },
-        { value: "none", label: "None" }
-      ]
+        // { value: "none", label: "None" }
+      ],
+      slackPopup: null,
+      slackChannels: [],
+      teams: [],
+      backendBase: "https://vaptbackend.secureitlab.com",
     };
   },
   computed: {
-  returnTo() {
-    return this.$route.query.returnTo || null;
-  },
+    returnTo() {
+      return this.$route.query.returnTo || null;
+    },
+    isFromOnboarding() {
+      return !this.returnTo;
+    },
+    generatedInviteLink() {
+      const base = "https://vaptbackend.secureitlab.com";
 
-  isFromOnboarding() {
-    return !this.returnTo;
-  }
-},
+      // default: show base url
+      if (!this.externalLocation) {
+        return base;
+      }
+
+      const locationObj = this.authStore.locations.find(
+        loc => loc._id === this.externalLocation
+      );
+
+      if (!locationObj) return base;
+
+      const locationSlug = locationObj.location_name
+        .toLowerCase()
+        .replace(/\s+/g, "");
+
+      // only location selected
+      if (!this.selectedSecondaryRoles.length) {
+        return `${base}/${locationSlug}`;
+      }
+
+      // location + roles
+      const roleSlugs = this.selectedSecondaryRoles
+        .map(role =>
+          this.roleOptions.find(r => r.short === role)?.full
+            .toLowerCase()
+            .replace(/\s+/g, "")
+        )
+        .join("/");
+
+      return `${base}/${locationSlug}/${roleSlugs}`;
+    },
+    canCopyInviteLink() {
+      return !!this.externalLocation || this.selectedSecondaryRoles.length > 0;
+    }
+  },
   methods: {
     initChipSelection() {
       document
@@ -342,60 +378,39 @@ export default {
       this.locationName = country;
       this.showDropdown = false;
     },
-    // async handleAddLocation() {
-    //   if (!this.locationName.trim()) return;
-
-    //   const res = await this.authStore.addLocation(this.locationName.trim());
-
-    //   if (res.status) {
-    //     this.locationName = "";
-    //     this.filteredCountries = [];
-    //     this.showDropdown = false;
-    //   } else {
-    //     Swal.fire("Error", res.message || "Failed to add location", "error");
-    //   }
-    // },
     async handleAddLocation() {
-  if (!this.locationName.trim()) return;
-
-  const res = await this.authStore.addLocation(this.locationName.trim());
-
-  // ❌ DUPLICATE LOCATION (Backend validation error)
-  if (
-    res.status === false &&
-    res.details?.location_name?.length
-  ) {
-    Swal.fire({
-      icon: "warning", // ⚠️ exclamation icon
-      title: "Duplicate Location",
-      text: res.details.location_name[0],
-      confirmButtonColor: "#5a44ff"
-    });
-    return;
-  }
-
-  // ❌ Other backend error
-  if (res.status === false) {
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: res.message || "Failed to add location",
-      confirmButtonColor: "#5a44ff"
-    });
-    return;
-  }
-
-  // ✅ SUCCESS (ONLY HERE)
-  this.locationName = "";
-  this.filteredCountries = [];
-  this.showDropdown = false;
-
-  Swal.fire({
-    icon: "success",
-    title: "Location added",
-    text: "Location has been added successfully",
-    confirmButtonColor: "#5a44ff"
-  });
+      if (!this.locationName.trim()) return;
+      const res = await this.authStore.addLocation(this.locationName.trim());
+      if (
+        res.status === false &&
+        res.details?.location_name?.length
+      ) {
+        Swal.fire({
+          icon: "warning", 
+          title: "Duplicate Location",
+          text: res.details.location_name[0],
+          confirmButtonColor: "#5a44ff"
+        });
+        return;
+      }
+      if (res.status === false) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: res.message || "Failed to add location",
+          confirmButtonColor: "#5a44ff"
+        });
+        return;
+      }
+      this.locationName = "";
+      this.filteredCountries = [];
+      this.showDropdown = false;
+      Swal.fire({
+        icon: "success",
+        title: "Location added",
+        text: "Location has been added successfully",
+        confirmButtonColor: "#5a44ff"
+      });
     },
     getInitials(name) {
       if (!name) return "";
@@ -422,18 +437,38 @@ export default {
 
       // If NONE active → block others
       if (this.communicationNoneSelected) return;
-
-      // First-time selection → apply immediately
       if (!this.selectedCommunication) {
         this.selectedCommunication = value;
+
+        if (value === "slack") {
+          await this.startSlackLogin();
+        }
+
+        // ✅ ADD THIS
+        if (value === "teams") {
+          await this.startMicrosoftLogin();
+        }
+
+
         return;
       }
+
 
       // Clicking same platform → do nothing
       if (this.selectedCommunication === value) return;
 
       // Switching platform → ask confirmation FIRST
       this.pendingCommunication = value;
+
+      // const res = await Swal.fire({
+      //   title: "Switch platform?",
+      //   text: "Are you sure you want to switch the communication platform?",
+      //   icon: "warning",
+      //   showCancelButton: true,
+      //   confirmButtonText: "Yes",
+      //   cancelButtonText: "No",
+      // });
+
 
       const res = await Swal.fire({
         title: "Switch platform?",
@@ -445,9 +480,23 @@ export default {
       });
 
       if (res.isConfirmed) {
-        // ✅ Apply active ONLY now
         this.selectedCommunication = this.pendingCommunication;
+
+        // ✅ VERY IMPORTANT
+        if (this.pendingCommunication === "slack") {
+          await this.startSlackLogin();
+        }
       }
+
+      this.pendingCommunication = null;
+
+
+      // if (res.isConfirmed) {
+
+      //   this.selectedCommunication = this.pendingCommunication;
+      // }
+
+
 
       // Cleanup
       this.pendingCommunication = null;
@@ -515,9 +564,65 @@ export default {
       // Navigate to next page
       this.$router.push('/riskcriteria');
     },
+    async startMicrosoftLogin() {
+  try {
+    const redirectUri = `${window.location.origin}/microsoft/callback`;
+
+    const res = await this.authStore.getMicrosoftOAuthUrl(redirectUri);
+
+    if (res.status && res.data.auth_url) {
+      // ✅ Open Microsoft OAuth in NEW TAB
+      window.open(res.data.auth_url, "_blank");
+    } else {
+      Swal.fire("Error", "Failed to start Microsoft login", "error");
+    }
+  } catch (err) {
+    console.error("Microsoft login error:", err);
+    Swal.fire("Error", "Microsoft login failed", "error");
+  }
+    },
+    onTeamsConnected(event) {
+      if (event.data?.type === "TEAMS_CONNECTED") {
+        Swal.fire("Success", "Microsoft Teams connected successfully", "success");
+        this.fetchTeams();
+      }
+    },
+    onSlackConnected(event) {
+      if (event.data?.type === "SLACK_CONNECTED") {
+        this.fetchSlackChannels();
+        Swal.fire("Success", "Slack connected successfully", "success");
+      }
+    },
+    async startSlackLogin() {
+      const res = await this.authStore.getSlackOAuthUrl(this.backendBase);
+      if (res.status) {
+        window.open(
+          res.data.auth_url.replace(
+            res.data.redirect_uri,
+            `${window.location.origin}/slack/callback`
+          ),
+          "_blank",
+          "width=600,height=700"
+        );
+      }
+    },
   },
 
   mounted() {
+    window.addEventListener("message", this.onTeamsConnected);
+
+  const teamsToken = localStorage.getItem("teams_access_token");
+  if (teamsToken) {
+    this.fetchTeams();
+  }
+
+    window.addEventListener("message", this.onSlackConnected);
+
+    const token = localStorage.getItem("slack_bot_token");
+    if (token) {
+      this.fetchSlackChannels();
+    }
+
     document.addEventListener("click", this.closeOnOutside);
     console.log("Route query:", this.$route.query);
     this.initChipSelection();
@@ -541,6 +646,8 @@ export default {
 
   beforeUnmount() {
     document.removeEventListener("click", this.closeOnOutside);
+    window.removeEventListener("message", this.onSlackConnected);
+    window.removeEventListener("message", this.onTeamsConnected);
   },
 
 };
