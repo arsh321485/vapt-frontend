@@ -36,12 +36,12 @@
                                         
                                     </select>
                                 </div>
-                                <div>
+                                <!-- <div>
                                     <router-link to="/createnewticket">
                                         <button type="submit" class="btn btn-ticket py-2 px-5 me-5"><i class="bi bi-plus-lg"></i>
                                         Create a new ticket</button>
                                     </router-link>
-                                </div>
+                                </div> -->
                                 
                             </div>
                         </div>

@@ -153,41 +153,61 @@
 
                     </div>
                     </div>
-                    <div class="dropdown">
-  <div class="dropdown-btn" @click="showDropdown = !showDropdown">
-    {{ locationName || "Select location" }}
-  </div>
-
-  <div class="dropdown-content" v-if="showDropdown">
-    <!-- <a
-      href="#"
-      v-for="(loc, index) in authStore.reportLocations"
-      :key="loc.id || index"
-      @click.prevent="selectLocation(loc)"
-      :class="{ active: loc.id === selectedLocation }"
-    >
-      {{ loc.name }}
-    </a> -->
-    <a
-  v-for="(loc, index) in authStore.reportLocations"
-  :key="loc.id || index"
->
-  {{ loc.name }}
-</a>
-
-  </div>
-</div>
-
-
+                    <!-- OLD DROPDOWN - COMMENTED FOR API CHANGE -->
                     <!-- <div class="dropdown">
-                      <div  class="dropdown-btn"> Select location</div>
-                        <div class="dropdown-content">
-                        <a href="" v-for="(loc, index) in authStore.locations"
-                              :key="loc._id || index"
-                              :value="loc._id">{{ loc.location_name }}</a>
-                        
-                        </div>
+                      <div class="dropdown-btn" @click="showDropdown = !showDropdown">
+                        {{ locationName || "Select location" }}
+                      </div>
+                      <div class="dropdown-content" v-if="showDropdown">
+                        <a
+                      v-for="(loc, index) in authStore.reportLocations"
+                      :key="loc.id || index"
+                    >
+                      {{ loc.name }}
+                    </a>
+
+                      </div>
                     </div> -->
+
+                    <!-- NEW DROPDOWN WITH SUB-DROPDOWN FOR LOCATIONS WITH BOTH TYPES -->
+                    <div class="location-dropdown">
+                      <div class="location-dropdown-btn" @click="toggleLocationDropdown">
+                        {{ selectedLocationDisplay || "Select location" }}
+                        <i class="bi bi-chevron-down ms-2"></i>
+                      </div>
+                      <div class="location-dropdown-content" v-if="showLocationDropdown">
+                        <div
+                          v-for="loc in tempLocations"
+                          :key="loc.id"
+                          class="location-item"
+                          :class="{ 'has-submenu': loc.types.length > 1 }"
+                        >
+                          <!-- Location with both types - expandable inline -->
+                          <template v-if="loc.types.length > 1">
+                            <div class="location-name" @click.stop="toggleSubDropdown(loc.id)">
+                              {{ loc.name }}
+                              <i :class="activeSubDropdown === loc.id ? 'bi bi-chevron-up' : 'bi bi-chevron-down'" class="ms-auto"></i>
+                            </div>
+                            <!-- Inline sub-options -->
+                            <div class="sub-options" v-if="activeSubDropdown === loc.id">
+                              <a
+                                v-for="type in loc.types"
+                                :key="type"
+                                @click="selectLocationWithType(loc, type)"
+                              >
+                                {{ type }}
+                              </a>
+                            </div>
+                          </template>
+                          <!-- Location with single type - no submenu -->
+                          <template v-else>
+                            <div class="location-name" @click="selectLocationWithType(loc, loc.types[0])">
+                              {{ loc.name }}
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </div>
                   <NotificationPanel />
 
                 </div>
@@ -633,6 +653,18 @@ export default {
       locationName: "",
       showDropdown: false,
       filteredCountries: [],
+      // NEW DROPDOWN DATA
+      showLocationDropdown: false,
+      activeSubDropdown: null,
+      selectedLocationData: null,
+      selectedLocationType: null,
+      // Temporary hardcoded locations (will be replaced with API later)
+      tempLocations: [
+        { id: 1, name: "India", types: ["Internal", "External"] },
+        { id: 2, name: "China", types: ["Internal"] },
+        { id: 3, name: "USA", types: ["External"] },
+        { id: 4, name: "Germany", types: ["Internal", "External"] },
+      ],
     };
   },
   computed: {
@@ -679,8 +711,43 @@ export default {
 
     return `${weeks}w ${days}d ${hours}hrs`;
   },
+  // Display text for selected location
+  selectedLocationDisplay() {
+    if (!this.selectedLocationData) return "";
+    if (this.selectedLocationType) {
+      return `${this.selectedLocationData.name} - ${this.selectedLocationType}`;
+    }
+    return this.selectedLocationData.name;
+  },
   },
    methods: {
+    // NEW DROPDOWN METHODS
+    toggleLocationDropdown() {
+      this.showLocationDropdown = !this.showLocationDropdown;
+      if (!this.showLocationDropdown) {
+        this.activeSubDropdown = null;
+      }
+    },
+    toggleSubDropdown(locId) {
+      this.activeSubDropdown = this.activeSubDropdown === locId ? null : locId;
+    },
+    selectLocationWithType(loc, type) {
+      this.selectedLocationData = loc;
+      this.selectedLocationType = loc.types.length > 1 ? type : null;
+      this.showLocationDropdown = false;
+      this.activeSubDropdown = null;
+      // For now just log - later integrate with API
+      console.log("Selected:", loc.name, type);
+    },
+    closeLocationDropdown(e) {
+      const dropdown = this.$el.querySelector('.location-dropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
+        this.showLocationDropdown = false;
+        this.activeSubDropdown = null;
+      }
+    },
+
+    // OLD METHODS (kept for reference)
     toggleDropdown() {
     this.showDropdown = !this.showDropdown;
   },
@@ -786,26 +853,30 @@ export default {
     },
   },
   mounted() {
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
+    // OLD DROPDOWN CODE - COMMENTED
+    // const dropdown = document.querySelector('.dropdown');
+    // const btn = dropdown.querySelector('.dropdown-btn');
+    // const options = dropdown.querySelectorAll('.dropdown-content a');
 
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; 
-        dropdown.classList.remove('show');
-      });
-    });
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-    
+    // btn.addEventListener('click', () => {
+    //   dropdown.classList.toggle('show');
+    // });
+    // options.forEach(option => {
+    //   option.addEventListener('click', (e) => {
+    //     e.preventDefault();
+    //     btn.textContent = option.textContent;
+    //     dropdown.classList.remove('show');
+    //   });
+    // });
+    // document.addEventListener('click', (e) => {
+    //   if (!dropdown.contains(e.target)) {
+    //     dropdown.classList.remove('show');
+    //   }
+    // });
+
+    // NEW DROPDOWN - Close on outside click
+    document.addEventListener('click', this.closeLocationDropdown);
+
     this.authStore.fetchCountries();
     // 🟡 3️⃣ Fetch locations by admin id instead of old fetchLocations()
       const user =
@@ -842,6 +913,10 @@ export default {
     }
   });
     },
+  beforeUnmount() {
+    // Clean up event listener
+    document.removeEventListener('click', this.closeLocationDropdown);
+  },
 };
 </script>
 
@@ -1038,5 +1113,85 @@ export default {
     background-color: rgba(49, 33, 177, 1);
     border-radius: 30px;
     border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* ===== NEW LOCATION DROPDOWN WITH SUB-DROPDOWN ===== */
+.location-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 200px;
+}
+
+.location-dropdown-btn {
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 50px;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.location-dropdown-btn:hover {
+  border-color: rgba(49, 33, 177, 0.5);
+}
+
+.location-dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  min-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  margin-top: 4px;
+  padding: 8px 0;
+  overflow: visible;
+}
+
+.location-item {
+  position: relative;
+}
+
+.location-name {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.location-name:hover {
+  background-color: #f5f5f5;
+}
+
+.location-item.has-submenu .location-name {
+  padding-right: 12px;
+}
+
+/* Inline sub-options - appears below location name */
+.sub-options {
+  background-color: #f9f9f9;
+  padding: 4px 0;
+}
+
+.sub-options a {
+  display: block;
+  padding: 8px 16px 8px 32px;
+  text-decoration: none;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sub-options a:hover {
+  background-color: #eef0ff;
+  color: rgba(49, 33, 177, 1);
 }
 </style>

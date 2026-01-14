@@ -5,6 +5,12 @@
       <img src="@/assets/images/logo-capital.png" alt="" class="h-50">
     </div>
 
+    <!-- UPLOAD PROGRESS TOAST -->
+    <div v-if="hasAnyUploading" class="upload-toast">
+      <i class="bi bi-cloud-upload"></i>
+      {{ uploadingCount }} file(s) still uploading... Please don't refresh the page.
+    </div>
+
     <div class="app">
       <!-- STEPPER -->
       <Stepper />
@@ -27,7 +33,7 @@
             <div class="d-flex gap-3 mt-3">
               <select v-model="location" class="form-select">
                 <option disabled value="">Select Location</option>
-                <option v-for="loc in locations" :key="loc._id" :value="loc._id">
+                <option v-for="loc in availableLocations" :key="loc._id" :value="loc._id">
                     {{ loc.location_name }}
                   </option>
               </select>
@@ -124,9 +130,6 @@
           >
             {{ returnTo ? 'Back to Previous Page →' : 'Continue to Dashboard →' }}
           </button>
-          <p v-if="hasAnyUploading" class="upload-warning">
-            ⏳ {{ uploadingCount }} file(s) still uploading... Please don't refresh the page.
-          </p>
         </div>
       </div>
     </div>
@@ -168,6 +171,21 @@ export default {
       map[file.locationId].add(file.type.toLowerCase());
     }
     return map;
+  },
+  // Filter locations that already have both External AND Internal (or "Both") uploaded
+  availableLocations() {
+    return this.locations.filter(loc => {
+      const used = this.usedTypesByLocation[loc._id];
+      if (!used) return true; // No uploads yet - show it
+
+      // Hide if "both" was uploaded
+      if (used.has('both')) return false;
+
+      // Hide if both internal AND external were uploaded separately
+      if (used.has('internal') && used.has('external')) return false;
+
+      return true; // Still needs files
+    });
   },
   // Get disabled types for currently selected location
   disabledTypes() {
@@ -854,5 +872,39 @@ export default {
   gap: 7px;
   margin-top: 0px;
 }
+}
+
+/* Upload progress toast - top right */
+.upload-toast {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  background: #22c55e;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideIn 0.3s ease;
+}
+
+.upload-toast i {
+  font-size: 18px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 </style>

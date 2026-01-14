@@ -215,207 +215,181 @@
     <div class="col-12 mt-4">
         <!-- Dynamic Content per Tab -->
         <div v-for="(tab, index) in tabs" :key="index" v-show="activeTab === index">
-        <!-- Internal Users -->
-        <h5 style="color: rgba(0, 0, 0, 1); font-weight: 600;">
-            Internal ({{ filteredUsers(tab.name, 'Internal').length }})
-        </h5>
 
-        <div class="row mb-4">
-            <div class="col-10">
-              <!-- <table class="table align-middle table-hover">
-                <thead class="table-light">
-                  <tr>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Location</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Role</th>
-                                            <th scope="col"></th>
-                                            
-                                        </tr>
-                </thead>
-                <tbody class="raised-tbody">
-                  <tr>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table> -->
-            <table class="table align-middle table-hover">
-  <thead class="table-light">
-    <tr>
-      <th class="text-center" scope="col">Name</th>
-      <th class="text-center" scope="col">Location</th>
-      <th class="text-center" scope="col">Email</th>
-      <th class="text-center" scope="col">Role</th>
-      <th class="text-center" scope="col"></th>
-    </tr>
-  </thead>
+        <!-- Internal Users Section -->
+        <div class="team-section mb-5">
+          <h5 class="section-title">
+              Internal ({{ filteredUsers(tab.name, 'Internal').length }})
+          </h5>
 
-  <tbody class="raised-tbody">
-    <tr
-      v-for="user in filteredUsers(tab.name, 'Internal')"
-      :key="user._id"
-    >
-      <!-- Name + initials -->
-      <td>
-        <div class="d-flex align-items-center">
-          <div
-            class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-            style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
-          >
-            {{ getInitials(user.first_name, user.last_name) }}
-          </div>
-          <span class="fw-medium text-dark">
-            {{ user.first_name }} {{ user.last_name }}
-          </span>
-        </div>
-      </td>
+          <div class="table-responsive">
+            <table class="table team-table align-middle">
+              <thead>
+                <tr>
+                  <th style="width: 22%;">Name</th>
+                  <th style="width: 18%;">Location</th>
+                  <th style="width: 25%;">Email</th>
+                  <th style="width: 22%;">Role</th>
+                  <th style="width: 13%;">Action</th>
+                </tr>
+              </thead>
 
-      <!-- Location -->
-      <td>
-        {{ user.select_location }}
-      </td>
+              <tbody>
+                <tr v-if="filteredUsers(tab.name, 'Internal').length === 0">
+                  <td colspan="5" class="text-center text-muted py-4">
+                    No internal users found
+                  </td>
+                </tr>
+                <tr
+                  v-for="user in filteredUsers(tab.name, 'Internal')"
+                  :key="user._id"
+                >
+                  <!-- Name + initials -->
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="user-avatar internal-avatar">
+                        {{ getInitials(user.first_name, user.last_name) }}
+                      </div>
+                      <span class="user-name">
+                        {{ user.first_name }} {{ user.last_name }}
+                      </span>
+                    </div>
+                  </td>
 
-      <!-- Email -->
-      <td>
-        {{ user.email }}
-      </td>
+                  <!-- Location -->
+                  <td>{{ user.select_location }}</td>
 
-      <!-- Role dropdown -->
-      <td>
-        <div class="multi-select-dropdown">
-          <div
-            class="dropdown-input rounded-0"
-            @click="toggleDropdown(user._id)"
-          >
-            <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-            <span><i class="bi bi-chevron-down"></i></span>
-          </div>
+                  <!-- Email -->
+                  <td class="email-cell">{{ user.email }}</td>
 
-          <div class="dropdown-list" v-show="isOpen[user._id]">
-            <label v-for="option in roleOptions" :key="option.short">
-              <input
-                type="checkbox"
-                :value="option.short"
-                v-model="selectedRoles[user._id]"
-                @change="updateSelectedRoleText(user._id)"
-              />
-              {{ option.full }}
-            </label>
+                  <!-- Role dropdown -->
+                  <td>
+                    <div class="multi-select-dropdown">
+                      <div
+                        class="dropdown-input"
+                        @click="toggleDropdown(user._id)"
+                      >
+                        <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+                        <i class="bi bi-chevron-down"></i>
+                      </div>
+
+                      <div class="dropdown-list" v-show="isOpen[user._id]">
+                        <label v-for="option in roleOptions" :key="option.short">
+                          <input
+                            type="checkbox"
+                            :value="option.short"
+                            v-model="selectedRoles[user._id]"
+                            @change="handleRoleChange($event, user, option)"
+                          />
+                          {{ option.full }}
+                        </label>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Remove button -->
+                  <td>
+                    <a
+                      href="#"
+                      class="remove-btn"
+                      @click.prevent="removeUserFromCurrentTab(user)"
+                    >
+                      <i class="bi bi-dash-circle me-1"></i> Remove
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </td>
 
-      <!-- Remove button -->
-      <td>
-        <a
-          href="#"
-          class="d-flex align-items-center fw-semibold"
-          style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
-          @click.prevent="removeUserFromCurrentTab(user)"
-        >
-          <i class="bi bi-dash-circle me-1"></i> Remove
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+        <!-- External Users Section -->
+        <div class="team-section">
+          <h5 class="section-title">
+              External ({{ filteredUsers(tab.name, 'External').length }})
+          </h5>
 
-              
-            </div>
-        </div>
+          <div class="table-responsive">
+            <table class="table team-table align-middle">
+              <thead>
+                <tr>
+                  <th style="width: 22%;">Name</th>
+                  <th style="width: 18%;">Location</th>
+                  <th style="width: 25%;">Email</th>
+                  <th style="width: 22%;">Role</th>
+                  <th style="width: 13%;">Action</th>
+                </tr>
+              </thead>
 
-        <!-- External Users -->
-        <h5 style="color: rgba(0, 0, 0, 1); font-weight: 600;">
-            External ({{ filteredUsers(tab.name, 'External').length }})
-        </h5>
+              <tbody>
+                <tr v-if="filteredUsers(tab.name, 'External').length === 0">
+                  <td colspan="5" class="text-center text-muted py-4">
+                    No external users found
+                  </td>
+                </tr>
+                <tr
+                  v-for="user in filteredUsers(tab.name, 'External')"
+                  :key="user._id"
+                >
+                  <!-- Name + initials -->
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="user-avatar external-avatar">
+                        {{ getInitials(user.first_name, user.last_name) }}
+                      </div>
+                      <span class="user-name">
+                        {{ user.first_name }} {{ user.last_name }}
+                      </span>
+                    </div>
+                  </td>
 
-        <div class="row">
-            <div class="col-10">
-              <table class="table align-middle table-hover">
-  <thead class="table-light">
-    <tr>
-      <th class="text-center" scope="col">Name</th>
-      <th class="text-center" scope="col">Location</th>
-      <th class="text-center" scope="col">Email</th>
-      <th class="text-center" scope="col">Role</th>
-      <th class="text-center" scope="col"></th>
-    </tr>
-  </thead>
+                  <!-- Location -->
+                  <td>{{ user.select_location }}</td>
 
-  <tbody class="raised-tbody">
-    <tr
-      v-for="user in filteredUsers(tab.name, 'External')"
-      :key="user._id"
-    >
-      <!-- Name + initials -->
-      <td>
-        <div class="d-flex align-items-center">
-          <div
-            class="rounded-circle bg-success bg-opacity-25 text-success d-flex justify-content-center align-items-center me-3"
-            style="width: 32px; height: 32px; font-weight: 600; font-size: 14px;"
-          >
-            {{ getInitials(user.first_name, user.last_name) }}
-          </div>
-          <span class="fw-medium text-dark">
-            {{ user.first_name }} {{ user.last_name }}
-          </span>
-        </div>
-      </td>
+                  <!-- Email -->
+                  <td class="email-cell">{{ user.email }}</td>
 
-      <!-- Location -->
-      <td>
-        {{ user.select_location }}
-      </td>
+                  <!-- Role dropdown -->
+                  <td>
+                    <div class="multi-select-dropdown">
+                      <div
+                        class="dropdown-input"
+                        @click="toggleDropdown(user._id)"
+                      >
+                        <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+                        <i class="bi bi-chevron-down"></i>
+                      </div>
 
-      <!-- Email -->
-      <td>
-        {{ user.email }}
-      </td>
+                      <div class="dropdown-list" v-show="isOpen[user._id]">
+                        <label v-for="option in roleOptions" :key="option.short">
+                          <input
+                            type="checkbox"
+                            :value="option.short"
+                            v-model="selectedRoles[user._id]"
+                            @change="handleRoleChange($event, user, option)"
+                          />
+                          {{ option.full }}
+                        </label>
+                      </div>
+                    </div>
+                  </td>
 
-      <!-- Role dropdown (external) -->
-      <td>
-        <div class="multi-select-dropdown">
-          <div
-            class="dropdown-input rounded-0"
-            @click="toggleDropdown(user._id)"
-          >
-            <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-            <span><i class="bi bi-chevron-down"></i></span>
-          </div>
-
-          <div class="dropdown-list" v-show="isOpen[user._id]">
-            <label v-for="option in roleOptions" :key="option.short">
-              <input
-                type="checkbox"
-                :value="option.short"
-                v-model="selectedRoles[user._id]"
-                @change="updateSelectedRoleText(user._id)"
-              />
-              {{ option.full }}
-            </label>
+                  <!-- Remove button -->
+                  <td>
+                    <a
+                      href="#"
+                      class="remove-btn"
+                      @click.prevent="removeUserFromCurrentTab(user)"
+                    >
+                      <i class="bi bi-dash-circle me-1"></i> Remove
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </td>
 
-      <!-- Remove button -->
-      <td>
-        <a
-          href="#"
-          class="d-flex align-items-center fw-semibold"
-          style="font-size: 15px; text-decoration: none; color: rgba(49, 33, 177, 1);"
-          @click.prevent="removeUserFromCurrentTab(user)"
-        >
-          <i class="bi bi-dash-circle me-1"></i> Remove
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-            
-            </div>
-        </div>
         </div>
     </div>
     
@@ -687,6 +661,65 @@ export default {
       });
     }
   },
+  // Handle checkbox change - detect check/uncheck
+  async handleRoleChange(event, user, option) {
+    const isChecked = event.target.checked;
+    const roleFullName = option.full; // e.g., "Patch Management"
+
+    if (!isChecked) {
+      // UNCHECKED - Call delete role API
+      await this.deleteRoleFromUser(user, roleFullName);
+    } else {
+      // CHECKED - Call update roles API (add role)
+      await this.updateSelectedRoleText(user._id);
+    }
+  },
+
+  // Delete a specific role from user (called when checkbox unchecked)
+  async deleteRoleFromUser(user, roleToRemove) {
+    try {
+      const res = await endpoint.delete(
+        `/admin/users_details/user-detail/${user._id}/delete-role/`,
+        {
+          data: {
+            confirm: true,
+            member_role: roleToRemove,
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        // Update user's roles from response
+        user.Member_role = res.data.remaining_roles || [];
+
+        // Update display text
+        this.selectedRoleText[user._id] = this.selectedRoles[user._id].join(", ");
+
+        Swal.fire({
+          icon: "success",
+          title: "Role Removed",
+          text: `Role '${roleToRemove}' removed successfully from ${user.first_name}.`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (err) {
+      console.error("❌ Error removing role:", err);
+
+      // Revert checkbox state on error
+      const shortCode = this.roleMapping[roleToRemove];
+      if (shortCode && !this.selectedRoles[user._id].includes(shortCode)) {
+        this.selectedRoles[user._id].push(shortCode);
+      }
+
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Remove Role",
+        text: err.response?.data?.message || "Please try again.",
+      });
+    }
+  },
+
   async updateSelectedRoleText(userId) {
     this.selectedRoleText[userId] = this.selectedRoles[userId].join(", ");
     const fullRoles = this.selectedRoles[userId].map(short =>
@@ -697,7 +730,7 @@ export default {
     if (res.status) {
       const user = this.users.find(u => u._id === userId);
       if (user) {
-        user.Member_role = res.updated_roles; 
+        user.Member_role = res.updated_roles;
       }
 
       Swal.fire({
@@ -831,9 +864,259 @@ export default {
         margin-right: 5px;
     }
     .uniform-input {
-  height: 42px; 
+  height: 42px;
   line-height: 32px;
-  padding: 0 8px; 
-   
+  padding: 0 8px;
+}
+
+/* ===== Team Section Styles ===== */
+.team-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.10);
+  overflow: visible;
+}
+
+.section-title {
+  color: #1a1a1a;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* ===== Team Table Styles ===== */
+.table-responsive {
+  overflow: visible !important;
+}
+
+.team-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  overflow: visible;
+}
+
+.team-table thead {
+  background: #f8f9fc;
+}
+
+.team-table thead th {
+  font-weight: 600;
+  font-size: 13px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 14px 12px;
+  border: none;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.team-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.team-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.team-table tbody td {
+  padding: 14px 12px;
+  border: none;
+  font-size: 14px;
+  color: #334155;
+  vertical-align: middle;
+}
+
+/* Remove first row top border and last row bottom border */
+.team-table tbody tr:first-child td {
+  border-top: none;
+}
+
+.team-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== User Avatar Styles ===== */
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.internal-avatar {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.external-avatar {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== Email Cell ===== */
+.email-cell {
+  word-break: break-word;
+  max-width: 200px;
+}
+
+/* ===== Remove Button ===== */
+.remove-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: rgba(49, 33, 177, 1);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.remove-btn:hover {
+  color: #dc2626;
+  transform: translateX(2px);
+}
+
+/* ===== Multi-select Dropdown (Updated) ===== */
+.multi-select-dropdown {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+}
+
+.multi-select-dropdown .dropdown-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.multi-select-dropdown .dropdown-input:hover {
+  border-color: rgba(49, 33, 177, 0.5);
+}
+
+.multi-select-dropdown .dropdown-input span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.multi-select-dropdown .dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  min-width: 200px;
+  border: 1px solid #e2e8f0;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+  margin-top: 4px;
+}
+
+/* Ensure table rows don't clip the dropdown */
+.team-table tbody {
+  overflow: visible;
+}
+
+.team-table tbody tr {
+  position: relative;
+}
+
+.team-table tbody td {
+  position: relative;
+  overflow: visible;
+}
+
+/* ===== Responsive Styles ===== */
+@media (max-width: 1200px) {
+  .team-table thead th,
+  .team-table tbody td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+
+  .multi-select-dropdown {
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 992px) {
+  .team-section {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .team-table {
+    table-layout: auto;
+  }
+
+  .team-table thead th,
+  .team-table tbody td {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+    margin-right: 8px;
+  }
+
+  .multi-select-dropdown {
+    max-width: 150px;
+  }
+
+  .remove-btn {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .team-table {
+    min-width: 700px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
 }
 </style>

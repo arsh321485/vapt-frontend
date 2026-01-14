@@ -460,7 +460,8 @@ export default {
           icon: 'success',
           title: 'OTP Sent',
           text: `OTP has been sent to ${this.formData.email}`,
-          confirmButtonColor: '#5a44ff'
+          timer: 2000,
+          showConfirmButton: false
         });
         this.otpSent = true;
         this.resetRecaptcha();
@@ -786,7 +787,8 @@ export default {
             icon: "success",
             title: "Reset Link Sent!",
             text: "Check your email for the password reset link.",
-            confirmButtonColor: '#5a44ff'
+            timer: 3000,
+            showConfirmButton: false
           });
         } else {
           Swal.fire({
@@ -844,7 +846,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
   .password-rules {
@@ -999,6 +1000,14 @@ export default {
   transform: translateY(-50%);
   cursor: pointer;
   opacity: 0.7;
+  color: #fff;
+}
+
+/* When browser autofill changes background to white, make eye icon dark */
+.custom-input:-webkit-autofill ~ .password-toggle,
+.custom-input:-webkit-autofill ~ .password-toggle i {
+  color: #020617 !important;
+  opacity: 1;
 }
 
 /* ===== OTP INPUTS ===== */

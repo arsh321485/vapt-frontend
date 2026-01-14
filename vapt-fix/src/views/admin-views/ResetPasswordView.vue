@@ -183,7 +183,8 @@ export default {
             icon: "success",
             title: "Password Reset Successful!",
             text: "Your password has been reset. You can now sign in with your new password.",
-            confirmButtonColor: '#5a44ff'
+            timer: 2500,
+            showConfirmButton: false
           });
           this.$router.push("/auth");
         } else {

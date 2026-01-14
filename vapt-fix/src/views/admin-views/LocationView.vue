@@ -411,7 +411,8 @@ export default {
         icon: "success",
         title: "Location added",
         text: "Location has been added successfully",
-        confirmButtonColor: "#5a44ff"
+        timer: 2000,
+        showConfirmButton: false
       });
     },
     getInitials(name) {
@@ -595,14 +596,26 @@ export default {
     },
     onTeamsConnected(event) {
       if (event.data?.type === "TEAMS_CONNECTED") {
-        Swal.fire("Success", "Microsoft Teams connected successfully", "success");
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Microsoft Teams connected successfully",
+          timer: 2000,
+          showConfirmButton: false
+        });
         this.fetchTeams();
       }
     },
     onSlackConnected(event) {
       if (event.data?.type === "SLACK_CONNECTED") {
         this.fetchSlackChannels();
-        Swal.fire("Success", "Slack connected successfully", "success");
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Slack connected successfully",
+          timer: 2000,
+          showConfirmButton: false
+        });
       }
     },
     async startSlackLogin() {
