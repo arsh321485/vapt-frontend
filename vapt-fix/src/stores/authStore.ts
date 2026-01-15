@@ -117,8 +117,8 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // signup
-  async signup(payload: {
+  // ✅ Signup Step 1: Send OTP
+  async signupSendOtp(payload: {
       email: string;
       password: string;
       confirm_password: string;
@@ -126,7 +126,26 @@ export const useAuthStore = defineStore("auth", {
     }) {
       try {
         const res = await endpoint.post(
-          "/admin/users/signup/",
+          "/admin/users/signup/send-otp/",
+          payload
+        );
+        return { status: true, data: res.data, message: res.data.message };
+      } catch (error: any) {
+        const errorData = error.response?.data;
+        const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "Failed to send OTP";
+        return {
+          status: false,
+          message: errorMessage,
+          details: errorData || null,
+        };
+      }
+    },
+
+  // ✅ Signup Step 2: Verify OTP
+  async signupVerifyOtp(payload: { email: string; otp: string }) {
+      try {
+        const res = await endpoint.post(
+          "/admin/users/signup/verify-otp/",
           payload
         );
 
@@ -143,12 +162,14 @@ export const useAuthStore = defineStore("auth", {
           localStorage.setItem("isNewUser", "true");
         }
 
-        return { status: true, data };
+        return { status: true, data, message: data.message };
       } catch (error: any) {
+        const errorData = error.response?.data;
+        const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "OTP verification failed";
         return {
           status: false,
-          message: error.response?.data?.message || "Signup failed",
-          details: error.response?.data || null,
+          message: errorMessage,
+          details: errorData || null,
         };
       }
     },
@@ -176,12 +197,14 @@ export const useAuthStore = defineStore("auth", {
 
         localStorage.setItem("isNewUser", "false");
 
-        return { status: true, data };
+        return { status: true, data, message: data.message };
       } catch (error: any) {
+        const errorData = error.response?.data;
+        const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "Login failed";
         return {
           status: false,
-          message: error.response?.data?.message || "Login failed",
-          details: error.response?.data || null,
+          message: errorMessage,
+          details: errorData || null,
         };
       }
     },

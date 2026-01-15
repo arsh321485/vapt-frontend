@@ -487,12 +487,68 @@ export default {
       }
     }
 
-    /* ================= ADMIN SIGNUP TEMP OTP FLOW ================= */
+    /* ================= ADMIN SIGNUP OTP FLOW ================= */
     if (
       this.currentRole === 'admin' &&
       this.currentMode === 'signup'
     ) {
-      // 👉 PASSWORD VALIDATION (same as before)
+      // STEP 2: VERIFY OTP (if OTP already sent)
+      if (this.adminOtpSent) {
+        if (!this.otp || this.otp.length !== 6) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid OTP',
+            text: 'Please enter a valid 6-digit OTP',
+            timer: 3000,
+            showConfirmButton: false
+          });
+          return;
+        }
+
+        this.loading = true;
+
+        try {
+          const result = await this.authStore.signupVerifyOtp({
+            email: this.formData.email,
+            otp: this.otp
+          });
+
+          if (result.status) {
+            await Swal.fire({
+              icon: 'success',
+              title: 'Account Created!',
+              text: result.message || 'Your account has been created successfully.',
+              timer: 2000,
+              showConfirmButton: false
+            });
+
+            this.$router.push('/location');
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Verification Failed',
+              text: result.message || 'Invalid OTP. Please try again.',
+              timer: 3000,
+              showConfirmButton: false
+            });
+          }
+        } catch (error) {
+          console.error('OTP verification error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong. Please try again.',
+            timer: 3000,
+            showConfirmButton: false
+          });
+        } finally {
+          this.loading = false;
+        }
+
+        return;
+      }
+
+      // STEP 1: SEND OTP (Password validation first)
       if (
         !this.rules.minLength ||
         !this.rules.uppercase ||
@@ -502,7 +558,8 @@ export default {
           icon: 'error',
           title: 'Invalid Password',
           text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
-          confirmButtonColor: '#5a44ff'
+          timer: 4000,
+          showConfirmButton: false
         });
         return;
       }
@@ -512,43 +569,72 @@ export default {
           icon: 'error',
           title: 'Password Mismatch',
           text: 'Password and Confirm Password do not match.',
-          confirmButtonColor: '#5a44ff'
-        });
-        return;
-      }
-
-      // STEP 1: SEND OTP (UI ONLY)
-      if (!this.adminOtpSent) {
-        Swal.fire({
-          icon: 'success',
-          title: 'OTP Sent',
-          text: `OTP has been sent to ${this.formData.email}`,
-          timer: 2000,
+          timer: 3000,
           showConfirmButton: false
         });
+        return;
+      }
 
-        this.adminOtpSent = true;
+      // Get reCAPTCHA response
+      const recaptchaResponse = window.grecaptcha
+        ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
+        : "";
+
+      if (!recaptchaResponse) {
+        Swal.fire({
+          icon: 'error',
+          title: 'reCAPTCHA Required',
+          text: 'Please complete the reCAPTCHA verification.',
+          timer: 3000,
+          showConfirmButton: false
+        });
+        return;
+      }
+
+      this.loading = true;
+
+      try {
+        const result = await this.authStore.signupSendOtp({
+          email: this.formData.email,
+          password: this.formData.password,
+          confirm_password: this.formData.confirm_password,
+          recaptcha: recaptchaResponse
+        });
+
+        if (result.status) {
+          Swal.fire({
+            icon: 'success',
+            title: 'OTP Sent!',
+            text: result.message || `OTP has been sent to ${this.formData.email}`,
+            timer: 2500,
+            showConfirmButton: false
+          });
+
+          this.adminOtpSent = true;
+          this.resetRecaptcha();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Failed to Send OTP',
+            text: result.message || 'Something went wrong. Please try again.',
+            timer: 3000,
+            showConfirmButton: false
+          });
+          this.resetRecaptcha();
+        }
+      } catch (error) {
+        console.error('Send OTP error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Something went wrong. Please try again.',
+          timer: 3000,
+          showConfirmButton: false
+        });
         this.resetRecaptcha();
-        return;
+      } finally {
+        this.loading = false;
       }
-
-      // STEP 2: VERIFY OTP (UI ONLY)
-      if (!this.otp || this.otp.length !== 6) {
-        Swal.fire('Error', 'Please enter valid OTP', 'error');
-        return;
-      }
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Signup Successful',
-        text: 'Redirecting...',
-        timer: 1500,
-        showConfirmButton: false
-      });
-
-      setTimeout(() => {
-        this.$router.push('/location');
-      }, 1500);
 
       return;
     }
@@ -569,11 +655,13 @@ export default {
       }
     } catch (error) {
       console.error('Form submission error:', error);
-      Swal.fire(
-        'Error',
-        error.message || 'Something went wrong',
-        'error'
-      );
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Something went wrong',
+        timer: 3000,
+        showConfirmButton: false
+      });
     } finally {
       this.loading = false;
     }
@@ -603,7 +691,13 @@ export default {
           }
         }
 
-        Swal.fire('Error', errorMessage, 'error');
+        Swal.fire({
+          icon: 'error',
+          title: 'Signup Failed',
+          text: errorMessage,
+          timer: 3000,
+          showConfirmButton: false
+        });
         this.resetRecaptcha();
       }
     },
@@ -620,7 +714,13 @@ export default {
         console.log('✅ Login successful');
         await this.checkAndRedirect();
       } else {
-        Swal.fire('Error', result.message || 'Login failed', 'error');
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: result.message || 'Login failed',
+          timer: 3000,
+          showConfirmButton: false
+        });
         this.resetRecaptcha();
       }
     },
