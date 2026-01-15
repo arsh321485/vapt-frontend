@@ -482,31 +482,29 @@ export default {
         popup.style.display = "none";
       }, 2000);
     },
-    toggleDropdown(dropdownName) {
-      for (const key in this.isOpen) {
-        if (key !== dropdownName) {
-          this.isOpen[key] = false;
-        }
-      }
-      this.isOpen[dropdownName] = !this.isOpen[dropdownName];
-    },
     onClickOutside(event) {
-    for (const key in this.isOpen) {
-      const dropdown = document.getElementById(`dropdown-${key}`);
-      if (dropdown && !dropdown.contains(event.target)) {
-        this.isOpen[key] = false;
+      // Check if click is inside any dropdown
+      const clickedInsideDropdown = event.target.closest('.multi-select-dropdown') ||
+                                     event.target.closest('.modal-multi-select-dropdown');
+
+      // If clicked outside all dropdowns, close all
+      if (!clickedInsideDropdown) {
+        Object.keys(this.isOpen).forEach(key => {
+          this.isOpen[key] = false;
+        });
       }
-    }
-  },
+    },
     getInitials(first, last) {
       return (first?.[0] || '') + (last?.[0] || '');
     },
     toggleDropdown(id) {
-    Object.keys(this.isOpen).forEach(key => {
-      if (key !== id) this.isOpen[key] = false;
-    });
-    this.isOpen[id] = !this.isOpen[id];
-  },
+      // Close all other dropdowns first
+      Object.keys(this.isOpen).forEach(key => {
+        if (key !== id) this.isOpen[key] = false;
+      });
+      // Toggle the clicked dropdown
+      this.isOpen[id] = !this.isOpen[id];
+    },
     filteredUsers(tabName, type) {
   if (!Array.isArray(this.users)) return [];
 
@@ -665,6 +663,9 @@ export default {
   async handleRoleChange(event, user, option) {
     const isChecked = event.target.checked;
     const roleFullName = option.full; // e.g., "Patch Management"
+
+    // Close dropdown before showing alert
+    this.isOpen[user._id] = false;
 
     if (!isChecked) {
       // UNCHECKED - Call delete role API

@@ -42,8 +42,8 @@
                 <div class="mb-2" v-if="(currentRole === 'admin' && !adminOtpSent) || (currentRole === 'user' && !otpSent)">
                   <label class="form-label">Email</label>
                   <input type="email" class="form-control custom-input" placeholder="name@work.com"
-                    v-model="formData.email" autocomplete="new-email" autocorrect="off" autocapitalize="off"
-                    spellcheck="false" :name="'email_' + formKey" required />
+                    v-model="formData.email" autocomplete="off" autocorrect="off" autocapitalize="off"
+                    spellcheck="false" :name="'email_' + formKey" readonly onfocus="this.removeAttribute('readonly');" required />
                 </div>
 
                 <!-- OTP FIELD (Only for User when OTP is sent) -->
@@ -98,8 +98,8 @@
                   <label class="form-label">Password</label>
                   <div class="position-relative">
                     <input :type="showPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Password" v-model="formData.password" @input="validatePassword" autocomplete="new-password" autocorrect="off"
-                      autocapitalize="off" spellcheck="false" :name="'password_' + formKey" required />
+                      placeholder="Password" v-model="formData.password" @input="validatePassword" autocomplete="off" autocorrect="off"
+                      autocapitalize="off" spellcheck="false" :name="'password_' + formKey" readonly onfocus="this.removeAttribute('readonly');" required />
 
                     <span class="password-toggle" @click="showPassword = !showPassword">
                       <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
@@ -118,8 +118,8 @@
                   <label class="form-label">Confirm Password</label>
                   <div class="position-relative">
                     <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Confirm Password" v-model="formData.confirm_password" autocomplete="new-password"
-                      :name="'confirm-password-' + formKey" required />
+                      placeholder="Confirm Password" v-model="formData.confirm_password" autocomplete="off"
+                      :name="'confirm-password-' + formKey" readonly onfocus="this.removeAttribute('readonly');" required />
                     <span class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
                       <i :class="showConfirmPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
                     </span>
@@ -196,6 +196,9 @@
                 class="form-control custom-input"
                 placeholder="name@work.com"
                 v-model="forgotEmail"
+                autocomplete="off"
+                readonly
+                onfocus="this.removeAttribute('readonly');"
                 required
               />
             </div>
