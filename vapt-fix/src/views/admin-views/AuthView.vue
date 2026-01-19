@@ -1,7 +1,7 @@
 <template>
   <main>
-    <div class="container-fluid vh-100">
-      <div class="row h-100">
+    <div class="container-fluid min-vh-100">
+      <div class="row min-vh-100">
         <div class="col-xl-5 col-lg-12 col-md-12 col-12 form-section">
 
           <!-- LOGO (FIXED POSITION) -->
@@ -59,6 +59,7 @@
                       v-model="otpDigits[index]"
                       @input="handleOtpInput($event, index)"
                       @keydown="handleOtpKeydown($event, index)"
+                      @paste="handleOtpPaste($event, index)"
                       :ref="el => otpRefs[index] = el"
                       autocomplete="off"
                       required
@@ -83,6 +84,7 @@
                       v-model="otpDigits[index]"
                       @input="handleOtpInput($event, index)"
                       @keydown="handleOtpKeydown($event, index)"
+                      @paste="handleOtpPaste($event, index)"
                       :ref="el => otpRefs[index] = el"
                       autocomplete="off"
                       required
@@ -107,7 +109,7 @@
                   </div>
                 </div>
 
-                <ul v-if="showPasswordRules && currentRole === 'admin' && !adminOtpSent" class="password-rules mt-2 mb-1">
+                <ul v-if="showPasswordRules && currentRole === 'admin' && !adminOtpSent && !allRulesValid" class="password-rules mt-2 mb-1">
                   <li :class="{ valid: rules.minLength }">At least 8 characters</li>
                   <li :class="{ valid: rules.uppercase }">At least 1 uppercase letter</li>
                   <li :class="{ valid: rules.special }">At least 1 special character</li>
@@ -123,6 +125,23 @@
                     <span class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
                       <i :class="showConfirmPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
                     </span>
+                  </div>
+                </div>
+
+                <!-- TESTING BOX DROPDOWN (Signin only, Admin only) -->
+                <div class="mb-1" v-if="currentMode === 'signin' && currentRole === 'admin'" ref="testingBoxDropdown">
+                  <label class="form-label">Testing Box</label>
+                  <div class="position-relative">
+                    <div class="form-control custom-input dropdown-trigger" @click="isTestingBoxOpen = !isTestingBoxOpen">
+                      <span class="dropdown-text">{{ selectedTestingBox.length ? selectedTestingBox.map(v => testingBoxOptions.find(o => o.value === v)?.label).join(', ') : 'Select testing type' }}</span>
+                      <i :class="isTestingBoxOpen ? 'bi bi-chevron-up' : 'bi bi-chevron-down'" class="dropdown-icon"></i>
+                    </div>
+                    <div v-if="isTestingBoxOpen" class="testing-dropdown-list">
+                      <label v-for="option in testingBoxOptions" :key="option.value" class="dropdown-option">
+                        <input type="checkbox" :value="option.value" v-model="selectedTestingBox" />
+                        {{ option.label }}
+                      </label>
+                    </div>
                   </div>
                 </div>
 
@@ -152,7 +171,6 @@
           </div>
 
         </div>
-
 
         <!-- RIGHT SECTION -->
         <div class="col-xl-7 col-lg-12 col-md-12 col-12 d-flex flex-column justify-content-center align-items-center info-section p-5">
@@ -253,6 +271,15 @@ export default {
       showForgotPasswordModal: false,
       forgotEmail: "",
       forgotLoading: false,
+      // Testing Box dropdown
+      selectedTestingBox: [],
+      isTestingBoxOpen: false,
+      testingBoxOptions: [
+        // { value: "all", label: "All" },
+        { value: "white_box", label: "White Box" },
+        { value: "grey_box", label: "Grey Box" },
+        { value: "black_box", label: "Black Box" }
+      ],
     };
   },
   computed: {
@@ -286,6 +313,9 @@ export default {
     },
     isAdmin() {
       return this.currentRole === "admin";
+    },
+    allRulesValid() {
+      return this.rules.minLength && this.rules.uppercase && this.rules.special;
     }
   },
   methods: {
@@ -371,6 +401,42 @@ export default {
       }
       if (event.key === 'ArrowRight' && index < 5) {
         this.otpRefs[index + 1]?.focus();
+      }
+    },
+    handleOtpPaste(event, index) {
+      event.preventDefault();
+
+      // Get pasted text
+      const pastedText = (event.clipboardData || window.clipboardData).getData('text');
+
+      // Extract only digits
+      const digits = pastedText.replace(/\D/g, '').slice(0, 6);
+
+      if (digits.length === 0) return;
+
+      // Fill OTP boxes starting from current index
+      for (let i = 0; i < digits.length && (index + i) < 6; i++) {
+        this.otpDigits[index + i] = digits[i];
+      }
+
+      // If pasting from first box, fill all available digits
+      if (index === 0 && digits.length <= 6) {
+        for (let i = 0; i < digits.length; i++) {
+          this.otpDigits[i] = digits[i];
+        }
+      }
+
+      // Combine all digits into otp string
+      this.otp = this.otpDigits.join('');
+
+      // Focus on the next empty box or last box
+      const nextIndex = Math.min(index + digits.length, 5);
+      this.otpRefs[nextIndex]?.focus();
+    },
+    closeTestingBoxOnOutside(e) {
+      const dropdown = this.$refs.testingBoxDropdown;
+      if (dropdown && !dropdown.contains(e.target)) {
+        this.isTestingBoxOpen = false;
       }
     },
     validateForm() {
@@ -517,15 +583,30 @@ export default {
           });
 
           if (result.status) {
+            const userEmail = this.formData.email;
+
             await Swal.fire({
               icon: 'success',
               title: 'Account Created!',
-              text: result.message || 'Your account has been created successfully.',
+              text: 'Your account has been created. Please sign in to continue.',
               timer: 2000,
               showConfirmButton: false
             });
 
-            this.$router.push('/location');
+            // Switch to signin tab instead of redirecting
+            this.currentMode = 'signin';
+            this.adminOtpSent = false;
+            this.otpDigits = ['', '', '', '', '', ''];
+            this.otp = '';
+            this.formData.password = '';
+            this.formData.confirm_password = '';
+            // Keep email pre-filled for convenience
+            this.formData.email = userEmail;
+
+            // Reinitialize reCAPTCHA for signin
+            this.$nextTick(() => {
+              this.reinitializeRecaptcha();
+            });
           } else {
             Swal.fire({
               icon: 'error',
@@ -926,6 +1007,9 @@ export default {
       this.startSlider();
     });
 
+    // Add click listener for closing testing box dropdown
+    document.addEventListener("click", this.closeTestingBoxOnOutside);
+
     // Clear any autofilled data on signup
     // this.clearAutofill();
   },
@@ -946,11 +1030,33 @@ export default {
     if (window.onRecaptchaLoad) {
       delete window.onRecaptchaLoad;
     }
+
+    // Remove testing box dropdown listener
+    document.removeEventListener("click", this.closeTestingBoxOnOutside);
   }
 };
 </script>
 
 <style scoped>
+/* main {
+  background-color: rgb(9, 9, 35);
+  min-height: 100vh;
+} */
+
+/* .container-fluid {
+  background-color: rgb(9, 9, 35);
+  min-height: 100vh;
+} */
+
+/* .container-fluid > .row {
+  min-height: 100vh;
+} */
+
+/* .form-section,
+.info-section {
+  min-height: 100vh;
+} */
+
   .password-rules {
   list-style: none;
   padding-left: 0;
@@ -1516,5 +1622,79 @@ export default {
   .forgot-modal-body {
     padding: 20px;
   }
+}
+
+/* ===================================
+   TESTING BOX DROPDOWN STYLES
+   =================================== */
+.dropdown-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+}
+
+.dropdown-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-icon {
+  color: #9ca3af;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+  margin-left: 10px;
+}
+
+.testing-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #020617;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 8px;
+  z-index: 20;
+  margin-top: 4px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #e5e7eb;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.dropdown-option:hover {
+  background: rgba(90, 68, 255, 0.15);
+}
+
+.dropdown-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: rgb(90, 68, 255);
+  cursor: pointer;
+}
+
+.forgot-link {
+  /* color: #9ca3af; */
+  color: rgb(90, 68, 255);
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: rgb(90, 68, 255);
 }
 </style>

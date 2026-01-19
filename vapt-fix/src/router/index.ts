@@ -43,6 +43,7 @@ import UserSignupView from '../views/user-views/UserSignupView.vue'
 import ChooseAccountView from '../views/admin-views/ChooseAccountView.vue'
 import AuthView from '../views/admin-views/AuthView.vue'
 import JiraCallbackView from '../views/admin-views/JiraCallbackView.vue'
+import ReportView from '../views/admin-dashboard/ReportView.vue'
 
 
 const router = createRouter({
@@ -185,6 +186,11 @@ const router = createRouter({
       path: '/vulnerabilityregister',
       name: 'vulnerabilityregister',
       component: VulnerabilityRegisterView,
+    }, 
+    {
+      path: '/report',
+      name: 'report',
+      component: ReportView,
     }, 
     {
       path: '/assets',

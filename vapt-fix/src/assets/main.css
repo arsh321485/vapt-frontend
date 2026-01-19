@@ -800,7 +800,7 @@ html, body {
 /* make button a positioning context */
 .sidebar .btn {
   position: relative;
-  padding-bottom: 10px; /* space for underline */
+  padding-bottom: 6px; 
 }
 
 /* underline for active menu */

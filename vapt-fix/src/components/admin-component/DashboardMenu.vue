@@ -4,7 +4,7 @@
     <div class="d-flex"> 
     <div class="sidebar d-flex flex-column align-items-center my-5 py-2">
       <!-- Navigation Icons -->
-      <div class="flex-grow-1 d-flex flex-column align-items-center  text-center gap-1">
+      <div class="flex-grow-1 d-flex flex-column align-items-center  text-center">
          <div>
           <router-link to="/admindashboardonboarding">
           <button class="btn border-0" :class="{ activeBtn: isActive('/admindashboardonboarding') }"><i class="bi bi-house-door nav-menu"></i>
@@ -16,6 +16,13 @@
           <router-link to="/vulnerabilityregister">
           <button class="btn border-0" :class="{ activeBtn: isActive('/vulnerabilityregister') }"><i class="bi bi-list-ul nav-menu"></i>
           <p class="menu-heading">Register</p></button>
+          </router-link>
+         </div>
+
+         <div>
+          <router-link to="/report">
+          <button class="btn border-0" :class="{ activeBtn: isActive('/report') }"><i class="bi bi-file-earmark-text nav-menu"></i>
+          <p class="menu-heading">Report</p></button>
           </router-link>
          </div>
 

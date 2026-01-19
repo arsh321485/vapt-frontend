@@ -11,7 +11,7 @@
 
       <!-- CONTENT -->
       <div class="content">
-        <h1>Add location and users</h1>
+        <h1>Add users</h1>
         <p>Align your team and tools for a seamless build.</p>
 
         <!-- Communication -->
@@ -42,16 +42,16 @@
         </div>
 
         <!-- Location -->
-        <div class="section">
+        <!-- <div class="section">
           <div class="section-title">Location</div>
 
           <div class="d-flex gap-3 flex-wrap align-items-start">
-            <!-- INPUT + DROPDOWN -->
+           
             <div style="position: relative; width: 50%;">
               <input class="form-control" placeholder="e.g. India, Bahrain" v-model="locationName"
                 @input="onLocationInput" @focus="onLocationInput" />
 
-              <!-- COUNTRY DROPDOWN -->
+           
               <ul v-if="showDropdown && filteredCountries.length" class="list-group" style="
           position: absolute;
           top: 100%;
@@ -68,12 +68,12 @@
               </ul>
             </div>
 
-            <!-- ADD BUTTON -->
+           
             <button class="btn btn-primary" @click="handleAddLocation">
               Add location
             </button>
 
-            <!-- AVATAR CIRCLES -->
+           
             <div class="d-flex gap-2 align-items-center flex-wrap location-circle">
               <div v-for="(loc, index) in authStore.locations" :key="loc._id || index"
                 class="rounded-circle d-flex align-items-center justify-content-center" :style="{
@@ -87,7 +87,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Users -->
         <div class="section">
@@ -111,12 +111,12 @@
             <input class="form-control" placeholder="Email" type="email" v-model="form.email" />
 
             <!-- Location -->
-            <select v-model="selectedLocation" class="form-select">
+            <!-- <select v-model="selectedLocation" class="form-select">
               <option disabled value="">Location</option>
               <option v-for="loc in authStore.locations" :key="loc._id" :value="loc._id">
                 {{ loc.location_name }}
               </option>
-            </select>
+            </select> -->
 
             <!-- Member Role (Multi Select) -->
             <div class="position-relative" ref="roleDropdown">
@@ -901,7 +901,7 @@ export default {
 
 .row-users {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1.6fr 1fr 1.2fr;
+  grid-template-columns: 1fr 1fr 1fr 1.6fr 1.2fr;
   gap: 14px;
 }
 

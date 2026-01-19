@@ -906,10 +906,10 @@ export const useAuthStore = defineStore("auth", {
         return { status: true, data: res.data };
       }
       return { status: false };
-    },
+  },
 
-    // 🔑 Slack Login (THIS SAVES BOT TOKEN)
-    async loginWithSlack(code: string, redirectUri: string) {
+  // 🔑 Slack Login (THIS SAVES BOT TOKEN)
+  async loginWithSlack(code: string, redirectUri: string) {
       const res = await endpoint.post(
         "/admin/users/slack-oauth/",
         {
@@ -936,7 +936,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       return { status: false };
-    },
+  },
 
   // 🧠 Jira OAuth - Get Authorization URL
   async getJiraAuthUrl() {

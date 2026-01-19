@@ -40,7 +40,7 @@
   :to="{ path: '/location', query: { returnTo: $route.fullPath } }"
   class="btn btn-sm btn-outline-primary w-100 mb-2"
 >
-  Add Location
+  Add User
 </router-link>
 <router-link
   :to="{ path: '/uploadreport', query: { returnTo: $route.fullPath } }" class="btn btn-sm btn-outline-primary w-100 mb-2"
