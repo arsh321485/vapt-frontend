@@ -290,34 +290,22 @@ export default {
         return;
       }
 
-      // 2️⃣ Find selected location object
-      const selectedLoc = this.authStore.locations.find(
-        l => l._id === this.selectedLocation
-      );
-
-      if (!selectedLoc) {
-        Swal.fire("Error", "Please select a location", "error");
-        return;
-      }
-
-      // 3️⃣ Build payload EXACTLY as backend expects
+      // 2️⃣ Build payload (❌ location removed)
       const payload = {
-        admin_id: adminId,                                // ✅ correct
-        location_id: this.selectedLocation,               // ✅ correct
-        select_location: selectedLoc.location_name,        // ✅ REQUIRED
+        admin_id: adminId,                 // ✅ required
         first_name: this.form.first_name,
         last_name: this.form.last_name,
         email: this.form.email,
         user_type: this.form.user_type,
         Member_role: this.selectedRoles.map(
           r => this.roleOptions.find(o => o.short === r)?.full
-        )                                                  // ✅ FULL role names
+        )                                  // ✅ full role names
       };
 
-      // 🧪 Debug once
+      // 🧪 Debug
       console.log("FINAL PAYLOAD 👉", payload);
 
-      // 4️⃣ API call
+      // 3️⃣ API call
       const res = await this.authStore.createUserDetail(payload);
 
       if (res.status) {
@@ -329,12 +317,11 @@ export default {
           allowOutsideClick: false
         });
 
-        // reset form
+        // 🔄 reset form
         this.form.first_name = "";
         this.form.last_name = "";
         this.form.email = "";
         this.form.user_type = "";
-        this.selectedLocation = "";
         this.selectedRoles = [];
         this.isRoleOpen = false;
 
