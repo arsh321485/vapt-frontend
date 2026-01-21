@@ -1,7 +1,7 @@
 <template>
   <main>
     <section>
-      <TestingInProgressOverlay :isActive="testingActive" />
+    
       <div class="container-fluid">
         <div class="row">
           <DashboardHeader />
@@ -11,7 +11,7 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1" :class="{ 'greyed': testingActive }">
+          <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1">
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <div class="d-flex flex-row gap-2">
                 <h2>Vulnerability Management Program</h2>
@@ -867,11 +867,6 @@ export default {
 </script>
 
 <style scoped>
-  .greyed {
-  pointer-events: none;
-  filter: grayscale(1);
-  opacity: 0.6;
-}
 
 .custom-modal-backdrop {
   position: fixed;
