@@ -57,7 +57,7 @@
                                                 <option value="external">External</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-4">
+                                            <!-- <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">Select Location</label>
                                                 <select class="form-select rounded-0 uniform-input">
                                                 <option selected disabled>Select location</option>
@@ -65,7 +65,7 @@
                                                 <option>Delhi</option>
                                                 <option>Bahrain</option>
                                                 </select>
-                                            </div>
+                                            </div> -->
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">Member Role</label>
                                                 <div class="modal-multi-select-dropdown" ref="roleDropdown3">
@@ -136,7 +136,7 @@
                                                 <option value="external">External</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-4">
+                                            <!-- <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">Select Location</label>
                                                 <select class="form-select rounded-0 uniform-input">
                                                 <option selected disabled>Select location</option>
@@ -144,7 +144,7 @@
                                                 <option>Delhi</option>
                                                 <option>Bahrain</option>
                                                 </select>
-                                            </div>
+                                            </div> -->
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold text-center w-100">Member Role</label>
                                                 <div class="modal-multi-select-dropdown" ref="roleDropdown2">
@@ -227,7 +227,7 @@
               <thead>
                 <tr>
                   <th style="width: 22%;">Name</th>
-                  <th style="width: 18%;">Location</th>
+                
                   <th style="width: 25%;">Email</th>
                   <th style="width: 22%;">Role</th>
                   <th style="width: 13%;">Action</th>
@@ -257,7 +257,7 @@
                   </td>
 
                   <!-- Location -->
-                  <td>{{ user.select_location }}</td>
+                  <!-- <td>{{ user.select_location }}</td> -->
 
                   <!-- Email -->
                   <td class="email-cell">{{ user.email }}</td>
@@ -314,7 +314,7 @@
               <thead>
                 <tr>
                   <th style="width: 22%;">Name</th>
-                  <th style="width: 18%;">Location</th>
+                  <!-- <th style="width: 18%;">Location</th> -->
                   <th style="width: 25%;">Email</th>
                   <th style="width: 22%;">Role</th>
                   <th style="width: 13%;">Action</th>
@@ -344,7 +344,7 @@
                   </td>
 
                   <!-- Location -->
-                  <td>{{ user.select_location }}</td>
+                  <!-- <td>{{ user.select_location }}</td> -->
 
                   <!-- Email -->
                   <td class="email-cell">{{ user.email }}</td>
@@ -548,12 +548,12 @@ export default {
 
     // ✅ 3️⃣ Prepare payload
     this.form.admin_id = adminId;
-    this.form.location_id = this.selectedLocation;
+    // this.form.location_id = this.selectedLocation;
 
-    const selectedLoc = this.authStore.locations.find(
-      (loc) => loc._id === this.selectedLocation
-    );
-    this.form.select_location = selectedLoc ? selectedLoc.location_name : "";
+    // const selectedLoc = this.authStore.locations.find(
+    //   (loc) => loc._id === this.selectedLocation
+    // );
+    // this.form.select_location = selectedLoc ? selectedLoc.location_name : "";
 
     // Convert short codes to full names → array format (backend expects array)
     this.form.Member_role = this.selectedRoles1.map(
@@ -598,15 +598,15 @@ export default {
       // ✅ 7️⃣ Reset form
       this.form = {
         admin_id: "",
-        location_id: "",
+        // location_id: "",
         first_name: "",
         last_name: "",
         user_type: "",
         email: "",
-        select_location: "",
+        // select_location: "",
         Member_role: [],
       };
-      this.selectedLocation = "";
+      // this.selectedLocation = "";
       this.selectedRoles1 = [];
     }
   } catch (err) {

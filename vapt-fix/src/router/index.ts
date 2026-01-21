@@ -44,6 +44,7 @@ import ChooseAccountView from '../views/admin-views/ChooseAccountView.vue'
 import AuthView from '../views/admin-views/AuthView.vue'
 import JiraCallbackView from '../views/admin-views/JiraCallbackView.vue'
 import ReportView from '../views/admin-dashboard/ReportView.vue'
+import ScopeView from '../views/admin-dashboard/ScopeView.vue'
 
 
 const router = createRouter({
@@ -104,6 +105,11 @@ const router = createRouter({
       path: '/admindashboardonboarding',
       name: 'admindashboardonboarding',
       component: AdminDashboardOnboardingView,
+    },
+    {
+      path: '/scope',
+      name: 'scope',
+      component: ScopeView,
     },
     {
       path: '/mitigationstrategy',

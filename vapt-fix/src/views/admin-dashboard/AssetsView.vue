@@ -395,14 +395,7 @@
                     <p class="mt-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability
                       card</p>
                     <div class="d-flex justify-content-between">
-                      <div class="dropdown">
-                        <div class="dropdown-btn"> Select location</div>
-                        <div class="dropdown-content">
-                          <a href="#">Greece</a>
-                          <a href="#">Germany</a>
-                          <a href="#">Bahrain</a>
-                        </div>
-                      </div>
+                     
                       <NotificationPanel />
                     </div>
                   </div>

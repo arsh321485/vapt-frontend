@@ -158,14 +158,7 @@
 
                     </div>
                   </div>
-                  <div class="dropdown">
-                            <div class="dropdown-btn"> Select location</div>
-                            <div class="dropdown-content">
-                                <a href="#">Greece</a>
-                                <a href="#">Germany</a>
-                                <a href="#">Bahrain</a>
-                            </div>
-                  </div>
+                  
                    <NotificationPanel />
                 </div>
 

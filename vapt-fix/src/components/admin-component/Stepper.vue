@@ -59,7 +59,7 @@
       @click="handleStepClick('/location', 1)"
     >
       <div class="step-circle">1</div>
-      <div class="step-label">Add location<br />and users</div>
+      <div class="step-label">Add<br />users</div>
       <div class="step-line" :class="{ active: isLineActive(2), completed: isLineCompleted(1) }"></div>
     </div>
 

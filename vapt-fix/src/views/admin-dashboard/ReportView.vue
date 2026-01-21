@@ -16,13 +16,13 @@
             <!-- HEADER -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                <h4 class="mb-1">
-                    <i class="bi bi-clipboard-data me-2"></i>
+                <h2 class="mb-1">
+                    <!-- <i class="bi bi-clipboard-data me-2"></i> -->
                     Vulnerability Reports
-                </h4>
-                <small class="text-muted">
+                </h2>
+                <!-- <small class="text-muted">
                     View and download security assessment reports
-                </small>
+                </small> -->
                 </div>
 
                 <button class="btn btn-primary">
