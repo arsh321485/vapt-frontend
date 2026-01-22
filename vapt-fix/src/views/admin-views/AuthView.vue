@@ -129,7 +129,7 @@
                 </div>
 
                 <!-- TESTING BOX DROPDOWN (Signin only, Admin only) -->
-                <div class="mb-1" v-if="currentMode === 'signin' && currentRole === 'admin'" ref="testingBoxDropdown">
+                <!-- <div class="mb-1" v-if="currentMode === 'signin' && currentRole === 'admin'" ref="testingBoxDropdown">
                   <label class="form-label">Testing Box</label>
                   <div class="position-relative">
                     <div class="form-control custom-input dropdown-trigger" @click="isTestingBoxOpen = !isTestingBoxOpen">
@@ -143,7 +143,55 @@
                       </label>
                     </div>
                   </div>
-                </div>
+                </div> -->
+
+                <!-- TESTING BOX DROPDOWN -->
+<div
+  class="mb-1"
+  v-if="currentMode === 'signin' && currentRole === 'admin'"
+  ref="testingBoxDropdown"
+>
+  <label class="form-label">Testing Box</label>
+
+  <div class="position-relative">
+    <div
+      class="form-control custom-input dropdown-trigger"
+      @click="isTestingBoxOpen = !isTestingBoxOpen"
+    >
+      <span class="dropdown-text">
+        {{
+          selectedTestingBox.length
+            ? selectedTestingBox
+                .map(v => testingBoxOptions.find(o => o.value === v)?.label)
+                .join(', ')
+            : 'Select testing type'
+        }}
+      </span>
+      <i
+        :class="isTestingBoxOpen ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"
+        class="dropdown-icon"
+      ></i>
+    </div>
+
+    <div v-if="isTestingBoxOpen" class="testing-dropdown-list">
+      <label
+        v-for="option in testingBoxOptions"
+        :key="option.value"
+        class="dropdown-option"
+        :class="{ disabled: isPreviouslySelected(option.value) }"
+      >
+        <input
+          type="checkbox"
+          :value="option.value"
+          v-model="selectedTestingBox"
+          :disabled="isPreviouslySelected(option.value)"
+        />
+        {{ option.label }}
+      </label>
+    </div>
+  </div>
+</div>
+
 
                 <!-- FORGOT PASSWORD (Signin only, Admin only) -->
                 <div class="text-end mb-2" v-if="currentMode === 'signin' && currentRole === 'admin'">
@@ -271,11 +319,10 @@ export default {
       showForgotPasswordModal: false,
       forgotEmail: "",
       forgotLoading: false,
-      // Testing Box dropdown
       selectedTestingBox: [],
       isTestingBoxOpen: false,
+       previouslySelectedTestingBox: [],
       testingBoxOptions: [
-        // { value: "all", label: "All" },
         { value: "white_box", label: "White Box" },
         { value: "grey_box", label: "Grey Box" },
         { value: "black_box", label: "Black Box" }
@@ -319,6 +366,22 @@ export default {
     }
   },
   methods: {
+    isPreviouslySelected(type) {
+    return this.previouslySelectedTestingBox.includes(type);
+  },
+    async fetchPreviousTestingTypes() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user?.id) return;
+
+  const res = await this.authStore.getAdminTestingTypes(user.id);
+
+  if (res.status && res.data.length) {
+    this.previouslySelectedTestingBox = res.data;
+
+    // ✅ Preselect old values
+    this.selectedTestingBox = [...res.data];
+  }
+},
     switchRole(role) {
       this.currentRole = role;
 
@@ -353,7 +416,7 @@ export default {
       this.formData = {
         email: "",
         password: "",
-        confirm_password: ""
+        confirm_password: "",
       };
       this.showPassword = false;
       this.showConfirmPassword = false;
@@ -361,6 +424,8 @@ export default {
       this.adminOtpSent = false;
       this.otp = "";
       this.otpDigits = ['', '', '', '', '', ''];
+      this.selectedTestingBox = [];
+      this.isTestingBoxOpen = false;
     },
     clearAutofill() {
       requestAnimationFrame(() => {
@@ -500,6 +565,36 @@ export default {
       return false;
     }
   }
+
+  // ✅ Testing Type validation (Admin Sign In only)
+// if (
+//   this.currentRole === 'admin' &&
+//   this.currentMode === 'signin' &&
+//   (!this.selectedTestingBox || this.selectedTestingBox.length === 0)
+// ) {
+//   Swal.fire(
+//     'Error',
+//     'Please select at least one testing type',
+//     'error'
+//   );
+//   return false;
+// }
+const finalTestingTypes = [
+  ...new Set([
+    ...this.previouslySelectedTestingBox,
+    ...this.selectedTestingBox,
+  ]),
+];
+
+if (
+  this.currentRole === "admin" &&
+  this.currentMode === "signin" &&
+  finalTestingTypes.length === 0
+) {
+  Swal.fire("Error", "Please select at least one testing type", "error");
+  return false;
+}
+
 
   // ✅ reCAPTCHA validation (Admin Sign In & Sign Up)
   if (window.grecaptcha && this.recaptchaWidgetId !== null) {
@@ -786,9 +881,16 @@ export default {
       }
     },
     async handleSignin(recaptchaResponse) {
+      const finalTestingTypes = [
+    ...new Set([
+      ...this.previouslySelectedTestingBox,
+      ...this.selectedTestingBox,
+    ]),
+  ];
       const payload = {
         email: this.formData.email,
         password: this.formData.password,
+        testing_type: finalTestingTypes,
         recaptcha: recaptchaResponse
       };
 
@@ -996,22 +1098,15 @@ export default {
     },
   },
   mounted() {
-    // Initialize auth store
     this.authStore = useAuthStore();
-
-    // Load reCAPTCHA
     this.loadRecaptchaScript();
-
-    // Start image slider animation
     this.$nextTick(() => {
       this.startSlider();
     });
-
-    // Add click listener for closing testing box dropdown
+    if (this.currentRole === "admin" && this.currentMode === "signin") {
+    this.fetchPreviousTestingTypes();
+  }
     document.addEventListener("click", this.closeTestingBoxOnOutside);
-
-    // Clear any autofilled data on signup
-    // this.clearAutofill();
   },
   beforeUnmount() {
     // Stop slider
@@ -1038,24 +1133,10 @@ export default {
 </script>
 
 <style scoped>
-/* main {
-  background-color: rgb(9, 9, 35);
-  min-height: 100vh;
-} */
-
-/* .container-fluid {
-  background-color: rgb(9, 9, 35);
-  min-height: 100vh;
-} */
-
-/* .container-fluid > .row {
-  min-height: 100vh;
-} */
-
-/* .form-section,
-.info-section {
-  min-height: 100vh;
-} */
+.dropdown-option.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
 
   .password-rules {
   list-style: none;

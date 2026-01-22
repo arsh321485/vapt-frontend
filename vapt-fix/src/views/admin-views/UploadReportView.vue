@@ -5,12 +5,6 @@
       <img src="@/assets/images/logo-capital.png" alt="" class="h-50">
     </div>
 
-    <!-- UPLOAD PROGRESS TOAST -->
-    <div v-if="hasAnyUploading" class="upload-toast">
-      <i class="bi bi-cloud-upload"></i>
-      {{ uploadingCount }} file(s) still uploading... Please don't refresh the page.
-    </div>
-
     <div class="app">
       <!-- STEPPER -->
       <Stepper />
@@ -19,22 +13,19 @@
       <div class="content">
         <div class="d-flex justify-content-between">
           <div>
-            <h1>Upload Vulnerability Report</h1>
-            <p>Upload findings to generate prioritized insights based on your defined risk criteria.</p>
+            <h1>Upload Targets for Assessment</h1>
+            <p>Add IP addresses, URLs, or subnets to begin vulnerability testing and risk analysis.</p>
           </div>
 
-          <!-- Testing Type Dropdown -->
+
+          <!-- Testing Type (Unified UI) -->
           <div class="testing-type">
-            <!-- <label class="form-label mb-1">Testing Type</label> -->
-            <select v-model="testingType" class="form-select testing-select">
-              <option disabled value="">Select Testing Type</option>
-              <option value="white-box">White Box</option>
-              <option value="black-box">Black Box</option>
-              <option value="grey-box">Grey Box</option>
+            <select v-model="selectedTestingType" class="form-select testing-select" :disabled="!showTestingDropdown">
+              <option v-for="type in allowedTestingTypes" :key="type" :value="type">
+                {{ formatTestingType(type) }}
+              </option>
             </select>
           </div>
-
-
         </div>
 
         <!-- MAIN TWO-COLUMN ROW -->
@@ -64,7 +55,7 @@
             </div>
           </div> -->
 
-          
+
 
 
             <div class="upload-box ip-box">
@@ -87,7 +78,7 @@ https://example.com"></textarea>
 
               <!-- ACTIONS -->
               <div class="ip-actions">
-                <input ref="fileInput" type="file" accept=".csv,.xlsx,.xls" hidden @change="handleFileUpload" />
+                <input ref="fileInput" type="file" accept=".csv,.xlsx,.xls,.txt" hidden @change="handleFileUpload" />
 
                 <button class="btn btn-primary" @click="$refs.fileInput.click()">
                   Upload CSV / Excel /Text File
@@ -98,8 +89,6 @@ https://example.com"></textarea>
             </div>
 
           </div>
-
-
 
           <!-- RIGHT COLUMN -->
           <div class="info-cards">
@@ -121,9 +110,6 @@ https://example.com"></textarea>
             </div>
           </div>
 
-
-
-
         </div>
 
         <!-- TARGET CARDS -->
@@ -144,18 +130,11 @@ https://example.com"></textarea>
 
                 </tr>
               </thead>
-              <!-- <tbody class="scroll-body"> -->
+
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
-                <!-- <tr v-for="(item, index) in internalTargets" :key="index"> -->
+
                 <tr v-for="(item, index) in internalTargets" :key="'int-' + index" draggable="true"
                   @dragstart="onDragStart(item, 'internal')">
-                  <!-- <td>{{ index + 1 }}</td>
-                  <td>
-                    {{ item.ip }}
-                    <span v-if="item.count" class="text-muted">
-                      ({{ item.count }})
-                    </span>
-                  </td> -->
 
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
@@ -164,9 +143,6 @@ https://example.com"></textarea>
                       ({{ item.count }})
                     </span>
                   </td>
-
-
-
                 </tr>
               </tbody>
             </table>
@@ -179,7 +155,7 @@ https://example.com"></textarea>
               External Targets
             </div>
 
-            <table class="mt-3">
+            <table class="mt-3" @dragover.prevent @drop="onDropTarget('external')">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
@@ -187,10 +163,8 @@ https://example.com"></textarea>
 
                 </tr>
               </thead>
-              <!-- <tbody class="scroll-body"> -->
-              <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
 
-                <!-- <tr v-for="(item, index) in externalTargets" :key="index"> -->
+              <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
                 <tr v-for="(item, index) in externalTargets" :key="'ext-' + index" draggable="true"
                   @dragstart="onDragStart(item, 'external')">
                   <!-- <td>{{ index + 1 }}</td>
@@ -231,20 +205,17 @@ https://example.com"></textarea>
 
                 </tr>
               </thead>
-              <tbody class="scroll-body">
-                <tr v-for="(item, index) in webAppTargets" :key="index">
-                  <!-- <td>{{ index + 1 }}</td>
-                  <td>{{ item.url }}</td> -->
 
+              <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
+                <tr v-for="(item, index) in webAppTargets" :key="'web-' + index" draggable="true"
+                  @dragstart="onDragStart(item, 'webapp')">
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
                     {{ item.url }}
-
                   </td>
-
-
                 </tr>
               </tbody>
+
             </table>
           </div>
 
@@ -284,8 +255,7 @@ https://example.com"></textarea>
 
         <div class="cta">
 
-          <button type="button" class="btn btn-primary" :disabled="!allUploadsComplete"
-            @click="handleUploadAndRedirect">
+          <button type="button" class="btn btn-primary" :disabled="!hasTargets" @click="handleUploadAndRedirect">
             {{ returnTo ? 'Back to Previous Page →' : 'Continue to Dashboard →' }}
           </button>
         </div>
@@ -323,6 +293,9 @@ export default {
       draggedItem: null,
       draggedFrom: null,
       testingType: "",
+      allowedTestingTypes: [],   // from API
+      selectedTestingType: "",   // final selected value
+      showTestingDropdown: false
     };
   },
   watch: {
@@ -341,9 +314,6 @@ export default {
       deep: true
     }
   },
-
-
-
   computed: {
     returnTo() {
       return this.$route.query.returnTo || null;
@@ -395,22 +365,18 @@ export default {
 
       return disabled;
     },
-    // Check if all uploads are complete (for enabling Continue button)
-    allUploadsComplete() {
-      if (this.uploadedFiles.length === 0) return false;
-      return this.uploadedFiles.every(f => f.status === 'success');
+    // Check if there are any targets in the cards (for enabling Continue button)
+    hasTargets() {
+      return (
+        this.internalTargets.length > 0 ||
+        this.externalTargets.length > 0 ||
+        this.webAppTargets.length > 0 ||
+        this.mobileAppTargets.length > 0
+      );
     },
-    // Check if any file is currently uploading
-    hasAnyUploading() {
-      return this.uploadedFiles.some(f => f.status === 'uploading');
-    },
-    // Count of files currently uploading
-    uploadingCount() {
-      return this.uploadedFiles.filter(f => f.status === 'uploading').length;
-    }
+
   },
 
-  // ✅ Mark step 3 as completed when table has successfully uploaded files
   uploadedFiles: {
     handler(files) {
       const hasSuccessfulUploads = files.some(f => f.status === 'success');
@@ -420,7 +386,6 @@ export default {
     },
     deep: true
   },
-
   async mounted() {
     this.authStore = useAuthStore();
     const user = JSON.parse(localStorage.getItem("user"));
@@ -429,47 +394,109 @@ export default {
     await this.fetchLocations();
     await this.fetchUploadedReports();
 
+    if (this.adminId) {
+      await this.fetchTestingTypes();
+    }
     // ✅ Check if step 3 should be marked completed on page load
     if (this.uploadedFiles.some(f => f.status === 'success')) {
       this.authStore.markStepCompleted(3);
     }
   },
   methods: {
+    async fetchTestingTypes() {
+      const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
-    // 🟣 Drag start
+      if (!res.status) {
+        Swal.fire(
+          "Error",
+          res.message || "Unable to fetch testing types",
+          "error"
+        );
+        return;
+      }
+
+      this.allowedTestingTypes = res.testingTypes || [];
+
+      // 🔥 RULES IMPLEMENTATION
+      if (this.allowedTestingTypes.length === 1) {
+        // Only one → auto select, no dropdown
+        this.selectedTestingType = this.allowedTestingTypes[0];
+        this.showTestingDropdown = false;
+      } else if (this.allowedTestingTypes.length > 1) {
+        // Two or more → dropdown, first selected
+        this.selectedTestingType = this.allowedTestingTypes[0];
+        this.showTestingDropdown = true;
+      }
+    },
+
+    formatTestingType(type) {
+      return type
+        .replace("_", " ")
+        .replace(/\b\w/g, l => l.toUpperCase());
+    },
     onDragStart(item, from) {
       this.draggedItem = item;
       this.draggedFrom = from;
     },
-
-    // 🟣 Drop handler
     onDropTarget(to) {
-      if (!this.draggedItem || this.draggedFrom === to) return;
+      if (!this.draggedItem) return;
 
-      // Remove from source
-      if (this.draggedFrom === 'internal') {
+      const from = this.draggedFrom;
+
+      // 🟢 SAME SOURCE DROP → JUST RE-ADD SAFELY
+      if (from === to) {
+        if (to === 'external' && this.draggedItem.ip) {
+          if (!this.externalTargets.some(t => t.ip === this.draggedItem.ip)) {
+            this.externalTargets.push(this.draggedItem);
+          }
+        }
+        this.draggedItem = null;
+        this.draggedFrom = null;
+        return;
+      }
+
+      // 🔹 REMOVE FROM SOURCE
+      if (from === 'internal') {
         this.internalTargets = this.internalTargets.filter(
           t => t.ip !== this.draggedItem.ip
         );
-      } else if (this.draggedFrom === 'external') {
+      } else if (from === 'external') {
         this.externalTargets = this.externalTargets.filter(
           t => t.ip !== this.draggedItem.ip
         );
+      } else if (from === 'webapp') {
+        this.webAppTargets = this.webAppTargets.filter(
+          t => t.url !== this.draggedItem.url
+        );
       }
 
-      // Add to destination
-      if (to === 'internal') {
-        this.internalTargets.push(this.draggedItem);
-      } else if (to === 'external') {
-        this.externalTargets.push(this.draggedItem);
+      // 🔹 ADD TO DESTINATION
+      if (to === 'internal' && this.draggedItem.ip) {
+        if (!this.internalTargets.some(t => t.ip === this.draggedItem.ip)) {
+          this.internalTargets.push(this.draggedItem);
+        }
       }
 
-      // Reset drag state
+      else if (to === 'external' && this.draggedItem.ip) {
+        if (!this.externalTargets.some(t => t.ip === this.draggedItem.ip)) {
+          this.externalTargets.push(this.draggedItem);
+        }
+      }
+
+      else if (to === 'webapp') {
+        const newUrl = this.draggedItem.url
+          ? this.draggedItem.url
+          : `http://${this.draggedItem.ip}`;
+
+        if (!this.webAppTargets.some(t => t.url === newUrl)) {
+          this.webAppTargets.push({ url: newUrl });
+        }
+      }
+
+      // 🔄 RESET
       this.draggedItem = null;
       this.draggedFrom = null;
     },
-
-
     buildTargetCards() {
       this.internalTargets = [];
       this.externalTargets = [];
@@ -517,8 +544,6 @@ export default {
         }
       });
     },
-
-
     isPrivateIP(value) {
       return (
         value.startsWith("10.") ||
@@ -526,25 +551,16 @@ export default {
         /^172\.(1[6-9]|2\d|3[0-1])\./.test(value)
       );
     },
-
-
-
-    // ✅ Validate subnet (CIDR)
     isValidSubnet(value) {
       const cidrRegex =
         /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}\/([0-9]|[1-2][0-9]|3[0-2])$/;
       return cidrRegex.test(value);
     },
-
     // ✅ COUNT IPs IN SUBNET (ADD THIS HERE)
     getSubnetCount(cidr) {
       const mask = parseInt(cidr.split("/")[1], 10);
       return Math.pow(2, 32 - mask);
     },
-
-
-
-
     viewInternalTarget(index) {
       console.log("View internal target:", this.internalTargets[index]);
     },
@@ -557,8 +573,6 @@ export default {
     viewMobileTarget(index) {
       window.open(this.mobileAppTargets[index].url, "_blank");
     },
-
-
     validateLastEntry() {
       const lines = this.ipInput.split("\n").filter(l => l.trim() !== "");
       if (!lines.length) return;
@@ -587,8 +601,6 @@ export default {
         confirmButtonColor: "#5a44ff"
       });
     },
-
-
     sanitizeIpInput() {
       const values = this.ipInput.split(/\n|,/);
       const validTargets = this.extractValidTargets(values);
@@ -604,8 +616,6 @@ export default {
 
       this.ipInput = validTargets.join("\n");
     },
-
-
     // 🔹 Extract IPs & URLs from textarea
     extractTargetsFromText() {
       const ipRegex =
@@ -639,39 +649,57 @@ export default {
 
       return [...new Set(validTargets)];
     },
-
-
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
+      const fileName = file.name.toLowerCase();
 
-      reader.onload = e => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      // Handle plain text files
+      if (fileName.endsWith('.txt')) {
+        reader.onload = e => {
+          const text = e.target.result;
+          const lines = text.split(/\r?\n/);
+          const validTargets = this.extractValidTargets(lines);
 
-        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        const flatValues = rows.flat();
+          // Append to textarea
+          this.ipInput = [...new Set([
+            ...this.ipInput.split(/\n|,/).map(v => v.trim()).filter(Boolean),
+            ...validTargets
+          ])].join("\n");
 
-        const validTargets = this.extractValidTargets(flatValues);
+          // Build cards
+          this.buildTargetCards();
+        };
+        reader.readAsText(file);
+      }
+      // Handle Excel/CSV files
+      else {
+        reader.onload = e => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-        // Append to textarea
-        this.ipInput = [...new Set([
-          ...this.ipInput.split(/\n|,/).map(v => v.trim()).filter(Boolean),
-          ...validTargets
-        ])].join("\n");
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const flatValues = rows.flat();
 
+          const validTargets = this.extractValidTargets(flatValues);
 
-        // 🔥 BUILD CARDS HERE
-        this.buildTargetCards();
-      };
+          // Append to textarea
+          this.ipInput = [...new Set([
+            ...this.ipInput.split(/\n|,/).map(v => v.trim()).filter(Boolean),
+            ...validTargets
+          ])].join("\n");
 
-      reader.readAsArrayBuffer(file);
+          // Build cards
+          this.buildTargetCards();
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
       event.target.value = "";
     },
-
     async fetchLocations() {
       const res = await this.authStore.fetchLocationsByAdminId(this.adminId);
       if (res.status) {
@@ -697,8 +725,6 @@ export default {
       this.dragover = false;
       this.handleFiles([...e.dataTransfer.files]);
     },
-
-
     isValidIP(value) {
       const ipRegex =
         /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
@@ -772,13 +798,13 @@ export default {
     // },
 
     handleUploadAndRedirect() {
-  // 🔐 Mark dashboard as locked
-  localStorage.setItem("dashboardTestingInProgress", "true");
-  localStorage.setItem("testingInProgress", "true");
-localStorage.setItem("testingStartTime", Date.now().toString());
+      // 🔐 Mark dashboard as locked
+      localStorage.setItem("dashboardTestingInProgress", "true");
+      localStorage.setItem("testingInProgress", "true");
+      localStorage.setItem("testingStartTime", Date.now().toString());
 
-  this.$router.push("/admindashboardonboarding");
-},
+      this.$router.push("/admindashboardonboarding");
+    },
 
     /* ---------------- FILE PREVIEW ---------------- */
     async viewFile(index) {
@@ -905,12 +931,18 @@ localStorage.setItem("testingStartTime", Date.now().toString());
     },
 
   },
-
-
 };
 </script>
 
 <style scoped>
+.testing-select:disabled {
+  background-color: #f1f3f5;
+  color: #333;
+  cursor: default;
+  opacity: 1;
+  /* remove faded look */
+}
+
 .testing-type {
   min-width: 200px;
 }

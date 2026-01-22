@@ -548,15 +548,15 @@ export default {
     return;
   }
       // Check if at least 1 location exists
-      if (!this.authStore.locations || this.authStore.locations.length === 0) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'No Location Added',
-          text: 'Please add at least one location before proceeding to Risk Criteria.',
-          confirmButtonColor: '#5a44ff'
-        });
-        return;
-      }
+      // if (!this.authStore.locations || this.authStore.locations.length === 0) {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'No Location Added',
+      //     text: 'Please add at least one location before proceeding to Risk Criteria.',
+      //     confirmButtonColor: '#5a44ff'
+      //   });
+      //   return;
+      // }
 
       // Mark step 1 as completed
       this.authStore.markStepCompleted(1);

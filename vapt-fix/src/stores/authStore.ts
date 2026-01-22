@@ -175,39 +175,46 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // ✅ LOGIN
-    async login(payload: {
-      email: string;
-      password: string;
-      recaptcha: string;
-    }) {
-      try {
-        const res = await endpoint.post(
-          "/admin/users/login/",
-          payload
-        );
+  async login(payload: {
+    email: string;
+    password: string;
+    testing_type: string[];
+    recaptcha: string;
+  }) {
+    try {
+      const res = await endpoint.post(
+        "/admin/users/login/",
+        payload
+      );
 
-        const data = res.data;
+      const data = res.data;
 
-        if (data.tokens?.access) {
-          this.setAuth(data.tokens.access, data.user);
-          if (data.tokens.refresh) {
-            localStorage.setItem("refreshToken", data.tokens.refresh);
-          }
+      if (data.tokens?.access) {
+        this.setAuth(data.tokens.access, data.user);
+
+        if (data.tokens.refresh) {
+          localStorage.setItem("refreshToken", data.tokens.refresh);
         }
-
-        localStorage.setItem("isNewUser", "false");
-
-        return { status: true, data, message: data.message };
-      } catch (error: any) {
-        const errorData = error.response?.data;
-        const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "Login failed";
-        return {
-          status: false,
-          message: errorMessage,
-          details: errorData || null,
-        };
       }
-    },
+
+      localStorage.setItem("isNewUser", "false");
+
+      return { status: true, data, message: data.message };
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      const errorMessage =
+        errorData?.message ||
+        errorData?.error ||
+        errorData?.detail ||
+        "Login failed";
+
+      return {
+        status: false,
+        message: errorMessage,
+        details: errorData || null,
+      };
+    }
+  },
 
   // ✅ Google login
   async googleLogin(id_token: string) {
@@ -407,6 +414,36 @@ export const useAuthStore = defineStore("auth", {
           error.message ||
           "Fetch locations failed",
         details: error.response?.data || null,
+      };
+    }
+  },
+
+  // ✅ Get admin testing types for upload report page
+  async getAdminTestingTypes(adminId: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/users/${adminId}/testing-type/`
+      );
+
+      const raw = res.data?.data?.testing_type;
+
+      let testingTypes: string[] = [];
+
+      // Backend returns string like "['white_box', 'grey_box']"
+      if (typeof raw === "string") {
+        testingTypes = JSON.parse(raw.replace(/'/g, '"'));
+      }
+
+      return {
+        status: true,
+        testingTypes,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch testing types",
       };
     }
   },
@@ -690,82 +727,6 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // ✅ GET Upload Report by ID
-  // async getUploadReportById(reportId: string) {
-  //   try {
-  //     if (!reportId) {
-  //       return {
-  //         status: false,
-  //         message: "Report ID not found",
-  //         isNotFound: true,
-  //       };
-  //     }
-
-  //     const res = await endpoint.get(`/admin/upload_report/upload/${reportId}/`);
-
-  //     if (res.data?.success && res.data?.upload_report) {
-  //       this.uploadedReportDetails = res.data.upload_report;
-
-  //       return {
-  //         status: true,
-  //         message: res.data.message || "Upload report retrieved successfully",
-  //         data: res.data,
-  //       };
-  //     }
-
-  //     return {
-  //       status: false,
-  //       message: "No upload report data found",
-  //       isNotFound: true,
-  //     };
-  //   } catch (error: any) {
-  //     const is404 = error?.response?.status === 404;
-
-  //     if (is404) {
-  //       console.log("ℹ️ No upload report found (404) - user can upload new");
-  //     } else {
-  //       console.error("❌ Error fetching upload report:", error);
-  //     }
-
-  //     return {
-  //       status: false,
-  //       message: error.response?.data?.message || error.message || "Failed to fetch upload report",
-  //       isNotFound: is404,
-  //     };
-  //   }
-  // },
-
-  // 🧠 Login with Microsoft Teams OAuth
-  // async microsoftLogin(authCode: string, state: string) {
-  // try {
-  //   const response = await endpoint.post("/admin/users/microsoft-oauth/", {
-  //     code: authCode,
-  //     state,
-  //   });
-
-  //   const data = response.data;
-  //   console.log("✅ Microsoft Teams login success:", data);
-
-  //   if (data && data.tokens && data.user) {
-  //     // Save in localStorage
-  //     localStorage.setItem("teams_user", JSON.stringify(data.user));
-  //     localStorage.setItem("teams_access_token", data.tokens.access);
-  //     localStorage.setItem("teams_refresh_token", data.tokens.refresh);
-  //     localStorage.setItem("authenticated", "true");
-
-  //     return { status: true, data };
-  //   } else {
-  //     return { status: false, message: "Invalid Microsoft login response" };
-  //   }
-  // } catch (err: any) {
-  //   console.error("❌ Microsoft login API error:", err);
-  //   return {
-  //     status: false,
-  //     message:
-  //       err.response?.data?.message || "Microsoft login failed, please try again",
-  //   };
-  // }
-  // },
   async microsoftLogin(authCode: string, state: string) {
       const response = await endpoint.post(
         "/api/admin/users/microsoft-teams-oauth/",

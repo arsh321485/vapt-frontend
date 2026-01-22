@@ -73,7 +73,7 @@ export default {
   components: { Vue3Select },
   data() {
     return {
-      form: { email: "", password: "" },
+      form: { email: "", password: "",testing_type: [], },
       showPassword: false,
       loading: false,
       authStore: useAuthStore(),

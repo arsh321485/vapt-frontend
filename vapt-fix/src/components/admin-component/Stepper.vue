@@ -89,7 +89,7 @@
       @click="handleStepClick('/uploadreport', 3)"
     >
       <div class="step-circle">3</div>
-      <div class="step-label">Vulnerability<br />Report</div>
+      <div class="step-label">Upload<br />Targets</div>
     </div>
 
   </div>
