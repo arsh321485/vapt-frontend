@@ -32,15 +32,15 @@
               <table class="scope-table">
                 <thead>
                   <tr>
-                    <th class="col-serial">S.No</th>
+                    <th class="col-serial ">S.No</th>
                     <th class="col-value text-center">IP Address</th>
-                    <th class="text-end col-actions">Actions</th>
+                    <th class=" col-actions">Actions</th>
 
 
                   </tr>
                 </thead>
 
-                <tbody @dragover.prevent @drop="onDropTarget('internal')">
+                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
                   <tr v-for="(item, index) in internalTargets" :key="item.id" draggable="true"
                     @dragstart="onDragStart(item, 'internal')">
 
@@ -49,7 +49,7 @@
                       {{ item.ip }}
                       <span v-if="item.count" class="subnet-count">({{ item.count }})</span>
                     </td>
-                    <td class="text-end col-actions actions">
+                    <td class=" col-actions actions">
                       <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
 
                       <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
@@ -76,17 +76,17 @@
                   <tr>
                     <th class="col-serial">S.No</th>
                     <th class="col-value text-center">IP Address</th>
-                    <th class="text-end col-actions">Actions</th>
+                    <th class=" col-actions">Actions</th>
 
 
                   </tr>
                 </thead>
-                <tbody @dragover.prevent @drop="onDropTarget('external')">
+                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
                   <tr v-for="(item, index) in externalTargets" :key="item.id" draggable="true"
                     @dragstart="onDragStart(item, 'external')">
                     <td class="col-serial">{{ index + 1 }}</td>
                     <td class="col-value text-center">{{ item.ip }}</td>
-                    <td class="text-end col-actions actions">
+                    <td class="col-actions actions">
                       <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
 
                       <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
@@ -107,17 +107,45 @@
                   <tr>
                     <th class="col-serial">S.No</th>
                     <th class="col-value text-center">URL</th>
-                    <th class="text-end col-actions">Actions</th>
-
-
-
+                    <th class="col-actions">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr v-for="(item, index) in webAppTargets" :key="item.id">
+                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
+                  <tr v-for="(item, index) in webAppTargets" :key="item.url || index"  draggable="true"
+  @dragstart="onDragStart(item, 'webapp')">
                     <td class="col-serial">{{ index + 1 }}</td>
                     <td class="col-value text-center">{{ item.url }}</td>
-                    <td class="text-end col-actions actions">
+                    <td class=" col-actions actions">
+                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
+
+                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
+
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile -->
+            <div class="scope-card">
+              <h3 class="scope-card-title">Mobile App Targets</h3>
+
+              <table class="scope-table">
+                <thead>
+                  <tr>
+                    <th class="col-serial">S.No</th>
+                    <th class="col-value text-center">URL</th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobile')">
+                  <tr v-for="(item, index) in mobAppTargets" :key="item.url || index"
+  draggable="true"
+  @dragstart="onDragStart(item, 'mobile')">
+                    <td class="col-serial">{{ index + 1 }}</td>
+                    <td class="col-value text-center">{{ item.url }}</td>
+                    <td class=" col-actions actions">
                       <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
 
                       <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
@@ -158,7 +186,7 @@
 
         <!-- ACTIONS -->
         <div class="modal-actions">
-          <button class="btn btn-secondary" @click="closeModal">
+          <button class="btn btn-danger" @click="closeModal">
             Cancel
           </button>
           <button class="btn btn-primary" @click="saveTarget">
@@ -185,13 +213,25 @@ export default {
     return {
       internalTargets: [
         { id: 1, ip: "192.168.1.10" },
-        { id: 2, ip: "192.168.2.0/28", count: 16 },
+        { id: 2, ip: "192.168.2.0" },
+        { id: 3, ip: "192.168.1.10" },
+        { id: 4, ip: "192.168.2.0" },
+        { id: 5, ip: "194.165.1.10" },
+        { id: 6, ip: "192.164.2.5" },
       ],
       externalTargets: [
-        { id: 3, ip: "8.8.8.8" },
+        { id: 3, ip: "192.168.1.19" },
+        { id: 3, ip: "192.156.2.00" },
       ],
       webAppTargets: [
         { id: 4, url: "https://example.com" },
+        { id: 4, url: "https://demo.com" },
+        { id: 4, url: "https://test.com" },
+      ],
+      mobAppTargets: [
+        { id: 4, url: "https://mobile.com" },
+        { id: 4, url: "https://demo2.com" },
+        { id: 4, url: "https://test1.com" },
       ],
       draggedItem: null,
       draggedFrom: null,
@@ -214,42 +254,84 @@ export default {
       this.draggedItem = item;
       this.draggedFrom = from;
     },
-
-    
-
     onDropTarget(to) {
   if (!this.draggedItem || this.draggedFrom === to) return;
 
-  const fromList =
-    this.draggedFrom === "internal"
-      ? this.internalTargets
-      : this.externalTargets;
+  // 🔹 Map source & destination lists
+  const listMap = {
+    internal: this.internalTargets,
+    external: this.externalTargets,
+    webapp: this.webAppTargets,
+    mobile: this.mobAppTargets,
+  };
 
-  const toList =
-    to === "internal"
-      ? this.internalTargets
-      : this.externalTargets;
+  const fromList = listMap[this.draggedFrom];
+  const toList = listMap[to];
 
-  const value = this.draggedItem.ip;
+  if (!fromList || !toList) return;
 
-  // 🔹 REMOVE from source (reactive)
-  const fromIndex = fromList.findIndex(item => item.ip === value);
+  // 🔹 Determine unique key (ip or url)
+  const value =
+    this.draggedItem.ip ||
+    this.draggedItem.url;
+
+  // 🔹 REMOVE from source
+  const fromIndex = fromList.findIndex(item =>
+    (item.ip || item.url) === value
+  );
   if (fromIndex !== -1) {
     fromList.splice(fromIndex, 1);
   }
 
-  // 🔹 PREVENT duplicates
-  if (!toList.some(item => item.ip === value)) {
-    toList.push({ ...this.draggedItem });
+  // 🔹 PREVENT duplicates in destination
+  const exists = toList.some(item =>
+    (item.ip || item.url) === value
+  );
+
+  if (!exists) {
+    // 🔹 Normalize data per destination
+    if (to === "webapp" || to === "mobile") {
+      toList.push({ id: Date.now(), url: value });
+    } else {
+      toList.push({ id: Date.now(), ip: value });
+    }
   }
 
   // 🔹 RESET drag state
   this.draggedItem = null;
   this.draggedFrom = null;
-},
+}
+,
+//     onDropTarget(to) {
+//   if (!this.draggedItem || this.draggedFrom === to) return;
 
+//   const fromList =
+//     this.draggedFrom === "internal"
+//       ? this.internalTargets
+//       : this.externalTargets;
 
+//   const toList =
+//     to === "internal"
+//       ? this.internalTargets
+//       : this.externalTargets;
 
+//   const value = this.draggedItem.ip;
+
+//   // 🔹 REMOVE from source (reactive)
+//   const fromIndex = fromList.findIndex(item => item.ip === value);
+//   if (fromIndex !== -1) {
+//     fromList.splice(fromIndex, 1);
+//   }
+
+//   // 🔹 PREVENT duplicates
+//   if (!toList.some(item => item.ip === value)) {
+//     toList.push({ ...this.draggedItem });
+//   }
+
+//   // 🔹 RESET drag state
+//   this.draggedItem = null;
+//   this.draggedFrom = null;
+// },
     openAddModal() {
       this.modalMode = "add";
       this.form = { type: "internal", value: "" };
@@ -340,6 +422,31 @@ export default {
 
 
 <style scoped>
+/* Scroll only table body */
+.scroll-body {
+  display: block;
+  max-height: 240px;   /* 👈 height for ~5 rows */
+  overflow-y: auto;
+}
+
+/* Keep table header fixed width */
+.scope-table thead,
+.scope-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Optional: smooth scrollbar */
+.scroll-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-body::-webkit-scrollbar-thumb {
+  background: #bbb7e1;
+  border-radius: 6px;
+}
+
 tr[draggable="true"] {
   cursor: grab;
 }
@@ -350,7 +457,7 @@ tr[draggable="true"]:active {
 }
 .scope-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 28px;
 }
 
@@ -360,8 +467,10 @@ tr[draggable="true"]:active {
   border-radius: 18px;
   padding: 22px 24px;
   border: 1px solid #e6e9f2;
-  /* box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06); */
   box-shadow: 0 5px 10px #bbb7e1;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Card title */
@@ -371,16 +480,19 @@ tr[draggable="true"]:active {
   font-weight: 600;
   color: #111827;
   margin-bottom: 18px;
-   border-bottom: 2px solid #a095f0;
-   display: table;          /* 👈 key trick */
-  margin: 0 auto 18px;
-    box-shadow: 0 5px 5px #bbb7e1;
+   border-bottom: 3px solid #a095f0;
+   display: table;         
+  margin: 0 auto 28px;
+  padding-bottom: 4px;       
+  /* margin-bottom: 18px; */
+    /* box-shadow: 0 5px 5px #bbb7e1; */
 }
 
 /* Table */
 .scope-table {
   width: 100%;
   font-size: 14px;
+  flex: 1;
 }
 
 .scope-table th {
@@ -399,7 +511,7 @@ tr[draggable="true"]:active {
 /* Actions */
 .actions i {
   font-size: 15px;
-  margin-left: 14px;
+  margin-left: 8px;
   cursor: pointer;
 }
 
@@ -538,12 +650,6 @@ tr[draggable="true"]:active {
 /* Header alignment */
 .scope-table thead th.col-value {
   text-align: center;
-  /* 👈 center heading only */
-}
-
-/* Keep body content readable (left aligned) */
-.scope-table tbody td.col-value {
-  text-align: left;
-  padding-left: 28px;
+  
 }
 </style>

@@ -18,13 +18,18 @@
           </div>
 
 
-          <!-- Testing Type (Unified UI) -->
+          <div class="d-flex justify-content-between gap-3">
+            <div>
+              <button  @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i class="bi bi-download me-2"></i> Download Excel file</button>
+            </div>
+            <!-- Testing Type (Unified UI) -->
           <div class="testing-type">
             <select v-model="selectedTestingType" class="form-select testing-select" :disabled="!showTestingDropdown">
               <option v-for="type in allowedTestingTypes" :key="type" :value="type">
                 {{ formatTestingType(type) }}
               </option>
             </select>
+          </div>
           </div>
         </div>
 
@@ -133,7 +138,7 @@ https://example.com"></textarea>
 
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
 
-                <tr v-for="(item, index) in internalTargets" :key="'int-' + index" draggable="true"
+                <tr v-for="(item, index) in internalTargets" :key="item.ip || index" draggable="true"
                   @dragstart="onDragStart(item, 'internal')">
 
                   <td class="col-serial">{{ index + 1 }}</td>
@@ -165,7 +170,7 @@ https://example.com"></textarea>
               </thead>
 
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
-                <tr v-for="(item, index) in externalTargets" :key="'ext-' + index" draggable="true"
+                <tr v-for="(item, index) in externalTargets" :key="item.ip || index" draggable="true"
                   @dragstart="onDragStart(item, 'external')">
                   <!-- <td>{{ index + 1 }}</td>
                   <td>
@@ -207,7 +212,7 @@ https://example.com"></textarea>
               </thead>
 
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
-                <tr v-for="(item, index) in webAppTargets" :key="'web-' + index" draggable="true"
+                <tr v-for="(item, index) in webAppTargets" :key="item.ip || index" draggable="true"
                   @dragstart="onDragStart(item, 'webapp')">
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
@@ -234,18 +239,13 @@ https://example.com"></textarea>
 
                 </tr>
               </thead>
-              <tbody class="scroll-body">
-                <tr v-for="(item, index) in mobileAppTargets" :key="index">
-                  <!-- <td>{{ index + 1 }}</td>
-                  <td>{{ item.url }}</td> -->
-
+              <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobileapp')">
+                <tr v-for="(item, index) in mobileAppTargets" :key="index" draggable="true"
+                  @dragstart="onDragStart(item, 'mobileapp')">
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
                     {{ item.url }}
-
                   </td>
-
-
                 </tr>
               </tbody>
             </table>
@@ -403,6 +403,46 @@ export default {
     }
   },
   methods: {
+    downloadExcelTemplate() {
+      // Create sample data with all 4 column types
+      const sampleData = [
+        {
+          IP_ADDRESS: '192.168.1.10',
+          SUBNET: '10.0.0.0/24',
+          WEB_APP_URL: 'https://example.com',
+          MOBILE_APP_URL: 'https://play.google.com/store/apps/details?id=com.example.app'
+        },
+        {
+          IP_ADDRESS: '8.8.8.8',
+          SUBNET: '172.16.0.0/16',
+          WEB_APP_URL: 'https://test.com',
+          MOBILE_APP_URL: 'https://apps.apple.com/app/example/id123456789'
+        },
+        {
+          IP_ADDRESS: '192.168.1.20',
+          SUBNET: '',
+          WEB_APP_URL: 'https://demo.com',
+          MOBILE_APP_URL: ''
+        }
+      ];
+
+      // Create workbook and worksheet
+      const ws = XLSX.utils.json_to_sheet(sampleData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Targets');
+
+      // Set column widths for better readability
+      ws['!cols'] = [
+        { wch: 15 },  // IP_ADDRESS
+        { wch: 18 },  // SUBNET
+        { wch: 30 },  // WEB_APP_URL
+        { wch: 60 }   // MOBILE_APP_URL
+      ];
+
+      // Download the file
+      XLSX.writeFile(wb, 'VAPT_Targets_Template.xlsx');
+    },
+
     async fetchTestingTypes() {
       const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
@@ -428,7 +468,6 @@ export default {
         this.showTestingDropdown = true;
       }
     },
-
     formatTestingType(type) {
       return type
         .replace("_", " ")
@@ -468,28 +507,39 @@ export default {
         this.webAppTargets = this.webAppTargets.filter(
           t => t.url !== this.draggedItem.url
         );
+      } else if (from === 'mobileapp') {
+        this.mobileAppTargets = this.mobileAppTargets.filter(
+          t => t.url !== this.draggedItem.url
+        );
       }
 
       // 🔹 ADD TO DESTINATION
-      if (to === 'internal' && this.draggedItem.ip) {
-        if (!this.internalTargets.some(t => t.ip === this.draggedItem.ip)) {
-          this.internalTargets.push(this.draggedItem);
+      // Get the value (could be ip or url)
+      const itemValue = this.draggedItem.ip || this.draggedItem.url;
+
+      if (to === 'internal') {
+        if (!this.internalTargets.some(t => t.ip === itemValue)) {
+          this.internalTargets.push({ ip: itemValue, count: this.draggedItem.count });
         }
       }
 
-      else if (to === 'external' && this.draggedItem.ip) {
-        if (!this.externalTargets.some(t => t.ip === this.draggedItem.ip)) {
-          this.externalTargets.push(this.draggedItem);
+      else if (to === 'external') {
+        if (!this.externalTargets.some(t => t.ip === itemValue)) {
+          this.externalTargets.push({ ip: itemValue, count: this.draggedItem.count });
         }
       }
 
       else if (to === 'webapp') {
-        const newUrl = this.draggedItem.url
-          ? this.draggedItem.url
-          : `http://${this.draggedItem.ip}`;
+        // Keep value as-is (IP stays IP, URL stays URL)
+        if (!this.webAppTargets.some(t => t.url === itemValue)) {
+          this.webAppTargets.push({ url: itemValue });
+        }
+      }
 
-        if (!this.webAppTargets.some(t => t.url === newUrl)) {
-          this.webAppTargets.push({ url: newUrl });
+      else if (to === 'mobileapp') {
+        // Keep value as-is (IP stays IP, URL stays URL)
+        if (!this.mobileAppTargets.some(t => t.url === itemValue)) {
+          this.mobileAppTargets.push({ url: itemValue });
         }
       }
 
@@ -537,10 +587,16 @@ export default {
           }
         }
 
-        // ✅ URL
+        // ✅ URL - Check if Mobile App or Web App
         else if (this.isValidURL(value)) {
-          this.webAppTargets.push({ url: value });
           this.extractedList.push(value);
+
+          // Check if it's a Mobile App URL (Play Store / App Store)
+          if (this.isMobileAppURL(value)) {
+            this.mobileAppTargets.push({ url: value });
+          } else {
+            this.webAppTargets.push({ url: value });
+          }
         }
       });
     },
@@ -586,7 +642,7 @@ export default {
         this.isValidURL(lastValue)
       ) {
         this.ipInput += "\n";
-        this.buildTargetCards();
+        // this.buildTargetCards();
         return;
       }
 
@@ -681,19 +737,130 @@ export default {
           const workbook = XLSX.read(data, { type: "array" });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-          const flatValues = rows.flat();
+          // const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          // const flatValues = rows.flat();
+          // const validTargets = this.extractValidTargets(flatValues);
 
-          const validTargets = this.extractValidTargets(flatValues);
+          const jsonRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-          // Append to textarea
-          this.ipInput = [...new Set([
-            ...this.ipInput.split(/\n|,/).map(v => v.trim()).filter(Boolean),
-            ...validTargets
-          ])].join("\n");
+jsonRows.forEach(row => {
+  // Process all columns in the row for auto-detection
+  Object.keys(row).forEach(key => {
+    const value = String(row[key]).trim();
+    if (!value) return;
 
-          // Build cards
-          this.buildTargetCards();
+    // ✅ Check for specific column names first
+    const keyUpper = key.toUpperCase();
+
+    // IP_ADDRESS column
+    if (keyUpper === 'IP_ADDRESS' && this.isValidIP(value)) {
+      const target = { ip: value };
+      if (this.isPrivateIP(value)) {
+        if (!this.internalTargets.some(t => t.ip === value)) {
+          this.internalTargets.push(target);
+        }
+      } else {
+        if (!this.externalTargets.some(t => t.ip === value)) {
+          this.externalTargets.push(target);
+        }
+      }
+      return;
+    }
+
+    // SUBNET column
+    if (keyUpper === 'SUBNET' && this.isValidSubnet(value)) {
+      const target = {
+        ip: value,
+        count: this.getSubnetCount(value)
+      };
+      if (this.isPrivateIP(value)) {
+        if (!this.internalTargets.some(t => t.ip === value)) {
+          this.internalTargets.push(target);
+        }
+      } else {
+        if (!this.externalTargets.some(t => t.ip === value)) {
+          this.externalTargets.push(target);
+        }
+      }
+      return;
+    }
+
+    // WEB_APP_URL column
+    if (keyUpper === 'WEB_APP_URL' && this.isValidURL(value)) {
+      if (!this.webAppTargets.some(t => t.url === value)) {
+        this.webAppTargets.push({ url: value });
+      }
+      return;
+    }
+
+    // MOBILE_APP_URL column
+    if (keyUpper === 'MOBILE_APP_URL' && this.isValidURL(value)) {
+      if (!this.mobileAppTargets.some(t => t.url === value)) {
+        this.mobileAppTargets.push({ url: value });
+      }
+      return;
+    }
+
+    // ✅ Auto-detect from any other column
+    // Check if it's a valid IP
+    if (this.isValidIP(value)) {
+      const target = { ip: value };
+      if (this.isPrivateIP(value)) {
+        if (!this.internalTargets.some(t => t.ip === value)) {
+          this.internalTargets.push(target);
+        }
+      } else {
+        if (!this.externalTargets.some(t => t.ip === value)) {
+          this.externalTargets.push(target);
+        }
+      }
+      return;
+    }
+
+    // Check if it's a valid subnet
+    if (this.isValidSubnet(value)) {
+      const target = {
+        ip: value,
+        count: this.getSubnetCount(value)
+      };
+      if (this.isPrivateIP(value)) {
+        if (!this.internalTargets.some(t => t.ip === value)) {
+          this.internalTargets.push(target);
+        }
+      } else {
+        if (!this.externalTargets.some(t => t.ip === value)) {
+          this.externalTargets.push(target);
+        }
+      }
+      return;
+    }
+
+    // Check if it's a valid URL
+    if (this.isValidURL(value)) {
+      // Auto-detect Mobile App URLs
+      if (this.isMobileAppURL(value)) {
+        if (!this.mobileAppTargets.some(t => t.url === value)) {
+          this.mobileAppTargets.push({ url: value });
+        }
+      } else {
+        if (!this.webAppTargets.some(t => t.url === value)) {
+          this.webAppTargets.push({ url: value });
+        }
+      }
+    }
+  });
+});
+
+          // Update extracted list count
+          this.extractedList = [
+            ...this.internalTargets.map(t => t.ip),
+            ...this.externalTargets.map(t => t.ip),
+            ...this.webAppTargets.map(t => t.url),
+            ...this.mobileAppTargets.map(t => t.url)
+          ];
+
+          // Update textarea with all targets for reference
+          this.ipInput = this.extractedList.join("\n");
         };
         reader.readAsArrayBuffer(file);
       }
@@ -732,9 +899,23 @@ export default {
     },
 
     isValidURL(value) {
+      // Improved regex to handle subdomains, query params, and complex paths
+      // Matches: https://play.google.com/store/apps/details?id=com.sample.app
+      // Matches: https://example.com, www.example.com, subdomain.example.com
       const urlRegex =
-        /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/\S*)?$/;
+        /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
       return urlRegex.test(value);
+    },
+
+    // Detect Mobile App URLs (Play Store / App Store)
+    isMobileAppURL(value) {
+      const lowerValue = value.toLowerCase();
+      return (
+        lowerValue.includes('play.google.com') ||
+        lowerValue.includes('apps.apple.com') ||
+        lowerValue.includes('itunes.apple.com') ||
+        lowerValue.includes('appstore.com')
+      );
     },
 
 
@@ -977,7 +1158,7 @@ export default {
 }
 
 .col-value {
-  text-align: left;
+  /* text-align: left; */
   padding-left: 8px;
 }
 
@@ -1048,7 +1229,7 @@ tr[draggable="true"]:active {
 /* ip input boxes */
 .files-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 

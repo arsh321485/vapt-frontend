@@ -11,7 +11,9 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1">
+          <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1 position-relative">
+            <!-- Testing overlay is now created via DOM manipulation in initTestingOverlay() -->
+
             <div class="d-flex flex-row align-items-center justify-content-between py-3">
               <div class="d-flex flex-row gap-2">
                 <h2>Vulnerability Management Program</h2>
@@ -570,6 +572,7 @@ import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
+import Swal from "sweetalert2";
 
 export default {
   name: 'AdminDashboardOnboardingView',
@@ -581,6 +584,9 @@ export default {
   data() {
     return {
       testingActive: false,
+      remainingSeconds: 20,
+      progressPercent: 100,
+      testingTimer: null,
       authStore: useAuthStore(),
       showReport: false,
       showCalendar: false,
@@ -669,6 +675,100 @@ export default {
   },
   },
    methods: {
+    initTestingOverlay() {
+      // Clear any existing timer and overlay
+      if (this.testingTimer) {
+        clearInterval(this.testingTimer);
+        this.testingTimer = null;
+      }
+      this.removeOverlayFromDOM();
+
+      const isTesting = localStorage.getItem("testingInProgress") === "true";
+      const startTimeNum = Number(localStorage.getItem("testingStartTime") || 0);
+      const elapsed = Date.now() - startTimeNum;
+      const remainingMs = Math.max(20000 - elapsed, 0);
+
+      console.log("initTestingOverlay - isTesting:", isTesting, "remainingMs:", remainingMs);
+
+      if (isTesting && remainingMs > 0) {
+        // Create overlay using DOM manipulation
+        this.createOverlayInDOM();
+        this.updateOverlayTimer(Math.ceil(remainingMs / 1000), (remainingMs / 20000) * 100);
+
+        // Start countdown timer
+        const self = this;
+        this.testingTimer = setInterval(function() {
+          const now = Date.now();
+          const elapsedNow = now - startTimeNum;
+          const remainingNow = Math.max(20000 - elapsedNow, 0);
+
+          const seconds = Math.ceil(remainingNow / 1000);
+          const percent = (remainingNow / 20000) * 100;
+          self.updateOverlayTimer(seconds, percent);
+
+          if (remainingNow <= 0) {
+            self.clearTestingState();
+          }
+        }, 500);
+      } else if (isTesting) {
+        this.clearTestingState();
+      }
+    },
+
+    createOverlayInDOM() {
+      // Remove existing if any
+      this.removeOverlayFromDOM();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'testing-overlay-dom';
+      overlay.innerHTML = `
+        <div style="position: fixed; top: 60px; left: 90px; right: 0; bottom: 0; background: rgba(255,255,255,0.97); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+          <div style="background: #fff; padding: 40px 60px; border-radius: 16px; box-shadow: 0 10px 40px rgba(49,33,177,0.25); text-align: center; border: 2px solid rgba(49,33,177,0.15);">
+            <div style="font-size: 48px; color: rgba(49,33,177,1); margin-bottom: 16px;">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h4 style="font-size: 24px; font-weight: 600; color: #111827; margin-bottom: 8px;">Please wait</h4>
+            <p style="font-size: 16px; color: #6b7280; margin-bottom: 20px;">Testing in progress...</p>
+            <div style="width: 200px; height: 8px; background: #e5e7eb; border-radius: 4px; margin: 0 auto 12px; overflow: hidden;">
+              <div id="testing-progress-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, rgba(49,33,177,1), rgba(90,68,255,1)); border-radius: 4px; transition: width 0.3s linear;"></div>
+            </div>
+            <small id="testing-timer-text" style="color: #9ca3af; font-size: 14px;">20s remaining</small>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      console.log("Overlay created in DOM");
+    },
+
+    updateOverlayTimer(seconds, percent) {
+      const timerText = document.getElementById('testing-timer-text');
+      const progressBar = document.getElementById('testing-progress-bar');
+      if (timerText) timerText.textContent = seconds + 's remaining';
+      if (progressBar) progressBar.style.width = percent + '%';
+    },
+
+    removeOverlayFromDOM() {
+      const existing = document.getElementById('testing-overlay-dom');
+      if (existing) {
+        existing.remove();
+        console.log("Overlay removed from DOM");
+      }
+    },
+
+    clearTestingState() {
+      console.log("clearTestingState called!");
+      this.testingActive = false;
+      this.removeOverlayFromDOM();
+
+      if (this.testingTimer) {
+        clearInterval(this.testingTimer);
+        this.testingTimer = null;
+      }
+      localStorage.removeItem("testingInProgress");
+      localStorage.removeItem("testingStartTime");
+      localStorage.removeItem("dashboardTestingInProgress");
+    },
+
     // NEW DROPDOWN METHODS
     toggleLocationDropdown() {
       this.showLocationDropdown = !this.showLocationDropdown;
@@ -801,25 +901,12 @@ export default {
     },
   },
   mounted() {
-    const isTesting =
-    localStorage.getItem("testingInProgress") === "true";
+    console.log("=== MOUNTED ===");
 
-  if (isTesting) {
-    this.testingActive = true;
-
-    const startTime = Number(
-      localStorage.getItem("testingStartTime")
-    );
-
-    const elapsed = Date.now() - startTime;
-    const remaining = Math.max(30000 - elapsed, 0);
-
+    // Initialize testing overlay with a small delay to ensure DOM is ready
     setTimeout(() => {
-      this.testingActive = false;
-      localStorage.removeItem("testingInProgress");
-      localStorage.removeItem("testingStartTime");
-    }, remaining);
-  }
+      this.initTestingOverlay();
+    }, 100);
     // NEW DROPDOWN - Close on outside click
     document.addEventListener('click', this.closeLocationDropdown);
 
@@ -862,11 +949,91 @@ export default {
   beforeUnmount() {
     // Clean up event listener
     document.removeEventListener('click', this.closeLocationDropdown);
+    // Clear testing timer and remove overlay
+    if (this.testingTimer) {
+      clearInterval(this.testingTimer);
+    }
+    this.removeOverlayFromDOM();
+  },
+  // Handle component reactivation (if using keep-alive)
+  activated() {
+    console.log("=== ACTIVATED hook called ===");
+    this.initTestingOverlay();
   },
 };
 </script>
 
 <style scoped>
+
+/* Testing Overlay - Only covers col-11 (right side of screen) */
+.testing-overlay {
+  position: fixed;
+  top: 64px; 
+  left: 100px; 
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.testing-alert-box {
+  top: 64px;
+  background: #fff;
+  padding: 40px 60px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(49, 33, 177, 0.2);
+  text-align: center;
+  border: 2px solid rgba(49, 33, 177, 0.1);
+}
+
+.testing-icon {
+  font-size: 48px;
+  color: rgba(49, 33, 177, 1);
+  margin-bottom: 16px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.testing-alert-box h4 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.testing-alert-box p {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.progress-bar-container {
+  width: 200px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  margin: 0 auto 12px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(49, 33, 177, 1), rgba(90, 68, 255, 1));
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.testing-alert-box small {
+  color: #9ca3af;
+  font-size: 13px;
+}
 
 .custom-modal-backdrop {
   position: fixed;
