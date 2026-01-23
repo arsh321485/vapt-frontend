@@ -722,7 +722,7 @@ export default {
       const overlay = document.createElement('div');
       overlay.id = 'testing-overlay-dom';
       overlay.innerHTML = `
-        <div style="position: fixed; top: 60px; left: 90px; right: 0; bottom: 0; background: rgba(255,255,255,0.97); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="position: fixed; top: 60px; left: 90px; right: 0; bottom: 0; background: rgba(255,255,255,0.80); display: flex; align-items: center; justify-content: center; z-index: 9999;">
           <div style="background: #fff; padding: 40px 60px; border-radius: 16px; box-shadow: 0 10px 40px rgba(49,33,177,0.25); text-align: center; border: 2px solid rgba(49,33,177,0.15);">
             <div style="font-size: 48px; color: rgba(49,33,177,1); margin-bottom: 16px;">
               <i class="bi bi-hourglass-split"></i>
