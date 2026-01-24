@@ -74,22 +74,40 @@ export const useAuthStore = defineStore("auth", {
   actions: {
   // ✅ Restore session on reload
   restoreFromStorage() {
-      const access = localStorage.getItem("accessToken");
-      const refresh = localStorage.getItem("refreshToken");
-      const user = localStorage.getItem("user");
+    const access = localStorage.getItem("authorization"); // ✅ FIX
+    const refresh = localStorage.getItem("refreshToken");
+    const user = localStorage.getItem("user");
 
-      if (access && user) {
-        this.accessToken = access;
-        this.refreshToken = refresh;
-        this.user = JSON.parse(user);
-        this.authenticated = true;
-        console.log("🔄 Session restored from localStorage");
-        return true;
-      }
-      return false;
+    if (access && user) {
+      this.token = access;
+      this.refreshToken = refresh;
+      this.user = JSON.parse(user);
+      this.authenticated = true;
+
+      console.log("🔄 Session restored from localStorage");
+      return true;
+    }
+
+    return false;
   },
+  // restoreFromStorage() {
+  //     const access = localStorage.getItem("accessToken");
+  //     const refresh = localStorage.getItem("refreshToken");
+  //     const user = localStorage.getItem("user");
+
+  //     if (access && user) {
+  //       this.accessToken = access;
+  //       this.refreshToken = refresh;
+  //       this.user = JSON.parse(user);
+  //       this.authenticated = true;
+  //       console.log("🔄 Session restored from localStorage");
+  //       return true;
+  //     }
+  //     return false;
+  // },
 
   // ✅ Restore auth + auto-fetch locations on refresh
+  
   initFromStorage() {
     try {
       // 1️⃣ Restore user
@@ -975,6 +993,49 @@ export const useAuthStore = defineStore("auth", {
       };
     }
   },
+
+  // upload target api's
+  // CREATE SCOPE (TEXT OR FILE)
+  async createScope(formData: FormData) {
+    try {
+      const adminId = this.user?.id || this.user?._id;
+
+      if (!adminId) {
+        throw new Error("Admin ID not found. Please login again.");
+      }
+
+      // 🔹 Attach admin_id if backend needs it
+      formData.append("admin_id", adminId);
+
+      const res = await endpoint.post(
+        "/admin/scope/create/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const data = res.data;
+
+      return {
+        status: true,
+        data,
+      };
+
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Create scope failed",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
 
   // fetch total assets
   async fetchTotalAssets(reportId: string) {

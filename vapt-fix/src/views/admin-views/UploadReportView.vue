@@ -20,16 +20,18 @@
 
           <div class="d-flex justify-content-between gap-3">
             <div>
-              <button  @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i class="bi bi-download me-2"></i> Download Excel file</button>
+              <button @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2"
+                style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i
+                  class="bi bi-download me-2"></i> Download Excel file</button>
             </div>
             <!-- Testing Type (Unified UI) -->
-          <div class="testing-type">
-            <select v-model="selectedTestingType" class="form-select testing-select" :disabled="!showTestingDropdown">
-              <option v-for="type in allowedTestingTypes" :key="type" :value="type">
-                {{ formatTestingType(type) }}
-              </option>
-            </select>
-          </div>
+            <div class="testing-type">
+              <select v-model="selectedTestingType" class="form-select testing-select" :disabled="!showTestingDropdown">
+                <option v-for="type in allowedTestingTypes" :key="type" :value="type">
+                  {{ formatTestingType(type) }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -60,9 +62,6 @@
             </div>
           </div> -->
 
-
-
-
             <div class="upload-box ip-box">
               <h5>Enter target IPs / URLs</h5>
               <p>
@@ -72,22 +71,20 @@
               </p>
 
               <!-- TEXTAREA -->
-
-
-              <textarea class="form-control ip-textarea" v-model="ipInput" @keydown.enter.prevent="validateLastEntry"
-                @blur="buildTargetCards" placeholder="Example:
+              <textarea class="form-control ip-textarea" v-model="ipInput" @keydown.enter.prevent="handleEnterSubmit"
+                @blur="handleAutoSubmit" placeholder="Example:
 192.168.1.1
 https://example.com"></textarea>
 
-
-
-              <!-- ACTIONS -->
+              <!-- upload btn -->
               <div class="ip-actions">
                 <input ref="fileInput" type="file" accept=".csv,.xlsx,.xls,.txt" hidden @change="handleFileUpload" />
 
                 <button class="btn btn-primary" @click="$refs.fileInput.click()">
                   Upload CSV / Excel /Text File
                 </button>
+                
+
 
                 <span class="ip-count">{{ extractedList.length }} targets</span>
               </div>
@@ -290,20 +287,18 @@ export default {
       externalTargets: [],
       webAppTargets: [],
       mobileAppTargets: [],
+      selectedFile: null,
+      autoSubmitTimer: null, 
+      isUploading: false,
       draggedItem: null,
       draggedFrom: null,
       testingType: "",
-      allowedTestingTypes: [],   // from API
-      selectedTestingType: "",   // final selected value
+      allowedTestingTypes: [],   
+      selectedTestingType: "",   
       showTestingDropdown: false
     };
   },
   watch: {
-
-    location() {
-      this.type = '';
-    },
-
     uploadedFiles: {
       handler(files) {
         const hasSuccessfulUploads = files.some(f => f.status === 'success');
@@ -318,54 +313,6 @@ export default {
     returnTo() {
       return this.$route.query.returnTo || null;
     },
-    // Map: locationId → Set of used types
-    usedTypesByLocation() {
-      const map = {};
-      for (const file of this.uploadedFiles) {
-        if (!map[file.locationId]) {
-          map[file.locationId] = new Set();
-        }
-        map[file.locationId].add(file.type.toLowerCase());
-      }
-      return map;
-    },
-    // Filter locations that already have both External AND Internal (or "Both") uploaded
-    availableLocations() {
-      return this.locations.filter(loc => {
-        const used = this.usedTypesByLocation[loc._id];
-        if (!used) return true; // No uploads yet - show it
-
-        // Hide if "both" was uploaded
-        if (used.has('both')) return false;
-
-        // Hide if both internal AND external were uploaded separately
-        if (used.has('internal') && used.has('external')) return false;
-
-        return true; // Still needs files
-      });
-    },
-    // Get disabled types for currently selected location
-    disabledTypes() {
-      if (!this.location) return [];
-      const used = this.usedTypesByLocation[this.location];
-      if (!used) return []; // First time - nothing disabled
-
-      // If "both" was selected, disable everything
-      if (used.has('both')) return ['both', 'external', 'internal'];
-
-      // If both internal AND external uploaded, disable all
-      if (used.has('internal') && used.has('external')) {
-        return ['both', 'external', 'internal'];
-      }
-
-      // Disable what's already used + "Both" (since partial exists)
-      const disabled = ['both']; // Can't select "Both" if any individual type exists
-      if (used.has('internal')) disabled.push('internal');
-      if (used.has('external')) disabled.push('external');
-
-      return disabled;
-    },
-    // Check if there are any targets in the cards (for enabling Continue button)
     hasTargets() {
       return (
         this.internalTargets.length > 0 ||
@@ -376,7 +323,6 @@ export default {
     },
 
   },
-
   uploadedFiles: {
     handler(files) {
       const hasSuccessfulUploads = files.some(f => f.status === 'success');
@@ -391,9 +337,6 @@ export default {
     const user = JSON.parse(localStorage.getItem("user"));
     this.adminId = user?.id;
 
-    await this.fetchLocations();
-    await this.fetchUploadedReports();
-
     if (this.adminId) {
       await this.fetchTestingTypes();
     }
@@ -403,6 +346,83 @@ export default {
     }
   },
   methods: {
+    mapApiResponse(data) {
+  // 🔄 Reset UI
+  this.internalTargets = [];
+  this.externalTargets = [];
+  this.webAppTargets = [];
+  this.mobileAppTargets = [];
+  this.extractedList = [];
+
+  const created = data.created || [];
+
+  created.forEach(item => {
+    const value = item.target_value;
+
+    // ✅ Fill textarea list
+    this.extractedList.push(value);
+
+    // ✅ Categorize correctly
+    switch (item.target_type) {
+      case "internal_ip":
+        this.internalTargets.push({
+          ip: value,
+          count: item.subnet_count,
+        });
+        break;
+
+      case "external_ip":
+        this.externalTargets.push({
+          ip: value,
+          count: item.subnet_count,
+        });
+        break;
+
+      case "web_url":
+        this.webAppTargets.push({
+          url: value,
+        });
+        break;
+
+      case "mobile_app":
+        this.mobileAppTargets.push({
+          url: value,
+        });
+        break;
+    }
+  });
+
+  // ✅ Update textarea (so admin can see/copy)
+  this.ipInput = [...new Set(this.extractedList)].join("\n");
+},
+   handleEnterSubmit() {
+  const lines = this.ipInput.split("\n").filter(l => l.trim());
+  const last = lines[lines.length - 1];
+
+  if (
+    this.isValidIP(last) ||
+    this.isValidSubnet(last) ||
+    this.isValidURL(last)
+  ) {
+    this.ipInput += "\n";
+    this.submitTargets(); // 🔥 auto submit
+  } else {
+    Swal.fire("Invalid entry", `"${last}" is invalid`, "error");
+  }
+}
+,
+handleAutoSubmit() {
+  if (!this.ipInput.trim()) return;
+  this.triggerAutoSubmit();
+},
+triggerAutoSubmit() {
+  clearTimeout(this.autoSubmitTimer);
+
+  this.autoSubmitTimer = setTimeout(() => {
+    this.submitTargets();
+  }, 500); // 0.5 sec debounce
+},
+
     downloadExcelTemplate() {
       // Create sample data with all 4 column types
       const sampleData = [
@@ -442,7 +462,6 @@ export default {
       // Download the file
       XLSX.writeFile(wb, 'VAPT_Targets_Template.xlsx');
     },
-
     async fetchTestingTypes() {
       const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
@@ -479,10 +498,7 @@ export default {
     },
     onDropTarget(to) {
       if (!this.draggedItem) return;
-
       const from = this.draggedFrom;
-
-      // 🟢 SAME SOURCE DROP → JUST RE-ADD SAFELY
       if (from === to) {
         if (to === 'external' && this.draggedItem.ip) {
           if (!this.externalTargets.some(t => t.ip === this.draggedItem.ip)) {
@@ -493,8 +509,6 @@ export default {
         this.draggedFrom = null;
         return;
       }
-
-      // 🔹 REMOVE FROM SOURCE
       if (from === 'internal') {
         this.internalTargets = this.internalTargets.filter(
           t => t.ip !== this.draggedItem.ip
@@ -512,9 +526,6 @@ export default {
           t => t.url !== this.draggedItem.url
         );
       }
-
-      // 🔹 ADD TO DESTINATION
-      // Get the value (could be ip or url)
       const itemValue = this.draggedItem.ip || this.draggedItem.url;
 
       if (to === 'internal') {
@@ -542,64 +553,62 @@ export default {
           this.mobileAppTargets.push({ url: itemValue });
         }
       }
-
-      // 🔄 RESET
       this.draggedItem = null;
       this.draggedFrom = null;
     },
-    buildTargetCards() {
-      this.internalTargets = [];
-      this.externalTargets = [];
-      this.webAppTargets = [];
-      this.mobileAppTargets = [];
-      this.extractedList = [];
+    // buildTargetCards() {
+    //   this.internalTargets = [];
+    //   this.externalTargets = [];
+    //   this.webAppTargets = [];
+    //   this.mobileAppTargets = [];
+    //   this.extractedList = [];
 
-      const targets = this.ipInput
-        .split(/\n|,/)
-        .map(v => v.trim())
-        .filter(Boolean);
+    //   const targets = this.ipInput
+    //     .split(/\n|,/)
+    //     .map(v => v.trim())
+    //     .filter(Boolean);
 
-      targets.forEach(value => {
+    //   targets.forEach(value => {
 
-        // ✅ SUBNET
-        if (this.isValidSubnet(value)) {
-          const count = this.getSubnetCount(value);
+    //     // ✅ SUBNET
+    //     if (this.isValidSubnet(value)) {
+    //       const count = this.getSubnetCount(value);
 
-          const target = { ip: value, count };
-          this.extractedList.push(value);
+    //       const target = { ip: value, count };
+    //       this.extractedList.push(value);
 
-          if (this.isPrivateIP(value)) {
-            this.internalTargets.push(target);
-          } else {
-            this.externalTargets.push(target);
-          }
-        }
+    //       if (this.isPrivateIP(value)) {
+    //         this.internalTargets.push(target);
+    //       } else {
+    //         this.externalTargets.push(target);
+    //       }
+    //     }
 
-        // ✅ SINGLE IP
-        else if (this.isValidIP(value)) {
-          const target = { ip: value };
-          this.extractedList.push(value);
+    //     // ✅ SINGLE IP
+    //     else if (this.isValidIP(value)) {
+    //       const target = { ip: value };
+    //       this.extractedList.push(value);
 
-          if (this.isPrivateIP(value)) {
-            this.internalTargets.push(target);
-          } else {
-            this.externalTargets.push(target);
-          }
-        }
+    //       if (this.isPrivateIP(value)) {
+    //         this.internalTargets.push(target);
+    //       } else {
+    //         this.externalTargets.push(target);
+    //       }
+    //     }
 
-        // ✅ URL - Check if Mobile App or Web App
-        else if (this.isValidURL(value)) {
-          this.extractedList.push(value);
+    //     // ✅ URL - Check if Mobile App or Web App
+    //     else if (this.isValidURL(value)) {
+    //       this.extractedList.push(value);
 
-          // Check if it's a Mobile App URL (Play Store / App Store)
-          if (this.isMobileAppURL(value)) {
-            this.mobileAppTargets.push({ url: value });
-          } else {
-            this.webAppTargets.push({ url: value });
-          }
-        }
-      });
-    },
+    //       // Check if it's a Mobile App URL (Play Store / App Store)
+    //       if (this.isMobileAppURL(value)) {
+    //         this.mobileAppTargets.push({ url: value });
+    //       } else {
+    //         this.webAppTargets.push({ url: value });
+    //       }
+    //     }
+    //   });
+    // },
     isPrivateIP(value) {
       return (
         value.startsWith("10.") ||
@@ -612,7 +621,6 @@ export default {
         /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}\/([0-9]|[1-2][0-9]|3[0-2])$/;
       return cidrRegex.test(value);
     },
-    // ✅ COUNT IPs IN SUBNET (ADD THIS HERE)
     getSubnetCount(cidr) {
       const mask = parseInt(cidr.split("/")[1], 10);
       return Math.pow(2, 32 - mask);
@@ -632,17 +640,13 @@ export default {
     validateLastEntry() {
       const lines = this.ipInput.split("\n").filter(l => l.trim() !== "");
       if (!lines.length) return;
-
       const lastValue = lines[lines.length - 1].trim();
-
-      // ✅ IP / Subnet / URL accepted
       if (
         this.isValidIP(lastValue) ||
         this.isValidSubnet(lastValue) ||
         this.isValidURL(lastValue)
       ) {
         this.ipInput += "\n";
-        // this.buildTargetCards();
         return;
       }
 
@@ -669,7 +673,6 @@ export default {
         });
         return;
       }
-
       this.ipInput = validTargets.join("\n");
     },
     // 🔹 Extract IPs & URLs from textarea
@@ -687,203 +690,115 @@ export default {
 
       this.extractedList = [...new Set([...ips, ...urls])];
     },
-    extractValidTargets(values) {
-      const validTargets = [];
+    // extractValidTargets(values) {
+    //   const validTargets = [];
 
-      values.forEach(v => {
-        const value = String(v).trim();
-        if (!value) return;
+    //   values.forEach(v => {
+    //     const value = String(v).trim();
+    //     if (!value) return;
 
-        if (
-          this.isValidIP(value) ||
-          this.isValidSubnet(value) ||
-          this.isValidURL(value)
-        ) {
-          validTargets.push(value);
-        }
-      });
+    //     if (
+    //       this.isValidIP(value) ||
+    //       this.isValidSubnet(value) ||
+    //       this.isValidURL(value)
+    //     ) {
+    //       validTargets.push(value);
+    //     }
+    //   });
 
-      return [...new Set(validTargets)];
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    //   return [...new Set(validTargets)];
+    // },
+ handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-      const reader = new FileReader();
-      const fileName = file.name.toLowerCase();
+  this.selectedFile = file;
 
-      // Handle plain text files
-      if (fileName.endsWith('.txt')) {
-        reader.onload = e => {
-          const text = e.target.result;
-          const lines = text.split(/\r?\n/);
-          const validTargets = this.extractValidTargets(lines);
+  // 🔥 Auto-submit to API
+  this.submitTargets();
 
-          // Append to textarea
-          this.ipInput = [...new Set([
-            ...this.ipInput.split(/\n|,/).map(v => v.trim()).filter(Boolean),
-            ...validTargets
-          ])].join("\n");
+  event.target.value = "";
+},
 
-          // Build cards
-          this.buildTargetCards();
-        };
-        reader.readAsText(file);
-      }
-      // Handle Excel/CSV files
-      else {
-        reader.onload = e => {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: "array" });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+async submitTargets() {
+  if (this.isUploading) return;
 
-          // const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-          // const flatValues = rows.flat();
-          // const validTargets = this.extractValidTargets(flatValues);
+  try {
+    this.isUploading = true;
 
-          const jsonRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    // 🔥 SHOW LOADING ALERT
+    Swal.fire({
+      title: "Please wait",
+      text: "Uploading & processing targets. Do not refresh the page.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
-jsonRows.forEach(row => {
-  // Process all columns in the row for auto-detection
-  Object.keys(row).forEach(key => {
-    const value = String(row[key]).trim();
-    if (!value) return;
+    const formData = new FormData();
 
-    // ✅ Check for specific column names first
-    const keyUpper = key.toUpperCase();
-
-    // IP_ADDRESS column
-    if (keyUpper === 'IP_ADDRESS' && this.isValidIP(value)) {
-      const target = { ip: value };
-      if (this.isPrivateIP(value)) {
-        if (!this.internalTargets.some(t => t.ip === value)) {
-          this.internalTargets.push(target);
-        }
-      } else {
-        if (!this.externalTargets.some(t => t.ip === value)) {
-          this.externalTargets.push(target);
-        }
-      }
-      return;
-    }
-
-    // SUBNET column
-    if (keyUpper === 'SUBNET' && this.isValidSubnet(value)) {
-      const target = {
-        ip: value,
-        count: this.getSubnetCount(value)
-      };
-      if (this.isPrivateIP(value)) {
-        if (!this.internalTargets.some(t => t.ip === value)) {
-          this.internalTargets.push(target);
-        }
-      } else {
-        if (!this.externalTargets.some(t => t.ip === value)) {
-          this.externalTargets.push(target);
-        }
-      }
-      return;
-    }
-
-    // WEB_APP_URL column
-    if (keyUpper === 'WEB_APP_URL' && this.isValidURL(value)) {
-      if (!this.webAppTargets.some(t => t.url === value)) {
-        this.webAppTargets.push({ url: value });
-      }
-      return;
-    }
-
-    // MOBILE_APP_URL column
-    if (keyUpper === 'MOBILE_APP_URL' && this.isValidURL(value)) {
-      if (!this.mobileAppTargets.some(t => t.url === value)) {
-        this.mobileAppTargets.push({ url: value });
-      }
-      return;
-    }
-
-    // ✅ Auto-detect from any other column
-    // Check if it's a valid IP
-    if (this.isValidIP(value)) {
-      const target = { ip: value };
-      if (this.isPrivateIP(value)) {
-        if (!this.internalTargets.some(t => t.ip === value)) {
-          this.internalTargets.push(target);
-        }
-      } else {
-        if (!this.externalTargets.some(t => t.ip === value)) {
-          this.externalTargets.push(target);
-        }
-      }
-      return;
-    }
-
-    // Check if it's a valid subnet
-    if (this.isValidSubnet(value)) {
-      const target = {
-        ip: value,
-        count: this.getSubnetCount(value)
-      };
-      if (this.isPrivateIP(value)) {
-        if (!this.internalTargets.some(t => t.ip === value)) {
-          this.internalTargets.push(target);
-        }
-      } else {
-        if (!this.externalTargets.some(t => t.ip === value)) {
-          this.externalTargets.push(target);
-        }
-      }
-      return;
-    }
-
-    // Check if it's a valid URL
-    if (this.isValidURL(value)) {
-      // Auto-detect Mobile App URLs
-      if (this.isMobileAppURL(value)) {
-        if (!this.mobileAppTargets.some(t => t.url === value)) {
-          this.mobileAppTargets.push({ url: value });
-        }
-      } else {
-        if (!this.webAppTargets.some(t => t.url === value)) {
-          this.webAppTargets.push({ url: value });
-        }
-      }
-    }
-  });
-});
-
-          // Update extracted list count
-          this.extractedList = [
-            ...this.internalTargets.map(t => t.ip),
-            ...this.externalTargets.map(t => t.ip),
-            ...this.webAppTargets.map(t => t.url),
-            ...this.mobileAppTargets.map(t => t.url)
-          ];
-
-          // Update textarea with all targets for reference
-          this.ipInput = this.extractedList.join("\n");
-        };
-        reader.readAsArrayBuffer(file);
-      }
-
-      event.target.value = "";
-    },
-    async fetchLocations() {
-      const res = await this.authStore.fetchLocationsByAdminId(this.adminId);
-      if (res.status) {
-        this.locations = this.authStore.locations;
-      }
-    },
-    openFilePicker() {
-      if (!this.location || !this.type) {
-        Swal.fire({
-          icon: "warning",
-          title: "Selection required",
-          text: "Please select location and type first",
-        });
+    if (this.selectedFile) {
+      formData.append("file", this.selectedFile);
+    } else {
+      if (!this.ipInput.trim()) {
+        Swal.close(); // close loader
         return;
       }
-      this.$refs.fileInput.click();
-    },
+      formData.append("targets", this.ipInput);
+    }
+
+    const res = await this.authStore.createScope(formData);
+
+    // 🔥 CLOSE LOADING ALERT
+    Swal.close();
+
+    if (!res.status) {
+      Swal.fire("Error", res.message, "error");
+      return;
+    }
+
+    // ✅ Update UI from backend
+    this.mapApiResponse(res.data);
+
+    // 🔶 SKIPPED (duplicates)
+    if (res.data.skipped?.length) {
+      console.warn("Skipped targets:", res.data.skipped);
+
+      Swal.fire({
+        icon: "warning",
+        title: "Already exists",
+        text: `${res.data.skipped_count} target(s) skipped`,
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    }
+
+    // 🟢 SUCCESS
+    if (res.data.created_count > 0) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: `${res.data.created_count} target(s) created`,
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    }
+
+    this.selectedFile = null;
+
+  } catch (err) {
+    Swal.close();
+    Swal.fire("Error", "Something went wrong", "error");
+  } finally {
+    this.isUploading = false;
+  }
+}
+
+
+,
     onFileChange(e) {
       this.handleFiles([...e.target.files]);
       e.target.value = "";
@@ -918,66 +833,6 @@ jsonRows.forEach(row => {
       );
     },
 
-
-    /* ---------------- ASYNC UPLOAD (BACKGROUND) ---------------- */
-    async uploadFileAsync(file, locationId, memberType, fileIndex) {
-      try {
-        const res = await this.authStore.uploadVulnerabilityReport({
-          locationId,
-          memberType,
-          file
-        });
-
-        // ❌ DUPLICATE FILE
-        if (!res.status && res.isDuplicate) {
-          this.uploadedFiles[fileIndex].status = 'error';
-          this.uploadedFiles[fileIndex].errorMsg = res.message;
-          Swal.fire({
-            icon: "warning",
-            title: "Duplicate File",
-            text: res.message,
-            confirmButtonColor: "#5a44ff"
-          });
-          return;
-        }
-
-        // ❌ OTHER ERROR
-        if (!res.status) {
-          this.uploadedFiles[fileIndex].status = 'error';
-          this.uploadedFiles[fileIndex].errorMsg = res.message || "Upload failed";
-          Swal.fire({
-            icon: "error",
-            title: "Upload failed",
-            text: res.message || "Something went wrong while uploading.",
-          });
-          return;
-        }
-
-        // ✅ SUCCESS - update status and reportId
-        this.uploadedFiles[fileIndex].status = 'success';
-        this.uploadedFiles[fileIndex].reportId = res.data?.results?.[0]?._id || res.data?.id;
-
-      } catch (err) {
-        this.uploadedFiles[fileIndex].status = 'error';
-        this.uploadedFiles[fileIndex].errorMsg = "Something went wrong";
-        Swal.fire({
-          icon: "error",
-          title: "Upload failed",
-          text: "Something went wrong while uploading.",
-        });
-      }
-    },
-    /* ---------------- FINAL CONTINUE BUTTON ---------------- */
-    // handleUploadAndRedirect() {
-    //   // 🟢 CASE 2: Came from another page
-    //   if (this.returnTo) {
-    //     this.$router.push(this.returnTo);
-    //     return;
-    //   }
-
-    //   this.$router.push("/admindashboardonboarding");
-    // },
-
     handleUploadAndRedirect() {
       // 🔐 Mark dashboard as locked
       localStorage.setItem("dashboardTestingInProgress", "true");
@@ -986,131 +841,6 @@ jsonRows.forEach(row => {
 
       this.$router.push("/admindashboardonboarding");
     },
-
-    /* ---------------- FILE PREVIEW ---------------- */
-    async viewFile(index) {
-      const item = this.uploadedFiles[index];
-
-      try {
-        // 1️⃣ Call View API (this is already authenticated via Axios interceptor)
-        const res = await this.authStore.getUploadReportById(item.reportId);
-
-        if (!res.status || !res.data?.file) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to retrieve report",
-          });
-          return;
-        }
-
-        // 2️⃣ Open file directly (NO TOKEN)
-        window.open(res.data.file, "_blank");
-
-      } catch (error) {
-        console.error("View file error:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Unable to open the report.",
-        });
-      }
-    },
-    async deleteFile(index) {
-      const report = this.uploadedFiles[index];
-
-      // 🔄 If still uploading or errored without reportId, just remove from list
-      if (report.status === 'uploading' || report.status === 'error') {
-        const confirm = await Swal.fire({
-          icon: "warning",
-          title: report.status === 'uploading' ? "Cancel Upload?" : "Remove Entry?",
-          text: report.status === 'uploading'
-            ? "This file is still uploading. Remove it from the list?"
-            : "Remove this failed upload from the list?",
-          showCancelButton: true,
-          confirmButtonText: "Yes, remove",
-          cancelButtonText: "Cancel",
-          confirmButtonColor: "#d33",
-        });
-
-        if (confirm.isConfirmed) {
-          this.uploadedFiles.splice(index, 1);
-        }
-        return;
-      }
-
-      // 🔐 Safety check for completed uploads
-      if (!report?.reportId) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Report ID not found",
-        });
-        return;
-      }
-
-      // 🟡 Confirm delete
-      const confirm = await Swal.fire({
-        icon: "warning",
-        title: "Delete Report?",
-        text: "Are you sure you want to delete this uploaded report?",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#d33",
-      });
-
-      if (!confirm.isConfirmed) return;
-
-      // 🔥 Call API
-      const res = await this.authStore.deleteUploadReport(report.reportId);
-
-      if (!res.status) {
-        Swal.fire({
-          icon: "error",
-          title: "Delete failed",
-          text: res.message,
-        });
-        return;
-      }
-
-      // ✅ Remove from table
-      this.uploadedFiles.splice(index, 1);
-
-      Swal.fire({
-        icon: "success",
-        title: "Deleted",
-        text: "Upload report deleted successfully",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    },
-    async fetchUploadedReports() {
-      const res = await this.authStore.getAllUploadReports();
-
-      if (!res.status) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Failed to fetch uploaded reports",
-        });
-        return;
-      }
-
-      // 🔁 Map backend response to table format
-      this.uploadedFiles = res.data.map(report => ({
-        reportId: report._id,               // 👈 REQUIRED for delete
-        fileUrl: report.file,               // backend file URL
-        file: { name: report.file.split("/").pop() }, // fake File name for table
-        locationId: report.location,
-        locationName: report.location_name,
-        type: report.member_type,
-        status: 'success',                  // Already uploaded = success
-        parsedCount: report.parsed_count,
-        uploadedAt: report.uploaded_at,
-      }));
-    },
-
   },
 };
 </script>

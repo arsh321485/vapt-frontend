@@ -174,20 +174,26 @@
     </div>
 
     <div v-if="isTestingBoxOpen" class="testing-dropdown-list">
-      <label
+      <!-- <label
         v-for="option in testingBoxOptions"
         :key="option.value"
         class="dropdown-option"
         :class="{ disabled: isPreviouslySelected(option.value) }"
-      >
-        <input
+      > -->
+      <label v-for="option in testingBoxOptions" :key="option.value" class="dropdown-option"
+                        :class="{ disabled: previouslySelectedBoxes.includes(option.value) }">
+                        <input type="checkbox" :value="option.value" v-model="selectedTestingBox"
+                          :disabled="previouslySelectedBoxes.includes(option.value)" />
+                        {{ option.label }}
+                      </label>
+        <!-- <input
           type="checkbox"
           :value="option.value"
           v-model="selectedTestingBox"
           :disabled="isPreviouslySelected(option.value)"
         />
         {{ option.label }}
-      </label>
+      </label> -->
     </div>
   </div>
 </div>
@@ -288,6 +294,7 @@ export default {
 
   data() {
     return {
+      previouslySelectedBoxes: [],
       currentRole: "admin",
       currentMode: "signup",
       formData: {
@@ -328,6 +335,24 @@ export default {
         { value: "black_box", label: "Black Box" }
       ],
     };
+  },
+  watch: {
+    "formData.email"(email) {
+      if (
+        this.currentRole === "admin" &&
+        this.currentMode === "signin" &&
+        email
+      ) {
+        const saved = localStorage.getItem(`testingBox_${email}`);
+        if (saved) {
+          this.previouslySelectedBoxes = JSON.parse(saved);
+          this.selectedTestingBox = [...this.previouslySelectedBoxes]; // auto-select
+        } else {
+          this.previouslySelectedBoxes = [];
+          this.selectedTestingBox = [];
+        }
+      }
+    }
   },
   computed: {
     rightHeadline() {
@@ -880,37 +905,69 @@ if (
         this.resetRecaptcha();
       }
     },
-    async handleSignin(recaptchaResponse) {
-      const finalTestingTypes = [
-    ...new Set([
-      ...this.previouslySelectedTestingBox,
-      ...this.selectedTestingBox,
-    ]),
-  ];
-      const payload = {
-        email: this.formData.email,
-        password: this.formData.password,
-        testing_type: finalTestingTypes,
-        recaptcha: recaptchaResponse
-      };
+  //   async handleSignin(recaptchaResponse) {
+  //     const finalTestingTypes = [
+  //   ...new Set([
+  //     ...this.previouslySelectedTestingBox,
+  //     ...this.selectedTestingBox,
+  //   ]),
+  // ];
+  //     const payload = {
+  //       email: this.formData.email,
+  //       password: this.formData.password,
+  //       testing_type: finalTestingTypes,
+  //       recaptcha: recaptchaResponse
+  //     };
 
-      const result = await this.authStore.login(payload);
+  //     const result = await this.authStore.login(payload);
 
-      if (result.status) {
-        console.log('✅ Login successful');
-        await this.checkAndRedirect();
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Login Failed',
-          text: result.message || 'Login failed',
-          timer: 3000,
-          showConfirmButton: false
-        });
-        this.resetRecaptcha();
-      }
-    },
-    async checkAndRedirect() {
+  //     if (result.status) {
+  //       console.log('✅ Login successful');
+  //       await this.checkAndRedirect();
+  //     } else {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Login Failed',
+  //         text: result.message || 'Login failed',
+  //         timer: 3000,
+  //         showConfirmButton: false
+  //       });
+  //       this.resetRecaptcha();
+  //     }
+  //   },
+  async handleSignin(recaptchaResponse) {
+  const payload = {
+    email: this.formData.email,
+    password: this.formData.password,
+    testing_type: this.selectedTestingBox,
+    recaptcha: recaptchaResponse
+  };
+
+  const result = await this.authStore.login(payload);
+
+  if (result.status) {
+    console.log('✅ Login successful');
+
+    // 🔐 SAVE testing box selection for this admin (FIRST login or later additions)
+    localStorage.setItem(
+      `testingBox_${this.formData.email}`,
+      JSON.stringify(this.selectedTestingBox)
+    );
+
+    // ➡️ then redirect
+    await this.checkAndRedirect();
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: result.message || 'Login failed',
+      timer: 3000,
+      showConfirmButton: false
+    });
+    this.resetRecaptcha();
+  }
+},  
+  async checkAndRedirect() {
       const reportId = localStorage.getItem('reportId');
 
       if (!reportId) {
@@ -1133,6 +1190,15 @@ if (
 </script>
 
 <style scoped>
+
+.dropdown-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdown-option.disabled:hover {
+  background: none;
+}
 .dropdown-option.disabled {
   opacity: 0.6;
   pointer-events: none;

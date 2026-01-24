@@ -18,7 +18,16 @@
                 View and manage all scoped targets.
               </p>
             </div>
-
+            <div>
+              <!-- Testing Type (Unified UI) -->
+            <div class="testing-type">
+              <select v-model="selectedTestingType" class="form-select testing-select" :disabled="!showTestingDropdown">
+                <option v-for="type in allowedTestingTypes" :key="type" :value="type">
+                  {{ formatTestingType(type) }}
+                </option>
+              </select>
+            </div>
+            </div>
 
           </div>
 
@@ -204,6 +213,7 @@
 <script>
 import DashboardMenu from "@/components/admin-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/admin-component/DashboardHeader.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: "ScopeView",
@@ -211,6 +221,11 @@ export default {
 
   data() {
     return {
+      authStore: null,
+      selectedTestingType: "",   
+      showTestingDropdown: false,
+      testingType: "",
+      allowedTestingTypes: [], 
       internalTargets: [
         { id: 1, ip: "192.168.1.10" },
         { id: 2, ip: "192.168.2.0" },
@@ -246,9 +261,52 @@ export default {
       },
     };
   },
+  async mounted() {
+  this.authStore = useAuthStore();
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log("USER FROM STORAGE:", user);
+
+  this.adminId = user?.id || user?._id;
+  console.log("ADMIN ID:", this.adminId);
+
+  if (this.adminId) {
+    await this.fetchTestingTypes();
+  } else {
+    console.error("Admin ID missing. Testing types API not called.");
+  }
+},
   methods: {
+    async fetchTestingTypes() {
+      const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
+      if (!res.status) {
+        Swal.fire(
+          "Error",
+          res.message || "Unable to fetch testing types",
+          "error"
+        );
+        return;
+      }
+
+      this.allowedTestingTypes = res.testingTypes || [];
+
+      // 🔥 RULES IMPLEMENTATION
+      if (this.allowedTestingTypes.length === 1) {
+        // Only one → auto select, no dropdown
+        this.selectedTestingType = this.allowedTestingTypes[0];
+        this.showTestingDropdown = false;
+      } else if (this.allowedTestingTypes.length > 1) {
+        // Two or more → dropdown, first selected
+        this.selectedTestingType = this.allowedTestingTypes[0];
+        this.showTestingDropdown = true;
+      }
+    },
+    formatTestingType(type) {
+      return type
+        .replace("_", " ")
+        .replace(/\b\w/g, l => l.toUpperCase());
+    },
     // 🟣 DRAG START
     onDragStart(item, from) {
       this.draggedItem = item;
@@ -422,6 +480,23 @@ export default {
 
 
 <style scoped>
+.testing-select:disabled {
+  background-color: #f1f3f5;
+  color: #333;
+  cursor: default;
+  opacity: 1;
+  /* remove faded look */
+}
+
+.testing-type {
+  min-width: 200px;
+}
+
+.testing-select {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
 /* Scroll only table body */
 .scroll-body {
   display: block;

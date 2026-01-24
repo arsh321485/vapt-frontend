@@ -14,7 +14,10 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.authStore.initFromStorage();
+    // this.authStore.initFromStorage();
+    // this.authStore.restoreFromStorage();
+    const restored = this.authStore.restoreFromStorage();
+  console.log("Session restored?", restored);
   },
 });
 </script>
