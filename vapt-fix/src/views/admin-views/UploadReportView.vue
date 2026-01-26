@@ -299,6 +299,11 @@ export default {
     };
   },
   watch: {
+    selectedTestingType(newType) {
+    if (newType) {
+      this.fetchTargetsByTestingType();
+    }
+  },
     uploadedFiles: {
       handler(files) {
         const hasSuccessfulUploads = files.some(f => f.status === 'success');
@@ -323,15 +328,6 @@ export default {
     },
 
   },
-  uploadedFiles: {
-    handler(files) {
-      const hasSuccessfulUploads = files.some(f => f.status === 'success');
-      if (hasSuccessfulUploads && this.authStore) {
-        this.authStore.markStepCompleted(3);
-      }
-    },
-    deep: true
-  },
   async mounted() {
     this.authStore = useAuthStore();
     const user = JSON.parse(localStorage.getItem("user"));
@@ -340,12 +336,77 @@ export default {
     if (this.adminId) {
       await this.fetchTestingTypes();
     }
+    if (this.selectedTestingType) {
+      this.fetchTargetsByTestingType();
+    }
     // ✅ Check if step 3 should be marked completed on page load
     if (this.uploadedFiles.some(f => f.status === 'success')) {
       this.authStore.markStepCompleted(3);
     }
   },
   methods: {
+    async fetchTargetsByTestingType() {
+  Swal.fire({
+    title: "Loading targets",
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  const res = await this.authStore.getScopeTargets(
+    this.selectedTestingType
+  );
+
+  Swal.close();
+
+  if (!res.status) {
+    Swal.fire("Error", res.message, "error");
+    return;
+  }
+
+  // ✅ Populate ONLY cards
+  this.mapGetTargetsResponse(res.data.data || []);
+},
+    mapGetTargetsResponse(list) {
+  // 🔄 Reset ONLY cards (not textarea)
+  this.internalTargets = [];
+  this.externalTargets = [];
+  this.webAppTargets = [];
+  this.mobileAppTargets = [];
+
+  list.forEach(item => {
+    const value = item.target_value;
+
+    switch (item.target_type) {
+      case "internal_ip":
+        this.internalTargets.push({
+          ip: value,
+          count: item.subnet_count,
+        });
+        break;
+
+      case "external_ip":
+        this.externalTargets.push({
+          ip: value,
+          count: item.subnet_count,
+        });
+        break;
+
+      case "web_url":
+        this.webAppTargets.push({
+          url: value,
+        });
+        break;
+
+      case "mobile_url":
+      case "mobile_app":
+        this.mobileAppTargets.push({
+          url: value,
+        });
+        break;
+    }
+  });
+},
     mapApiResponse(data) {
   // 🔄 Reset UI
   this.internalTargets = [];
@@ -384,6 +445,7 @@ export default {
         });
         break;
 
+      case "mobile_url":
       case "mobile_app":
         this.mobileAppTargets.push({
           url: value,
@@ -394,8 +456,8 @@ export default {
 
   // ✅ Update textarea (so admin can see/copy)
   this.ipInput = [...new Set(this.extractedList)].join("\n");
-},
-   handleEnterSubmit() {
+    },
+  handleEnterSubmit() {
   const lines = this.ipInput.split("\n").filter(l => l.trim());
   const last = lines[lines.length - 1];
 
@@ -409,8 +471,7 @@ export default {
   } else {
     Swal.fire("Invalid entry", `"${last}" is invalid`, "error");
   }
-}
-,
+  },
 handleAutoSubmit() {
   if (!this.ipInput.trim()) return;
   this.triggerAutoSubmit();
@@ -708,97 +769,103 @@ triggerAutoSubmit() {
 
     //   return [...new Set(validTargets)];
     // },
- handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-  this.selectedFile = file;
+      this.selectedFile = file;
 
-  // 🔥 Auto-submit to API
-  this.submitTargets();
+      // 🔥 Auto-submit to API
+      this.submitTargets();
 
-  event.target.value = "";
-},
-
-async submitTargets() {
-  if (this.isUploading) return;
-
-  try {
-    this.isUploading = true;
-
-    // 🔥 SHOW LOADING ALERT
-    Swal.fire({
-      title: "Please wait",
-      text: "Uploading & processing targets. Do not refresh the page.",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showConfirmButton: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    const formData = new FormData();
-
-    if (this.selectedFile) {
-      formData.append("file", this.selectedFile);
-    } else {
-      if (!this.ipInput.trim()) {
-        Swal.close(); // close loader
+      event.target.value = "";
+    },
+    async submitTargets() {
+      if (!this.selectedTestingType) {
+        Swal.fire(
+          "Testing type required",
+          "Please select a testing type before uploading targets",
+          "warning"
+        );
         return;
       }
-      formData.append("targets", this.ipInput);
-    }
+      if (this.isUploading) return;
 
-    const res = await this.authStore.createScope(formData);
+      try {
+        this.isUploading = true;
 
-    // 🔥 CLOSE LOADING ALERT
-    Swal.close();
+        // 🔥 SHOW LOADING ALERT
+        Swal.fire({
+          title: "Please wait",
+          text: "Uploading & processing targets. Do not refresh the page.",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
 
-    if (!res.status) {
-      Swal.fire("Error", res.message, "error");
-      return;
-    }
+        const formData = new FormData();
 
-    // ✅ Update UI from backend
-    this.mapApiResponse(res.data);
+        if (this.selectedFile) {
+          formData.append("file", this.selectedFile);
+          // 🔥 speed optimization
+      formData.append("expand_subnets", "false");
+        } else {
+          if (!this.ipInput.trim()) {
+            Swal.close(); // close loader
+            return;
+          }
+          formData.append("targets", this.ipInput);
+        }
 
-    // 🔶 SKIPPED (duplicates)
-    if (res.data.skipped?.length) {
-      console.warn("Skipped targets:", res.data.skipped);
+        const res = await this.authStore.createScope(formData,this.selectedTestingType);
 
-      Swal.fire({
-        icon: "warning",
-        title: "Already exists",
-        text: `${res.data.skipped_count} target(s) skipped`,
-        timer: 2500,
-        showConfirmButton: false,
-      });
-    }
+        // 🔥 CLOSE LOADING ALERT
+        Swal.close();
 
-    // 🟢 SUCCESS
-    if (res.data.created_count > 0) {
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: `${res.data.created_count} target(s) created`,
-        timer: 2500,
-        showConfirmButton: false,
-      });
-    }
+        if (!res.status) {
+          Swal.fire("Error", res.message, "error");
+          return;
+        }
 
-    this.selectedFile = null;
+        // ✅ Update UI from backend
+        this.mapApiResponse(res.data);
 
-  } catch (err) {
-    Swal.close();
-    Swal.fire("Error", "Something went wrong", "error");
-  } finally {
-    this.isUploading = false;
-  }
-}
+        // 🔶 SKIPPED (duplicates)
+        if (res.data.skipped?.length) {
+          console.warn("Skipped targets:", res.data.skipped);
 
+          Swal.fire({
+            icon: "warning",
+            title: "Already exists",
+            text: `${res.data.skipped_count} target(s) skipped`,
+            timer: 2500,
+            showConfirmButton: false,
+          });
+        }
 
-,
+        // 🟢 SUCCESS
+        if (res.data.created_count > 0) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: `${res.data.created_count} target(s) created`,
+            timer: 2500,
+            showConfirmButton: false,
+          });
+        }
+
+        this.selectedFile = null;
+
+      } catch (err) {
+        Swal.close();
+        Swal.fire("Error", "Something went wrong", "error");
+      } finally {
+        this.isUploading = false;
+      }
+    },
     onFileChange(e) {
       this.handleFiles([...e.target.files]);
       e.target.value = "";
@@ -812,17 +879,11 @@ async submitTargets() {
         /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
       return ipRegex.test(value);
     },
-
     isValidURL(value) {
-      // Improved regex to handle subdomains, query params, and complex paths
-      // Matches: https://play.google.com/store/apps/details?id=com.sample.app
-      // Matches: https://example.com, www.example.com, subdomain.example.com
       const urlRegex =
         /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
       return urlRegex.test(value);
     },
-
-    // Detect Mobile App URLs (Play Store / App Store)
     isMobileAppURL(value) {
       const lowerValue = value.toLowerCase();
       return (
@@ -832,7 +893,6 @@ async submitTargets() {
         lowerValue.includes('appstore.com')
       );
     },
-
     handleUploadAndRedirect() {
       // 🔐 Mark dashboard as locked
       localStorage.setItem("dashboardTestingInProgress", "true");

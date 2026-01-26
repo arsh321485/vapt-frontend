@@ -9,7 +9,6 @@
         </div>
 
         <div class="col-11 pt-5 pb-3 pe-4">
-
           <!-- HEADER -->
           <div class="d-flex justify-content-between align-items-center mb-4 pt-4">
             <div>
@@ -20,49 +19,41 @@
             </div>
             <div>
               <!-- Testing Type (Unified UI) -->
-            <div class="testing-type">
-              <select v-model="selectedTestingType" class="form-select testing-select" :disabled="!showTestingDropdown">
-                <option v-for="type in allowedTestingTypes" :key="type" :value="type">
-                  {{ formatTestingType(type) }}
-                </option>
-              </select>
+              <div class="testing-type">
+                <select v-model="selectedTestingType" class="form-select testing-select"
+                  :disabled="!showTestingDropdown">
+                  <option v-for="type in allowedTestingTypes" :key="type" :value="type">
+                    {{ formatTestingType(type) }}
+                  </option>
+                </select>
+              </div>
             </div>
-            </div>
-
           </div>
 
           <!-- TARGET CARDS -->
-          <div class="scope-grid">
+          <!-- <div class="scope-grid">
 
-            <!-- INTERNAL -->
             <div class="scope-card">
               <h3 class="scope-card-title">Internal Targets</h3>
-
               <table class="scope-table">
                 <thead>
                   <tr>
                     <th class="col-serial ">S.No</th>
-                    <th class="col-value text-center">IP Address</th>
+                    <th class="col-value">IP Address</th>
                     <th class=" col-actions">Actions</th>
-
-
                   </tr>
                 </thead>
-
                 <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
                   <tr v-for="(item, index) in internalTargets" :key="item.id" draggable="true"
                     @dragstart="onDragStart(item, 'internal')">
-
                     <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value text-center">
+                    <td class="col-value">
                       {{ item.ip }}
                       <span v-if="item.count" class="subnet-count">({{ item.count }})</span>
                     </td>
                     <td class=" col-actions actions">
                       <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
-
                       <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
-
                     </td>
                   </tr>
 
@@ -75,26 +66,21 @@
                 </tbody>
               </table>
             </div>
-
-            <!-- EXTERNAL -->
             <div class="scope-card">
               <h3 class="scope-card-title">External Targets</h3>
-
               <table class="scope-table">
                 <thead>
                   <tr>
                     <th class="col-serial">S.No</th>
-                    <th class="col-value text-center">IP Address</th>
+                    <th class="col-value">IP Address</th>
                     <th class=" col-actions">Actions</th>
-
-
                   </tr>
                 </thead>
                 <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
                   <tr v-for="(item, index) in externalTargets" :key="item.id" draggable="true"
                     @dragstart="onDragStart(item, 'external')">
                     <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value text-center">{{ item.ip }}</td>
+                    <td class="col-value ">{{ item.ip }}</td>
                     <td class="col-actions actions">
                       <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
 
@@ -102,12 +88,156 @@
 
                     </td>
                   </tr>
-
+                  <tr v-if="!internalTargets.length">
+                    <td colspan="3" class="empty-state">
+                      No external targets defined
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scope-card">
+              <h3 class="scope-card-title">Web App Targets</h3>
+              <table class="scope-table">
+                <thead>
+                  <tr>
+                    <th class="col-serial">S.No</th>
+                    <th class="col-value">URL</th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
+                  <tr v-for="(item, index) in webAppTargets" :key="item.url || index" draggable="true"
+                    @dragstart="onDragStart(item, 'webapp')">
+                    <td class="col-serial">{{ index + 1 }}</td>
+                    <td class="col-value ">{{ item.url }}</td>
+                    <td class=" col-actions actions">
+                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
+                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
+                    </td>
+                  </tr>
+                  <tr v-if="!internalTargets.length">
+                    <td colspan="3" class="empty-state">
+                      No web app targets defined
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scope-card">
+              <h3 class="scope-card-title">Mobile App Targets</h3>
+              <table class="scope-table">
+                <thead>
+                  <tr>
+                    <th class="col-serial">S.No</th>
+                    <th class="col-value">URL</th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobile')">
+                  <tr v-for="(item, index) in mobAppTargets" :key="item.url || index" draggable="true"
+                    @dragstart="onDragStart(item, 'mobile')">
+                    <td class="col-serial">{{ index + 1 }}</td>
+                    <td class="col-value">{{ item.url }}</td>
+                    <td class=" col-actions actions">
+                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
+                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
+                    </td>
+                  </tr>
+                  <tr v-if="!internalTargets.length">
+                    <td colspan="3" class="empty-state">
+                      No mob app targets defined
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
 
-            <!-- WEB -->
+          </div> -->
+
+          <!-- TARGET CARDS -->
+          <div class="scope-grid">
+
+            <!-- INTERNAL TARGETS -->
+            <div class="scope-card">
+              <h3 class="scope-card-title">Internal Targets</h3>
+
+              <!-- TABLE HEADER -->
+              <table class="scope-table">
+                <thead>
+                  <tr>
+                    <th class="col-serial">S.No</th>
+                    <th class="col-value">IP Address</th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+              <!-- TABLE BODY (SCROLLABLE) -->
+              <div class="table-body-wrapper">
+                <table class="scope-table">
+                  <tbody>
+                    <tr v-for="(item, index) in internalTargets" :key="item.id">
+                      <td class="col-serial">{{ index + 1 }}</td>
+                      <td class="col-value">
+                        {{ item.ip }}
+                        <span v-if="item.count" class="subnet-count">({{ item.count }})</span>
+                      </td>
+                      <td class="col-actions actions">
+                        <i class="bi bi-pencil" @click="openEditModal(item, 'internal')"></i>
+                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+                      </td>
+                    </tr>
+
+                    <tr v-if="!internalTargets.length">
+                      <td colspan="3" class="empty-state">
+                        No internal targets defined
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+            <!-- EXTERNAL TARGETS -->
+            <div class="scope-card">
+              <h3 class="scope-card-title">External Targets</h3>
+
+              <table class="scope-table">
+                <thead>
+                  <tr>
+                    <th class="col-serial">S.No</th>
+                    <th class="col-value">IP Address</th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+              <div class="table-body-wrapper">
+                <table class="scope-table">
+                  <tbody>
+                    <tr v-for="(item, index) in externalTargets" :key="item.id">
+                      <td class="col-serial">{{ index + 1 }}</td>
+                      <td class="col-value">{{ item.ip }}</td>
+                      <td class="col-actions actions">
+                        <i class="bi bi-pencil" @click="openEditModal(item, 'external')"></i>
+                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+                      </td>
+                    </tr>
+
+                    <tr v-if="!externalTargets.length">
+                      <td colspan="3" class="empty-state">
+                        No external targets defined
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+            <!-- WEB APP TARGETS -->
             <div class="scope-card">
               <h3 class="scope-card-title">Web App Targets</h3>
 
@@ -115,28 +245,36 @@
                 <thead>
                   <tr>
                     <th class="col-serial">S.No</th>
-                    <th class="col-value text-center">URL</th>
+                    <th class="col-value">URL</th>
                     <th class="col-actions">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
-                  <tr v-for="(item, index) in webAppTargets" :key="item.url || index"  draggable="true"
-  @dragstart="onDragStart(item, 'webapp')">
-                    <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value text-center">{{ item.url }}</td>
-                    <td class=" col-actions actions">
-                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
-
-                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
-
-                    </td>
-                  </tr>
-
-                </tbody>
               </table>
+
+              <div class="table-body-wrapper">
+                <table class="scope-table">
+                  <tbody>
+                    <tr v-for="(item, index) in webAppTargets" :key="item.id">
+                      <td class="col-serial">{{ index + 1 }}</td>
+                      <td class="col-value">{{ item.url }}</td>
+                      <td class="col-actions actions">
+                        <i class="bi bi-pencil" @click="openEditModal(item, 'web')"></i>
+                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+                      </td>
+                    </tr>
+
+                    <tr v-if="!webAppTargets.length">
+                      <td colspan="3" class="empty-state">
+                        No web app targets defined
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <!-- Mobile -->
+
+            <!-- MOBILE APP TARGETS -->
             <div class="scope-card">
               <h3 class="scope-card-title">Mobile App Targets</h3>
 
@@ -144,30 +282,36 @@
                 <thead>
                   <tr>
                     <th class="col-serial">S.No</th>
-                    <th class="col-value text-center">URL</th>
+                    <th class="col-value">URL</th>
                     <th class="col-actions">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobile')">
-                  <tr v-for="(item, index) in mobAppTargets" :key="item.url || index"
-  draggable="true"
-  @dragstart="onDragStart(item, 'mobile')">
-                    <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value text-center">{{ item.url }}</td>
-                    <td class=" col-actions actions">
-                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
-
-                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
-
-                    </td>
-                  </tr>
-
-                </tbody>
               </table>
+
+              <div class="table-body-wrapper">
+                <table class="scope-table">
+                  <tbody>
+                    <tr v-for="(item, index) in mobAppTargets" :key="item.id">
+                      <td class="col-serial">{{ index + 1 }}</td>
+                      <td class="col-value">{{ item.url }}</td>
+                      <td class="col-actions actions">
+                        <i class="bi bi-pencil" @click="openEditModal(item, 'mobile')"></i>
+                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+                      </td>
+                    </tr>
+
+                    <tr v-if="!mobAppTargets.length">
+                      <td colspan="3" class="empty-state">
+                        No mobile app targets defined
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-          </div>
 
+          </div>
         </div>
       </div>
     </div>
@@ -185,6 +329,7 @@
           <option value="internal">Internal</option>
           <option value="external">External</option>
           <option value="web">Web App</option>
+          <option value="mobile">Mobile App</option>
         </select>
 
         <!-- VALUE -->
@@ -205,10 +350,8 @@
       </div>
     </div>
 
-
   </main>
 </template>
-
 
 <script>
 import DashboardMenu from "@/components/admin-component/DashboardMenu.vue";
@@ -218,65 +361,114 @@ import { useAuthStore } from "@/stores/authStore";
 export default {
   name: "ScopeView",
   components: { DashboardMenu, DashboardHeader },
-
   data() {
     return {
       authStore: null,
-      selectedTestingType: "",   
+      selectedTestingType: "",
       showTestingDropdown: false,
       testingType: "",
-      allowedTestingTypes: [], 
-      internalTargets: [
-        { id: 1, ip: "192.168.1.10" },
-        { id: 2, ip: "192.168.2.0" },
-        { id: 3, ip: "192.168.1.10" },
-        { id: 4, ip: "192.168.2.0" },
-        { id: 5, ip: "194.165.1.10" },
-        { id: 6, ip: "192.164.2.5" },
-      ],
-      externalTargets: [
-        { id: 3, ip: "192.168.1.19" },
-        { id: 3, ip: "192.156.2.00" },
-      ],
-      webAppTargets: [
-        { id: 4, url: "https://example.com" },
-        { id: 4, url: "https://demo.com" },
-        { id: 4, url: "https://test.com" },
-      ],
-      mobAppTargets: [
-        { id: 4, url: "https://mobile.com" },
-        { id: 4, url: "https://demo2.com" },
-        { id: 4, url: "https://test1.com" },
-      ],
+      allowedTestingTypes: [],
+      internalTargets: [],
+      externalTargets: [],
+      webAppTargets: [],
+      mobAppTargets: [],
       draggedItem: null,
       draggedFrom: null,
-
       showModal: false,
       modalMode: "add",
       editingId: null,
-
       form: {
         type: "internal",
         value: "",
       },
     };
   },
+  watch: {
+    selectedTestingType: {
+      immediate: true,
+      async handler(newType) {
+        if (!newType) return;
+        await this.fetchScopeTargets(newType);
+      },
+    },
+  },
   async mounted() {
-  this.authStore = useAuthStore();
+    this.authStore = useAuthStore();
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  console.log("USER FROM STORAGE:", user);
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log("USER FROM STORAGE:", user);
 
-  this.adminId = user?.id || user?._id;
-  console.log("ADMIN ID:", this.adminId);
+    this.adminId = user?.id || user?._id;
+    console.log("ADMIN ID:", this.adminId);
 
-  if (this.adminId) {
-    await this.fetchTestingTypes();
-  } else {
-    console.error("Admin ID missing. Testing types API not called.");
-  }
-},
+    if (this.adminId) {
+      await this.fetchTestingTypes();
+    } else {
+      console.error("Admin ID missing. Testing types API not called.");
+    }
+  },
   methods: {
+    async fetchScopeTargets(testingType) {
+  try {
+    const res = await this.authStore.getScopeTargets(testingType);
+
+    if (!res.status) {
+      Swal.fire("Error", res.message || "Failed to fetch scope", "error");
+      return;
+    }
+
+    const targets = res.data?.data || [];
+
+    // 🔄 RESET
+    this.internalTargets = [];
+    this.externalTargets = [];
+    this.webAppTargets = [];
+    this.mobAppTargets = [];
+
+    targets.forEach(t => {
+      const value = t.target_value;
+
+      switch (t.target_type) {
+        case "internal_ip":
+          this.internalTargets.push({
+            id: t._id,
+            ip: value,
+            count: t.subnet_count || null,
+          });
+          break;
+
+        case "external_ip":
+          this.externalTargets.push({
+            id: t._id,
+            ip: value,
+            count: t.subnet_count || null,
+          });
+          break;
+
+        // 🔥 FIX HERE
+        case "web_url":
+          this.webAppTargets.push({
+            id: t._id,
+            url: value,
+          });
+          break;
+
+        // 🔥 FIX HERE
+        case "mobile_url":
+        case "mobile_app":
+          this.mobAppTargets.push({
+            id: t._id,
+            url: value,
+          });
+          break;
+      }
+    });
+
+  } catch (err) {
+    Swal.fire("Error", "Something went wrong", "error");
+    console.error(err);
+  }
+    },
     async fetchTestingTypes() {
       const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
@@ -307,117 +499,153 @@ export default {
         .replace("_", " ")
         .replace(/\b\w/g, l => l.toUpperCase());
     },
-    // 🟣 DRAG START
     onDragStart(item, from) {
       this.draggedItem = item;
       this.draggedFrom = from;
     },
     onDropTarget(to) {
-  if (!this.draggedItem || this.draggedFrom === to) return;
+      if (!this.draggedItem || this.draggedFrom === to) return;
 
-  // 🔹 Map source & destination lists
-  const listMap = {
-    internal: this.internalTargets,
-    external: this.externalTargets,
-    webapp: this.webAppTargets,
-    mobile: this.mobAppTargets,
-  };
+      // 🔹 Map source & destination lists
+      const listMap = {
+        internal: this.internalTargets,
+        external: this.externalTargets,
+        webapp: this.webAppTargets,
+        mobile: this.mobAppTargets,
+      };
 
-  const fromList = listMap[this.draggedFrom];
-  const toList = listMap[to];
+      const fromList = listMap[this.draggedFrom];
+      const toList = listMap[to];
 
-  if (!fromList || !toList) return;
+      if (!fromList || !toList) return;
 
-  // 🔹 Determine unique key (ip or url)
-  const value =
-    this.draggedItem.ip ||
-    this.draggedItem.url;
+      // 🔹 Determine unique key (ip or url)
+      const value =
+        this.draggedItem.ip ||
+        this.draggedItem.url;
 
-  // 🔹 REMOVE from source
-  const fromIndex = fromList.findIndex(item =>
-    (item.ip || item.url) === value
-  );
-  if (fromIndex !== -1) {
-    fromList.splice(fromIndex, 1);
-  }
+      // 🔹 REMOVE from source
+      const fromIndex = fromList.findIndex(item =>
+        (item.ip || item.url) === value
+      );
+      if (fromIndex !== -1) {
+        fromList.splice(fromIndex, 1);
+      }
 
-  // 🔹 PREVENT duplicates in destination
-  const exists = toList.some(item =>
-    (item.ip || item.url) === value
-  );
+      // 🔹 PREVENT duplicates in destination
+      const exists = toList.some(item =>
+        (item.ip || item.url) === value
+      );
 
-  if (!exists) {
-    // 🔹 Normalize data per destination
-    if (to === "webapp" || to === "mobile") {
-      toList.push({ id: Date.now(), url: value });
-    } else {
-      toList.push({ id: Date.now(), ip: value });
-    }
-  }
+      if (!exists) {
+        // 🔹 Normalize data per destination
+        if (to === "webapp" || to === "mobile") {
+          toList.push({ id: Date.now(), url: value });
+        } else {
+          toList.push({ id: Date.now(), ip: value });
+        }
+      }
 
-  // 🔹 RESET drag state
-  this.draggedItem = null;
-  this.draggedFrom = null;
-}
-,
-//     onDropTarget(to) {
-//   if (!this.draggedItem || this.draggedFrom === to) return;
-
-//   const fromList =
-//     this.draggedFrom === "internal"
-//       ? this.internalTargets
-//       : this.externalTargets;
-
-//   const toList =
-//     to === "internal"
-//       ? this.internalTargets
-//       : this.externalTargets;
-
-//   const value = this.draggedItem.ip;
-
-//   // 🔹 REMOVE from source (reactive)
-//   const fromIndex = fromList.findIndex(item => item.ip === value);
-//   if (fromIndex !== -1) {
-//     fromList.splice(fromIndex, 1);
-//   }
-
-//   // 🔹 PREVENT duplicates
-//   if (!toList.some(item => item.ip === value)) {
-//     toList.push({ ...this.draggedItem });
-//   }
-
-//   // 🔹 RESET drag state
-//   this.draggedItem = null;
-//   this.draggedFrom = null;
-// },
+      // 🔹 RESET drag state
+      this.draggedItem = null;
+      this.draggedFrom = null;
+    },
     openAddModal() {
       this.modalMode = "add";
       this.form = { type: "internal", value: "" };
       this.showModal = true;
     },
+    async openEditModal(item, type) {
+  try {
+    this.modalMode = "edit";
+    this.editingId = item.id;
+    this.showModal = true;
 
-    openEditModal(item, type) {
-      this.modalMode = "edit";
-      this.editingId = item.id;
-      this.form.type = type;
-      this.form.value = item.ip || item.url;
-      this.showModal = true;
+    // 🔄 Fetch latest data from backend
+    const res = await this.authStore.getScopeTargetById(
+      item.id,
+      this.selectedTestingType
+    );
+    if (!res.status) {
+      Swal.fire("Error", res.message, "error");
+      this.showModal = false;
+      return;
+    }
+    const data = res.data;
+    let formType = "internal";
+    if (data.target_type === "external_ip") {
+  formType = "external";
+} 
+else if (data.target_type === "web_url") {
+  formType = "web";
+} 
+else if (
+  data.target_type === "mobile_url" ||
+  data.target_type === "mobile_app"
+) {
+  formType = "mobile";
+}
+
+    // 🔹 Set form values
+    this.form = {
+      type: formType,
+      value: data.target_value,
+    };
+
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", "Unable to load target", "error");
+    this.showModal = false;
+  }
     },
-
     closeModal() {
       this.showModal = false;
     },
+    async saveTarget() {
+  // ADD MODE (local only – you already have this)
+  if (this.modalMode === "add") {
+    const id = Date.now();
+    this.pushTarget(id);
+    this.showModal = false;
+    return;
+  }
 
-    saveTarget() {
-      if (this.modalMode === "add") {
-        const id = Date.now();
-        this.pushTarget(id);
-      } else {
-        this.updateTarget();
-      }
-      this.showModal = false;
+  // 🔥 EDIT MODE → PATCH API
+  try {
+    const payload = {};
+
+    // We are editing VALUE only for now
+    payload["target_value"] = this.form.value;
+
+    const res = await this.authStore.updateScopeTarget(
+      this.editingId,
+      this.selectedTestingType,
+      payload
+    );
+
+    if (!res.status) {
+      Swal.fire("Error", res.message, "error");
+      return;
+    }
+
+    // Swal.fire({
+    //   icon: "success",
+    //   title: "Updated",
+    //   text: "Target updated successfully",
+    //   timer: 1200,
+    //   showConfirmButton: false,
+    // });
+
+    // 🔄 Refresh list from backend (single source of truth)
+    await this.fetchScopeTargets(this.selectedTestingType);
+
+    this.showModal = false;
+
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", "Update failed", "error");
+  }
     },
-
     pushTarget(id) {
       if (this.form.type === "internal")
         this.internalTargets.push({ id, ip: this.form.value });
@@ -428,7 +656,6 @@ export default {
       if (this.form.type === "web")
         this.webAppTargets.push({ id, url: this.form.value });
     },
-
     updateTarget() {
       const list =
         this.form.type === "internal"
@@ -436,48 +663,58 @@ export default {
           : this.form.type === "external"
             ? this.externalTargets
             : this.webAppTargets;
-
       const item = list.find(i => i.id === this.editingId);
       if (!item) return;
-
       if (this.form.type === "web") {
         item.url = this.form.value;
       } else {
         item.ip = this.form.value;
       }
     },
-
-
     deleteTarget(id) {
-      Swal.fire({
-        title: "Delete Target?",
-        text: "This action cannot be undone.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#6b7280",
-        confirmButtonText: "Yes, delete",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.internalTargets = this.internalTargets.filter(i => i.id !== id);
-          this.externalTargets = this.externalTargets.filter(i => i.id !== id);
-          this.webAppTargets = this.webAppTargets.filter(i => i.id !== id);
+  Swal.fire({
+    title: "Delete Target?",
+    text: "This action cannot be undone.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#6b7280",
+    confirmButtonText: "Yes, delete",
+  }).then(async (result) => {
+    if (!result.isConfirmed) return;
 
-          Swal.fire({
-            icon: "success",
-            title: "Deleted",
-            text: "Target removed successfully",
-            timer: 1500,
-            showConfirmButton: false,
-          });
-        }
+    try {
+      const res = await this.authStore.deleteScopeTarget(
+        id,
+        this.selectedTestingType
+      );
+
+      if (!res.status) {
+        Swal.fire("Error", res.message, "error");
+        return;
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted",
+        text: res.message || "Target deleted successfully",
+        timer: 1200,
+        showConfirmButton: false,
       });
-    },
+
+      // 🔄 Refresh list from backend
+      await this.fetchScopeTargets(this.selectedTestingType);
+
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Delete failed", "error");
+    }
+  });
+},
 
   }
 };
 </script>
-
 
 <style scoped>
 .testing-select:disabled {
@@ -487,7 +724,6 @@ export default {
   opacity: 1;
   /* remove faded look */
 }
-
 .testing-type {
   min-width: 200px;
 }
@@ -497,10 +733,12 @@ export default {
   padding: 10px 14px;
   font-size: 14px;
 }
+
 /* Scroll only table body */
 .scroll-body {
   display: block;
-  max-height: 240px;   /* 👈 height for ~5 rows */
+  max-height: 240px;
+  /* 👈 height for ~5 rows */
   overflow-y: auto;
 }
 
@@ -530,6 +768,7 @@ tr[draggable="true"]:active {
   cursor: grabbing;
   opacity: 0.6;
 }
+
 .scope-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -555,19 +794,21 @@ tr[draggable="true"]:active {
   font-weight: 600;
   color: #111827;
   margin-bottom: 18px;
-   border-bottom: 3px solid #a095f0;
-   display: table;         
+  border-bottom: 3px solid #a095f0;
+  display: table;
   margin: 0 auto 28px;
-  padding-bottom: 4px;       
+  padding-bottom: 4px;
   /* margin-bottom: 18px; */
-    /* box-shadow: 0 5px 5px #bbb7e1; */
+  /* box-shadow: 0 5px 5px #bbb7e1; */
 }
 
 /* Table */
 .scope-table {
   width: 100%;
   font-size: 14px;
-  flex: 1;
+  /* flex: 1; */
+  table-layout: fixed; 
+  border-collapse: collapse;
 }
 
 .scope-table th {
@@ -584,10 +825,19 @@ tr[draggable="true"]:active {
 }
 
 /* Actions */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  /* padding-left: 170px; */
+}
+
 .actions i {
   font-size: 15px;
-  margin-left: 8px;
+  /* margin-left: 8px; */
   cursor: pointer;
+  /* padding-left: 50px; */
 }
 
 .actions i.bi-pencil {
@@ -606,9 +856,14 @@ tr[draggable="true"]:active {
 }
 
 /* URL */
-.url-cell {
+/* .url-cell {
   word-break: break-all;
+} */
+ .col-value {
+  word-break: break-word;
+  white-space: normal;
 }
+
 
 /* Empty state */
 .empty-state {
@@ -700,31 +955,54 @@ tr[draggable="true"]:active {
 .col-serial {
   width: 60px;
   text-align: center;
-  padding-left: 14px;
+  /* padding-left: 14px; */
 }
 
 .col-value {
-  padding-left: 28px;
-  /* 👈 pushes IP / URL to right */
+  text-align: left;
+  padding-left: 24px;
+  padding-right: 12px;
+  word-break: break-word;
 }
 
 .col-actions {
-  width: 90px;
-  padding-right: 14px;
+  /* width: 90px;
+  padding-right: 14px; */
+   width: 229px;
+  text-align: center;
 }
 
+.scope-table th.col-actions,
+.scope-table td.col-actions {
+  width: 196px;        
+  text-align: center;  /* icons exactly under heading */
+  /* padding-right: 0; */
+}
 /* Header alignment match */
-.scope-table th.col-serial {
+.scope-table th.col-serial,
+.scope-table td.col-serial {
+  width: 60px;
   text-align: center;
 }
 
 .scope-table th.col-value {
-  padding-left: 28px;
+  /* padding-left: 28px; */
+  text-align: left;         
+  padding-left: 24px;       
+  padding-right: 12px;
+  word-break: break-word;
+}
+.scope-table td.col-value {
+  text-align: left;          
+  padding-left: 24px;        
+  /* padding-right: 12px; */
+  word-break: break-word;
 }
 
 /* Header alignment */
 .scope-table thead th.col-value {
-  text-align: center;
-  
+  /* text-align: center; */
+  text-align: left;
+  padding-left: 24px;
 }
 </style>

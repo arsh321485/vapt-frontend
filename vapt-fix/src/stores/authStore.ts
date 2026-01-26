@@ -994,21 +994,15 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // upload target api's
   // CREATE SCOPE (TEXT OR FILE)
-  async createScope(formData: FormData) {
+  async createScope(formData: FormData, testingType: string) {
     try {
-      const adminId = this.user?.id || this.user?._id;
-
-      if (!adminId) {
-        throw new Error("Admin ID not found. Please login again.");
+      if (!testingType) {
+        throw new Error("Testing type is required");
       }
 
-      // 🔹 Attach admin_id if backend needs it
-      formData.append("admin_id", adminId);
-
       const res = await endpoint.post(
-        "/admin/scope/create/",
+        `/admin/scope/create/?current_testing_box=${testingType}`,
         formData,
         {
           headers: {
@@ -1017,18 +1011,18 @@ export const useAuthStore = defineStore("auth", {
         }
       );
 
-      const data = res.data;
-
       return {
         status: true,
-        data,
+        data: res.data,
       };
 
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as AxiosError<any>;
+
       return {
         status: false,
         message:
-          error.response?.data?.message ||
+          (error.response?.data as any)?.message ||
           error.message ||
           "Create scope failed",
         details: error.response?.data || null,
@@ -1036,6 +1030,99 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // get all scope targets
+  async getScopeTargets(testingType: string) {
+    try {
+      const res = await endpoint.get(
+        `/admin/scope/?current_testing_box=${testingType}`
+      );
+
+      return {
+        status: true,
+        data: res.data,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch targets",
+      };
+    }
+  },
+
+  // 🔥 NEW: Get single target by ID
+  async getScopeTargetById(id: string, testingType: string) {
+      try {
+        const res = await endpoint.get(
+          `/admin/scope/${id}/?current_testing_box=${testingType}`
+        );
+
+        return {
+          status: true,
+          data: res.data.data, // 👈 ONLY target object
+        };
+      } catch (error: any) {
+        return {
+          status: false,
+          message:
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to fetch target",
+        };
+      }
+  },
+
+  // 🔥 PATCH: Update target (partial)
+  async updateScopeTarget(
+    id: string,
+    testingType: string,
+    payload: Record<string, any>
+  ) {
+    try {
+      const res = await endpoint.patch(
+        `/admin/scope/${id}/?current_testing_box=${testingType}`,
+        payload
+      );
+
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to update target",
+      };
+    }
+  },
+
+  // 🔥 DELETE: Delete single scope target
+  async deleteScopeTarget(id: string, testingType: string) {
+    try {
+      const res = await endpoint.delete(
+        `/admin/scope/${id}/?current_testing_box=${testingType}`
+      );
+
+      return {
+        status: true,
+        message: res.data.message,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to delete target",
+      };
+    }
+  },
 
   // fetch total assets
   async fetchTotalAssets(reportId: string) {
