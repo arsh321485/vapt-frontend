@@ -71,10 +71,19 @@
               </p>
 
               <!-- TEXTAREA -->
-              <textarea class="form-control ip-textarea" v-model="ipInput" @keydown.enter.prevent="handleEnterSubmit"
+              <!-- <textarea class="form-control ip-textarea" v-model="ipInput" @keydown.enter.prevent="handleEnterSubmit"
                 @blur="handleAutoSubmit" placeholder="Example:
 192.168.1.1
-https://example.com"></textarea>
+https://example.com"></textarea> -->
+
+              <textarea
+  class="form-control ip-textarea"
+  v-model="ipInput"
+  placeholder="Example:
+192.168.1.1
+https://example.com">
+</textarea>
+
 
               <!-- upload btn -->
               <div class="ip-actions">
@@ -83,8 +92,13 @@ https://example.com"></textarea>
                 <button class="btn btn-primary" @click="$refs.fileInput.click()">
                   Upload CSV / Excel /Text File
                 </button>
-                
-
+                <button
+    class="btn btn-primary ms-2"
+    :disabled="!ipInput.trim() || isUploading"
+    @click="submitTargets"
+  >
+    Submit Targets
+  </button>
 
                 <span class="ip-count">{{ extractedList.length }} targets</span>
               </div>
@@ -169,13 +183,7 @@ https://example.com"></textarea>
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
                 <tr v-for="(item, index) in externalTargets" :key="item.ip || index" draggable="true"
                   @dragstart="onDragStart(item, 'external')">
-                  <!-- <td>{{ index + 1 }}</td>
-                  <td>
-                    {{ item.ip }}
-                    <span v-if="item.count" class="text-muted">
-                      ({{ item.count }})
-                    </span>
-                  </td> -->
+                  
 
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
@@ -457,32 +465,6 @@ export default {
   // ✅ Update textarea (so admin can see/copy)
   this.ipInput = [...new Set(this.extractedList)].join("\n");
     },
-  handleEnterSubmit() {
-  const lines = this.ipInput.split("\n").filter(l => l.trim());
-  const last = lines[lines.length - 1];
-
-  if (
-    this.isValidIP(last) ||
-    this.isValidSubnet(last) ||
-    this.isValidURL(last)
-  ) {
-    this.ipInput += "\n";
-    this.submitTargets(); // 🔥 auto submit
-  } else {
-    Swal.fire("Invalid entry", `"${last}" is invalid`, "error");
-  }
-  },
-handleAutoSubmit() {
-  if (!this.ipInput.trim()) return;
-  this.triggerAutoSubmit();
-},
-triggerAutoSubmit() {
-  clearTimeout(this.autoSubmitTimer);
-
-  this.autoSubmitTimer = setTimeout(() => {
-    this.submitTargets();
-  }, 500); 
-},
 
   downloadExcelTemplate() {
   // Sample data in the exact format you want
@@ -731,30 +713,30 @@ triggerAutoSubmit() {
     viewMobileTarget(index) {
       window.open(this.mobileAppTargets[index].url, "_blank");
     },
-    validateLastEntry() {
-      const lines = this.ipInput.split("\n").filter(l => l.trim() !== "");
-      if (!lines.length) return;
-      const lastValue = lines[lines.length - 1].trim();
-      if (
-        this.isValidIP(lastValue) ||
-        this.isValidSubnet(lastValue) ||
-        this.isValidURL(lastValue)
-      ) {
-        this.ipInput += "\n";
-        return;
-      }
+    // validateLastEntry() {
+    //   const lines = this.ipInput.split("\n").filter(l => l.trim() !== "");
+    //   if (!lines.length) return;
+    //   const lastValue = lines[lines.length - 1].trim();
+    //   if (
+    //     this.isValidIP(lastValue) ||
+    //     this.isValidSubnet(lastValue) ||
+    //     this.isValidURL(lastValue)
+    //   ) {
+    //     this.ipInput += "\n";
+    //     return;
+    //   }
 
-      // ❌ Invalid
-      lines.pop();
-      this.ipInput = lines.join("\n") + (lines.length ? "\n" : "");
+    //   // ❌ Invalid
+    //   lines.pop();
+    //   this.ipInput = lines.join("\n") + (lines.length ? "\n" : "");
 
-      Swal.fire({
-        icon: "error",
-        title: "Invalid entry",
-        text: `"${lastValue}" is not a valid IP, subnet, or URL.`,
-        confirmButtonColor: "#5a44ff"
-      });
-    },
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Invalid entry",
+    //     text: `"${lastValue}" is not a valid IP, subnet, or URL.`,
+    //     confirmButtonColor: "#5a44ff"
+    //   });
+    // },
     sanitizeIpInput() {
       const values = this.ipInput.split(/\n|,/);
       const validTargets = this.extractValidTargets(values);
@@ -865,6 +847,8 @@ triggerAutoSubmit() {
 
         // ✅ Update UI from backend
         this.mapApiResponse(res.data);
+        this.ipInput = "";
+this.extractedList = [];
 
         // 🔶 SKIPPED (duplicates)
         if (res.data.skipped?.length) {
@@ -939,6 +923,16 @@ triggerAutoSubmit() {
 </script>
 
 <style scoped>
+.btn-primary:not(:disabled) {
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed !important;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 .testing-select:disabled {
   background-color: #f1f3f5;
   color: #333;

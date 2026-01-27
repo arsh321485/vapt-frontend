@@ -24,7 +24,8 @@
 
               <!-- SUB TABS -->
               <div class="sub-tabs">
-                <div class="sub-tab" :class="{ active: currentMode === 'signup' }" @click="switchMode('signup')" v-if="currentRole === 'admin'">
+                <div class="sub-tab" :class="{ active: currentMode === 'signup' }" @click="switchMode('signup')"
+                  v-if="currentRole === 'admin'">
                   Sign Up
                 </div>
                 <div class="sub-tab" :class="{ active: currentMode === 'signin' }" @click="switchMode('signin')">
@@ -39,56 +40,35 @@
                 <input type="password" style="display:none" aria-hidden="true">
 
                 <!-- EMAIL (Hidden for User when OTP is sent) -->
-                <div class="mb-2" v-if="(currentRole === 'admin' && !adminOtpSent) || (currentRole === 'user' && !otpSent)">
+                <div class="mb-2"
+                  v-if="(currentRole === 'admin' && !adminOtpSent) || (currentRole === 'user' && !otpSent)">
                   <label class="form-label">Email</label>
                   <input type="email" class="form-control custom-input" placeholder="name@work.com"
                     v-model="formData.email" autocomplete="off" autocorrect="off" autocapitalize="off"
-                    spellcheck="false" :name="'email_' + formKey" readonly onfocus="this.removeAttribute('readonly');" required />
+                    spellcheck="false" :name="'email_' + formKey" readonly onfocus="this.removeAttribute('readonly');"
+                    required />
                 </div>
 
                 <!-- OTP FIELD (Only for User when OTP is sent) -->
                 <div class="mb-3" v-if="currentRole === 'user' && otpSent">
                   <label class="form-label">Enter OTP</label>
                   <div class="otp-inputs d-flex justify-content-between gap-2">
-                    <input
-                      v-for="(digit, index) in 6"
-                      :key="index"
-                      type="text"
-                      class="form-control otp-box text-center"
-                      maxlength="1"
-                      v-model="otpDigits[index]"
-                      @input="handleOtpInput($event, index)"
-                      @keydown="handleOtpKeydown($event, index)"
-                      @paste="handleOtpPaste($event, index)"
-                      :ref="el => otpRefs[index] = el"
-                      autocomplete="off"
-                      required
-                    />
+                    <input v-for="(digit, index) in 6" :key="index" type="text" class="form-control otp-box text-center"
+                      maxlength="1" v-model="otpDigits[index]" @input="handleOtpInput($event, index)"
+                      @keydown="handleOtpKeydown($event, index)" @paste="handleOtpPaste($event, index)"
+                      :ref="el => otpRefs[index] = el" autocomplete="off" required />
                   </div>
                   <small class="text-light d-block mt-2">OTP has been sent to your email</small>
                 </div>
 
                 <!-- ADMIN OTP FIELD (Signup only - TEMP) -->
-                <div
-                  class="mb-3"
-                  v-if="currentRole === 'admin' && currentMode === 'signup' && adminOtpSent"
-                >
+                <div class="mb-3" v-if="currentRole === 'admin' && currentMode === 'signup' && adminOtpSent">
                   <label class="form-label">Enter OTP</label>
                   <div class="otp-inputs d-flex justify-content-between gap-2">
-                    <input
-                      v-for="(digit, index) in 6"
-                      :key="index"
-                      type="text"
-                      class="form-control otp-box text-center"
-                      maxlength="1"
-                      v-model="otpDigits[index]"
-                      @input="handleOtpInput($event, index)"
-                      @keydown="handleOtpKeydown($event, index)"
-                      @paste="handleOtpPaste($event, index)"
-                      :ref="el => otpRefs[index] = el"
-                      autocomplete="off"
-                      required
-                    />
+                    <input v-for="(digit, index) in 6" :key="index" type="text" class="form-control otp-box text-center"
+                      maxlength="1" v-model="otpDigits[index]" @input="handleOtpInput($event, index)"
+                      @keydown="handleOtpKeydown($event, index)" @paste="handleOtpPaste($event, index)"
+                      :ref="el => otpRefs[index] = el" autocomplete="off" required />
                   </div>
                   <small class="text-light d-block mt-2">
                     OTP has been sent to your email
@@ -100,8 +80,9 @@
                   <label class="form-label">Password</label>
                   <div class="position-relative">
                     <input :type="showPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Password" v-model="formData.password" @input="validatePassword" autocomplete="off" autocorrect="off"
-                      autocapitalize="off" spellcheck="false" :name="'password_' + formKey" readonly onfocus="this.removeAttribute('readonly');" required />
+                      placeholder="Password" v-model="formData.password" @input="validatePassword" autocomplete="off"
+                      autocorrect="off" autocapitalize="off" spellcheck="false" :name="'password_' + formKey" readonly
+                      onfocus="this.removeAttribute('readonly');" required />
 
                     <span class="password-toggle" @click="showPassword = !showPassword">
                       <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
@@ -109,43 +90,59 @@
                   </div>
                 </div>
 
-                <ul v-if="showPasswordRules && currentRole === 'admin' && !adminOtpSent && !allRulesValid" class="password-rules mt-2 mb-1">
+
+                <!-- new / ongoin project -->
+                <!-- PROJECT TYPE SELECTION (SECOND LOGIN ONLY) -->
+                <div v-if="
+                  currentRole === 'admin' &&
+                  currentMode === 'signin' &&
+                  hasExistingProject
+                " class="mb-2">
+                  <label class="form-label">Project Type</label>
+
+                  <div class="d-flex gap-2">
+                    <div class="project-card" :class="{ active: projectChoice === 'ongoing' }"
+                      @click="selectOngoingProject">
+                      <strong>Ongoing Project</strong>
+                      <small>Continue previous testing</small>
+                    </div>
+
+                    <div class="project-card" :class="{ active: projectChoice === 'new' }" @click="selectNewProject">
+                      <strong>New Project</strong>
+                      <small>Start fresh testing</small>
+                    </div>
+                  </div>
+                </div>
+
+
+                <!-- TESTING BOX DROPDOWN (Signin only, Admin only) -->
+
+                <ul v-if="showPasswordRules && currentRole === 'admin' && !adminOtpSent && !allRulesValid"
+                  class="password-rules mt-2 mb-1">
                   <li :class="{ valid: rules.minLength }">At least 8 characters</li>
                   <li :class="{ valid: rules.uppercase }">At least 1 uppercase letter</li>
                   <li :class="{ valid: rules.special }">At least 1 special character</li>
                 </ul>
 
                 <!-- CONFIRM PASSWORD (Signup only, Admin only) -->
-                <div class="mb-2 password-confirm" v-if="currentMode === 'signup' && currentRole === 'admin' && !adminOtpSent">
+                <div class="mb-2 password-confirm"
+                  v-if="currentMode === 'signup' && currentRole === 'admin' && !adminOtpSent">
                   <label class="form-label">Confirm Password</label>
                   <div class="position-relative">
                     <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control custom-input"
                       placeholder="Confirm Password" v-model="formData.confirm_password" autocomplete="off"
-                      :name="'confirm-password-' + formKey" readonly onfocus="this.removeAttribute('readonly');" required />
+                      :name="'confirm-password-' + formKey" readonly onfocus="this.removeAttribute('readonly');"
+                      required />
                     <span class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
                       <i :class="showConfirmPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
                     </span>
                   </div>
                 </div>
 
-                <!-- TESTING BOX DROPDOWN (Signin only, Admin only) -->
-                <!-- <div class="mb-1" v-if="currentMode === 'signin' && currentRole === 'admin'" ref="testingBoxDropdown">
-                  <label class="form-label">Testing Box</label>
-                  <div class="position-relative">
-                    <div class="form-control custom-input dropdown-trigger" @click="isTestingBoxOpen = !isTestingBoxOpen">
-                      <span class="dropdown-text">{{ selectedTestingBox.length ? selectedTestingBox.map(v => testingBoxOptions.find(o => o.value === v)?.label).join(', ') : 'Select testing type' }}</span>
-                      <i :class="isTestingBoxOpen ? 'bi bi-chevron-up' : 'bi bi-chevron-down'" class="dropdown-icon"></i>
-                    </div>
-                    <div v-if="isTestingBoxOpen" class="testing-dropdown-list">
-                      <label v-for="option in testingBoxOptions" :key="option.value" class="dropdown-option">
-                        <input type="checkbox" :value="option.value" v-model="selectedTestingBox" />
-                        {{ option.label }}
-                      </label>
-                    </div>
-                  </div>
-                </div> -->
+
 
                 <!-- TESTING BOX DROPDOWN -->
+               <!-- TESTING BOX DROPDOWN -->
 <div
   class="mb-1"
   v-if="currentMode === 'signin' && currentRole === 'admin'"
@@ -154,9 +151,11 @@
   <label class="form-label">Testing Type</label>
 
   <div class="position-relative">
+    <!-- 🔽 THIS IS WHERE YOUR LINE GOES -->
     <div
       class="form-control custom-input dropdown-trigger"
-      @click="isTestingBoxOpen = !isTestingBoxOpen"
+      :class="{ disabled: projectChoice === 'ongoing' }"
+      @click="projectChoice !== 'ongoing' && (isTestingBoxOpen = !isTestingBoxOpen)"
     >
       <span class="dropdown-text">
         {{
@@ -167,36 +166,33 @@
             : 'Select testing type'
         }}
       </span>
+
       <i
         :class="isTestingBoxOpen ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"
         class="dropdown-icon"
       ></i>
     </div>
 
+    <!-- DROPDOWN OPTIONS -->
     <div v-if="isTestingBoxOpen" class="testing-dropdown-list">
-      <!-- <label
+      <label
         v-for="option in testingBoxOptions"
         :key="option.value"
         class="dropdown-option"
-        :class="{ disabled: isPreviouslySelected(option.value) }"
-      > -->
-      <label v-for="option in testingBoxOptions" :key="option.value" class="dropdown-option"
-                        :class="{ disabled: previouslySelectedBoxes.includes(option.value) }">
-                        <input type="checkbox" :value="option.value" v-model="selectedTestingBox"
-                          :disabled="previouslySelectedBoxes.includes(option.value)" />
-                        {{ option.label }}
-                      </label>
-        <!-- <input
+        :class="{ disabled: projectChoice === 'ongoing' }"
+      >
+        <input
           type="checkbox"
           :value="option.value"
           v-model="selectedTestingBox"
-          :disabled="isPreviouslySelected(option.value)"
+          :disabled="projectChoice === 'ongoing'"
         />
         {{ option.label }}
-      </label> -->
+      </label>
     </div>
   </div>
 </div>
+
 
 
                 <!-- FORGOT PASSWORD (Signin only, Admin only) -->
@@ -207,8 +203,8 @@
                 </div>
 
                 <!-- reCAPTCHA (Admin only) -->
-                <div class="mb-2 d-flex justify-content-center"  v-if="(currentRole === 'admin' && !adminOtpSent) ||
-        (currentRole === 'user' && currentMode === 'signin' && !otpSent)">
+                <div class="mb-2 d-flex justify-content-center" v-if="(currentRole === 'admin' && !adminOtpSent) ||
+                  (currentRole === 'user' && currentMode === 'signin' && !otpSent)">
                   <div :id="recaptchaContainerId" :key="recaptchaKey"></div>
                 </div>
 
@@ -218,7 +214,7 @@
                   {{ submitButtonText }}
                 </button>
 
-                
+
               </form>
 
             </div>
@@ -227,10 +223,11 @@
         </div>
 
         <!-- RIGHT SECTION -->
-        <div class="col-xl-7 col-lg-12 col-md-12 col-12 d-flex flex-column justify-content-center align-items-center info-section p-5">
+        <div
+          class="col-xl-7 col-lg-12 col-md-12 col-12 d-flex flex-column justify-content-center align-items-center info-section p-5">
 
           <h2 class="testimonial-headline text-center mb-2">
-          <span class="text-white">VAPTFIX — Scan Smart. Fix Fast. Stay Secure.</span><br />
+            <span class="text-white">VAPTFIX — Scan Smart. Fix Fast. Stay Secure.</span><br />
             <!-- <span class="text-white">{{ rightHeadline }}</span> -->
           </h2>
           <!-- DASHBOARD ROTATOR -->
@@ -241,8 +238,8 @@
           </div>
 
           <p class="text-white fst-italic">VAPTFIX gives a clear and structured way to handle vulnerability assessments.
-          Instead of juggling multiple tools and reports, everything now lives in one place.
-          It’s helped a team stay organised, focused, and confident in a security workflow.</p>
+            Instead of juggling multiple tools and reports, everything now lives in one place.
+            It’s helped a team stay organised, focused, and confident in a security workflow.</p>
 
           <p class="text-light fw-semibold">From risk to resolution, VAPTFIX keeps everything Intune.</p>
 
@@ -263,16 +260,8 @@
           <form @submit.prevent="handleForgotPassword">
             <div class="mb-3">
               <label class="form-label text-light">Email</label>
-              <input
-                type="email"
-                class="form-control custom-input"
-                placeholder="name@work.com"
-                v-model="forgotEmail"
-                autocomplete="off"
-                readonly
-                onfocus="this.removeAttribute('readonly');"
-                required
-              />
+              <input type="email" class="form-control custom-input" placeholder="name@work.com" v-model="forgotEmail"
+                autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
             </div>
             <button type="submit" class="btn signup-btn w-100" :disabled="forgotLoading">
               <span v-if="forgotLoading" class="spinner-border spinner-border-sm me-2"></span>
@@ -294,6 +283,9 @@ export default {
 
   data() {
     return {
+      hasExistingProject: false,
+      projectChoice: null, // "ongoing" | "new"
+      lockedTestingBox: [],
       previouslySelectedBoxes: [],
       currentRole: "admin",
       currentMode: "signup",
@@ -309,7 +301,7 @@ export default {
       recaptchaKey: 0,
       recaptchaSiteKey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
       authStore: null,
-      formKey: Date.now(), 
+      formKey: Date.now(),
       adminOtpSent: false,
       otpSent: false,
       otp: "",
@@ -328,7 +320,7 @@ export default {
       forgotLoading: false,
       selectedTestingBox: [],
       isTestingBoxOpen: false,
-       previouslySelectedTestingBox: [],
+      previouslySelectedTestingBox: [],
       testingBoxOptions: [
         { value: "white_box", label: "White Box" },
         { value: "grey_box", label: "Grey Box" },
@@ -336,6 +328,25 @@ export default {
       ],
     };
   },
+  // watch: {
+  //   "formData.email"(email) {
+  //     if (
+  //       this.currentRole === "admin" &&
+  //       this.currentMode === "signin" &&
+  //       email
+  //     ) {
+  //       const saved = localStorage.getItem(`testingBox_${email}`);
+  //       if (saved) {
+  //         this.previouslySelectedBoxes = JSON.parse(saved);
+  //         this.selectedTestingBox = [...this.previouslySelectedBoxes]; // auto-select
+  //       } else {
+  //         this.previouslySelectedBoxes = [];
+  //         this.selectedTestingBox = [];
+  //       }
+  //     }
+  //   }
+  // },
+
   watch: {
     "formData.email"(email) {
       if (
@@ -343,17 +354,22 @@ export default {
         this.currentMode === "signin" &&
         email
       ) {
-        const saved = localStorage.getItem(`testingBox_${email}`);
-        if (saved) {
-          this.previouslySelectedBoxes = JSON.parse(saved);
-          this.selectedTestingBox = [...this.previouslySelectedBoxes]; // auto-select
+        const savedProject = localStorage.getItem(`project_${email}`);
+
+        if (savedProject) {
+          const parsed = JSON.parse(savedProject);
+          this.hasExistingProject = true;
+          this.lockedTestingBox = parsed.testingTypes || [];
+          this.projectChoice = null;
         } else {
-          this.previouslySelectedBoxes = [];
-          this.selectedTestingBox = [];
+          this.hasExistingProject = false;
+          this.projectChoice = null;
+          this.lockedTestingBox = [];
         }
       }
     }
   },
+
   computed: {
     rightHeadline() {
       if (this.currentRole === "admin") {
@@ -372,9 +388,9 @@ export default {
       }
 
       // ADMIN SIGNUP TEMP OTP FLOW
-  if (this.currentRole === 'admin' && this.currentMode === 'signup') {
-    return this.adminOtpSent ? "Sign Up" : "Send OTP";
-  }
+      if (this.currentRole === 'admin' && this.currentMode === 'signup') {
+        return this.adminOtpSent ? "Sign Up" : "Send OTP";
+      }
       return "Sign In";
     },
     recaptchaContainerId() {
@@ -391,22 +407,74 @@ export default {
     }
   },
   methods: {
-    isPreviouslySelected(type) {
-    return this.previouslySelectedTestingBox.includes(type);
-  },
-    async fetchPreviousTestingTypes() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user?.id) return;
+    async checkScopeAndRedirect() {
+  const testingType = this.selectedTestingBox[0]; // white_box / grey_box / black_box
 
-  const res = await this.authStore.getAdminTestingTypes(user.id);
+  const res = await this.authStore.getScopeTargets(testingType);
 
-  if (res.status && res.data.length) {
-    this.previouslySelectedTestingBox = res.data;
-
-    // ✅ Preselect old values
-    this.selectedTestingBox = [...res.data];
+  if (
+    res.status &&
+    res.data &&
+    (
+      (Array.isArray(res.data.data) && res.data.data.length > 0) ||
+      res.data.count > 0
+    )
+  ) {
+    // ✅ IP / URL exists
+    this.$router.push("/admindashboardonboarding");
+  } else {
+    // ❌ No targets uploaded
+    this.$router.push("/location");
   }
 },
+hasUploadedTargets(email) {
+  const saved = localStorage.getItem(`targets_${email}`);
+  if (!saved) return false;
+
+  try {
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed.targets)
+      ? parsed.targets.length > 0
+      : parsed.count > 0;
+  } catch {
+    return false;
+  }
+},
+
+
+
+    selectOngoingProject() {
+    this.projectChoice = "ongoing";
+
+    // Load old testing types
+    this.selectedTestingBox = [...this.lockedTestingBox];
+
+    // Lock dropdown
+    this.isTestingBoxOpen = false;
+  },
+
+  selectNewProject() {
+    this.projectChoice = "new";
+
+    // Allow fresh selection
+    this.selectedTestingBox = [];
+  },
+    isPreviouslySelected(type) {
+      return this.previouslySelectedTestingBox.includes(type);
+    },
+    async fetchPreviousTestingTypes() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?.id) return;
+
+      const res = await this.authStore.getAdminTestingTypes(user.id);
+
+      if (res.status && res.data.length) {
+        this.previouslySelectedTestingBox = res.data;
+
+        // ✅ Preselect old values
+        this.selectedTestingBox = [...res.data];
+      }
+    },
     switchRole(role) {
       this.currentRole = role;
 
@@ -531,18 +599,97 @@ export default {
     },
     validateForm() {
 
-  /* ================= USER ROLE ================= */
-  if (this.currentRole === 'user') {
+      /* ================= USER ROLE ================= */
+      if (this.currentRole === 'user') {
 
-    // STEP 1: Email validation (Before sending OTP)
-    if (!this.otpSent) {
+        // STEP 1: Email validation (Before sending OTP)
+        if (!this.otpSent) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(this.formData.email)) {
+            Swal.fire('Error', 'Please enter a valid email', 'error');
+            return false;
+          }
+
+          // ✅ reCAPTCHA validation (User → Sign In → Send OTP)
+          if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+            const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
+            if (!recaptchaResponse) {
+              Swal.fire('Error', 'Please verify you are not a robot', 'error');
+              return false;
+            }
+          }
+
+          return true;
+        }
+
+        // STEP 2: OTP validation (After OTP is sent)
+        if (!this.otp || this.otp.trim() === '') {
+          Swal.fire('Error', 'Please enter the OTP', 'error');
+          return false;
+        }
+
+        return true;
+      }
+
+      /* ================= ADMIN ROLE ================= */
+
+      // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.formData.email)) {
         Swal.fire('Error', 'Please enter a valid email', 'error');
         return false;
       }
 
-      // ✅ reCAPTCHA validation (User → Sign In → Send OTP)
+      // Password validation (Signup)
+      if (this.isSignup) {
+        if (this.formData.password.length < 8) {
+          Swal.fire('Error', 'Password must be at least 8 characters', 'error');
+          return false;
+        }
+
+        if (this.formData.password !== this.formData.confirm_password) {
+          Swal.fire('Error', 'Passwords do not match', 'error');
+          return false;
+        }
+      } else {
+        // Sign In validation
+        if (!this.formData.password || this.formData.password.trim() === '') {
+          Swal.fire('Error', 'Please enter your password', 'error');
+          return false;
+        }
+      }
+
+      // ✅ Testing Type validation (Admin Sign In only)
+      // if (
+      //   this.currentRole === 'admin' &&
+      //   this.currentMode === 'signin' &&
+      //   (!this.selectedTestingBox || this.selectedTestingBox.length === 0)
+      // ) {
+      //   Swal.fire(
+      //     'Error',
+      //     'Please select at least one testing type',
+      //     'error'
+      //   );
+      //   return false;
+      // }
+      const finalTestingTypes = [
+        ...new Set([
+          ...this.previouslySelectedTestingBox,
+          ...this.selectedTestingBox,
+        ]),
+      ];
+
+      if (
+        this.currentRole === "admin" &&
+        this.currentMode === "signin" &&
+        finalTestingTypes.length === 0
+      ) {
+        Swal.fire("Error", "Please select at least one testing type", "error");
+        return false;
+      }
+
+
+      // ✅ reCAPTCHA validation (Admin Sign In & Sign Up)
       if (window.grecaptcha && this.recaptchaWidgetId !== null) {
         const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
         if (!recaptchaResponse) {
@@ -552,142 +699,164 @@ export default {
       }
 
       return true;
-    }
-
-    // STEP 2: OTP validation (After OTP is sent)
-    if (!this.otp || this.otp.trim() === '') {
-      Swal.fire('Error', 'Please enter the OTP', 'error');
-      return false;
-    }
-
-    return true;
-  }
-
-  /* ================= ADMIN ROLE ================= */
-
-  // Email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(this.formData.email)) {
-    Swal.fire('Error', 'Please enter a valid email', 'error');
-    return false;
-  }
-
-  // Password validation (Signup)
-  if (this.isSignup) {
-    if (this.formData.password.length < 8) {
-      Swal.fire('Error', 'Password must be at least 8 characters', 'error');
-      return false;
-    }
-
-    if (this.formData.password !== this.formData.confirm_password) {
-      Swal.fire('Error', 'Passwords do not match', 'error');
-      return false;
-    }
-  } else {
-    // Sign In validation
-    if (!this.formData.password || this.formData.password.trim() === '') {
-      Swal.fire('Error', 'Please enter your password', 'error');
-      return false;
-    }
-  }
-
-  // ✅ Testing Type validation (Admin Sign In only)
-// if (
-//   this.currentRole === 'admin' &&
-//   this.currentMode === 'signin' &&
-//   (!this.selectedTestingBox || this.selectedTestingBox.length === 0)
-// ) {
-//   Swal.fire(
-//     'Error',
-//     'Please select at least one testing type',
-//     'error'
-//   );
-//   return false;
-// }
-const finalTestingTypes = [
-  ...new Set([
-    ...this.previouslySelectedTestingBox,
-    ...this.selectedTestingBox,
-  ]),
-];
-
-if (
-  this.currentRole === "admin" &&
-  this.currentMode === "signin" &&
-  finalTestingTypes.length === 0
-) {
-  Swal.fire("Error", "Please select at least one testing type", "error");
-  return false;
-}
-
-
-  // ✅ reCAPTCHA validation (Admin Sign In & Sign Up)
-  if (window.grecaptcha && this.recaptchaWidgetId !== null) {
-    const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
-    if (!recaptchaResponse) {
-      Swal.fire('Error', 'Please verify you are not a robot', 'error');
-      return false;
-    }
-  }
-
-  return true;
     },
     async handleSubmit() {
-    // if (!this.validateForm()) return;
-    if (
-  !(this.currentRole === 'admin' &&
-    this.currentMode === 'signup' &&
-    this.adminOtpSent)
-) {
-  if (!this.validateForm()) return;
-}
+      // if (!this.validateForm()) return;
+      if (
+        !(this.currentRole === 'admin' &&
+          this.currentMode === 'signup' &&
+          this.adminOtpSent)
+      ) {
+        if (!this.validateForm()) return;
+      }
 
-    /* ================= USER ROLE (OTP FLOW) ================= */
-    if (this.currentRole === 'user') {
-      if (!this.otpSent) {
-        Swal.fire({
-          icon: 'success',
-          title: 'OTP Sent',
-          text: `OTP has been sent to ${this.formData.email}`,
-          timer: 2000,
-          showConfirmButton: false
-        });
-        this.otpSent = true;
-        this.resetRecaptcha();
-        return;
-      } else {
-        this.loading = true;
-        setTimeout(() => {
-          this.loading = false;
+      /* ================= USER ROLE (OTP FLOW) ================= */
+      if (this.currentRole === 'user') {
+        if (!this.otpSent) {
           Swal.fire({
             icon: 'success',
-            title: 'Success',
-            text: 'Sign in successful!',
-            confirmButtonColor: '#5a44ff',
-            timer: 1500,
+            title: 'OTP Sent',
+            text: `OTP has been sent to ${this.formData.email}`,
+            timer: 2000,
             showConfirmButton: false
           });
-
+          this.otpSent = true;
+          this.resetRecaptcha();
+          return;
+        } else {
+          this.loading = true;
           setTimeout(() => {
-            this.$router.push('/userdashboard');
-          }, 1500);
-        }, 500);
-        return;
-      }
-    }
+            this.loading = false;
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Sign in successful!',
+              confirmButtonColor: '#5a44ff',
+              timer: 1500,
+              showConfirmButton: false
+            });
 
-    /* ================= ADMIN SIGNUP OTP FLOW ================= */
-    if (
-      this.currentRole === 'admin' &&
-      this.currentMode === 'signup'
-    ) {
-      // STEP 2: VERIFY OTP (if OTP already sent)
-      if (this.adminOtpSent) {
-        if (!this.otp || this.otp.length !== 6) {
+            setTimeout(() => {
+              this.$router.push('/userdashboard');
+            }, 1500);
+          }, 500);
+          return;
+        }
+      }
+
+      /* ================= ADMIN SIGNUP OTP FLOW ================= */
+      if (
+        this.currentRole === 'admin' &&
+        this.currentMode === 'signup'
+      ) {
+        // STEP 2: VERIFY OTP (if OTP already sent)
+        if (this.adminOtpSent) {
+          if (!this.otp || this.otp.length !== 6) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Invalid OTP',
+              text: 'Please enter a valid 6-digit OTP',
+              timer: 3000,
+              showConfirmButton: false
+            });
+            return;
+          }
+
+          this.loading = true;
+
+          try {
+            const result = await this.authStore.signupVerifyOtp({
+              email: this.formData.email,
+              otp: this.otp
+            });
+
+            if (result.status) {
+              const userEmail = this.formData.email;
+
+              await Swal.fire({
+                icon: 'success',
+                title: 'Account Created!',
+                text: 'Your account has been created. Please sign in to continue.',
+                timer: 2000,
+                showConfirmButton: false
+              });
+
+              // Switch to signin tab instead of redirecting
+              this.currentMode = 'signin';
+              this.adminOtpSent = false;
+              this.otpDigits = ['', '', '', '', '', ''];
+              this.otp = '';
+              this.formData.password = '';
+              this.formData.confirm_password = '';
+              // Keep email pre-filled for convenience
+              this.formData.email = userEmail;
+
+              // Reinitialize reCAPTCHA for signin
+              this.$nextTick(() => {
+                this.reinitializeRecaptcha();
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Verification Failed',
+                text: result.message || 'Invalid OTP. Please try again.',
+                timer: 3000,
+                showConfirmButton: false
+              });
+            }
+          } catch (error) {
+            console.error('OTP verification error:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Something went wrong. Please try again.',
+              timer: 3000,
+              showConfirmButton: false
+            });
+          } finally {
+            this.loading = false;
+          }
+
+          return;
+        }
+
+        // STEP 1: SEND OTP (Password validation first)
+        if (
+          !this.rules.minLength ||
+          !this.rules.uppercase ||
+          !this.rules.special
+        ) {
           Swal.fire({
             icon: 'error',
-            title: 'Invalid OTP',
-            text: 'Please enter a valid 6-digit OTP',
+            title: 'Invalid Password',
+            text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
+            timer: 4000,
+            showConfirmButton: false
+          });
+          return;
+        }
+
+        if (this.formData.password !== this.formData.confirm_password) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Password Mismatch',
+            text: 'Password and Confirm Password do not match.',
+            timer: 3000,
+            showConfirmButton: false
+          });
+          return;
+        }
+
+        // Get reCAPTCHA response
+        const recaptchaResponse = window.grecaptcha
+          ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
+          : "";
+
+        if (!recaptchaResponse) {
+          Swal.fire({
+            icon: 'error',
+            title: 'reCAPTCHA Required',
+            text: 'Please complete the reCAPTCHA verification.',
             timer: 3000,
             showConfirmButton: false
           });
@@ -697,47 +866,36 @@ if (
         this.loading = true;
 
         try {
-          const result = await this.authStore.signupVerifyOtp({
+          const result = await this.authStore.signupSendOtp({
             email: this.formData.email,
-            otp: this.otp
+            password: this.formData.password,
+            confirm_password: this.formData.confirm_password,
+            recaptcha: recaptchaResponse
           });
 
           if (result.status) {
-            const userEmail = this.formData.email;
-
-            await Swal.fire({
+            Swal.fire({
               icon: 'success',
-              title: 'Account Created!',
-              text: 'Your account has been created. Please sign in to continue.',
-              timer: 2000,
+              title: 'OTP Sent!',
+              text: result.message || `OTP has been sent to ${this.formData.email}`,
+              timer: 2500,
               showConfirmButton: false
             });
 
-            // Switch to signin tab instead of redirecting
-            this.currentMode = 'signin';
-            this.adminOtpSent = false;
-            this.otpDigits = ['', '', '', '', '', ''];
-            this.otp = '';
-            this.formData.password = '';
-            this.formData.confirm_password = '';
-            // Keep email pre-filled for convenience
-            this.formData.email = userEmail;
-
-            // Reinitialize reCAPTCHA for signin
-            this.$nextTick(() => {
-              this.reinitializeRecaptcha();
-            });
+            this.adminOtpSent = true;
+            this.resetRecaptcha();
           } else {
             Swal.fire({
               icon: 'error',
-              title: 'Verification Failed',
-              text: result.message || 'Invalid OTP. Please try again.',
+              title: 'Failed to Send OTP',
+              text: result.message || 'Something went wrong. Please try again.',
               timer: 3000,
               showConfirmButton: false
             });
+            this.resetRecaptcha();
           }
         } catch (error) {
-          console.error('OTP verification error:', error);
+          console.error('Send OTP error:', error);
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -745,6 +903,7 @@ if (
             timer: 3000,
             showConfirmButton: false
           });
+          this.resetRecaptcha();
         } finally {
           this.loading = false;
         }
@@ -752,124 +911,33 @@ if (
         return;
       }
 
-      // STEP 1: SEND OTP (Password validation first)
-      if (
-        !this.rules.minLength ||
-        !this.rules.uppercase ||
-        !this.rules.special
-      ) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Password',
-          text: 'Password must be at least 8 characters long, include one uppercase letter and one special character.',
-          timer: 4000,
-          showConfirmButton: false
-        });
-        return;
-      }
-
-      if (this.formData.password !== this.formData.confirm_password) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Password Mismatch',
-          text: 'Password and Confirm Password do not match.',
-          timer: 3000,
-          showConfirmButton: false
-        });
-        return;
-      }
-
-      // Get reCAPTCHA response
-      const recaptchaResponse = window.grecaptcha
-        ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
-        : "";
-
-      if (!recaptchaResponse) {
-        Swal.fire({
-          icon: 'error',
-          title: 'reCAPTCHA Required',
-          text: 'Please complete the reCAPTCHA verification.',
-          timer: 3000,
-          showConfirmButton: false
-        });
-        return;
-      }
+      /* ================= ADMIN SIGN IN / OLD FLOW ================= */
 
       this.loading = true;
 
       try {
-        const result = await this.authStore.signupSendOtp({
-          email: this.formData.email,
-          password: this.formData.password,
-          confirm_password: this.formData.confirm_password,
-          recaptcha: recaptchaResponse
-        });
+        const recaptchaResponse = window.grecaptcha
+          ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
+          : "";
 
-        if (result.status) {
-          Swal.fire({
-            icon: 'success',
-            title: 'OTP Sent!',
-            text: result.message || `OTP has been sent to ${this.formData.email}`,
-            timer: 2500,
-            showConfirmButton: false
-          });
-
-          this.adminOtpSent = true;
-          this.resetRecaptcha();
+        if (this.isSignup) {
+          await this.handleSignup(recaptchaResponse);
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Failed to Send OTP',
-            text: result.message || 'Something went wrong. Please try again.',
-            timer: 3000,
-            showConfirmButton: false
-          });
-          this.resetRecaptcha();
+          await this.handleSignin(recaptchaResponse);
         }
       } catch (error) {
-        console.error('Send OTP error:', error);
+        console.error('Form submission error:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Something went wrong. Please try again.',
+          text: error.message || 'Something went wrong',
           timer: 3000,
           showConfirmButton: false
         });
-        this.resetRecaptcha();
       } finally {
         this.loading = false;
       }
-
-      return;
-    }
-
-    /* ================= ADMIN SIGN IN / OLD FLOW ================= */
-
-    this.loading = true;
-
-    try {
-      const recaptchaResponse = window.grecaptcha
-        ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
-        : "";
-
-      if (this.isSignup) {
-        await this.handleSignup(recaptchaResponse);
-      } else {
-        await this.handleSignin(recaptchaResponse);
-      }
-    } catch (error) {
-      console.error('Form submission error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'Something went wrong',
-        timer: 3000,
-        showConfirmButton: false
-      });
-    } finally {
-      this.loading = false;
-    }
-    },  
+    },
     async handleSignup(recaptchaResponse) {
       const payload = {
         email: this.formData.email,
@@ -905,37 +973,43 @@ if (
         this.resetRecaptcha();
       }
     },
-  //   async handleSignin(recaptchaResponse) {
-  //     const finalTestingTypes = [
-  //   ...new Set([
-  //     ...this.previouslySelectedTestingBox,
-  //     ...this.selectedTestingBox,
-  //   ]),
-  // ];
-  //     const payload = {
-  //       email: this.formData.email,
-  //       password: this.formData.password,
-  //       testing_type: finalTestingTypes,
-  //       recaptcha: recaptchaResponse
-  //     };
+    //   async handleSignin(recaptchaResponse) {
+    //     const finalTestingTypes = [
+    //   ...new Set([
+    //     ...this.previouslySelectedTestingBox,
+    //     ...this.selectedTestingBox,
+    //   ]),
+    // ];
+    //     const payload = {
+    //       email: this.formData.email,
+    //       password: this.formData.password,
+    //       testing_type: finalTestingTypes,
+    //       recaptcha: recaptchaResponse
+    //     };
 
-  //     const result = await this.authStore.login(payload);
+    //     const result = await this.authStore.login(payload);
 
-  //     if (result.status) {
-  //       console.log('✅ Login successful');
-  //       await this.checkAndRedirect();
-  //     } else {
-  //       Swal.fire({
-  //         icon: 'error',
-  //         title: 'Login Failed',
-  //         text: result.message || 'Login failed',
-  //         timer: 3000,
-  //         showConfirmButton: false
-  //       });
-  //       this.resetRecaptcha();
-  //     }
-  //   },
-  async handleSignin(recaptchaResponse) {
+    //     if (result.status) {
+    //       console.log('✅ Login successful');
+    //       await this.checkAndRedirect();
+    //     } else {
+    //       Swal.fire({
+    //         icon: 'error',
+    //         title: 'Login Failed',
+    //         text: result.message || 'Login failed',
+    //         timer: 3000,
+    //         showConfirmButton: false
+    //       });
+    //       this.resetRecaptcha();
+    //     }
+    //   },
+async handleSignin(recaptchaResponse) {
+  /* 🚫 Block until project type is selected on second login */
+  if (this.hasExistingProject && !this.projectChoice) {
+    Swal.fire("Error", "Please select project type", "error");
+    return;
+  }
+
   const payload = {
     email: this.formData.email,
     password: this.formData.password,
@@ -945,29 +1019,55 @@ if (
 
   const result = await this.authStore.login(payload);
 
-  if (result.status) {
-    console.log('✅ Login successful');
-
-    // 🔐 SAVE testing box selection for this admin (FIRST login or later additions)
-    localStorage.setItem(
-      `testingBox_${this.formData.email}`,
-      JSON.stringify(this.selectedTestingBox)
-    );
-
-    // ➡️ then redirect
-    await this.checkAndRedirect();
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Login Failed',
-      text: result.message || 'Login failed',
-      timer: 3000,
-      showConfirmButton: false
-    });
-    this.resetRecaptcha();
+  if (!result.status) {
+    Swal.fire("Login Failed", result.message || "Invalid credentials", "error");
+    return;
   }
-},  
-  async checkAndRedirect() {
+
+  /* ✅ SAVE PROJECT CONFIG ONLY FOR NEW PROJECT */
+  if (!this.hasExistingProject || this.projectChoice === "new") {
+    localStorage.setItem(
+      `project_${this.formData.email}`,
+      JSON.stringify({
+        testingTypes: this.selectedTestingBox
+      })
+    );
+  }
+
+  /* 🔀 FINAL REDIRECT LOGIC (DB-BASED) */
+  if (this.projectChoice === "ongoing") {
+    try {
+      const testingType = this.selectedTestingBox[0]; // e.g. white_box
+
+      const res = await this.authStore.getScopeTargets(testingType);
+
+      if (
+        res.status &&
+        res.data &&
+        (
+          (Array.isArray(res.data.data) && res.data.data.length > 0) ||
+          res.data.count > 0
+        )
+      ) {
+        // ✅ IP / URL exists in DB
+        this.$router.push("/admindashboardonboarding");
+      } else {
+        // ❌ No IP / URL uploaded
+        this.$router.push("/location");
+      }
+
+    } catch (error) {
+      console.error("Scope check failed:", error);
+      this.$router.push("/location");
+    }
+
+  } else {
+    // 🆕 New project → always go to Location
+    this.$router.push("/location");
+  }
+},
+
+    async checkAndRedirect() {
       const reportId = localStorage.getItem('reportId');
 
       if (!reportId) {
@@ -1087,13 +1187,13 @@ if (
       }
     },
     validatePassword() {
-    const pwd = this.formData.password;
+      const pwd = this.formData.password;
 
-    this.showPasswordRules = pwd.length > 0;
+      this.showPasswordRules = pwd.length > 0;
 
-    this.rules.minLength = pwd.length >= 8;
-    this.rules.uppercase = /[A-Z]/.test(pwd);
-    this.rules.special = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+      this.rules.minLength = pwd.length >= 8;
+      this.rules.uppercase = /[A-Z]/.test(pwd);
+      this.rules.special = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
     },
     openForgotPasswordModal() {
       this.showForgotPasswordModal = true;
@@ -1161,8 +1261,8 @@ if (
       this.startSlider();
     });
     if (this.currentRole === "admin" && this.currentMode === "signin") {
-    this.fetchPreviousTestingTypes();
-  }
+      this.fetchPreviousTestingTypes();
+    }
     document.addEventListener("click", this.closeTestingBoxOnOutside);
   },
   beforeUnmount() {
@@ -1191,6 +1291,34 @@ if (
 
 <style scoped>
 
+.project-card {
+  flex: 1;
+  background: #020617;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.project-card small {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.project-card.active {
+  border-color: rgb(90, 68, 255);
+  box-shadow: 0 0 0 2px rgba(90, 68, 255, 0.25);
+}
+
+.dropdown-trigger.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+
+
 .dropdown-option.disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -1199,12 +1327,13 @@ if (
 .dropdown-option.disabled:hover {
   background: none;
 }
+
 .dropdown-option.disabled {
   opacity: 0.6;
   pointer-events: none;
 }
 
-  .password-rules {
+.password-rules {
   list-style: none;
   padding-left: 0;
   font-size: 13px;
@@ -1289,13 +1418,16 @@ if (
   height: 46px;
   flex-shrink: 0;
 }
+
 #authForm {
   flex-grow: 1;
 }
+
 /* Prevent password confirm toggle shift */
 .password-confirm {
   min-height: 78px;
 }
+
 .sub-tab {
   padding: 10px 0;
   cursor: pointer;
@@ -1360,8 +1492,8 @@ if (
 }
 
 /* When browser autofill changes background to white, make eye icon dark */
-.custom-input:-webkit-autofill ~ .password-toggle,
-.custom-input:-webkit-autofill ~ .password-toggle i {
+.custom-input:-webkit-autofill~.password-toggle,
+.custom-input:-webkit-autofill~.password-toggle i {
   color: #020617 !important;
   opacity: 1;
 }
@@ -1574,26 +1706,28 @@ if (
     padding-bottom: 60px;
   }
 
- 
+
 
 }
 
 /* monitor size */
-@media screen and (min-width: 1920px){
- .form-wrapper {
+@media screen and (min-width: 1920px) {
+  .form-wrapper {
     padding-top: 50px;
     padding-bottom: 40px;
   }
-.dashboard-slider{
+
+  .dashboard-slider {
     margin: 80px auto 60px;
-}
-.form-area {
-  padding-top: 230px;
-}
+  }
+
+  .form-area {
+    padding-top: 230px;
+  }
 }
 
 @media (max-width: 1200px) {
- .form-wrapper {
+  .form-wrapper {
     padding-top: 50px;
     padding-bottom: 40px;
   }
@@ -1608,7 +1742,7 @@ if (
     padding-bottom: 40px;
   }
 
- 
+
 }
 
 /* Tablets */
@@ -1618,10 +1752,10 @@ if (
     padding-bottom: 32px;
   }
 
-   .logo-wrapper {
-  top: 20px;
- 
-}
+  .logo-wrapper {
+    top: 20px;
+
+  }
 }
 
 /* Mobile */
@@ -1635,10 +1769,10 @@ if (
     padding-bottom: 24px;
   }
 
-   .logo-wrapper {
-  top: 20px;
+  .logo-wrapper {
+    top: 20px;
 
-}
+  }
 
 }
 
@@ -1663,6 +1797,7 @@ if (
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1683,6 +1818,7 @@ if (
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
