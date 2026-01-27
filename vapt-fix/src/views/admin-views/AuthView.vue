@@ -151,7 +151,7 @@
   v-if="currentMode === 'signin' && currentRole === 'admin'"
   ref="testingBoxDropdown"
 >
-  <label class="form-label">Testing Box</label>
+  <label class="form-label">Testing Type</label>
 
   <div class="position-relative">
     <div

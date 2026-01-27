@@ -22,7 +22,7 @@
             <div>
               <button @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2"
                 style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i
-                  class="bi bi-download me-2"></i> Download Excel file</button>
+                  class="bi bi-download me-1"></i> Sample Report</button>
             </div>
             <!-- Testing Type (Unified UI) -->
             <div class="testing-type">
@@ -481,48 +481,82 @@ triggerAutoSubmit() {
 
   this.autoSubmitTimer = setTimeout(() => {
     this.submitTargets();
-  }, 500); // 0.5 sec debounce
+  }, 500); 
 },
 
-    downloadExcelTemplate() {
-      // Create sample data with all 4 column types
-      const sampleData = [
-        {
-          IP_ADDRESS: '192.168.1.10',
-          SUBNET: '10.0.0.0/24',
-          WEB_APP_URL: 'https://example.com',
-          MOBILE_APP_URL: 'https://play.google.com/store/apps/details?id=com.example.app'
-        },
-        {
-          IP_ADDRESS: '8.8.8.8',
-          SUBNET: '172.16.0.0/16',
-          WEB_APP_URL: 'https://test.com',
-          MOBILE_APP_URL: 'https://apps.apple.com/app/example/id123456789'
-        },
-        {
-          IP_ADDRESS: '192.168.1.20',
-          SUBNET: '',
-          WEB_APP_URL: 'https://demo.com',
-          MOBILE_APP_URL: ''
-        }
-      ];
-
-      // Create workbook and worksheet
-      const ws = XLSX.utils.json_to_sheet(sampleData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Targets');
-
-      // Set column widths for better readability
-      ws['!cols'] = [
-        { wch: 15 },  // IP_ADDRESS
-        { wch: 18 },  // SUBNET
-        { wch: 30 },  // WEB_APP_URL
-        { wch: 60 }   // MOBILE_APP_URL
-      ];
-
-      // Download the file
-      XLSX.writeFile(wb, 'VAPT_Targets_Template.xlsx');
+  downloadExcelTemplate() {
+  // Sample data in the exact format you want
+  const sampleData = [
+    {
+      INTERNAL: '192.168.1.1',
+      EXTERNAL: '33.87.0.22',
+      WEB_APP_URL: 'www.trox.com',
+      MOBILE_APP_URL: 'app2.apk'
     },
+    {
+      INTERNAL: '190.132.1.3/5',
+      EXTERNAL: '',
+      WEB_APP_URL: '',
+      MOBILE_APP_URL: ''
+    }
+  ];
+
+  // Create worksheet
+  const ws = XLSX.utils.json_to_sheet(sampleData, {
+    header: ['INTERNAL', 'EXTERNAL', 'WEB_APP_URL', 'MOBILE_APP_URL']
+  });
+
+  // Create workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Targets');
+
+  // Column widths
+  ws['!cols'] = [
+    { wch: 20 }, // INTERNAL
+    { wch: 20 }, // EXTERNAL
+    { wch: 30 }, // WEB_APP_URL
+    { wch: 30 }  // MOBILE_APP_URL
+  ];
+
+  // Download file
+  XLSX.writeFile(wb, 'Sample_Report.xlsx');
+},
+
+    // downloadExcelTemplate() {
+      
+    //   const sampleData = [
+    //     {
+    //       IP_ADDRESS: '192.168.1.1',
+    //       SUBNET: '10.0.0.0/24',
+    //       WEB_APP_URL: 'https://example.com',
+    //       MOBILE_APP_URL: 'https://play.google.com/store/apps/details?id=com.example.app'
+    //     },
+    //     {
+    //       IP_ADDRESS: '8.8.8.8',
+    //       SUBNET: '172.16.0.0/16',
+    //       WEB_APP_URL: 'https://test.com',
+    //       MOBILE_APP_URL: 'https://apps.apple.com/app/example/id123456789'
+    //     },
+    //     {
+    //       IP_ADDRESS: '192.168.1.20',
+    //       SUBNET: '',
+    //       WEB_APP_URL: 'https://demo.com',
+    //       MOBILE_APP_URL: ''
+    //     }
+    //   ];
+    //   const ws = XLSX.utils.json_to_sheet(sampleData);
+    //   const wb = XLSX.utils.book_new();
+    //   XLSX.utils.book_append_sheet(wb, ws, 'Targets');
+
+    //   ws['!cols'] = [
+    //     { wch: 15 },  
+    //     { wch: 18 },  
+    //     { wch: 30 },  
+    //     { wch: 60 }   
+    //   ];
+
+    //   XLSX.writeFile(wb, 'Sample_Target_Report.xlsx');
+    // },
     async fetchTestingTypes() {
       const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
@@ -537,13 +571,12 @@ triggerAutoSubmit() {
 
       this.allowedTestingTypes = res.testingTypes || [];
 
-      // 🔥 RULES IMPLEMENTATION
       if (this.allowedTestingTypes.length === 1) {
-        // Only one → auto select, no dropdown
+   
         this.selectedTestingType = this.allowedTestingTypes[0];
         this.showTestingDropdown = false;
       } else if (this.allowedTestingTypes.length > 1) {
-        // Two or more → dropdown, first selected
+       
         this.selectedTestingType = this.allowedTestingTypes[0];
         this.showTestingDropdown = true;
       }

@@ -168,369 +168,251 @@
             </div>
 
             <div class="row my-4">
-              <div class="col-10">
+              <div class="col-12">
                 <div class="d-flex justify-content-between tab-wrapper position-relative">
                   <p v-for="(tab, index) in tabs" :key="index" class="nav-item" :class="{ active: activeTab === index }"
                     :style="{ width: '25%', color: activeTab === index ? 'rgba(49, 33, 177, 1)' : '#000' }"
                     @click="selectTab(index)">
                     {{ tab.name }}
                   </p>
+                  <div class="tab-line" :style="{
+                    width: tabWidth + '%',
+                    left: tabWidth * activeTab + '%'
+                  }"></div>
 
-                  <!-- Blue underline -->
-                  <div class="tab-line" :style="{ width: '25%', left: 25 * activeTab + '%' }">
-                  </div>
                 </div>
               </div>
-              <div class="col-2">
-                <!-- blank -->
-              </div>
-
+            
               <div class="col-12 mt-4">
                 <!-- Dynamic Content per Tab -->
                 <div v-for="(tab, index) in tabs" :key="index" v-show="activeTab === index">
-
-                  <!-- ================= INTERNAL SECTION ================= -->
-                  <div class="team-section mb-5">
-                    <div class="subtab-header">
-                      <span class="subtab" :class="{ active: internalSubTab === 'list' }"
-                        @click="internalSubTab = 'list'">
-                        Internal Team Members({{ internalCount(tab.name) }})
-                      </span>
-
-                      <span class="subtab" :class="{
-                        active: internalSubTab === 'assign',
-                        disabled: internalCount(tab.name) === 0
-                      }" @click="openInternalAssign(tab.name)">
-                        Assign IP to Team (optional)
-                      </span>
-
-                    </div>
-
-                    <!-- INTERNAL LIST -->
-                    <div v-if="internalSubTab === 'list'">
-                      <table class="table team-table align-middle">
-                        <thead>
-                          <tr>
-                            <th style="width: 22%;">Name</th>
-
-                            <th style="width: 25%;">Email</th>
-                            <th style="width: 22%;">Role</th>
-                            <th style="width: 13%;">Action</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          <tr v-if="filteredUsers(tab.name, 'Internal').length === 0">
-                            <td colspan="5" class="text-center text-muted py-4">
-                              No internal users found
-                            </td>
-                          </tr>
-                          <tr v-for="user in filteredUsers(tab.name, 'Internal')" :key="user._id">
-
-                            <td>
-                              <div class="d-flex align-items-center">
-                                <div class="user-avatar internal-avatar">
-                                  {{ getInitials(user.first_name, user.last_name) }}
-                                </div>
-                                <span class="user-name">
-                                  {{ user.first_name }} {{ user.last_name }}
-                                </span>
+                  <div v-if="isAssignIpTab">
+                    <div class="team-section mb-5">
+                    <table class="table team-table">
+                      <thead>
+                        <tr>
+                          <th style="width:30%">Asset</th>
+                          <th style="width:30%">Name</th>
+                          <th style="width:20%">Role</th>
+                          <th style="width:20%">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <!-- ASSET -->
+                          <td>
+                            <div class="hierarchy-dropdown">
+                              <div class="dropdown-input" @click.stop="assetDropdownOpen = !assetDropdownOpen">
+                                {{ selectedAssetsText }}
+                                <i class="bi bi-chevron-down"></i>
                               </div>
-                            </td>
 
+                              <div v-if="assetDropdownOpen" class="dropdown-panel">
+                                <div v-for="box in assetHierarchy" :key="box.label" class="parent-item">
+                                  <div class="parent-label" @click.stop="box.open = !box.open">
+                                    {{ box.label }}
+                                    <i class="bi bi-chevron-right" :class="{ rotate: box.open }"></i>
+                                  </div>
 
-                            <td class="email-cell">{{ user.email }}</td>
-
-
-                            <td>
-                              <div class="multi-select-dropdown">
-                                <div class="dropdown-input" @click="toggleDropdown(user._id)">
-                                  <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-                                  <i class="bi bi-chevron-down"></i>
-                                </div>
-
-                                <div class="dropdown-list" v-show="isOpen[user._id]">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input type="checkbox" :value="option.short" v-model="selectedRoles[user._id]"
-                                      @change="handleRoleChange($event, user, option)" />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td>
-                              <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                              </a>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-
-                    <!-- INTERNAL ASSIGN -->
-                    <div v-if="internalSubTab === 'assign'">
-                      <table class="table team-table">
-                        <thead>
-                          <tr>
-                            <th style="width:30%">Asset</th>
-                            <th style="width:30%">Name</th>
-                            <th style="width:20%">Role</th>
-                            <th style="width:20%">Action</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          <tr>
-                            <!-- ASSET DROPDOWN -->
-                            <td>
-                              <div class="hierarchy-dropdown">
-                                <div class="dropdown-input" @click.stop="assetDropdownOpen = !assetDropdownOpen">
-                                  {{ selectedAssetsText }}
-                                  <i class="bi bi-chevron-down"></i>
-                                </div>
-
-                                <div v-if="assetDropdownOpen" class="dropdown-panel">
-                                  <div v-for="box in assetHierarchy" :key="box.label" class="parent-item">
-                                    <div class="parent-label" @click.stop="box.open = !box.open">
-                                      {{ box.label }}
-                                      <i class="bi bi-chevron-right" :class="{ rotate: box.open }"></i>
-                                    </div>
-
-                                    <div v-if="box.open" class="child-list">
-                                      <label v-for="asset in box.items" :key="asset.value" class="child-item">
-                                        <input type="checkbox" v-model="asset.checked" class="me-2" />
-                                        {{ asset.value }}
-                                      </label>
-                                    </div>
+                                  <div v-if="box.open" class="child-list">
+                                    <label v-for="asset in box.items" :key="asset.value" class="child-item">
+                                      <input type="checkbox" v-model="asset.checked" class="me-2" />
+                                      {{ asset.value }}
+                                    </label>
                                   </div>
                                 </div>
                               </div>
-                            </td>
+                            </div>
+                          </td>
 
-
-                            <!-- NAME DROPDOWN -->
-                            <td>
-                              <div class="multi-select-dropdown">
-                                <div class="dropdown-input" @click="assignUsersOpen = !assignUsersOpen">
-                                  {{ selectedUsersText }}
-                                  <i class="bi bi-chevron-down"></i>
-                                </div>
-
-                                <div v-if="assignUsersOpen" class="dropdown-list">
-                                  <label v-for="user in users" :key="user._id" class="d-flex align-items-center">
-                                    <input type="checkbox" :value="user._id" v-model="selectedAssignUsers" class="me-2"
-                                      @change="onAssignUserChange" />
-
-                                    {{ user.first_name }} {{ user.last_name }}
-                                  </label>
-                                </div>
+                          <!-- USERS -->
+                          <td>
+                            <div class="multi-select-dropdown">
+                              <div class="dropdown-input" @click="assignUsersOpen = !assignUsersOpen">
+                                {{ selectedUsersText }}
+                                <i class="bi bi-chevron-down"></i>
                               </div>
-                            </td>
 
-                            <!-- ROLE -->
-                            <td>
-                              <div class="multi-select-dropdown">
-                                <div class="dropdown-input" @click.stop="assignRoleOpen = !assignRoleOpen">
-                                  <span>{{ assignRoleText }}</span>
-                                  <i class="bi bi-chevron-down"></i>
-                                </div>
-
-                                <div class="dropdown-list" v-show="assignRoleOpen">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input type="checkbox" :value="option.short" v-model="assignRoles" />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
-                              </div>
-                            </td>
-
-
-                            <!-- ACTION -->
-                            <td>
-                              <a class="remove-btn gap-2">
-                                <i class="bi bi-dash-circle"></i> Remove
-                              </a>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-
-                  </div>
-
-                  <div class="team-section">
-                    <div class="subtab-header">
-                      <span class="subtab" :class="{ active: externalSubTab === 'list' }"
-                        @click="externalSubTab = 'list'">
-                        External Team Members({{ externalCount(tab.name) }})
-                      </span>
-
-                      <span class="subtab" :class="{
-                        active: externalSubTab === 'assign',
-                        disabled: internalCount(tab.name) === 0
-                      }" @click="openExternalAssign(tab.name)">
-                        Assign IP to Team (optional)
-                      </span>
-
-                    </div>
-
-
-                    <div v-if="externalSubTab === 'list'">
-                      <table class="table team-table align-middle">
-                        <thead>
-                          <tr>
-                            <th style="width: 22%;">Name</th>
-
-                            <th style="width: 25%;">Email</th>
-                            <th style="width: 22%;">Role</th>
-                            <th style="width: 13%;">Action</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          <tr v-if="filteredUsers(tab.name, 'External').length === 0">
-                            <td colspan="5" class="text-center text-muted py-4">
-                              No external users found
-                            </td>
-                          </tr>
-                          <tr v-for="user in filteredUsers(tab.name, 'External')" :key="user._id">
-                            <td>
-                              <div class="d-flex align-items-center">
-                                <div class="user-avatar external-avatar">
-                                  {{ getInitials(user.first_name, user.last_name) }}
-                                </div>
-                                <span class="user-name">
+                              <div v-if="assignUsersOpen" class="dropdown-list">
+                                <label v-for="user in users" :key="user._id">
+                                  <input type="checkbox" :value="user._id"
+                                    v-model="selectedAssignUsers" class="me-2" />
                                   {{ user.first_name }} {{ user.last_name }}
-                                </span>
+                                </label>
                               </div>
-                            </td>
+                            </div>
+                          </td>
 
-
-                            <td class="email-cell">{{ user.email }}</td>
-
-                            <td>
-                              <div class="multi-select-dropdown">
-                                <div class="dropdown-input" @click="toggleDropdown(user._id)">
-                                  <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-                                  <i class="bi bi-chevron-down"></i>
-                                </div>
-
-                                <div class="dropdown-list" v-show="isOpen[user._id]">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input type="checkbox" :value="option.short" v-model="selectedRoles[user._id]"
-                                      @change="handleRoleChange($event, user, option)" />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
+                          <!-- ROLE -->
+                          <td>
+                            <div class="multi-select-dropdown">
+                              <div class="dropdown-input" @click.stop="assignRoleOpen = !assignRoleOpen">
+                                {{ assignRoleText }}
+                                <i class="bi bi-chevron-down"></i>
                               </div>
-                            </td>
 
-                            <td>
-                              <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
-                                <i class="bi bi-dash-circle me-1"></i> Remove
-                              </a>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                              <div class="dropdown-list" v-show="assignRoleOpen">
+                                <label v-for="option in roleOptions" :key="option.short">
+                                  <input type="checkbox" :value="option.short" v-model="assignRoles" />
+                                  {{ option.full }}
+                                </label>
+                              </div>
+                            </div>
+                          </td>
+
+                          <!-- ACTION -->
+                          <td>
+                            <a class="remove-btn">
+                              <i class="bi bi-dash-circle me-1"></i> Remove
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                     </div>
+                  </div>
+                  <div v-else>
+                    <!-- ================= INTERNAL SECTION ================= -->
+                    <div class="team-section mb-5">
+                      <div class="subtab-header">
+                        <span class="subtab" :class="{ active: internalSubTab === 'list' }"
+                          @click="internalSubTab = 'list'">
+                          Internal Team Members({{ internalCount(tab.name) }})
+                        </span>
+                      </div>
+                      <!-- INTERNAL LIST -->
+                      <div v-if="internalSubTab === 'list'">
+                        <table class="table team-table align-middle">
+                          <thead>
+                            <tr>
+                              <th style="width: 22%;">Name</th>
 
-                    <!-- external -->
-                    <div v-if="externalSubTab === 'assign'">
-                      <table class="table team-table">
-                        <thead>
-                          <tr>
-                            <th style="width:30%">Asset</th>
-                            <th style="width:30%">Name</th>
-                            <th style="width:20%">Role</th>
-                            <th style="width:20%">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <!-- ASSET DROPDOWN -->
-                            <td>
-                              <div class="hierarchy-dropdown">
-                                <div class="dropdown-input" @click.stop="assetDropdownOpen = !assetDropdownOpen">
-                                  {{ selectedAssetsText }}
-                                  <i class="bi bi-chevron-down"></i>
+                              <th style="width: 25%;">Email</th>
+                              <th style="width: 22%;">Role</th>
+                              <th style="width: 13%;">Action</th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            <tr v-if="filteredUsers(tab.name, 'Internal').length === 0">
+                              <td colspan="5" class="text-center text-muted py-4">
+                                No internal users found
+                              </td>
+                            </tr>
+                            <tr v-for="user in filteredUsers(tab.name, 'Internal')" :key="user._id">
+
+                              <td>
+                                <div class="d-flex align-items-center">
+                                  <div class="user-avatar internal-avatar">
+                                    {{ getInitials(user.first_name, user.last_name) }}
+                                  </div>
+                                  <span class="user-name">
+                                    {{ user.first_name }} {{ user.last_name }}
+                                  </span>
                                 </div>
+                              </td>
 
-                                <div v-if="assetDropdownOpen" class="dropdown-panel">
-                                  <div v-for="box in assetHierarchy" :key="box.label" class="parent-item">
-                                    <div class="parent-label" @click.stop="box.open = !box.open">
-                                      {{ box.label }}
-                                      <i class="bi bi-chevron-right" :class="{ rotate: box.open }"></i>
-                                    </div>
 
-                                    <div v-if="box.open" class="child-list">
-                                      <label v-for="asset in box.items" :key="asset.value" class="child-item">
-                                        <input type="checkbox" v-model="asset.checked" class="me-2" />
-                                        {{ asset.value }}
-                                      </label>
-                                    </div>
+                              <td class="email-cell">{{ user.email }}</td>
+
+
+                              <td>
+                                <div class="multi-select-dropdown">
+                                  <div class="dropdown-input" @click="toggleDropdown(user._id)">
+                                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                  </div>
+
+                                  <div class="dropdown-list" v-show="isOpen[user._id]">
+                                    <label v-for="option in roleOptions" :key="option.short">
+                                      <input type="checkbox" :value="option.short" v-model="selectedRoles[user._id]"
+                                        @change="handleRoleChange($event, user, option)" />
+                                      {{ option.full }}
+                                    </label>
                                   </div>
                                 </div>
-                              </div>
-                            </td>
+                              </td>
 
+                              <td>
+                                <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
+                                  <i class="bi bi-dash-circle me-1"></i> Remove
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="team-section">
+                      <div class="subtab-header">
+                        <span class="subtab" :class="{ active: externalSubTab === 'list' }"
+                          @click="externalSubTab = 'list'">
+                          External Team Members({{ externalCount(tab.name) }})
+                        </span>
+                      </div>
 
-                            <!-- NAME DROPDOWN -->
-                            <td>
-                              <div class="multi-select-dropdown">
-                                <div class="dropdown-input" @click="assignUsersOpen = !assignUsersOpen">
-                                  {{ selectedUsersText }}
-                                  <i class="bi bi-chevron-down"></i>
-                                </div>
+                      <div v-if="externalSubTab === 'list'">
+                        <table class="table team-table align-middle">
+                          <thead>
+                            <tr>
+                              <th style="width: 22%;">Name</th>
 
-                                <div v-if="assignUsersOpen" class="dropdown-list">
-                                  <label v-for="user in users" :key="user._id" class="d-flex align-items-center">
-                                    <input type="checkbox" :value="user._id" v-model="selectedAssignUsers" class="me-2"
-                                      @change="onAssignUserChange" />
+                              <th style="width: 25%;">Email</th>
+                              <th style="width: 22%;">Role</th>
+                              <th style="width: 13%;">Action</th>
+                            </tr>
+                          </thead>
 
+                          <tbody>
+                            <tr v-if="filteredUsers(tab.name, 'External').length === 0">
+                              <td colspan="5" class="text-center text-muted py-4">
+                                No external users found
+                              </td>
+                            </tr>
+                            <tr v-for="user in filteredUsers(tab.name, 'External')" :key="user._id">
+                              <td>
+                                <div class="d-flex align-items-center">
+                                  <div class="user-avatar external-avatar">
+                                    {{ getInitials(user.first_name, user.last_name) }}
+                                  </div>
+                                  <span class="user-name">
                                     {{ user.first_name }} {{ user.last_name }}
-                                  </label>
+                                  </span>
                                 </div>
-                              </div>
-                            </td>
+                              </td>
 
-                            <!-- ROLE -->
-                            <td>
-                              <div class="multi-select-dropdown">
-                                <div class="dropdown-input" @click.stop="assignRoleOpen = !assignRoleOpen">
-                                  <span>{{ assignRoleText }}</span>
-                                  <i class="bi bi-chevron-down"></i>
+
+                              <td class="email-cell">{{ user.email }}</td>
+
+                              <td>
+                                <div class="multi-select-dropdown">
+                                  <div class="dropdown-input" @click="toggleDropdown(user._id)">
+                                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                  </div>
+
+                                  <div class="dropdown-list" v-show="isOpen[user._id]">
+                                    <label v-for="option in roleOptions" :key="option.short">
+                                      <input type="checkbox" :value="option.short" v-model="selectedRoles[user._id]"
+                                        @change="handleRoleChange($event, user, option)" />
+                                      {{ option.full }}
+                                    </label>
+                                  </div>
                                 </div>
+                              </td>
 
-                                <div class="dropdown-list" v-show="assignRoleOpen">
-                                  <label v-for="option in roleOptions" :key="option.short">
-                                    <input type="checkbox" :value="option.short" v-model="assignRoles" />
-                                    {{ option.full }}
-                                  </label>
-                                </div>
-                              </div>
-                            </td>
+                              <td>
+                                <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
+                                  <i class="bi bi-dash-circle me-1"></i> Remove
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
 
-
-                            <!-- ACTION -->
-                            <td>
-                              <a class="remove-btn gap-2">
-                                <i class="bi bi-dash-circle"></i> Remove
-                              </a>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
                     </div>
                   </div>
-
-
-
-
                 </div>
               </div>
 
@@ -562,9 +444,6 @@ export default {
     return {
       dropdownRefs: {},
       showPopup: false,
-      //   isOpen: {
-      // dropdown3: false
-      // },
       selectedRoles1: [],
       selectedRoles2: [],
       selectedRoles3: [],
@@ -580,7 +459,8 @@ export default {
         { name: "Patch Management" },
         { name: "Configuration Management" },
         { name: "Network Security" },
-        { name: "Architectural Flaws" }
+        { name: "Architectural Flaws" },
+        { name: "Assign IP to Team" }
       ],
       authStore: useAuthStore(),
       users: [],
@@ -593,11 +473,7 @@ export default {
         "Network Security": "NS",
         "Architectural Flaws": "AF"
       },
-
-
-
       assetDropdownOpen: false,
-
       assetHierarchy: [
         {
           label: "White Box",
@@ -636,8 +512,6 @@ export default {
       selectedAssignUsers: [],
       assignRoles: [],
       assignRoleOpen: false,
-
-
     };
   },
   computed: {
@@ -650,7 +524,6 @@ export default {
     selectedRoleText3() {
       return this.selectedRoles3.length > 0 ? this.selectedRoles3.join(', ') : 'Select roles';
     },
-
     selectedAssetsText() {
       const selected = [];
 
@@ -664,8 +537,6 @@ export default {
       if (selected.length <= 2) return selected.join(", ");
       return `${selected.length} assets selected`;
     },
-
-
     selectedUsersText() {
       if (this.selectedAssignUsers.length === 0) return "Select Users";
 
@@ -676,17 +547,21 @@ export default {
       if (names.length <= 2) return names.join(", ");
       return `${names.length} users selected`;
     },
-
     assignRoleText() {
       return this.assignRoles.length
         ? this.assignRoles.join(', ')
         : 'Select Role';
     },
-
+    isAssignIpTab() {
+      return this.tabs[this.activeTab].name === "Assign IP to Team";
+    },
+    tabWidth() {
+      return 100 / this.tabs.length;
+    }
   },
   methods: {
     onAssignUserChange() {
-      // close dropdown after selection
+
       this.assignUsersOpen = false;
     },
     internalCount(roleName) {
@@ -744,24 +619,6 @@ export default {
         popup.style.display = "none";
       }, 2000);
     },
-
-
-    // onClickOutside(event) {
-    //   const clickedInside =
-    //     event.target.closest('.multi-select-dropdown') ||
-    //     event.target.closest('.modal-multi-select-dropdown') ||
-    //     event.target.closest('.hierarchy-dropdown');
-
-    //   if (!clickedInside) {
-    //     this.assetDropdownOpen = false;
-    //     this.assignUsersOpen = false;
-
-    //     Object.keys(this.isOpen).forEach(key => {
-    //       this.isOpen[key] = false;
-    //     });
-    //   }
-    // },
-
     onClickOutside(event) {
       const clickedInside =
         event.target.closest('.multi-select-dropdown') ||
@@ -1123,28 +980,29 @@ export default {
 }
 
 .subtab-header {
-  /* display: flex;
+  display: flex;
   gap: 54px;
   margin-bottom: 16px;
-  font-weight: 500; */
-  display: flex;
+  font-weight: 500;
+  /* display: flex;
   justify-content: space-around;
   align-items: center;
   gap: 58px;
   margin-bottom: 16px;
-  font-weight: 500;
+  font-weight: 500; */
 }
 
 .subtab {
-  cursor: pointer;
+  /* cursor: pointer; */
   padding-bottom: 4px;
   font-size: 16px;
+  font-weight: 600;
 }
 
-.subtab.active {
+/* .subtab.active {
   color: rgba(49, 33, 177, 1);
   border-bottom: 3px solid rgba(49, 33, 177, 1);
-}
+} */
 
 .multi-select-dropdown {
   position: relative;
