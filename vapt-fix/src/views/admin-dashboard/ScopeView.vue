@@ -31,166 +31,53 @@
           </div>
 
           <!-- TARGET CARDS -->
-          <!-- <div class="scope-grid">
-
-            <div class="scope-card">
-              <h3 class="scope-card-title">Internal Targets</h3>
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial ">S.No</th>
-                    <th class="col-value">IP Address</th>
-                    <th class=" col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
-                  <tr v-for="(item, index) in internalTargets" :key="item.id" draggable="true"
-                    @dragstart="onDragStart(item, 'internal')">
-                    <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value">
-                      {{ item.ip }}
-                      <span v-if="item.count" class="subnet-count">({{ item.count }})</span>
-                    </td>
-                    <td class=" col-actions actions">
-                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
-                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
-                    </td>
-                  </tr>
-
-
-                  <tr v-if="!internalTargets.length">
-                    <td colspan="3" class="empty-state">
-                      No internal targets defined
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="scope-card">
-              <h3 class="scope-card-title">External Targets</h3>
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial">S.No</th>
-                    <th class="col-value">IP Address</th>
-                    <th class=" col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
-                  <tr v-for="(item, index) in externalTargets" :key="item.id" draggable="true"
-                    @dragstart="onDragStart(item, 'external')">
-                    <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value ">{{ item.ip }}</td>
-                    <td class="col-actions actions">
-                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
-
-                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
-
-                    </td>
-                  </tr>
-                  <tr v-if="!internalTargets.length">
-                    <td colspan="3" class="empty-state">
-                      No external targets defined
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="scope-card">
-              <h3 class="scope-card-title">Web App Targets</h3>
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial">S.No</th>
-                    <th class="col-value">URL</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
-                  <tr v-for="(item, index) in webAppTargets" :key="item.url || index" draggable="true"
-                    @dragstart="onDragStart(item, 'webapp')">
-                    <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value ">{{ item.url }}</td>
-                    <td class=" col-actions actions">
-                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
-                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
-                    </td>
-                  </tr>
-                  <tr v-if="!internalTargets.length">
-                    <td colspan="3" class="empty-state">
-                      No web app targets defined
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="scope-card">
-              <h3 class="scope-card-title">Mobile App Targets</h3>
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial">S.No</th>
-                    <th class="col-value">URL</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobile')">
-                  <tr v-for="(item, index) in mobAppTargets" :key="item.url || index" draggable="true"
-                    @dragstart="onDragStart(item, 'mobile')">
-                    <td class="col-serial">{{ index + 1 }}</td>
-                    <td class="col-value">{{ item.url }}</td>
-                    <td class=" col-actions actions">
-                      <i class="bi bi-pencil" title="Edit" @click="openEditModal(item, 'internal')"></i>
-                      <i class="bi bi-trash" title="Delete" @click="deleteTarget(item.id)"></i>
-                    </td>
-                  </tr>
-                  <tr v-if="!internalTargets.length">
-                    <td colspan="3" class="empty-state">
-                      No mob app targets defined
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-          </div> -->
-
-          <!-- TARGET CARDS -->
           <div class="scope-grid">
 
             <!-- INTERNAL TARGETS -->
             <div class="scope-card">
               <h3 class="scope-card-title">Internal Targets</h3>
 
-              <!-- TABLE HEADER -->
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial">S.No</th>
-                    <th class="col-value">IP Address</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-              </table>
+              <!-- TABLE WRAPPER (SCROLL AFTER 5 ROWS) -->
+              <div class="table-responsive internal-table-scroll">
+                <table class="table table-light table-hover mb-0">
+                  <thead class="sticky-top">
+                    <tr>
+                      <th style="width: 60px;">S.No</th>
+                      <th>IP Address</th>
+                      <th style="width: 100px;">Actions</th>
+                    </tr>
+                  </thead>
 
-              <!-- TABLE BODY (SCROLLABLE) -->
-              <div class="table-body-wrapper">
-                <table class="scope-table">
                   <tbody>
                     <tr v-for="(item, index) in internalTargets" :key="item.id">
-                      <td class="col-serial">{{ index + 1 }}</td>
-                      <td class="col-value">
+                      <td>{{ index + 1 }}</td>
+
+                      <td>
                         {{ item.ip }}
-                        <span v-if="item.count" class="subnet-count">({{ item.count }})</span>
+                        <span
+                          v-if="item.count"
+                          class="subnet-count ms-1"
+                        >
+                          ({{ item.count }})
+                        </span>
                       </td>
-                      <td class="col-actions actions">
-                        <i class="bi bi-pencil" @click="openEditModal(item, 'internal')"></i>
-                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+
+                      <td class="text-center">
+                        <i
+                          class="bi bi-pencil me-3 action-icon"
+                          @click="openEditModal(item, 'internal')"
+                        ></i>
+
+                        <i
+                          class="bi bi-trash action-icon text-danger"
+                          @click="deleteTarget(item.id)"
+                        ></i>
                       </td>
                     </tr>
 
+                    <!-- EMPTY STATE -->
                     <tr v-if="!internalTargets.length">
-                      <td colspan="3" class="empty-state">
+                      <td colspan="3" class="text-center text-muted py-4">
                         No internal targets defined
                       </td>
                     </tr>
@@ -199,35 +86,38 @@
               </div>
             </div>
 
-
             <!-- EXTERNAL TARGETS -->
             <div class="scope-card">
               <h3 class="scope-card-title">External Targets</h3>
 
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial">S.No</th>
-                    <th class="col-value">IP Address</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-              </table>
+              <div class="table-responsive internal-table-scroll">
+                <table class="table table-light table-hover mb-0">
+                  <thead class="sticky-top">
+                    <tr>
+                      <th style="width: 60px;">S.No</th>
+                      <th>IP Address</th>
+                      <th style="width: 100px;">Actions</th>
+                    </tr>
+                  </thead>
 
-              <div class="table-body-wrapper">
-                <table class="scope-table">
                   <tbody>
                     <tr v-for="(item, index) in externalTargets" :key="item.id">
-                      <td class="col-serial">{{ index + 1 }}</td>
-                      <td class="col-value">{{ item.ip }}</td>
-                      <td class="col-actions actions">
-                        <i class="bi bi-pencil" @click="openEditModal(item, 'external')"></i>
-                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+                      <td>{{ index + 1 }}</td>
+                      <td>{{ item.ip }}</td>
+                      <td class="text-center">
+                        <i
+                          class="bi bi-pencil me-3 action-icon"
+                          @click="openEditModal(item, 'external')"
+                        ></i>
+                        <i
+                          class="bi bi-trash action-icon text-danger"
+                          @click="deleteTarget(item.id)"
+                        ></i>
                       </td>
                     </tr>
 
                     <tr v-if="!externalTargets.length">
-                      <td colspan="3" class="empty-state">
+                      <td colspan="3" class="text-center text-muted py-4">
                         No external targets defined
                       </td>
                     </tr>
@@ -236,35 +126,38 @@
               </div>
             </div>
 
-
             <!-- WEB APP TARGETS -->
             <div class="scope-card">
               <h3 class="scope-card-title">Web App Targets</h3>
 
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial">S.No</th>
-                    <th class="col-value">URL</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-              </table>
+              <div class="table-responsive internal-table-scroll">
+                <table class="table table-light table-hover mb-0">
+                  <thead class="sticky-top">
+                    <tr>
+                      <th style="width: 60px;">S.No</th>
+                      <th>URL</th>
+                      <th style="width: 100px;">Actions</th>
+                    </tr>
+                  </thead>
 
-              <div class="table-body-wrapper">
-                <table class="scope-table">
                   <tbody>
                     <tr v-for="(item, index) in webAppTargets" :key="item.id">
-                      <td class="col-serial">{{ index + 1 }}</td>
-                      <td class="col-value">{{ item.url }}</td>
-                      <td class="col-actions actions">
-                        <i class="bi bi-pencil" @click="openEditModal(item, 'web')"></i>
-                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+                      <td>{{ index + 1 }}</td>
+                      <td class="text-break">{{ item.url }}</td>
+                      <td class="text-center">
+                        <i
+                          class="bi bi-pencil me-3 action-icon"
+                          @click="openEditModal(item, 'web')"
+                        ></i>
+                        <i
+                          class="bi bi-trash action-icon text-danger"
+                          @click="deleteTarget(item.id)"
+                        ></i>
                       </td>
                     </tr>
 
                     <tr v-if="!webAppTargets.length">
-                      <td colspan="3" class="empty-state">
+                      <td colspan="3" class="text-center text-muted py-4">
                         No web app targets defined
                       </td>
                     </tr>
@@ -273,35 +166,38 @@
               </div>
             </div>
 
-
             <!-- MOBILE APP TARGETS -->
             <div class="scope-card">
               <h3 class="scope-card-title">Mobile App Targets</h3>
 
-              <table class="scope-table">
-                <thead>
-                  <tr>
-                    <th class="col-serial">S.No</th>
-                    <th class="col-value">URL</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-              </table>
+              <div class="table-responsive internal-table-scroll">
+                <table class="table table-light table-hover mb-0">
+                  <thead class="sticky-top">
+                    <tr>
+                      <th style="width: 60px;">S.No</th>
+                      <th>URL</th>
+                      <th style="width: 100px;">Actions</th>
+                    </tr>
+                  </thead>
 
-              <div class="table-body-wrapper">
-                <table class="scope-table">
                   <tbody>
                     <tr v-for="(item, index) in mobAppTargets" :key="item.id">
-                      <td class="col-serial">{{ index + 1 }}</td>
-                      <td class="col-value">{{ item.url }}</td>
-                      <td class="col-actions actions">
-                        <i class="bi bi-pencil" @click="openEditModal(item, 'mobile')"></i>
-                        <i class="bi bi-trash" @click="deleteTarget(item.id)"></i>
+                      <td>{{ index + 1 }}</td>
+                      <td class="text-break">{{ item.url }}</td>
+                      <td class="text-center">
+                        <i
+                          class="bi bi-pencil me-3 action-icon"
+                          @click="openEditModal(item, 'mobile')"
+                        ></i>
+                        <i
+                          class="bi bi-trash action-icon text-danger"
+                          @click="deleteTarget(item.id)"
+                        ></i>
                       </td>
                     </tr>
 
                     <tr v-if="!mobAppTargets.length">
-                      <td colspan="3" class="empty-state">
+                      <td colspan="3" class="text-center text-muted py-4">
                         No mobile app targets defined
                       </td>
                     </tr>
@@ -309,7 +205,6 @@
                 </table>
               </div>
             </div>
-
 
           </div>
         </div>
@@ -717,6 +612,36 @@ else if (
 </script>
 
 <style scoped>
+/* Scroll after 5 rows */
+.internal-table-scroll {
+  max-height: 250px; /* ~5 rows */
+  overflow-y: auto;
+}
+
+/* Sticky header */
+.internal-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Action icons */
+.action-icon {
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.action-icon:hover {
+  opacity: 0.8;
+}
+
+/* Subnet count */
+.subnet-count {
+  font-size: 12px;
+  color: #c7c7ff;
+}
+
+
 .testing-select:disabled {
   background-color: #f1f3f5;
   color: #333;
@@ -798,15 +723,12 @@ tr[draggable="true"]:active {
   display: table;
   margin: 0 auto 28px;
   padding-bottom: 4px;
-  /* margin-bottom: 18px; */
-  /* box-shadow: 0 5px 5px #bbb7e1; */
 }
 
 /* Table */
 .scope-table {
   width: 100%;
   font-size: 14px;
-  /* flex: 1; */
   table-layout: fixed; 
   border-collapse: collapse;
 }
@@ -972,11 +894,14 @@ tr[draggable="true"]:active {
   text-align: center;
 }
 
-.scope-table th.col-actions,
+.scope-table th.col-actions {
+  width: 135px;        
+  text-align: center; 
+}
+
 .scope-table td.col-actions {
   width: 196px;        
-  text-align: center;  /* icons exactly under heading */
-  /* padding-right: 0; */
+  text-align: center; 
 }
 /* Header alignment match */
 .scope-table th.col-serial,
