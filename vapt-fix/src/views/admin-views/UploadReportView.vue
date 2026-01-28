@@ -22,7 +22,7 @@
             <div>
               <button @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2"
                 style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i
-                  class="bi bi-download me-1"></i> Sample Report</button>
+                  class="bi bi-download me-2"></i> Sample Report</button>
             </div>
             <!-- Testing Type (Unified UI) -->
             <div class="testing-type">
@@ -40,27 +40,7 @@
 
           <!-- LEFT COLUMN -->
           <div class="left-column ">
-            <!-- Pick Location -->
-            <!-- <div class="card-box location-card">
-            <strong>📍 Pick location to upload report</strong>
-            <p class="mt-1">Pick a location and then add a vulnerability report for it.</p>
-
-            <div class="d-flex gap-3 mt-3">
-              <select v-model="location" class="form-select">
-                <option disabled value="">Select Location</option>
-                <option v-for="loc in availableLocations" :key="loc._id" :value="loc._id">
-                    {{ loc.location_name }}
-                  </option>
-              </select>
-
-              <select v-model="type" class="form-select">
-                <option disabled value="">Select Type</option>
-                <option value="Both" :disabled="disabledTypes.includes('both')">Both</option>
-                <option value="External" :disabled="disabledTypes.includes('external')">External</option>
-                <option value="Internal" :disabled="disabledTypes.includes('internal')">Internal</option>
-              </select>
-            </div>
-          </div> -->
+          
 
             <div class="upload-box ip-box">
               <h5>Enter target IPs / URLs</h5>
@@ -71,12 +51,7 @@
               </p>
 
               <!-- TEXTAREA -->
-              <!-- <textarea class="form-control ip-textarea" v-model="ipInput" @keydown.enter.prevent="handleEnterSubmit"
-                @blur="handleAutoSubmit" placeholder="Example:
-192.168.1.1
-https://example.com"></textarea> -->
-
-              <textarea
+             <textarea
   class="form-control ip-textarea"
   v-model="ipInput"
   placeholder="Example:
@@ -86,22 +61,44 @@ https://example.com">
 
 
               <!-- upload btn -->
-              <div class="ip-actions">
+              <!-- <div class="ip-actions">
                 <input ref="fileInput" type="file" accept=".csv,.xlsx,.xls,.txt" hidden @change="handleFileUpload" />
 
                 <button class="btn btn-primary" @click="$refs.fileInput.click()">
                   Upload CSV / Excel /Text File
                 </button>
-                <button
-    class="btn btn-primary ms-2"
-    :disabled="!ipInput.trim() || isUploading"
-    @click="submitTargets"
-  >
-    Submit Targets
-  </button>
+                
+
 
                 <span class="ip-count">{{ extractedList.length }} targets</span>
-              </div>
+              </div> -->
+
+              <div class="ip-actions">
+  <input
+    ref="fileInput"
+    type="file"
+    accept=".csv,.xlsx,.xls,.txt"
+    hidden
+    @change="handleFileUpload"
+  />
+
+  <!-- Upload file button (unchanged) -->
+  <button class="btn btn-primary" @click="$refs.fileInput.click()">
+    Upload CSV / Excel / Text File
+  </button>
+
+  <!-- NEW manual submit button -->
+  <button
+    class="btn btn-primary ms-0 me-0"
+    :disabled="!ipInput.trim() || isUploading"
+    @click="submitManualTargets"
+  >
+    Submit / Save
+  </button>
+
+  <span class="ip-count">{{ extractedList.length }} targets</span>
+</div>
+
             </div>
 
           </div>
@@ -129,9 +126,9 @@ https://example.com">
         </div>
 
         <!-- TARGET CARDS -->
-        <div class="files-card-grid">
+        <!-- <div class="files-card-grid">
 
-          <!-- INTERNAL -->
+        
           <div class="files-card" v-if="internalTargets.length">
 
             <div class="card-header-title">
@@ -164,7 +161,6 @@ https://example.com">
             </table>
           </div>
 
-          <!-- EXTERNAL -->
           <div class="files-card" v-if="externalTargets.length">
 
             <div class="card-header-title">
@@ -183,7 +179,7 @@ https://example.com">
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
                 <tr v-for="(item, index) in externalTargets" :key="item.ip || index" draggable="true"
                   @dragstart="onDragStart(item, 'external')">
-                  
+                
 
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
@@ -200,7 +196,7 @@ https://example.com">
             </table>
           </div>
 
-          <!-- WEB APP -->
+       
           <div class="files-card" v-if="webAppTargets.length">
 
             <div class="card-header-title">
@@ -229,7 +225,7 @@ https://example.com">
             </table>
           </div>
 
-          <!-- MOBILE APP -->
+  
           <div class="files-card" v-if="mobileAppTargets.length">
 
             <div class="card-header-title">
@@ -256,7 +252,175 @@ https://example.com">
             </table>
           </div>
 
-        </div>
+        </div> -->
+
+<!-- TARGET CARDS -->
+<div class="files-card-grid">
+
+  <!-- INTERNAL TARGETS -->
+  <div class="files-card" v-if="internalTargets.length || isUploadingTargets || uploadSuccess">
+    <div class="card-header-title">
+      Internal Targets
+    </div>
+
+    <!-- Uploading -->
+    <div v-if="isUploadingTargets" class="card-status">
+      <span class="loader"></span>
+      <span class="ms-2">Uploading targets...</span>
+    </div>
+
+    <!-- Success -->
+    <div v-else-if="uploadSuccess" class="card-status success">
+      <i class="bi bi-check-circle-fill"></i>
+      <span class="ms-2">Uploaded successfully</span>
+    </div>
+
+    <!-- Table -->
+    <table v-if="internalTargets.length && !isUploadingTargets" class="mt-3">
+      <thead>
+        <tr>
+          <th class="col-serial">S.No.</th>
+          <th class="col-value">IP Address</th>
+        </tr>
+      </thead>
+      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
+        <tr
+          v-for="(item, index) in internalTargets"
+          :key="item.ip || index"
+          draggable="true"
+          @dragstart="onDragStart(item, 'internal')"
+        >
+          <td class="col-serial">{{ index + 1 }}</td>
+          <td class="col-value">
+            {{ item.ip }}
+            <span v-if="item.count" class="subnet-count">
+              ({{ item.count }})
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EXTERNAL TARGETS -->
+  <div class="files-card" v-if="externalTargets.length || isUploadingTargets || uploadSuccess">
+    <div class="card-header-title">
+      External Targets
+    </div>
+
+    <div v-if="isUploadingTargets" class="card-status">
+      <span class="loader"></span>
+      <span class="ms-2">Uploading targets...</span>
+    </div>
+
+    <div v-else-if="uploadSuccess" class="card-status success">
+      <i class="bi bi-check-circle-fill"></i>
+      <span class="ms-2">Uploaded successfully</span>
+    </div>
+
+    <table v-if="externalTargets.length && !isUploadingTargets" class="mt-3">
+      <thead>
+        <tr>
+          <th class="col-serial">S.No.</th>
+          <th class="col-value">IP Address</th>
+        </tr>
+      </thead>
+      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
+        <tr
+          v-for="(item, index) in externalTargets"
+          :key="item.ip || index"
+          draggable="true"
+          @dragstart="onDragStart(item, 'external')"
+        >
+          <td class="col-serial">{{ index + 1 }}</td>
+          <td class="col-value">
+            {{ item.ip }}
+            <span v-if="item.count" class="subnet-count">
+              ({{ item.count }})
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- WEB APP TARGETS -->
+  <div class="files-card" v-if="webAppTargets.length || isUploadingTargets || uploadSuccess">
+    <div class="card-header-title">
+      Web App Targets
+    </div>
+
+    <div v-if="isUploadingTargets" class="card-status">
+      <span class="loader"></span>
+      <span class="ms-2">Uploading targets...</span>
+    </div>
+
+    <div v-else-if="uploadSuccess" class="card-status success">
+      <i class="bi bi-check-circle-fill"></i>
+      <span class="ms-2">Uploaded successfully</span>
+    </div>
+
+    <table v-if="webAppTargets.length && !isUploadingTargets" class="mt-3">
+      <thead>
+        <tr>
+          <th class="col-serial">S.No.</th>
+          <th class="col-value">URL</th>
+        </tr>
+      </thead>
+      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
+        <tr
+          v-for="(item, index) in webAppTargets"
+          :key="item.url || index"
+          draggable="true"
+          @dragstart="onDragStart(item, 'webapp')"
+        >
+          <td class="col-serial">{{ index + 1 }}</td>
+          <td class="col-value">{{ item.url }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MOBILE APP TARGETS -->
+  <div class="files-card" v-if="mobileAppTargets.length || isUploadingTargets || uploadSuccess">
+    <div class="card-header-title">
+      Mobile App Targets
+    </div>
+
+    <div v-if="isUploadingTargets" class="card-status">
+      <span class="loader"></span>
+      <span class="ms-2">Uploading targets...</span>
+    </div>
+
+    <div v-else-if="uploadSuccess" class="card-status success">
+      <i class="bi bi-check-circle-fill"></i>
+      <span class="ms-2">Uploaded successfully</span>
+    </div>
+
+    <table v-if="mobileAppTargets.length && !isUploadingTargets" class="mt-3">
+      <thead>
+        <tr>
+          <th class="col-serial">S.No.</th>
+          <th class="col-value">URL</th>
+        </tr>
+      </thead>
+      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobileapp')">
+        <tr
+          v-for="(item, index) in mobileAppTargets"
+          :key="item.url || index"
+          draggable="true"
+          @dragstart="onDragStart(item, 'mobileapp')"
+        >
+          <td class="col-serial">{{ index + 1 }}</td>
+          <td class="col-value">{{ item.url }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
 
         <div class="cta">
 
@@ -297,13 +461,14 @@ export default {
       mobileAppTargets: [],
       selectedFile: null,
       autoSubmitTimer: null, 
-      isUploading: false,
       draggedItem: null,
       draggedFrom: null,
       testingType: "",
       allowedTestingTypes: [],   
       selectedTestingType: "",   
-      showTestingDropdown: false
+      showTestingDropdown: false,
+       isUploadingTargets: false,   // 🔄 uploading state
+    uploadSuccess: false,        // ✅ success state
     };
   },
   watch: {
@@ -323,6 +488,13 @@ export default {
     }
   },
   computed: {
+      remainingTestingTypes() {
+    if (!this.allowedTestingTypes.length) return [];
+
+    return this.allowedTestingTypes.filter(
+      type => type !== this.selectedTestingType
+    );
+  },
     returnTo() {
       return this.$route.query.returnTo || null;
     },
@@ -336,24 +508,117 @@ export default {
     },
 
   },
-  async mounted() {
-    this.authStore = useAuthStore();
-    const user = JSON.parse(localStorage.getItem("user"));
-    this.adminId = user?.id;
+  // async mounted() {
+  //   this.authStore = useAuthStore();
+  //   const user = JSON.parse(localStorage.getItem("user"));
+  //   this.adminId = user?.id;
 
+  //   if (this.adminId) {
+  //     await this.fetchTestingTypes();
+  //   }
+  //   if (this.selectedTestingType) {
+  //     this.fetchTargetsByTestingType();
+  //   }
+  //   // ✅ Check if step 3 should be marked completed on page load
+  //   if (this.uploadedFiles.some(f => f.status === 'success')) {
+  //     this.authStore.markStepCompleted(3);
+  //   }
+  // },
+
+  async mounted() {
+  this.authStore = useAuthStore();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  this.adminId = user?.id;
+
+  const isNewProject = localStorage.getItem("isNewProject") === "true";
+
+  if (isNewProject) {
+    // 🔥 FULL RESET — no old data allowed
+    this.resetUploadState();
+
+    // fetch ONLY testing types (no targets)
     if (this.adminId) {
       await this.fetchTestingTypes();
     }
-    if (this.selectedTestingType) {
-      this.fetchTargetsByTestingType();
-    }
-    // ✅ Check if step 3 should be marked completed on page load
-    if (this.uploadedFiles.some(f => f.status === 'success')) {
-      this.authStore.markStepCompleted(3);
-    }
-  },
+
+    // ❗ do NOT auto-fetch targets
+    return;
+  }
+
+  // 🔁 OLD / ONGOING PROJECT FLOW
+  if (this.adminId) {
+    await this.fetchTestingTypes();
+  }
+
+  if (this.selectedTestingType) {
+    this.fetchTargetsByTestingType();
+  }
+},
+
   methods: {
-    async fetchTargetsByTestingType() {
+
+    resetUploadState() {
+  this.ipInput = "";
+  this.extractedList = [];
+
+  this.internalTargets = [];
+  this.externalTargets = [];
+  this.webAppTargets = [];
+  this.mobileAppTargets = [];
+
+  this.selectedFile = null;
+  this.isUploadingTargets = false;
+  this.uploadSuccess = false;
+
+  // ensure dropdown starts clean
+  this.selectedTestingType = "";
+},
+
+
+    redirectToDashboard() {
+  // 🔐 Mark dashboard as locked
+  localStorage.setItem("dashboardTestingInProgress", "true");
+  localStorage.setItem("testingInProgress", "true");
+  localStorage.setItem("testingStartTime", Date.now().toString());
+
+  this.$router.push("/admindashboardonboarding");
+},
+
+
+  submitManualTargets() {
+    this.selectedFile = null; // 🚫 ensure file logic not triggered
+    this.submitTargets();     // ✅ reuse existing API logic
+  },
+
+
+
+//     async fetchTargetsByTestingType() {
+//   Swal.fire({
+//     title: "Loading targets",
+//     allowOutsideClick: false,
+//     showConfirmButton: false,
+//     didOpen: () => Swal.showLoading(),
+//   });
+
+//   const res = await this.authStore.getScopeTargets(
+//     this.selectedTestingType
+//   );
+
+//   Swal.close();
+
+//   if (!res.status) {
+//     Swal.fire("Error", res.message, "error");
+//     return;
+//   }
+
+//   // ✅ Populate ONLY cards
+//   this.mapGetTargetsResponse(res.data.data || []);
+// },
+   async fetchTargetsByTestingType() {
+  const isNewProject = localStorage.getItem("isNewProject") === "true";
+  if (isNewProject) return;
+
   Swal.fire({
     title: "Loading targets",
     allowOutsideClick: false,
@@ -361,9 +626,7 @@ export default {
     didOpen: () => Swal.showLoading(),
   });
 
-  const res = await this.authStore.getScopeTargets(
-    this.selectedTestingType
-  );
+  const res = await this.authStore.getScopeTargets(this.selectedTestingType);
 
   Swal.close();
 
@@ -372,10 +635,13 @@ export default {
     return;
   }
 
-  // ✅ Populate ONLY cards
   this.mapGetTargetsResponse(res.data.data || []);
 },
-    mapGetTargetsResponse(list) {
+
+
+
+
+mapGetTargetsResponse(list) {
   // 🔄 Reset ONLY cards (not textarea)
   this.internalTargets = [];
   this.externalTargets = [];
@@ -465,8 +731,34 @@ export default {
   // ✅ Update textarea (so admin can see/copy)
   this.ipInput = [...new Set(this.extractedList)].join("\n");
     },
+  handleEnterSubmit() {
+  const lines = this.ipInput.split("\n").filter(l => l.trim());
+  const last = lines[lines.length - 1];
 
-  downloadExcelTemplate() {
+  if (
+    this.isValidIP(last) ||
+    this.isValidSubnet(last) ||
+    this.isValidURL(last)
+  ) {
+    this.ipInput += "\n";
+    this.submitTargets(); // 🔥 auto submit
+  } else {
+    Swal.fire("Invalid entry", `"${last}" is invalid`, "error");
+  }
+  },
+handleAutoSubmit() {
+  if (!this.ipInput.trim()) return;
+  this.triggerAutoSubmit();
+},
+triggerAutoSubmit() {
+  clearTimeout(this.autoSubmitTimer);
+
+  this.autoSubmitTimer = setTimeout(() => {
+    this.submitTargets();
+  }, 500); // 0.5 sec debounce
+},
+
+    downloadExcelTemplate() {
   // Sample data in the exact format you want
   const sampleData = [
     {
@@ -503,42 +795,6 @@ export default {
   // Download file
   XLSX.writeFile(wb, 'Sample_Report.xlsx');
 },
-
-    // downloadExcelTemplate() {
-      
-    //   const sampleData = [
-    //     {
-    //       IP_ADDRESS: '192.168.1.1',
-    //       SUBNET: '10.0.0.0/24',
-    //       WEB_APP_URL: 'https://example.com',
-    //       MOBILE_APP_URL: 'https://play.google.com/store/apps/details?id=com.example.app'
-    //     },
-    //     {
-    //       IP_ADDRESS: '8.8.8.8',
-    //       SUBNET: '172.16.0.0/16',
-    //       WEB_APP_URL: 'https://test.com',
-    //       MOBILE_APP_URL: 'https://apps.apple.com/app/example/id123456789'
-    //     },
-    //     {
-    //       IP_ADDRESS: '192.168.1.20',
-    //       SUBNET: '',
-    //       WEB_APP_URL: 'https://demo.com',
-    //       MOBILE_APP_URL: ''
-    //     }
-    //   ];
-    //   const ws = XLSX.utils.json_to_sheet(sampleData);
-    //   const wb = XLSX.utils.book_new();
-    //   XLSX.utils.book_append_sheet(wb, ws, 'Targets');
-
-    //   ws['!cols'] = [
-    //     { wch: 15 },  
-    //     { wch: 18 },  
-    //     { wch: 30 },  
-    //     { wch: 60 }   
-    //   ];
-
-    //   XLSX.writeFile(wb, 'Sample_Target_Report.xlsx');
-    // },
     async fetchTestingTypes() {
       const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
@@ -553,12 +809,13 @@ export default {
 
       this.allowedTestingTypes = res.testingTypes || [];
 
+      // 🔥 RULES IMPLEMENTATION
       if (this.allowedTestingTypes.length === 1) {
-   
+        // Only one → auto select, no dropdown
         this.selectedTestingType = this.allowedTestingTypes[0];
         this.showTestingDropdown = false;
       } else if (this.allowedTestingTypes.length > 1) {
-       
+        // Two or more → dropdown, first selected
         this.selectedTestingType = this.allowedTestingTypes[0];
         this.showTestingDropdown = true;
       }
@@ -713,30 +970,30 @@ export default {
     viewMobileTarget(index) {
       window.open(this.mobileAppTargets[index].url, "_blank");
     },
-    // validateLastEntry() {
-    //   const lines = this.ipInput.split("\n").filter(l => l.trim() !== "");
-    //   if (!lines.length) return;
-    //   const lastValue = lines[lines.length - 1].trim();
-    //   if (
-    //     this.isValidIP(lastValue) ||
-    //     this.isValidSubnet(lastValue) ||
-    //     this.isValidURL(lastValue)
-    //   ) {
-    //     this.ipInput += "\n";
-    //     return;
-    //   }
+    validateLastEntry() {
+      const lines = this.ipInput.split("\n").filter(l => l.trim() !== "");
+      if (!lines.length) return;
+      const lastValue = lines[lines.length - 1].trim();
+      if (
+        this.isValidIP(lastValue) ||
+        this.isValidSubnet(lastValue) ||
+        this.isValidURL(lastValue)
+      ) {
+        this.ipInput += "\n";
+        return;
+      }
 
-    //   // ❌ Invalid
-    //   lines.pop();
-    //   this.ipInput = lines.join("\n") + (lines.length ? "\n" : "");
+      // ❌ Invalid
+      lines.pop();
+      this.ipInput = lines.join("\n") + (lines.length ? "\n" : "");
 
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Invalid entry",
-    //     text: `"${lastValue}" is not a valid IP, subnet, or URL.`,
-    //     confirmButtonColor: "#5a44ff"
-    //   });
-    // },
+      Swal.fire({
+        icon: "error",
+        title: "Invalid entry",
+        text: `"${lastValue}" is not a valid IP, subnet, or URL.`,
+        confirmButtonColor: "#5a44ff"
+      });
+    },
     sanitizeIpInput() {
       const values = this.ipInput.split(/\n|,/);
       const validTargets = this.extractValidTargets(values);
@@ -795,94 +1052,270 @@ export default {
 
       event.target.value = "";
     },
-    async submitTargets() {
-      if (!this.selectedTestingType) {
-        Swal.fire(
-          "Testing type required",
-          "Please select a testing type before uploading targets",
-          "warning"
-        );
-        return;
-      }
-      if (this.isUploading) return;
+    // async submitTargets() {
+    //   if (!this.selectedTestingType) {
+    //     Swal.fire(
+    //       "Testing type required",
+    //       "Please select a testing type before uploading targets",
+    //       "warning"
+    //     );
+    //     return;
+    //   }
+    //   if (this.isUploading) return;
 
-      try {
-        this.isUploading = true;
+    //   try {
+    //     this.isUploading = true;
 
-        // 🔥 SHOW LOADING ALERT
-        Swal.fire({
-          title: "Please wait",
-          text: "Uploading & processing targets. Do not refresh the page.",
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          showConfirmButton: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
+    //     // 🔥 SHOW LOADING ALERT
+    //     Swal.fire({
+    //       title: "Please wait",
+    //       text: "Uploading & processing targets. Do not refresh the page.",
+    //       allowOutsideClick: false,
+    //       allowEscapeKey: false,
+    //       showConfirmButton: false,
+    //       didOpen: () => {
+    //         Swal.showLoading();
+    //       },
+    //     });
 
-        const formData = new FormData();
+    //     const formData = new FormData();
 
-        if (this.selectedFile) {
-          formData.append("file", this.selectedFile);
-          // 🔥 speed optimization
+    //     if (this.selectedFile) {
+    //       formData.append("file", this.selectedFile);
+    //       // 🔥 speed optimization
+    //   formData.append("expand_subnets", "false");
+    //     } else {
+    //       if (!this.ipInput.trim()) {
+    //         Swal.close(); // close loader
+    //         return;
+    //       }
+    //       formData.append("targets", this.ipInput);
+    //     }
+
+    //     const res = await this.authStore.createScope(formData,this.selectedTestingType);
+
+    //     // 🔥 CLOSE LOADING ALERT
+    //     Swal.close();
+
+    //     if (!res.status) {
+    //       Swal.fire("Error", res.message, "error");
+    //       return;
+    //     }
+
+    //     // ✅ Update UI from backend
+    //     this.mapApiResponse(res.data);
+
+    //     // 🔶 SKIPPED (duplicates)
+    //     if (res.data.skipped?.length) {
+    //       console.warn("Skipped targets:", res.data.skipped);
+
+    //       Swal.fire({
+    //         icon: "warning",
+    //         title: "Already exists",
+    //         text: `${res.data.skipped_count} target(s) skipped`,
+    //         timer: 2500,
+    //         showConfirmButton: false,
+    //       });
+    //     }
+
+    //     // 🟢 SUCCESS
+    //     if (res.data.created_count > 0) {
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "Success",
+    //         text: `${res.data.created_count} target(s) created`,
+    //         timer: 2500,
+    //         showConfirmButton: false,
+    //       });
+    //     }
+
+    //     this.selectedFile = null;
+
+    //   } catch (err) {
+    //     Swal.close();
+    //     Swal.fire("Error", "Something went wrong", "error");
+    //   } finally {
+    //     this.isUploading = false;
+    //   }
+    // },
+   
+//    async submitTargets() {
+//   if (!this.selectedTestingType) {
+//     Swal.fire(
+//       "Testing type required",
+//       "Please select a testing type before uploading targets",
+//       "warning"
+//     );
+//     return;
+//   }
+
+//   if (this.isUploadingTargets) return;
+
+//   try {
+//     this.isUploadingTargets = true;
+//     this.uploadSuccess = false;
+
+//     const formData = new FormData();
+
+//     if (this.selectedFile) {
+//       formData.append("file", this.selectedFile);
+//       formData.append("expand_subnets", "false");
+//     } else {
+//       if (!this.ipInput.trim()) return;
+//       formData.append("targets", this.ipInput);
+//     }
+
+//     const res = await this.authStore.createScope(
+//       formData,
+//       this.selectedTestingType
+//     );
+
+//     if (!res.status) {
+//       Swal.fire("Error", res.message, "error");
+//       return;
+//     }
+
+//     // ✅ Update UI
+//     this.mapApiResponse(res.data);
+
+//     // ✅ Success state
+//     this.uploadSuccess = true;
+
+//     // ⚠️ Skipped targets
+//     if (res.data.skipped?.length) {
+//       Swal.fire({
+//         icon: "warning",
+//         title: "Already exists",
+//         text: `${res.data.skipped_count} target(s) skipped`,
+//         timer: 2500,
+//         showConfirmButton: false,
+//       });
+//     }
+
+//     // 🎉 Success toast
+//     if (res.data.created_count > 0) {
+//       Swal.fire({
+//         icon: "success",
+//         title: "Success",
+//         text: `${res.data.created_count} target(s) created`,
+//         timer: 2500,
+//         showConfirmButton: false,
+//       });
+//     }
+
+//     this.selectedFile = null;
+
+//   } catch (err) {
+//     Swal.fire("Error", "Something went wrong", "error");
+//   } finally {
+//     this.isUploadingTargets = false;
+
+//     // auto-hide success tick after 3s
+//     setTimeout(() => {
+//       this.uploadSuccess = false;
+//     }, 3000);
+//   }
+// },
+
+
+
+async submitTargets() {
+  if (!this.selectedTestingType) {
+    Swal.fire(
+      "Testing type required",
+      "Please select a testing type before uploading targets",
+      "warning"
+    );
+    return;
+  }
+
+  if (this.isUploadingTargets) return;
+
+  try {
+    this.isUploadingTargets = true;
+    this.uploadSuccess = false;
+
+    const formData = new FormData();
+
+    // 📁 FILE UPLOAD
+    if (this.selectedFile) {
+      formData.append("file", this.selectedFile);
       formData.append("expand_subnets", "false");
-        } else {
-          if (!this.ipInput.trim()) {
-            Swal.close(); // close loader
-            return;
-          }
-          formData.append("targets", this.ipInput);
-        }
+    }
+    // ✍️ MANUAL INPUT
+    else {
+      if (!this.ipInput.trim()) return;
+      formData.append("targets", this.ipInput);
+    }
 
-        const res = await this.authStore.createScope(formData,this.selectedTestingType);
+    const res = await this.authStore.createScope(
+      formData,
+      this.selectedTestingType
+    );
 
-        // 🔥 CLOSE LOADING ALERT
-        Swal.close();
+    if (!res.status) {
+      Swal.fire("Error", res.message, "error");
+      return;
+    }
 
-        if (!res.status) {
-          Swal.fire("Error", res.message, "error");
-          return;
-        }
+    /* =====================================================
+       ✅ SUCCESS — UPDATE UI
+       ===================================================== */
 
-        // ✅ Update UI from backend
-        this.mapApiResponse(res.data);
-        this.ipInput = "";
-this.extractedList = [];
+    // Populate cards from backend response
+    this.mapApiResponse(res.data);
 
-        // 🔶 SKIPPED (duplicates)
-        if (res.data.skipped?.length) {
-          console.warn("Skipped targets:", res.data.skipped);
+    // Show success state (tick)
+    this.uploadSuccess = true;
 
-          Swal.fire({
-            icon: "warning",
-            title: "Already exists",
-            text: `${res.data.skipped_count} target(s) skipped`,
-            timer: 2500,
-            showConfirmButton: false,
-          });
-        }
+    // 🔥 IMPORTANT: new project becomes active now
+    localStorage.removeItem("isNewProject");
 
-        // 🟢 SUCCESS
-        if (res.data.created_count > 0) {
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: `${res.data.created_count} target(s) created`,
-            timer: 2500,
-            showConfirmButton: false,
-          });
-        }
+    /* =====================================================
+       ⚠️ SKIPPED TARGETS
+       ===================================================== */
+    if (res.data.skipped?.length) {
+      Swal.fire({
+        icon: "warning",
+        title: "Already exists",
+        text: `${res.data.skipped_count} target(s) skipped`,
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    }
 
-        this.selectedFile = null;
+    /* =====================================================
+       🎉 CREATED TARGETS
+       ===================================================== */
+    if (res.data.created_count > 0) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: `${res.data.created_count} target(s) created`,
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    }
 
-      } catch (err) {
-        Swal.close();
-        Swal.fire("Error", "Something went wrong", "error");
-      } finally {
-        this.isUploading = false;
-      }
-    },
+    // Reset file input
+    this.selectedFile = null;
+
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire("Error", "Something went wrong", "error");
+  } finally {
+    this.isUploadingTargets = false;
+
+    // ⏱️ Auto-hide success tick after 3s
+    setTimeout(() => {
+      this.uploadSuccess = false;
+    }, 3000);
+  }
+},
+
+
+   
+   
     onFileChange(e) {
       this.handleFiles([...e.target.files]);
       e.target.value = "";
@@ -910,29 +1343,77 @@ this.extractedList = [];
         lowerValue.includes('appstore.com')
       );
     },
-    handleUploadAndRedirect() {
-      // 🔐 Mark dashboard as locked
-      localStorage.setItem("dashboardTestingInProgress", "true");
-      localStorage.setItem("testingInProgress", "true");
-      localStorage.setItem("testingStartTime", Date.now().toString());
+    // handleUploadAndRedirect() {
+    //   // 🔐 Mark dashboard as locked
+    //   localStorage.setItem("dashboardTestingInProgress", "true");
+    //   localStorage.setItem("testingInProgress", "true");
+    //   localStorage.setItem("testingStartTime", Date.now().toString());
 
-      this.$router.push("/admindashboardonboarding");
-    },
+    //   this.$router.push("/admindashboardonboarding");
+    // },
+
+    handleUploadAndRedirect() {
+  // if no remaining testing types → go directly
+  if (!this.remainingTestingTypes.length) {
+    this.redirectToDashboard();
+    return;
+  }
+
+  const nextTestingType = this.remainingTestingTypes[0];
+
+  Swal.fire({
+    title: "Upload remaining targets?",
+    text: `Do you want to upload targets for ${this.formatTestingType(
+      nextTestingType
+    )} testing?`,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Yes",
+    cancelButtonText: "Skip for now",
+    confirmButtonColor: "#5a44ff",
+    cancelButtonColor: "#6b7280",
+  }).then(result => {
+    if (result.isConfirmed) {
+      // 👉 Stay on same page
+      this.selectedTestingType = nextTestingType;
+
+      // Clear current inputs (optional but recommended)
+      this.ipInput = "";
+      this.selectedFile = null;
+
+      // Fetch targets if any already exist
+      this.fetchTargetsByTestingType();
+    } else {
+      // 👉 Skip → Dashboard
+      this.redirectToDashboard();
+    }
+  });
+},
+
   },
 };
 </script>
 
 <style scoped>
-.btn-primary:not(:disabled) {
-  cursor: pointer;
+/* ..... */
+.card-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+  font-size: 14px;
+  color: #5a44ff;
 }
 
-.btn-primary:disabled {
-  cursor: not-allowed !important;
-  pointer-events: none;
-  opacity: 0.6;
+.card-status.success {
+  color: #22c55e;
 }
 
+.card-status i {
+  font-size: 20px;
+}
+
+/* ...... */
 .testing-select:disabled {
   background-color: #f1f3f5;
   color: #333;

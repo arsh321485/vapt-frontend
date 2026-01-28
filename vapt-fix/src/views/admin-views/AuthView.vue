@@ -1004,68 +1004,90 @@ hasUploadedTargets(email) {
     //     }
     //   },
 async handleSignin(recaptchaResponse) {
-  /* 🚫 Block until project type is selected on second login */
-  if (this.hasExistingProject && !this.projectChoice) {
-    Swal.fire("Error", "Please select project type", "error");
-    return;
-  }
-
-  const payload = {
-    email: this.formData.email,
-    password: this.formData.password,
-    testing_type: this.selectedTestingBox,
-    recaptcha: recaptchaResponse
-  };
-
-  const result = await this.authStore.login(payload);
-
-  if (!result.status) {
-    Swal.fire("Login Failed", result.message || "Invalid credentials", "error");
-    return;
-  }
-
-  /* ✅ SAVE PROJECT CONFIG ONLY FOR NEW PROJECT */
-  if (!this.hasExistingProject || this.projectChoice === "new") {
-    localStorage.setItem(
-      `project_${this.formData.email}`,
-      JSON.stringify({
-        testingTypes: this.selectedTestingBox
-      })
-    );
-  }
-
-  /* 🔀 FINAL REDIRECT LOGIC (DB-BASED) */
-  if (this.projectChoice === "ongoing") {
-    try {
-      const testingType = this.selectedTestingBox[0]; // e.g. white_box
-
-      const res = await this.authStore.getScopeTargets(testingType);
-
-      if (
-        res.status &&
-        res.data &&
-        (
-          (Array.isArray(res.data.data) && res.data.data.length > 0) ||
-          res.data.count > 0
-        )
-      ) {
-        // ✅ IP / URL exists in DB
-        this.$router.push("/admindashboardonboarding");
-      } else {
-        // ❌ No IP / URL uploaded
-        this.$router.push("/location");
+      /* 🚫 Block until project type is selected on second login */
+      if (this.hasExistingProject && !this.projectChoice) {
+        Swal.fire("Error", "Please select project type", "error");
+        return;
       }
 
-    } catch (error) {
-      console.error("Scope check failed:", error);
-      this.$router.push("/location");
-    }
+      const payload = {
+        email: this.formData.email,
+        password: this.formData.password,
+        testing_type: this.selectedTestingBox,
+        recaptcha: recaptchaResponse
+      };
 
-  } else {
-    // 🆕 New project → always go to Location
-    this.$router.push("/location");
-  }
-},
+      const result = await this.authStore.login(payload);
+
+      if (!result.status) {
+        Swal.fire(
+          "Login Failed",
+          result.message || "Invalid credentials",
+          "error"
+        );
+        return;
+      }
+
+      /* =====================================================
+         🧠 PROJECT CONTEXT HANDLING (CRITICAL)
+         ===================================================== */
+
+      // 🆕 NEW PROJECT → hard reset everything
+      if (!this.hasExistingProject || this.projectChoice === "new") {
+
+        // 🔹 Save selected testing types for this project
+        localStorage.setItem(
+          `project_${this.formData.email}`,
+          JSON.stringify({
+            testingTypes: this.selectedTestingBox
+          })
+        );
+
+        // 🔥 Mark as NEW project (used by UploadReportView)
+        localStorage.setItem("isNewProject", "true");
+
+        // 🧹 Clear any previous project leftovers
+        localStorage.removeItem("dashboardTestingInProgress");
+        localStorage.removeItem("testingInProgress");
+        localStorage.removeItem("testingStartTime");
+
+        // 🚀 Always go to fresh upload flow
+        this.$router.push("/location");
+        return;
+      }
+
+      // 🔁 ONGOING PROJECT
+      localStorage.removeItem("isNewProject");
+
+      /* =====================================================
+         🔀 REDIRECT LOGIC (ONGOING PROJECT)
+         ===================================================== */
+
+      try {
+        const testingType = this.selectedTestingBox[0]; // e.g. white_box
+
+        const res = await this.authStore.getScopeTargets(testingType);
+
+        if (
+          res.status &&
+          res.data &&
+          (
+            (Array.isArray(res.data.data) && res.data.data.length > 0) ||
+            res.data.count > 0
+          )
+        ) {
+          // ✅ Targets exist → Dashboard
+          this.$router.push("/admindashboardonboarding");
+        } else {
+          // ❌ No targets → Upload page
+          this.$router.push("/location");
+        }
+
+      } catch (error) {
+        console.error("Scope check failed:", error);
+        this.$router.push("/location");
+      }
+    },
 
     async checkAndRedirect() {
       const reportId = localStorage.getItem('reportId');
