@@ -22,7 +22,7 @@
             <div>
               <button @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2"
                 style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i
-                  class="bi bi-download me-2"></i> Sample Report</button>
+                  class="bi bi-download me-2"></i>Sample File</button>
             </div>
             <!-- Testing Type (Unified UI) -->
             <div class="testing-type">
@@ -445,6 +445,7 @@ export default {
 
   data() {
     return {
+      uploadedTestingTypes: new Set(),
       location: "",
       type: "",
       uploadedFiles: [],
@@ -557,6 +558,18 @@ export default {
 },
 
   methods: {
+
+  hasTargetsForTestingType(type) {
+  const allTargets = [
+    ...this.internalTargets,
+    ...this.externalTargets,
+    ...this.webAppTargets,
+    ...this.mobileAppTargets,
+  ];
+
+  return allTargets.some(t => t.testing_type === type);
+},
+
 
     resetUploadState() {
   this.ipInput = "";
@@ -758,7 +771,46 @@ triggerAutoSubmit() {
   }, 500); // 0.5 sec debounce
 },
 
-    downloadExcelTemplate() {
+    // downloadExcelTemplate() {
+    //   // Create sample data with all 4 column types
+    //   const sampleData = [
+    //     {
+    //       IP_ADDRESS: '192.168.1.10',
+    //       SUBNET: '10.0.0.0/24',
+    //       WEB_APP_URL: 'https://example.com',
+    //       MOBILE_APP_URL: 'https://play.google.com/store/apps/details?id=com.example.app'
+    //     },
+    //     {
+    //       IP_ADDRESS: '8.8.8.8',
+    //       SUBNET: '172.16.0.0/16',
+    //       WEB_APP_URL: 'https://test.com',
+    //       MOBILE_APP_URL: 'https://apps.apple.com/app/example/id123456789'
+    //     },
+    //     {
+    //       IP_ADDRESS: '192.168.1.20',
+    //       SUBNET: '',
+    //       WEB_APP_URL: 'https://demo.com',
+    //       MOBILE_APP_URL: ''
+    //     }
+    //   ];
+
+    //   // Create workbook and worksheet
+    //   const ws = XLSX.utils.json_to_sheet(sampleData);
+    //   const wb = XLSX.utils.book_new();
+    //   XLSX.utils.book_append_sheet(wb, ws, 'Targets');
+
+    //   // Set column widths for better readability
+    //   ws['!cols'] = [
+    //     { wch: 15 },  // IP_ADDRESS
+    //     { wch: 18 },  // SUBNET
+    //     { wch: 30 },  // WEB_APP_URL
+    //     { wch: 60 }   // MOBILE_APP_URL
+    //   ];
+
+    //   // Download the file
+    //   XLSX.writeFile(wb, 'VAPT_Targets_Template.xlsx');
+    // },
+   downloadExcelTemplate() {
   // Sample data in the exact format you want
   const sampleData = [
     {
@@ -795,6 +847,8 @@ triggerAutoSubmit() {
   // Download file
   XLSX.writeFile(wb, 'Sample_Report.xlsx');
 },
+   
+   
     async fetchTestingTypes() {
       const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
@@ -1267,6 +1321,8 @@ async submitTargets() {
 
     // Show success state (tick)
     this.uploadSuccess = true;
+    this.uploadedTestingTypes.add(this.selectedTestingType);
+
 
     // 🔥 IMPORTANT: new project becomes active now
     localStorage.removeItem("isNewProject");
@@ -1352,43 +1408,50 @@ async submitTargets() {
     //   this.$router.push("/admindashboardonboarding");
     // },
 
-    handleUploadAndRedirect() {
-  // if no remaining testing types → go directly
-  if (!this.remainingTestingTypes.length) {
+handleUploadAndRedirect() {
+  // No multiple testing types → go directly
+  if (this.allowedTestingTypes.length <= 1) {
     this.redirectToDashboard();
     return;
   }
 
-  const nextTestingType = this.remainingTestingTypes[0];
+  // Find testing types WITHOUT targets
+  const missingTypes = this.allowedTestingTypes.filter(
+  type => !this.uploadedTestingTypes.has(type)
+);
+
+  // ✅ All testing types filled → NO alert
+  if (!missingTypes.length) {
+    this.redirectToDashboard();
+    return;
+  }
+
+  // ❗ Some testing types missing → show alert
+  const nextTestingType = missingTypes[0];
 
   Swal.fire({
     title: "Upload remaining targets?",
-    text: `Do you want to upload targets for ${this.formatTestingType(
+    text: `You haven't uploaded targets for ${this.formatTestingType(
       nextTestingType
-    )} testing?`,
+    )}. Do you want to upload now?`,
     icon: "question",
     showCancelButton: true,
-    confirmButtonText: "Yes",
-    cancelButtonText: "Skip for now",
+    confirmButtonText: "Yes, upload now",
+    cancelButtonText: "Skip & continue",
     confirmButtonColor: "#5a44ff",
     cancelButtonColor: "#6b7280",
   }).then(result => {
     if (result.isConfirmed) {
-      // 👉 Stay on same page
       this.selectedTestingType = nextTestingType;
-
-      // Clear current inputs (optional but recommended)
       this.ipInput = "";
       this.selectedFile = null;
-
-      // Fetch targets if any already exist
       this.fetchTargetsByTestingType();
     } else {
-      // 👉 Skip → Dashboard
       this.redirectToDashboard();
     }
   });
 },
+
 
   },
 };
