@@ -17,7 +17,26 @@
                 View and manage all scoped targets.
               </p>
             </div>
-            <div>
+            <div class="d-flex justify-content-between gap-3">
+
+              <!-- project name -->
+              <div class="testing-type">
+    <select
+      v-model="projectname"
+      class="form-select testing-select"
+    >
+      <option value="" disabled>Select Project</option>
+
+      <option
+        v-for="(project, index) in projectList"
+        :key="index"
+        :value="project"
+      >
+        {{ project }}
+      </option>
+    </select>
+  </div>
+
               <!-- Testing Type (Unified UI) -->
               <div class="testing-type">
                 <select v-model="selectedTestingType" class="form-select testing-select"
@@ -276,119 +295,231 @@ export default {
         type: "internal",
         value: "",
       },
+      projectname: "",
+      projectList: [],
+      adminId: null,
+      isInitialLoad: true,
+      scopeId: null,
     };
   },
   watch: {
-    selectedTestingType: {
-      immediate: true,
-      async handler(newType) {
-        if (!newType) return;
-        await this.fetchScopeTargets(newType);
-      },
-    },
+    projectname: {
+    immediate: true,
+    async handler(newProject) {
+      if (!newProject || !this.adminId) return;
+
+      // await this.fetchTestingTypeByProject(newProject);
+      await this.fetchFullScopeData(newProject);
+
+    }
+  },
+  selectedTestingType: {
+  async handler(newType) {
+    if (!newType) return;
+    if (this.isInitialLoad) return; // ⛔ skip on first load
+
+    await this.fetchScopeTargets(newType);
+  },
+},
+
   },
   async mounted() {
-    this.authStore = useAuthStore();
+  this.authStore = useAuthStore();
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    console.log("USER FROM STORAGE:", user);
+  const user = JSON.parse(localStorage.getItem("user"));
+  this.adminId = user?.id || user?._id;
 
-    this.adminId = user?.id || user?._id;
-    console.log("ADMIN ID:", this.adminId);
-
-    if (this.adminId) {
-      await this.fetchTestingTypes();
-    } else {
-      console.error("Admin ID missing. Testing types API not called.");
-    }
+  if (this.adminId) {
+    await this.fetchProjectNames(); // project → full scope
+  } else {
+    console.error("Admin ID missing.");
+  }
   },
   methods: {
-    async fetchScopeTargets(testingType) {
-  try {
-    const res = await this.authStore.getScopeTargets(testingType);
+    async fetchFullScopeData(projectName) {
+  const res = await this.authStore.getFullScopeData(
+    this.adminId,
+    projectName
+  );
 
-    if (!res.status) {
-      Swal.fire("Error", res.message || "Failed to fetch scope", "error");
-      return;
-    }
-
-    const targets = res.data?.data || [];
-
-    // 🔄 RESET
-    this.internalTargets = [];
-    this.externalTargets = [];
-    this.webAppTargets = [];
-    this.mobAppTargets = [];
-
-    targets.forEach(t => {
-      const value = t.target_value;
-
-      switch (t.target_type) {
-        case "internal_ip":
-          this.internalTargets.push({
-            id: t._id,
-            ip: value,
-            count: t.subnet_count || null,
-          });
-          break;
-
-        case "external_ip":
-          this.externalTargets.push({
-            id: t._id,
-            ip: value,
-            count: t.subnet_count || null,
-          });
-          break;
-
-        // 🔥 FIX HERE
-        case "web_url":
-          this.webAppTargets.push({
-            id: t._id,
-            url: value,
-          });
-          break;
-
-        // 🔥 FIX HERE
-        case "mobile_url":
-        case "mobile_app":
-          this.mobAppTargets.push({
-            id: t._id,
-            url: value,
-          });
-          break;
-      }
-    });
-
-  } catch (err) {
-    Swal.fire("Error", "Something went wrong", "error");
-    console.error(err);
+  if (!res.status) {
+    Swal.fire("Error", res.message, "error");
+    return;
   }
-    },
-    async fetchTestingTypes() {
-      const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
-      if (!res.status) {
-        Swal.fire(
-          "Error",
-          res.message || "Unable to fetch testing types",
-          "error"
-        );
-        return;
+  const scope = res.data;
+  this.scopeId = scope.id;
+  // 🔄 RESET EVERYTHING
+  this.internalTargets = [];
+  this.externalTargets = [];
+  this.webAppTargets = [];
+  this.mobAppTargets = [];
+
+  // 🔹 Testing Type (single source of truth)
+  this.allowedTestingTypes = [scope.testing_type];
+  this.selectedTestingType = scope.testing_type;
+  this.showTestingDropdown = false;
+  // this.isInitialLoad = false;
+
+  // 🔹 Map entries → UI lists
+  scope.entries.forEach(entry => {
+    switch (entry.entry_type) {
+      case "internal_ip":
+        this.internalTargets.push({
+          id: entry.id,
+          ip: entry.value,
+          count: entry.subnet_mask,
+        });
+        break;
+
+      case "external_ip":
+        this.externalTargets.push({
+          id: entry.id,
+          ip: entry.value,
+        });
+        break;
+
+      case "web_url":
+        this.webAppTargets.push({
+          id: entry.id,
+          url: entry.value,
+        });
+        break;
+
+      case "mobile_url":
+      case "mobile_app":
+        this.mobAppTargets.push({
+          id: entry.id,
+          url: entry.value,
+        });
+        break;
+    }
+  });
+  this.isInitialLoad = false;
+},
+    async fetchTestingTypeByProject(projectName) {
+  const res = await this.authStore.getTestingTypeByScope(
+    this.adminId,
+    projectName
+  );
+
+  if (!res.status) {
+    Swal.fire("Error", res.message, "error");
+    return;
+  }
+
+  const testingType = res.data.testing_type;
+
+  // 🔄 Reset first
+  this.allowedTestingTypes = [];
+  this.selectedTestingType = "";
+  this.showTestingDropdown = false;
+
+  // 🔥 Backend gives single testing type
+  this.allowedTestingTypes = [testingType];
+  this.selectedTestingType = testingType;
+  this.showTestingDropdown = false; // single → no dropdown
+},
+    async fetchProjectNames() {
+    const res = await this.authStore.fetchScopeProjectNames(this.adminId);
+
+    if (res.status) {
+      this.projectList = res.data.scope_names;
+
+      // auto select first project
+      if (this.projectList.length && !this.projectname) {
+        this.projectname = this.projectList[0];
       }
+    } else {
+      console.error("Project name fetch failed:", res.message);
+    }
+  },
+  //   async fetchScopeTargets(testingType) {
+  // try {
+  //   const res = await this.authStore.getScopeTargets(testingType);
 
-      this.allowedTestingTypes = res.testingTypes || [];
+  //   if (!res.status) {
+  //     Swal.fire("Error", res.message || "Failed to fetch scope", "error");
+  //     return;
+  //   }
 
-      // 🔥 RULES IMPLEMENTATION
-      if (this.allowedTestingTypes.length === 1) {
-        // Only one → auto select, no dropdown
-        this.selectedTestingType = this.allowedTestingTypes[0];
-        this.showTestingDropdown = false;
-      } else if (this.allowedTestingTypes.length > 1) {
-        // Two or more → dropdown, first selected
-        this.selectedTestingType = this.allowedTestingTypes[0];
-        this.showTestingDropdown = true;
-      }
-    },
+  //   const targets = res.data?.data || [];
+
+  //   // 🔄 RESET
+  //   this.internalTargets = [];
+  //   this.externalTargets = [];
+  //   this.webAppTargets = [];
+  //   this.mobAppTargets = [];
+
+  //   targets.forEach(t => {
+  //     const value = t.target_value;
+
+  //     switch (t.target_type) {
+  //       case "internal_ip":
+  //         this.internalTargets.push({
+  //           id: t._id,
+  //           ip: value,
+  //           count: t.subnet_count || null,
+  //         });
+  //         break;
+
+  //       case "external_ip":
+  //         this.externalTargets.push({
+  //           id: t._id,
+  //           ip: value,
+  //           count: t.subnet_count || null,
+  //         });
+  //         break;
+
+  //       // 🔥 FIX HERE
+  //       case "web_url":
+  //         this.webAppTargets.push({
+  //           id: t._id,
+  //           url: value,
+  //         });
+  //         break;
+
+  //       // 🔥 FIX HERE
+  //       case "mobile_url":
+  //       case "mobile_app":
+  //         this.mobAppTargets.push({
+  //           id: t._id,
+  //           url: value,
+  //         });
+  //         break;
+  //     }
+  //   });
+
+  // } catch (err) {
+  //   Swal.fire("Error", "Something went wrong", "error");
+  //   console.error(err);
+  // }
+  //   },
+    // async fetchTestingTypes() {
+    //   const res = await this.authStore.getAdminTestingTypes(this.adminId);
+
+    //   if (!res.status) {
+    //     Swal.fire(
+    //       "Error",
+    //       res.message || "Unable to fetch testing types",
+    //       "error"
+    //     );
+    //     return;
+    //   }
+
+    //   this.allowedTestingTypes = res.testingTypes || [];
+
+    //   // 🔥 RULES IMPLEMENTATION
+    //   if (this.allowedTestingTypes.length === 1) {
+    //     // Only one → auto select, no dropdown
+    //     this.selectedTestingType = this.allowedTestingTypes[0];
+    //     this.showTestingDropdown = false;
+    //   } else if (this.allowedTestingTypes.length > 1) {
+    //     // Two or more → dropdown, first selected
+    //     this.selectedTestingType = this.allowedTestingTypes[0];
+    //     this.showTestingDropdown = true;
+    //   }
+    // },
     formatTestingType(type) {
       return type
         .replace("_", " ")
@@ -512,26 +643,23 @@ else if (
     // We are editing VALUE only for now
     payload["target_value"] = this.form.value;
 
-    const res = await this.authStore.updateScopeTarget(
-      this.editingId,
-      this.selectedTestingType,
-      payload
-    );
+    // const res = await this.authStore.updateScopeTarget(
+    //   this.editingId,
+    //   this.selectedTestingType,
+    //   payload
+    // );
+    const res = await this.authStore.updateScopeEntry(
+  this.scopeId,
+  this.editingId,
+  payload
+);
 
     if (!res.status) {
       Swal.fire("Error", res.message, "error");
       return;
     }
 
-    // Swal.fire({
-    //   icon: "success",
-    //   title: "Updated",
-    //   text: "Target updated successfully",
-    //   timer: 1200,
-    //   showConfirmButton: false,
-    // });
-
-    // 🔄 Refresh list from backend (single source of truth)
+   
     await this.fetchScopeTargets(this.selectedTestingType);
 
     this.showModal = false;
@@ -566,7 +694,7 @@ else if (
         item.ip = this.form.value;
       }
     },
-    deleteTarget(id) {
+   deleteTarget(entryId) {
   Swal.fire({
     title: "Delete Target?",
     text: "This action cannot be undone.",
@@ -579,9 +707,9 @@ else if (
     if (!result.isConfirmed) return;
 
     try {
-      const res = await this.authStore.deleteScopeTarget(
-        id,
-        this.selectedTestingType
+      const res = await this.authStore.deleteScopeEntry(
+        this.scopeId,
+        entryId
       );
 
       if (!res.status) {
@@ -592,13 +720,13 @@ else if (
       Swal.fire({
         icon: "success",
         title: "Deleted",
-        text: res.message || "Target deleted successfully",
+        text: res.message,
         timer: 1200,
         showConfirmButton: false,
       });
 
-      // 🔄 Refresh list from backend
-      await this.fetchScopeTargets(this.selectedTestingType);
+      // 🔄 Refresh FULL scope (single source of truth)
+      await this.fetchFullScopeData(this.projectname);
 
     } catch (err) {
       console.error(err);

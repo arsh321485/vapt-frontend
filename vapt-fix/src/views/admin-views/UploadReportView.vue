@@ -18,11 +18,19 @@
           </div>
 
 
-          <div class="d-flex justify-content-between gap-3">
+          <div class="d-flex justify-content-between gap-2">
             <div>
               <button @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2"
                 style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i
                   class="bi bi-download me-2"></i>Sample File</button>
+            </div>
+            <div>
+              <input class="form-control"
+  type="text"
+  v-model="name"
+  placeholder="Enter project name"
+  required
+/>
             </div>
             <!-- Testing Type (Unified UI) -->
             <div class="testing-type">
@@ -40,7 +48,7 @@
 
           <!-- LEFT COLUMN -->
           <div class="left-column ">
-          
+
 
             <div class="upload-box ip-box">
               <h5>Enter target IPs / URLs</h5>
@@ -51,53 +59,30 @@
               </p>
 
               <!-- TEXTAREA -->
-             <textarea
-  class="form-control ip-textarea"
-  v-model="ipInput"
-  placeholder="Example:
+              <textarea class="form-control ip-textarea" v-model="ipInput" placeholder="Example:
 192.168.1.1
 https://example.com">
 </textarea>
-
-
-              <!-- upload btn -->
-              <!-- <div class="ip-actions">
+              <div class="ip-actions">
                 <input ref="fileInput" type="file" accept=".csv,.xlsx,.xls,.txt" hidden @change="handleFileUpload" />
 
-                <button class="btn btn-primary" @click="$refs.fileInput.click()">
-                  Upload CSV / Excel /Text File
-                </button>
-                
+                <!-- Upload file button (unchanged) -->
+                <!-- <button class="btn btn-primary" @click="$refs.fileInput.click()">
+                  Upload CSV / Excel / Text File
+                </button> -->
+                <button class="btn btn-primary" @click="handleUploadClick">
+  Upload CSV / Excel / Text File
+</button>
 
+
+                <!-- NEW manual submit button -->
+                <button class="btn btn-primary ms-0 me-0" :disabled="!ipInput.trim() || isUploading"
+                  @click="submitManualTargets">
+                  Submit / Save
+                </button>
 
                 <span class="ip-count">{{ extractedList.length }} targets</span>
-              </div> -->
-
-              <div class="ip-actions">
-  <input
-    ref="fileInput"
-    type="file"
-    accept=".csv,.xlsx,.xls,.txt"
-    hidden
-    @change="handleFileUpload"
-  />
-
-  <!-- Upload file button (unchanged) -->
-  <button class="btn btn-primary" @click="$refs.fileInput.click()">
-    Upload CSV / Excel / Text File
-  </button>
-
-  <!-- NEW manual submit button -->
-  <button
-    class="btn btn-primary ms-0 me-0"
-    :disabled="!ipInput.trim() || isUploading"
-    @click="submitManualTargets"
-  >
-    Submit / Save
-  </button>
-
-  <span class="ip-count">{{ extractedList.length }} targets</span>
-</div>
+              </div>
 
             </div>
 
@@ -126,29 +111,37 @@ https://example.com">
         </div>
 
         <!-- TARGET CARDS -->
-        <!-- <div class="files-card-grid">
+        <div class="files-card-grid">
 
-        
-          <div class="files-card" v-if="internalTargets.length">
-
+          <!-- INTERNAL TARGETS -->
+          <div class="files-card" v-if="internalTargets.length || isUploadingTargets || uploadSuccess">
             <div class="card-header-title">
               Internal Targets
             </div>
 
-            <table class="mt-3">
+            <!-- Uploading -->
+            <div v-if="isUploadingTargets" class="card-status">
+              <span class="loader"></span>
+              <span class="ms-2">Uploading targets...</span>
+            </div>
+
+            <!-- Success -->
+            <div v-else-if="uploadSuccess" class="card-status success">
+              <i class="bi bi-check-circle-fill"></i>
+              <span class="ms-2">Uploaded successfully</span>
+            </div>
+
+            <!-- Table -->
+            <table v-if="internalTargets.length && !isUploadingTargets" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
                   <th class="col-value">IP Address</th>
-
                 </tr>
               </thead>
-
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
-
                 <tr v-for="(item, index) in internalTargets" :key="item.ip || index" draggable="true"
                   @dragstart="onDragStart(item, 'internal')">
-
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
                     {{ item.ip }}
@@ -161,26 +154,32 @@ https://example.com">
             </table>
           </div>
 
-          <div class="files-card" v-if="externalTargets.length">
-
+          <!-- EXTERNAL TARGETS -->
+          <div class="files-card" v-if="externalTargets.length || isUploadingTargets || uploadSuccess">
             <div class="card-header-title">
               External Targets
             </div>
 
-            <table class="mt-3" @dragover.prevent @drop="onDropTarget('external')">
+            <div v-if="isUploadingTargets" class="card-status">
+              <span class="loader"></span>
+              <span class="ms-2">Uploading targets...</span>
+            </div>
+
+            <div v-else-if="uploadSuccess" class="card-status success">
+              <i class="bi bi-check-circle-fill"></i>
+              <span class="ms-2">Uploaded successfully</span>
+            </div>
+
+            <table v-if="externalTargets.length && !isUploadingTargets" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
                   <th class="col-value">IP Address</th>
-
                 </tr>
               </thead>
-
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
                 <tr v-for="(item, index) in externalTargets" :key="item.ip || index" draggable="true"
                   @dragstart="onDragStart(item, 'external')">
-                
-
                   <td class="col-serial">{{ index + 1 }}</td>
                   <td class="col-value">
                     {{ item.ip }}
@@ -188,239 +187,78 @@ https://example.com">
                       ({{ item.count }})
                     </span>
                   </td>
-
-
-
                 </tr>
               </tbody>
             </table>
           </div>
 
-       
-          <div class="files-card" v-if="webAppTargets.length">
-
+          <!-- WEB APP TARGETS -->
+          <div class="files-card" v-if="webAppTargets.length || isUploadingTargets || uploadSuccess">
             <div class="card-header-title">
               Web App Targets
             </div>
 
-            <table class="mt-3">
+            <div v-if="isUploadingTargets" class="card-status">
+              <span class="loader"></span>
+              <span class="ms-2">Uploading targets...</span>
+            </div>
+
+            <div v-else-if="uploadSuccess" class="card-status success">
+              <i class="bi bi-check-circle-fill"></i>
+              <span class="ms-2">Uploaded successfully</span>
+            </div>
+
+            <table v-if="webAppTargets.length && !isUploadingTargets" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
                   <th class="col-value">URL</th>
-
                 </tr>
               </thead>
-
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
-                <tr v-for="(item, index) in webAppTargets" :key="item.ip || index" draggable="true"
+                <tr v-for="(item, index) in webAppTargets" :key="item.url || index" draggable="true"
                   @dragstart="onDragStart(item, 'webapp')">
                   <td class="col-serial">{{ index + 1 }}</td>
-                  <td class="col-value">
-                    {{ item.url }}
-                  </td>
+                  <td class="col-value">{{ item.url }}</td>
                 </tr>
               </tbody>
-
             </table>
           </div>
 
-  
-          <div class="files-card" v-if="mobileAppTargets.length">
-
+          <!-- MOBILE APP TARGETS -->
+          <div class="files-card" v-if="mobileAppTargets.length || isUploadingTargets || uploadSuccess">
             <div class="card-header-title">
               Mobile App Targets
             </div>
 
-            <table class="mt-3">
+            <div v-if="isUploadingTargets" class="card-status">
+              <span class="loader"></span>
+              <span class="ms-2">Uploading targets...</span>
+            </div>
+
+            <div v-else-if="uploadSuccess" class="card-status success">
+              <i class="bi bi-check-circle-fill"></i>
+              <span class="ms-2">Uploaded successfully</span>
+            </div>
+
+            <table v-if="mobileAppTargets.length && !isUploadingTargets" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
                   <th class="col-value">URL</th>
-
                 </tr>
               </thead>
               <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobileapp')">
-                <tr v-for="(item, index) in mobileAppTargets" :key="index" draggable="true"
+                <tr v-for="(item, index) in mobileAppTargets" :key="item.url || index" draggable="true"
                   @dragstart="onDragStart(item, 'mobileapp')">
                   <td class="col-serial">{{ index + 1 }}</td>
-                  <td class="col-value">
-                    {{ item.url }}
-                  </td>
+                  <td class="col-value">{{ item.url }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-        </div> -->
-
-<!-- TARGET CARDS -->
-<div class="files-card-grid">
-
-  <!-- INTERNAL TARGETS -->
-  <div class="files-card" v-if="internalTargets.length || isUploadingTargets || uploadSuccess">
-    <div class="card-header-title">
-      Internal Targets
-    </div>
-
-    <!-- Uploading -->
-    <div v-if="isUploadingTargets" class="card-status">
-      <span class="loader"></span>
-      <span class="ms-2">Uploading targets...</span>
-    </div>
-
-    <!-- Success -->
-    <div v-else-if="uploadSuccess" class="card-status success">
-      <i class="bi bi-check-circle-fill"></i>
-      <span class="ms-2">Uploaded successfully</span>
-    </div>
-
-    <!-- Table -->
-    <table v-if="internalTargets.length && !isUploadingTargets" class="mt-3">
-      <thead>
-        <tr>
-          <th class="col-serial">S.No.</th>
-          <th class="col-value">IP Address</th>
-        </tr>
-      </thead>
-      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('internal')">
-        <tr
-          v-for="(item, index) in internalTargets"
-          :key="item.ip || index"
-          draggable="true"
-          @dragstart="onDragStart(item, 'internal')"
-        >
-          <td class="col-serial">{{ index + 1 }}</td>
-          <td class="col-value">
-            {{ item.ip }}
-            <span v-if="item.count" class="subnet-count">
-              ({{ item.count }})
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- EXTERNAL TARGETS -->
-  <div class="files-card" v-if="externalTargets.length || isUploadingTargets || uploadSuccess">
-    <div class="card-header-title">
-      External Targets
-    </div>
-
-    <div v-if="isUploadingTargets" class="card-status">
-      <span class="loader"></span>
-      <span class="ms-2">Uploading targets...</span>
-    </div>
-
-    <div v-else-if="uploadSuccess" class="card-status success">
-      <i class="bi bi-check-circle-fill"></i>
-      <span class="ms-2">Uploaded successfully</span>
-    </div>
-
-    <table v-if="externalTargets.length && !isUploadingTargets" class="mt-3">
-      <thead>
-        <tr>
-          <th class="col-serial">S.No.</th>
-          <th class="col-value">IP Address</th>
-        </tr>
-      </thead>
-      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('external')">
-        <tr
-          v-for="(item, index) in externalTargets"
-          :key="item.ip || index"
-          draggable="true"
-          @dragstart="onDragStart(item, 'external')"
-        >
-          <td class="col-serial">{{ index + 1 }}</td>
-          <td class="col-value">
-            {{ item.ip }}
-            <span v-if="item.count" class="subnet-count">
-              ({{ item.count }})
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- WEB APP TARGETS -->
-  <div class="files-card" v-if="webAppTargets.length || isUploadingTargets || uploadSuccess">
-    <div class="card-header-title">
-      Web App Targets
-    </div>
-
-    <div v-if="isUploadingTargets" class="card-status">
-      <span class="loader"></span>
-      <span class="ms-2">Uploading targets...</span>
-    </div>
-
-    <div v-else-if="uploadSuccess" class="card-status success">
-      <i class="bi bi-check-circle-fill"></i>
-      <span class="ms-2">Uploaded successfully</span>
-    </div>
-
-    <table v-if="webAppTargets.length && !isUploadingTargets" class="mt-3">
-      <thead>
-        <tr>
-          <th class="col-serial">S.No.</th>
-          <th class="col-value">URL</th>
-        </tr>
-      </thead>
-      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('webapp')">
-        <tr
-          v-for="(item, index) in webAppTargets"
-          :key="item.url || index"
-          draggable="true"
-          @dragstart="onDragStart(item, 'webapp')"
-        >
-          <td class="col-serial">{{ index + 1 }}</td>
-          <td class="col-value">{{ item.url }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- MOBILE APP TARGETS -->
-  <div class="files-card" v-if="mobileAppTargets.length || isUploadingTargets || uploadSuccess">
-    <div class="card-header-title">
-      Mobile App Targets
-    </div>
-
-    <div v-if="isUploadingTargets" class="card-status">
-      <span class="loader"></span>
-      <span class="ms-2">Uploading targets...</span>
-    </div>
-
-    <div v-else-if="uploadSuccess" class="card-status success">
-      <i class="bi bi-check-circle-fill"></i>
-      <span class="ms-2">Uploaded successfully</span>
-    </div>
-
-    <table v-if="mobileAppTargets.length && !isUploadingTargets" class="mt-3">
-      <thead>
-        <tr>
-          <th class="col-serial">S.No.</th>
-          <th class="col-value">URL</th>
-        </tr>
-      </thead>
-      <tbody class="scroll-body" @dragover.prevent @drop="onDropTarget('mobileapp')">
-        <tr
-          v-for="(item, index) in mobileAppTargets"
-          :key="item.url || index"
-          draggable="true"
-          @dragstart="onDragStart(item, 'mobileapp')"
-        >
-          <td class="col-serial">{{ index + 1 }}</td>
-          <td class="col-value">{{ item.url }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-</div>
-
-
+        </div>
 
         <div class="cta">
 
@@ -461,23 +299,24 @@ export default {
       webAppTargets: [],
       mobileAppTargets: [],
       selectedFile: null,
-      autoSubmitTimer: null, 
+      autoSubmitTimer: null,
       draggedItem: null,
       draggedFrom: null,
       testingType: "",
-      allowedTestingTypes: [],   
-      selectedTestingType: "",   
+      allowedTestingTypes: [],
+      selectedTestingType: "",
       showTestingDropdown: false,
-       isUploadingTargets: false,   // 🔄 uploading state
-    uploadSuccess: false,        // ✅ success state
+      isUploadingTargets: false,   // 🔄 uploading state
+      uploadSuccess: false, 
+      name: "",       // ✅ success state
     };
   },
   watch: {
     selectedTestingType(newType) {
-    if (newType) {
-      this.fetchTargetsByTestingType();
-    }
-  },
+      if (newType) {
+        this.fetchTargetsByTestingType();
+      }
+    },
     uploadedFiles: {
       handler(files) {
         const hasSuccessfulUploads = files.some(f => f.status === 'success');
@@ -489,13 +328,13 @@ export default {
     }
   },
   computed: {
-      remainingTestingTypes() {
-    if (!this.allowedTestingTypes.length) return [];
+    remainingTestingTypes() {
+      if (!this.allowedTestingTypes.length) return [];
 
-    return this.allowedTestingTypes.filter(
-      type => type !== this.selectedTestingType
-    );
-  },
+      return this.allowedTestingTypes.filter(
+        type => type !== this.selectedTestingType
+      );
+    },
     returnTo() {
       return this.$route.query.returnTo || null;
     },
@@ -509,346 +348,316 @@ export default {
     },
 
   },
-  // async mounted() {
-  //   this.authStore = useAuthStore();
-  //   const user = JSON.parse(localStorage.getItem("user"));
-  //   this.adminId = user?.id;
-
-  //   if (this.adminId) {
-  //     await this.fetchTestingTypes();
-  //   }
-  //   if (this.selectedTestingType) {
-  //     this.fetchTargetsByTestingType();
-  //   }
-  //   // ✅ Check if step 3 should be marked completed on page load
-  //   if (this.uploadedFiles.some(f => f.status === 'success')) {
-  //     this.authStore.markStepCompleted(3);
-  //   }
-  // },
+  
 
   async mounted() {
-  this.authStore = useAuthStore();
+    this.authStore = useAuthStore();
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  this.adminId = user?.id;
+    const user = JSON.parse(localStorage.getItem("user"));
+    this.adminId = user?.id;
 
-  const isNewProject = localStorage.getItem("isNewProject") === "true";
+    const isNewProject = localStorage.getItem("isNewProject") === "true";
 
-  if (isNewProject) {
-    // 🔥 FULL RESET — no old data allowed
-    this.resetUploadState();
+    if (isNewProject) {
+      // 🔥 FULL RESET — no old data allowed
+      this.resetUploadState();
 
-    // fetch ONLY testing types (no targets)
+      // fetch ONLY testing types (no targets)
+      if (this.adminId) {
+        await this.fetchTestingTypes();
+      }
+
+      // ❗ do NOT auto-fetch targets
+      return;
+    }
+
+    // 🔁 OLD / ONGOING PROJECT FLOW
     if (this.adminId) {
       await this.fetchTestingTypes();
     }
 
-    // ❗ do NOT auto-fetch targets
-    return;
-  }
-
-  // 🔁 OLD / ONGOING PROJECT FLOW
-  if (this.adminId) {
-    await this.fetchTestingTypes();
-  }
-
-  if (this.selectedTestingType) {
-    this.fetchTargetsByTestingType();
-  }
-},
+    if (this.selectedTestingType) {
+      this.fetchTargetsByTestingType();
+    }
+  },
 
   methods: {
+  showBackendError(err) {
+  const message =
+    err?.details?.detail ||
+    err?.details?.message ||
+    err?.message ||
+    "Something went wrong";
 
-  hasTargetsForTestingType(type) {
-  const allTargets = [
-    ...this.internalTargets,
-    ...this.externalTargets,
-    ...this.webAppTargets,
-    ...this.mobileAppTargets,
-  ];
-
-  return allTargets.some(t => t.testing_type === type);
+  Swal.fire(message);
 },
+
+  handleUploadClick() {
+  // ❌ block upload if project name missing
+  if (!this.validateProjectName()) return;
+
+  // ✅ project name exists → allow file selection
+  this.$refs.fileInput.click();
+},
+
+     validateProjectName() {
+    if (!this.name || !this.name.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "name is required", // 👈 backend-style message
+        confirmButtonColor: "#5a44ff",
+      });
+      return false;
+    }
+    return true;
+  },
+    hasTargetsForTestingType(type) {
+      const allTargets = [
+        ...this.internalTargets,
+        ...this.externalTargets,
+        ...this.webAppTargets,
+        ...this.mobileAppTargets,
+      ];
+
+      return allTargets.some(t => t.testing_type === type);
+    },
 
 
     resetUploadState() {
-  this.ipInput = "";
-  this.extractedList = [];
+      this.ipInput = "";
+      this.extractedList = [];
 
-  this.internalTargets = [];
-  this.externalTargets = [];
-  this.webAppTargets = [];
-  this.mobileAppTargets = [];
+      this.internalTargets = [];
+      this.externalTargets = [];
+      this.webAppTargets = [];
+      this.mobileAppTargets = [];
 
-  this.selectedFile = null;
-  this.isUploadingTargets = false;
-  this.uploadSuccess = false;
+      this.selectedFile = null;
+      this.isUploadingTargets = false;
+      this.uploadSuccess = false;
 
-  // ensure dropdown starts clean
-  this.selectedTestingType = "";
-},
+      // ensure dropdown starts clean
+      this.selectedTestingType = "";
+    },
 
 
     redirectToDashboard() {
-  // 🔐 Mark dashboard as locked
-  localStorage.setItem("dashboardTestingInProgress", "true");
-  localStorage.setItem("testingInProgress", "true");
-  localStorage.setItem("testingStartTime", Date.now().toString());
+      // 🔐 Mark dashboard as locked
+      localStorage.setItem("dashboardTestingInProgress", "true");
+      localStorage.setItem("testingInProgress", "true");
+      localStorage.setItem("testingStartTime", Date.now().toString());
 
-  this.$router.push("/admindashboardonboarding");
-},
-
-
-  submitManualTargets() {
-    this.selectedFile = null; // 🚫 ensure file logic not triggered
-    this.submitTargets();     // ✅ reuse existing API logic
-  },
-
-
-
-//     async fetchTargetsByTestingType() {
-//   Swal.fire({
-//     title: "Loading targets",
-//     allowOutsideClick: false,
-//     showConfirmButton: false,
-//     didOpen: () => Swal.showLoading(),
-//   });
-
-//   const res = await this.authStore.getScopeTargets(
-//     this.selectedTestingType
-//   );
-
-//   Swal.close();
-
-//   if (!res.status) {
-//     Swal.fire("Error", res.message, "error");
-//     return;
-//   }
-
-//   // ✅ Populate ONLY cards
-//   this.mapGetTargetsResponse(res.data.data || []);
-// },
-   async fetchTargetsByTestingType() {
-  const isNewProject = localStorage.getItem("isNewProject") === "true";
-  if (isNewProject) return;
-
-  Swal.fire({
-    title: "Loading targets",
-    allowOutsideClick: false,
-    showConfirmButton: false,
-    didOpen: () => Swal.showLoading(),
-  });
-
-  const res = await this.authStore.getScopeTargets(this.selectedTestingType);
-
-  Swal.close();
-
-  if (!res.status) {
-    Swal.fire("Error", res.message, "error");
-    return;
-  }
-
-  this.mapGetTargetsResponse(res.data.data || []);
-},
-
-
-
-
-mapGetTargetsResponse(list) {
-  // 🔄 Reset ONLY cards (not textarea)
-  this.internalTargets = [];
-  this.externalTargets = [];
-  this.webAppTargets = [];
-  this.mobileAppTargets = [];
-
-  list.forEach(item => {
-    const value = item.target_value;
-
-    switch (item.target_type) {
-      case "internal_ip":
-        this.internalTargets.push({
-          ip: value,
-          count: item.subnet_count,
-        });
-        break;
-
-      case "external_ip":
-        this.externalTargets.push({
-          ip: value,
-          count: item.subnet_count,
-        });
-        break;
-
-      case "web_url":
-        this.webAppTargets.push({
-          url: value,
-        });
-        break;
-
-      case "mobile_url":
-      case "mobile_app":
-        this.mobileAppTargets.push({
-          url: value,
-        });
-        break;
-    }
-  });
-},
-    mapApiResponse(data) {
-  // 🔄 Reset UI
-  this.internalTargets = [];
-  this.externalTargets = [];
-  this.webAppTargets = [];
-  this.mobileAppTargets = [];
-  this.extractedList = [];
-
-  const created = data.created || [];
-
-  created.forEach(item => {
-    const value = item.target_value;
-
-    // ✅ Fill textarea list
-    this.extractedList.push(value);
-
-    // ✅ Categorize correctly
-    switch (item.target_type) {
-      case "internal_ip":
-        this.internalTargets.push({
-          ip: value,
-          count: item.subnet_count,
-        });
-        break;
-
-      case "external_ip":
-        this.externalTargets.push({
-          ip: value,
-          count: item.subnet_count,
-        });
-        break;
-
-      case "web_url":
-        this.webAppTargets.push({
-          url: value,
-        });
-        break;
-
-      case "mobile_url":
-      case "mobile_app":
-        this.mobileAppTargets.push({
-          url: value,
-        });
-        break;
-    }
-  });
-
-  // ✅ Update textarea (so admin can see/copy)
-  this.ipInput = [...new Set(this.extractedList)].join("\n");
+      this.$router.push("/admindashboardonboarding");
     },
-  handleEnterSubmit() {
-  const lines = this.ipInput.split("\n").filter(l => l.trim());
-  const last = lines[lines.length - 1];
 
-  if (
-    this.isValidIP(last) ||
-    this.isValidSubnet(last) ||
-    this.isValidURL(last)
-  ) {
-    this.ipInput += "\n";
-    this.submitTargets(); // 🔥 auto submit
-  } else {
-    Swal.fire("Invalid entry", `"${last}" is invalid`, "error");
-  }
-  },
-handleAutoSubmit() {
-  if (!this.ipInput.trim()) return;
-  this.triggerAutoSubmit();
-},
-triggerAutoSubmit() {
-  clearTimeout(this.autoSubmitTimer);
 
-  this.autoSubmitTimer = setTimeout(() => {
-    this.submitTargets();
-  }, 500); // 0.5 sec debounce
-},
+    submitManualTargets() {
+     if (!this.validateProjectName()) return;
+      this.selectedFile = null; // 🚫 ensure file logic not triggered
+      this.submitTargets();     // ✅ reuse existing API logic
+    },
 
-    // downloadExcelTemplate() {
-    //   // Create sample data with all 4 column types
-    //   const sampleData = [
-    //     {
-    //       IP_ADDRESS: '192.168.1.10',
-    //       SUBNET: '10.0.0.0/24',
-    //       WEB_APP_URL: 'https://example.com',
-    //       MOBILE_APP_URL: 'https://play.google.com/store/apps/details?id=com.example.app'
-    //     },
-    //     {
-    //       IP_ADDRESS: '8.8.8.8',
-    //       SUBNET: '172.16.0.0/16',
-    //       WEB_APP_URL: 'https://test.com',
-    //       MOBILE_APP_URL: 'https://apps.apple.com/app/example/id123456789'
-    //     },
-    //     {
-    //       IP_ADDRESS: '192.168.1.20',
-    //       SUBNET: '',
-    //       WEB_APP_URL: 'https://demo.com',
-    //       MOBILE_APP_URL: ''
-    //     }
-    //   ];
 
-    //   // Create workbook and worksheet
-    //   const ws = XLSX.utils.json_to_sheet(sampleData);
-    //   const wb = XLSX.utils.book_new();
-    //   XLSX.utils.book_append_sheet(wb, ws, 'Targets');
 
-    //   // Set column widths for better readability
-    //   ws['!cols'] = [
-    //     { wch: 15 },  // IP_ADDRESS
-    //     { wch: 18 },  // SUBNET
-    //     { wch: 30 },  // WEB_APP_URL
-    //     { wch: 60 }   // MOBILE_APP_URL
-    //   ];
+    //     async fetchTargetsByTestingType() {
+    //   Swal.fire({
+    //     title: "Loading targets",
+    //     allowOutsideClick: false,
+    //     showConfirmButton: false,
+    //     didOpen: () => Swal.showLoading(),
+    //   });
 
-    //   // Download the file
-    //   XLSX.writeFile(wb, 'VAPT_Targets_Template.xlsx');
+    //   const res = await this.authStore.getScopeTargets(
+    //     this.selectedTestingType
+    //   );
+
+    //   Swal.close();
+
+    //   if (!res.status) {
+    //     Swal.fire("Error", res.message, "error");
+    //     return;
+    //   }
+
+    //   // ✅ Populate ONLY cards
+    //   this.mapGetTargetsResponse(res.data.data || []);
     // },
-   downloadExcelTemplate() {
-  // Sample data in the exact format you want
-  const sampleData = [
-    {
-      INTERNAL: '192.168.1.1',
-      EXTERNAL: '33.87.0.22',
-      WEB_APP_URL: 'www.trox.com',
-      MOBILE_APP_URL: 'app2.apk'
+    async fetchTargetsByTestingType() {
+      const isNewProject = localStorage.getItem("isNewProject") === "true";
+      if (isNewProject) return;
+
+      Swal.fire({
+        title: "Loading targets",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const res = await this.authStore.getScopeTargets(this.selectedTestingType);
+
+      Swal.close();
+
+      if (!res.status) {
+        Swal.fire("Error", res.message, "error");
+        return;
+      }
+
+      this.mapGetTargetsResponse(res.data.data || []);
     },
-    {
-      INTERNAL: '190.132.1.3/5',
-      EXTERNAL: '',
-      WEB_APP_URL: '',
-      MOBILE_APP_URL: ''
+
+
+
+
+    mapGetTargetsResponse(list) {
+      // 🔄 Reset ONLY cards (not textarea)
+      this.internalTargets = [];
+      this.externalTargets = [];
+      this.webAppTargets = [];
+      this.mobileAppTargets = [];
+
+      list.forEach(item => {
+        const value = item.target_value;
+
+        switch (item.target_type) {
+          case "internal_ip":
+            this.internalTargets.push({
+              ip: value,
+              count: item.subnet_count,
+            });
+            break;
+
+          case "external_ip":
+            this.externalTargets.push({
+              ip: value,
+              count: item.subnet_count,
+            });
+            break;
+
+          case "web_url":
+            this.webAppTargets.push({
+              url: value,
+            });
+            break;
+
+          case "mobile_url":
+          case "mobile_app":
+            this.mobileAppTargets.push({
+              url: value,
+            });
+            break;
+        }
+      });
+    },
+    mapApiResponse(data) {
+  // 🔄 Reset cards
+  this.internalTargets = [];
+  this.externalTargets = [];
+  this.webAppTargets = [];
+  this.mobileAppTargets = [];
+
+  // ✅ backend sends: scope.entries
+  const entries = data.scope?.entries || [];
+
+  entries.forEach(item => {
+    const value = item.value;
+
+    switch (item.entry_type) {
+      case "internal_ip":
+        this.internalTargets.push({
+          ip: value,
+          count: item.subnet_mask ? item.subnet_mask : null,
+        });
+        break;
+
+      case "external_ip":
+        this.externalTargets.push({
+          ip: value,
+          count: item.subnet_mask ? item.subnet_mask : null,
+        });
+        break;
+
+      case "web_url":
+        this.webAppTargets.push({
+          url: value,
+        });
+        break;
+
+      case "mobile_url":
+      case "mobile_app":
+        this.mobileAppTargets.push({
+          url: value,
+        });
+        break;
     }
-  ];
-
-  // Create worksheet
-  const ws = XLSX.utils.json_to_sheet(sampleData, {
-    header: ['INTERNAL', 'EXTERNAL', 'WEB_APP_URL', 'MOBILE_APP_URL']
   });
-
-  // Create workbook
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Targets');
-
-  // Column widths
-  ws['!cols'] = [
-    { wch: 20 }, // INTERNAL
-    { wch: 20 }, // EXTERNAL
-    { wch: 30 }, // WEB_APP_URL
-    { wch: 30 }  // MOBILE_APP_URL
-  ];
-
-  // Download file
-  XLSX.writeFile(wb, 'Sample_Report.xlsx');
 },
-   
-   
+    handleEnterSubmit() {
+      const lines = this.ipInput.split("\n").filter(l => l.trim());
+      const last = lines[lines.length - 1];
+
+      if (
+        this.isValidIP(last) ||
+        this.isValidSubnet(last) ||
+        this.isValidURL(last)
+      ) {
+        this.ipInput += "\n";
+        this.submitTargets(); // 🔥 auto submit
+      } else {
+        Swal.fire("Invalid entry", `"${last}" is invalid`, "error");
+      }
+    },
+    handleAutoSubmit() {
+      if (!this.ipInput.trim()) return;
+      this.triggerAutoSubmit();
+    },
+    triggerAutoSubmit() {
+      clearTimeout(this.autoSubmitTimer);
+
+      this.autoSubmitTimer = setTimeout(() => {
+        this.submitTargets();
+      }, 500); // 0.5 sec debounce
+    },
+
+    
+    downloadExcelTemplate() {
+      // Sample data in the exact format you want
+      const sampleData = [
+        {
+          INTERNAL: '192.168.1.1',
+          EXTERNAL: '33.87.0.22',
+          WEB_APP_URL: 'www.trox.com',
+          MOBILE_APP_URL: 'app2.apk'
+        },
+        {
+          INTERNAL: '190.132.1.3/5',
+          EXTERNAL: '',
+          WEB_APP_URL: '',
+          MOBILE_APP_URL: ''
+        }
+      ];
+
+      // Create worksheet
+      const ws = XLSX.utils.json_to_sheet(sampleData, {
+        header: ['INTERNAL', 'EXTERNAL', 'WEB_APP_URL', 'MOBILE_APP_URL']
+      });
+
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Targets');
+
+      // Column widths
+      ws['!cols'] = [
+        { wch: 20 }, // INTERNAL
+        { wch: 20 }, // EXTERNAL
+        { wch: 30 }, // WEB_APP_URL
+        { wch: 30 }  // MOBILE_APP_URL
+      ];
+
+      // Download file
+      XLSX.writeFile(wb, 'Sample_Report.xlsx');
+    },
+
+
     async fetchTestingTypes() {
       const res = await this.authStore.getAdminTestingTypes(this.adminId);
 
@@ -943,59 +752,6 @@ triggerAutoSubmit() {
       this.draggedItem = null;
       this.draggedFrom = null;
     },
-    // buildTargetCards() {
-    //   this.internalTargets = [];
-    //   this.externalTargets = [];
-    //   this.webAppTargets = [];
-    //   this.mobileAppTargets = [];
-    //   this.extractedList = [];
-
-    //   const targets = this.ipInput
-    //     .split(/\n|,/)
-    //     .map(v => v.trim())
-    //     .filter(Boolean);
-
-    //   targets.forEach(value => {
-
-    //     // ✅ SUBNET
-    //     if (this.isValidSubnet(value)) {
-    //       const count = this.getSubnetCount(value);
-
-    //       const target = { ip: value, count };
-    //       this.extractedList.push(value);
-
-    //       if (this.isPrivateIP(value)) {
-    //         this.internalTargets.push(target);
-    //       } else {
-    //         this.externalTargets.push(target);
-    //       }
-    //     }
-
-    //     // ✅ SINGLE IP
-    //     else if (this.isValidIP(value)) {
-    //       const target = { ip: value };
-    //       this.extractedList.push(value);
-
-    //       if (this.isPrivateIP(value)) {
-    //         this.internalTargets.push(target);
-    //       } else {
-    //         this.externalTargets.push(target);
-    //       }
-    //     }
-
-    //     // ✅ URL - Check if Mobile App or Web App
-    //     else if (this.isValidURL(value)) {
-    //       this.extractedList.push(value);
-
-    //       // Check if it's a Mobile App URL (Play Store / App Store)
-    //       if (this.isMobileAppURL(value)) {
-    //         this.mobileAppTargets.push({ url: value });
-    //       } else {
-    //         this.webAppTargets.push({ url: value });
-    //       }
-    //     }
-    //   });
-    // },
     isPrivateIP(value) {
       return (
         value.startsWith("10.") ||
@@ -1106,272 +862,100 @@ triggerAutoSubmit() {
 
       event.target.value = "";
     },
-    // async submitTargets() {
-    //   if (!this.selectedTestingType) {
-    //     Swal.fire(
-    //       "Testing type required",
-    //       "Please select a testing type before uploading targets",
-    //       "warning"
-    //     );
-    //     return;
-    //   }
-    //   if (this.isUploading) return;
+    async submitTargets() {
+      if (!this.selectedTestingType) {
+        Swal.fire(
+          "Testing type required",
+          "Please select a testing type before uploading targets",
+          "warning"
+        );
+        return;
+      }
 
-    //   try {
-    //     this.isUploading = true;
+      if (this.isUploadingTargets) return;
 
-    //     // 🔥 SHOW LOADING ALERT
-    //     Swal.fire({
-    //       title: "Please wait",
-    //       text: "Uploading & processing targets. Do not refresh the page.",
-    //       allowOutsideClick: false,
-    //       allowEscapeKey: false,
-    //       showConfirmButton: false,
-    //       didOpen: () => {
-    //         Swal.showLoading();
-    //       },
-    //     });
+      try {
+        this.isUploadingTargets = true;
+        this.uploadSuccess = false;
 
-    //     const formData = new FormData();
+        const formData = new FormData();
+        formData.append("name", this.name);
+        // 📁 FILE UPLOAD
+        if (this.selectedFile) {
+        
+          formData.append("file", this.selectedFile);
+          formData.append("expand_subnets", "false");
+        }
+        // ✍️ MANUAL INPUT
+        else {
+          if (!this.ipInput.trim()) return;
+          formData.append("targets", this.ipInput);
+        }
 
-    //     if (this.selectedFile) {
-    //       formData.append("file", this.selectedFile);
-    //       // 🔥 speed optimization
-    //   formData.append("expand_subnets", "false");
-    //     } else {
-    //       if (!this.ipInput.trim()) {
-    //         Swal.close(); // close loader
-    //         return;
-    //       }
-    //       formData.append("targets", this.ipInput);
-    //     }
+        const res = await this.authStore.createScope(
+          formData,
+          this.selectedTestingType
+        );
 
-    //     const res = await this.authStore.createScope(formData,this.selectedTestingType);
+        if (!res.status) {
+          Swal.fire("Error", res.message, "error");
+          return;
+        }
 
-    //     // 🔥 CLOSE LOADING ALERT
-    //     Swal.close();
+        this.mapApiResponse(res.data);
 
-    //     if (!res.status) {
-    //       Swal.fire("Error", res.message, "error");
-    //       return;
-    //     }
+        this.ipInput = "";
+        this.extractedList = [];
 
-    //     // ✅ Update UI from backend
-    //     this.mapApiResponse(res.data);
-
-    //     // 🔶 SKIPPED (duplicates)
-    //     if (res.data.skipped?.length) {
-    //       console.warn("Skipped targets:", res.data.skipped);
-
-    //       Swal.fire({
-    //         icon: "warning",
-    //         title: "Already exists",
-    //         text: `${res.data.skipped_count} target(s) skipped`,
-    //         timer: 2500,
-    //         showConfirmButton: false,
-    //       });
-    //     }
-
-    //     // 🟢 SUCCESS
-    //     if (res.data.created_count > 0) {
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: "Success",
-    //         text: `${res.data.created_count} target(s) created`,
-    //         timer: 2500,
-    //         showConfirmButton: false,
-    //       });
-    //     }
-
-    //     this.selectedFile = null;
-
-    //   } catch (err) {
-    //     Swal.close();
-    //     Swal.fire("Error", "Something went wrong", "error");
-    //   } finally {
-    //     this.isUploading = false;
-    //   }
-    // },
-   
-//    async submitTargets() {
-//   if (!this.selectedTestingType) {
-//     Swal.fire(
-//       "Testing type required",
-//       "Please select a testing type before uploading targets",
-//       "warning"
-//     );
-//     return;
-//   }
-
-//   if (this.isUploadingTargets) return;
-
-//   try {
-//     this.isUploadingTargets = true;
-//     this.uploadSuccess = false;
-
-//     const formData = new FormData();
-
-//     if (this.selectedFile) {
-//       formData.append("file", this.selectedFile);
-//       formData.append("expand_subnets", "false");
-//     } else {
-//       if (!this.ipInput.trim()) return;
-//       formData.append("targets", this.ipInput);
-//     }
-
-//     const res = await this.authStore.createScope(
-//       formData,
-//       this.selectedTestingType
-//     );
-
-//     if (!res.status) {
-//       Swal.fire("Error", res.message, "error");
-//       return;
-//     }
-
-//     // ✅ Update UI
-//     this.mapApiResponse(res.data);
-
-//     // ✅ Success state
-//     this.uploadSuccess = true;
-
-//     // ⚠️ Skipped targets
-//     if (res.data.skipped?.length) {
-//       Swal.fire({
-//         icon: "warning",
-//         title: "Already exists",
-//         text: `${res.data.skipped_count} target(s) skipped`,
-//         timer: 2500,
-//         showConfirmButton: false,
-//       });
-//     }
-
-//     // 🎉 Success toast
-//     if (res.data.created_count > 0) {
-//       Swal.fire({
-//         icon: "success",
-//         title: "Success",
-//         text: `${res.data.created_count} target(s) created`,
-//         timer: 2500,
-//         showConfirmButton: false,
-//       });
-//     }
-
-//     this.selectedFile = null;
-
-//   } catch (err) {
-//     Swal.fire("Error", "Something went wrong", "error");
-//   } finally {
-//     this.isUploadingTargets = false;
-
-//     // auto-hide success tick after 3s
-//     setTimeout(() => {
-//       this.uploadSuccess = false;
-//     }, 3000);
-//   }
-// },
+        // Show success state (tick)
+        this.uploadSuccess = true;
+        this.uploadedTestingTypes.add(this.selectedTestingType);
 
 
+        // 🔥 IMPORTANT: new project becomes active now
+        localStorage.removeItem("isNewProject");
 
-async submitTargets() {
-  if (!this.selectedTestingType) {
-    Swal.fire(
-      "Testing type required",
-      "Please select a testing type before uploading targets",
-      "warning"
-    );
-    return;
-  }
+       
+        if (res.data.skipped?.length) {
+          Swal.fire({
+            icon: "warning",
+            title: "Already exists",
+            text: `${res.data.skipped_count} target(s) skipped`,
+            timer: 2500,
+            showConfirmButton: false,
+          });
+        }
 
-  if (this.isUploadingTargets) return;
+        /* =====================================================
+           🎉 CREATED TARGETS
+           ===================================================== */
+        if (res.data.created_count > 0) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: `${res.data.created_count} target(s) created`,
+            timer: 2500,
+            showConfirmButton: false,
+          });
+        }
 
-  try {
-    this.isUploadingTargets = true;
-    this.uploadSuccess = false;
+        // Reset file input
+        this.selectedFile = null;
 
-    const formData = new FormData();
+      } catch (err) {
+        console.error("Upload error:", err);
+        this.showBackendError(err);
+        Swal.fire("Error", "Something went wrong", "error");
+      } finally {
+        this.isUploadingTargets = false;
 
-    // 📁 FILE UPLOAD
-    if (this.selectedFile) {
-      formData.append("file", this.selectedFile);
-      formData.append("expand_subnets", "false");
-    }
-    // ✍️ MANUAL INPUT
-    else {
-      if (!this.ipInput.trim()) return;
-      formData.append("targets", this.ipInput);
-    }
+        // ⏱️ Auto-hide success tick after 3s
+        setTimeout(() => {
+          this.uploadSuccess = false;
+        }, 3000);
+      }
+    },
 
-    const res = await this.authStore.createScope(
-      formData,
-      this.selectedTestingType
-    );
-
-    if (!res.status) {
-      Swal.fire("Error", res.message, "error");
-      return;
-    }
-
-    /* =====================================================
-       ✅ SUCCESS — UPDATE UI
-       ===================================================== */
-
-    // Populate cards from backend response
-    this.mapApiResponse(res.data);
-
-    // Show success state (tick)
-    this.uploadSuccess = true;
-    this.uploadedTestingTypes.add(this.selectedTestingType);
-
-
-    // 🔥 IMPORTANT: new project becomes active now
-    localStorage.removeItem("isNewProject");
-
-    /* =====================================================
-       ⚠️ SKIPPED TARGETS
-       ===================================================== */
-    if (res.data.skipped?.length) {
-      Swal.fire({
-        icon: "warning",
-        title: "Already exists",
-        text: `${res.data.skipped_count} target(s) skipped`,
-        timer: 2500,
-        showConfirmButton: false,
-      });
-    }
-
-    /* =====================================================
-       🎉 CREATED TARGETS
-       ===================================================== */
-    if (res.data.created_count > 0) {
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: `${res.data.created_count} target(s) created`,
-        timer: 2500,
-        showConfirmButton: false,
-      });
-    }
-
-    // Reset file input
-    this.selectedFile = null;
-
-  } catch (err) {
-    console.error("Upload error:", err);
-    Swal.fire("Error", "Something went wrong", "error");
-  } finally {
-    this.isUploadingTargets = false;
-
-    // ⏱️ Auto-hide success tick after 3s
-    setTimeout(() => {
-      this.uploadSuccess = false;
-    }, 3000);
-  }
-},
-
-
-   
-   
     onFileChange(e) {
       this.handleFiles([...e.target.files]);
       e.target.value = "";
@@ -1408,49 +992,49 @@ async submitTargets() {
     //   this.$router.push("/admindashboardonboarding");
     // },
 
-handleUploadAndRedirect() {
-  // No multiple testing types → go directly
-  if (this.allowedTestingTypes.length <= 1) {
-    this.redirectToDashboard();
-    return;
-  }
+    handleUploadAndRedirect() {
+      // No multiple testing types → go directly
+      if (this.allowedTestingTypes.length <= 1) {
+        this.redirectToDashboard();
+        return;
+      }
 
-  // Find testing types WITHOUT targets
-  const missingTypes = this.allowedTestingTypes.filter(
-  type => !this.uploadedTestingTypes.has(type)
-);
+      // Find testing types WITHOUT targets
+      const missingTypes = this.allowedTestingTypes.filter(
+        type => !this.uploadedTestingTypes.has(type)
+      );
 
-  // ✅ All testing types filled → NO alert
-  if (!missingTypes.length) {
-    this.redirectToDashboard();
-    return;
-  }
+      // ✅ All testing types filled → NO alert
+      if (!missingTypes.length) {
+        this.redirectToDashboard();
+        return;
+      }
 
-  // ❗ Some testing types missing → show alert
-  const nextTestingType = missingTypes[0];
+      // ❗ Some testing types missing → show alert
+      const nextTestingType = missingTypes[0];
 
-  Swal.fire({
-    title: "Upload remaining targets?",
-    text: `You haven't uploaded targets for ${this.formatTestingType(
-      nextTestingType
-    )}. Do you want to upload now?`,
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Yes, upload now",
-    cancelButtonText: "Skip & continue",
-    confirmButtonColor: "#5a44ff",
-    cancelButtonColor: "#6b7280",
-  }).then(result => {
-    if (result.isConfirmed) {
-      this.selectedTestingType = nextTestingType;
-      this.ipInput = "";
-      this.selectedFile = null;
-      this.fetchTargetsByTestingType();
-    } else {
-      this.redirectToDashboard();
-    }
-  });
-},
+      Swal.fire({
+        title: "Upload remaining targets?",
+        text: `You haven't uploaded targets for ${this.formatTestingType(
+          nextTestingType
+        )}. Do you want to upload now?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, upload now",
+        cancelButtonText: "Skip & continue",
+        confirmButtonColor: "#5a44ff",
+        cancelButtonColor: "#6b7280",
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.selectedTestingType = nextTestingType;
+          this.ipInput = "";
+          this.selectedFile = null;
+          this.fetchTargetsByTestingType();
+        } else {
+          this.redirectToDashboard();
+        }
+      });
+    },
 
 
   },
@@ -1486,7 +1070,7 @@ handleUploadAndRedirect() {
 }
 
 .testing-type {
-  min-width: 200px;
+  min-width: 120px;
 }
 
 .testing-select {

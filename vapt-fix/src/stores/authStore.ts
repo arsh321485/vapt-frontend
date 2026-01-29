@@ -69,7 +69,11 @@ export const useAuthStore = defineStore("auth", {
     completedSteps: localStorage.getItem("completedSteps")
       ? JSON.parse(localStorage.getItem("completedSteps")!)
       : [] as number[],
+    projectNames: [] as string[],
+    isLoadingProjects: false,
+
     }),
+
 
   actions: {
   // ✅ Restore session on reload
@@ -994,6 +998,36 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // GET SCOPE PROJECT NAMES (BY ADMIN ID)
+  async fetchScopeProjectNames(adminId: string) {
+    try {
+      if (!adminId) {
+        throw new Error("Admin ID is required");
+      }
+
+      const res = await endpoint.get(
+        `/admin/scope/names/${adminId}/`
+      );
+
+      return {
+        status: true,
+        data: res.data, // full response
+      };
+
+    } catch (err) {
+      const error = err as AxiosError<any>;
+
+      return {
+        status: false,
+        message:
+          (error.response?.data as any)?.message ||
+          error.message ||
+          "Failed to fetch project names",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
   // CREATE SCOPE (TEXT OR FILE)
   async createScope(formData: FormData, testingType: string) {
     try {
@@ -1030,6 +1064,36 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // GET FULL SCOPE DATA BY PROJECT NAME
+  async getFullScopeData(adminId: string, projectName: string) {
+    try {
+      if (!adminId || !projectName) {
+        throw new Error("Admin ID and Project Name are required");
+      }
+
+      const res = await endpoint.get(
+        `/admin/scope/data/${adminId}/${encodeURIComponent(projectName)}/`
+      );
+
+      return {
+        status: true,
+        data: res.data,
+      };
+
+    } catch (err) {
+      const error = err as AxiosError<any>;
+
+      return {
+        status: false,
+        message:
+          (error.response?.data as any)?.message ||
+          error.message ||
+          "Failed to fetch scope data",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
   // get all scope targets
   async getScopeTargets(testingType: string) {
     try {
@@ -1052,27 +1116,58 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // 🔥 NEW: Get single target by ID
-  async getScopeTargetById(id: string, testingType: string) {
-      try {
-        const res = await endpoint.get(
-          `/admin/scope/${id}/?current_testing_box=${testingType}`
-        );
-
-        return {
-          status: true,
-          data: res.data.data, // 👈 ONLY target object
-        };
-      } catch (error: any) {
-        return {
-          status: false,
-          message:
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to fetch target",
-        };
+  // GET TESTING TYPE BY SCOPE PROJECT NAME
+  async getTestingTypeByScope(adminId: string, scopeName: string) {
+    try {
+      if (!adminId || !scopeName) {
+        throw new Error("Admin ID and Scope Name are required");
       }
+
+      const res = await endpoint.get(
+        `/admin/scope/testing-type/${adminId}/${encodeURIComponent(scopeName)}/`
+      );
+
+      return {
+        status: true,
+        data: res.data,
+      };
+
+    } catch (err) {
+      const error = err as AxiosError<any>;
+
+      return {
+        status: false,
+        message:
+          (error.response?.data as any)?.message ||
+          error.message ||
+          "Failed to fetch testing type",
+        details: error.response?.data || null,
+      };
+    }
   },
+
+  // 🔥 NEW: Get single target by ID
+  // async getScopeTargetById(id: string, testingType: string) {
+  //     try {
+  //       const res = await endpoint.get(
+  //         `/admin/scope/${id}/?current_testing_box=${testingType}`
+  //       );
+
+  //       return {
+  //         status: true,
+  //         data: res.data.data, // 👈 ONLY target object
+  //       };
+  //     } catch (error: any) {
+  //       return {
+  //         status: false,
+  //         message:
+  //           error.response?.data?.message ||
+  //           error.message ||
+  //           "Failed to fetch target",
+  //       };
+  //     }
+  // },
+
 
   // 🔥 PATCH: Update target (partial)
   async updateScopeTarget(
@@ -1103,23 +1198,52 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // 🔥 DELETE: Delete single scope target
-  async deleteScopeTarget(id: string, testingType: string) {
+  // async deleteScopeTarget(id: string, testingType: string) {
+  //   try {
+  //     const res = await endpoint.delete(
+  //       `/admin/scope/${id}/?current_testing_box=${testingType}`
+  //     );
+
+  //     return {
+  //       status: true,
+  //       message: res.data.message,
+  //     };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         error.message ||
+  //         "Failed to delete target",
+  //     };
+  //   }
+  // },
+  // DELETE SCOPE ENTRY
+  async deleteScopeEntry(scopeId: string, entryId: string) {
     try {
+      if (!scopeId || !entryId) {
+        throw new Error("Scope ID and Entry ID are required");
+      }
+
       const res = await endpoint.delete(
-        `/admin/scope/${id}/?current_testing_box=${testingType}`
+        `/admin/scope/${scopeId}/entries/${entryId}/`
       );
 
       return {
         status: true,
-        message: res.data.message,
+        message: res.data?.detail || "Entry deleted successfully",
       };
-    } catch (error: any) {
+
+    } catch (err) {
+      const error = err as AxiosError<any>;
+
       return {
         status: false,
         message:
-          error.response?.data?.message ||
+          error.response?.data?.detail ||
           error.message ||
-          "Failed to delete target",
+          "Failed to delete entry",
+        details: error.response?.data || null,
       };
     }
   },
