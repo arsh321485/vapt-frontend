@@ -92,10 +92,15 @@ const router = createRouter({
       component: RiskCriteriaView,
     },
     {
-      path: '/uploadreport',
-      name: 'uploadreport',
+      path: '/uploadtarget',
+      name: 'uploadtarget',
       component: UploadReportView,
     },
+    // {
+    //   path: '/uploadreport',
+    //   name: 'uploadreport',
+    //   component: UploadReportView,
+    // },
     {
       path: '/onboarding1',
       name: 'onboarding1',

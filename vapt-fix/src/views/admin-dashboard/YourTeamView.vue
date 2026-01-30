@@ -17,7 +17,7 @@
                 <div>
                   <button class="btn d-flex align-items-center px-3 py-2 text-light"
                     style="font-size: 14px;background-color: rgba(49, 33, 177, 1);border-radius: 20px;"
-                    @click="showPopup = true">
+                    @click="openModal">
                     <i class="bi bi-person-plus me-2"></i> Add a team member
                   </button>
                 </div>
@@ -27,148 +27,124 @@
 
             <!-- Add Team Member modal -->
             <div class="">
-              <!-- Modal -->
-              <div class="modal fade" tabindex="-1" :class="{ show: showPopup }" style="display: block;"
-                v-if="showPopup">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title w-100">
-                        <div class="d-flex justify-content-center">
-                          <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                            <i class="bi bi-link-45deg fs-5"></i>
-                          </div>
-                          <h5 class="fw-semibold ms-2 mt-2">Create invite link</h5>
-                        </div>
-                      </h5>
-                      <button type="button" class="btn-close" @click="showPopup = false"></button>
-                    </div>
-                    <div class="modal-body my-4 ms-3 me-4">
-                      <div class="container">
-                        <div class="row mb-3">
-                          <div class="col-md-4">
-                            <label class="form-label fw-semibold text-center w-100">User Type</label>
-                            <select class="form-select rounded-0 uniform-input">
-                              <option selected disabled>Select type</option>
-                              <option value="internal">Internal</option>
-                              <option value="external">External</option>
-                            </select>
-                          </div>
-                          <!-- <div class="col-md-4">
-                                                <label class="form-label fw-semibold text-center w-100">Select Location</label>
-                                                <select class="form-select rounded-0 uniform-input">
-                                                <option selected disabled>Select location</option>
-                                                <option>Germany</option>
-                                                <option>Delhi</option>
-                                                <option>Bahrain</option>
-                                                </select>
-                                            </div> -->
-                          <div class="col-md-4">
-                            <label class="form-label fw-semibold text-center w-100">Member Role</label>
-                            <div class="modal-multi-select-dropdown" ref="roleDropdown3">
-                              <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown3')">
-                                <span>{{ selectedRoleText3 }}</span>
-                                <span><i class="bi bi-chevron-down"></i></span>
-                              </div>
-                              <div class="dropdown-list" v-show="isOpen.dropdown3">
-                                <label v-for="option in roleOptions" :key="option.short">
-                                  <input type="checkbox" :value="option.short" v-model="selectedRoles3" />
-                                  {{ option.full }}
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row mb-4">
-                          <div class="col-12">
-                            <label class="form-label fw-semibold text-center w-100">Copy Link</label>
-                            <div class="position-relative w-100">
-                              <textarea id="shareLink" class="form-control form-control-sm border-bottom rounded-0"
-                                rows="2" readonly @click="copyLink"
-                                style="resize: none; overflow: hidden; white-space: normal; height: 42px; padding: 0 8px;">https://secureitlabbh.sharepoint.com/:w:/s/SITLDevelopment/ETbmVY-X3_FLvyBDP7aVAvIB82tWReGJNHD6pIOGzuRurg?e=e16G1P
-                                                </textarea>
-                              <!-- Popup message -->
-                              <div id="copyPopup" class="position-absolute px-2 py-1 rounded small text-white"
-                                style="background: grey; top: -40px; left: 10px;" v-show="linkCopied">
-                                Link Copied!
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row mb-3">
-                          <div class="modal-header mb-4">
-                            <h5 class="modal-title w-100">
-                              <div class="d-flex justify-content-center">
-                                <div class="col-1 d-flex justify-content-center align-items-center location-icon">
-                                  <i class="bi bi-person-fill fs-5"></i>
-                                </div>
-                                <h5 class="fw-semibold ms-2 mt-2">Add users</h5>
-                              </div>
-                            </h5>
+              <!-- Add User Modal -->
+            <div
+              class="modal fade"
+              id="addUserModal"
+              tabindex="-1"
+              aria-hidden="true"
+              ref="addUserModal"
+            >
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
 
-                          </div>
-                          <!-- <div class="d-flex justify-content-start">
-                      <div class="col-1 d-flex justify-content-center align-items-center location-icon me-2 mb-3">
-                      <i class="bi bi-person-fill fs-5"></i>
+                  <!-- MODAL HEADER -->
+                  <div class="modal-header border-0 justify-content-center position-relative">
+                    <div class="d-flex align-items-center">
+                      <div class="modal-icon me-2">
+                        <i class="bi bi-person-fill"></i>
+                      </div>
+                      <h5 class="modal-title fw-semibold">Add users</h5>
                     </div>
-                                            <h5 class="fw-semibold mt-2 ">Add users</h5></div> -->
-                          <div class="col-md-4">
-                            <label class="form-label fw-semibold text-center w-100">User Type</label>
-                            <select class="form-select rounded-0 uniform-input">
-                              <option selected disabled>Select type</option>
-                              <option value="internal">Internal</option>
-                              <option value="external">External</option>
-                            </select>
+
+                    <button
+                      type="button"
+                      class="btn-close position-absolute end-0 me-3"
+                      @click="closeModal"
+                    ></button>
+                  </div>
+
+                  <hr class="my-0" />
+
+                  <!-- MODAL BODY -->
+                  <div class="modal-body px-4 pt-4">
+                    <div class="row g-3">
+
+                      <!-- User Type -->
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold text-center w-100">
+                          User Type
+                        </label>
+                        <select class="form-select uniform-input" v-model="form.user_type">
+                          <option disabled selected>Select type</option>
+                          <option value="internal">Internal</option>
+                          <option value="external">External</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-4">
+                <label class="form-label fw-semibold text-center w-100">
+                  First Name
+                </label>
+                <input class="form-control uniform-input" type="text" v-model="form.first_name"/>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold text-center w-100">
+                          Last Name
+                        </label>
+                        <input class="form-control uniform-input" type="text" v-model="form.last_name"/>
+                      </div>
+
+                    </div>
+            <!-- BOTTOM ROW (UNCHANGED) -->
+            <div class="row g-3 mt-2">
+
+              <!-- Member Role -->
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold text-center w-100">
+                          Member Role
+                        </label>
+
+                        <div class="modal-multi-select-dropdown" ref="roleDropdown2">
+                          <div
+                            class="dropdown-input uniform-input"
+                            @click="toggleDropdown('dropdown2')"
+                          >
+                            <span>{{ selectedRoleText2 || 'Select roles' }}</span>
+                            <i class="bi bi-chevron-down"></i>
                           </div>
-                          <!-- <div class="col-md-4">
-                                                <label class="form-label fw-semibold text-center w-100">Select Location</label>
-                                                <select class="form-select rounded-0 uniform-input">
-                                                <option selected disabled>Select location</option>
-                                                <option>Germany</option>
-                                                <option>Delhi</option>
-                                                <option>Bahrain</option>
-                                                </select>
-                                            </div> -->
-                          <div class="col-md-4">
-                            <label class="form-label fw-semibold text-center w-100">Member Role</label>
-                            <div class="modal-multi-select-dropdown" ref="roleDropdown2">
-                              <div class="dropdown-input rounded-0" @click="toggleDropdown('dropdown2')">
-                                <span>{{ selectedRoleText2 }}</span>
-                                <span><i class="bi bi-chevron-down"></i></span>
-                              </div>
-                              <div class="dropdown-list" v-show="isOpen.dropdown2">
-                                <label v-for="option in roleOptions" :key="option.short">
-                                  <input type="checkbox" :value="option.short" v-model="selectedRoles2" />
-                                  {{ option.full }}
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-md-4">
-                            <label class="form-label fw-semibold text-center w-100">First Name</label>
-                            <input class="form-control uniform-input rounded-0" type="text">
-                          </div>
-                          <div class="col-md-4">
-                            <label class="form-label fw-semibold text-center w-100">Last Name</label>
-                            <input class="form-control rounded-0" type="text">
-                          </div>
-                          <div class="col-md-4">
-                            <label class="form-label fw-semibold text-center w-100">Email</label>
-                            <input class="form-control rounded-0" type="email">
+
+                          <div class="dropdown-list" v-show="isOpen.dropdown2">
+                            <label v-for="option in roleOptions" :key="option.short">
+                              <input
+                                type="checkbox"
+                                :value="option.short"
+                                v-model="selectedRoles2"
+                              />
+                              {{ option.full }}
+                            </label>
                           </div>
                         </div>
                       </div>
-                    </div>
-
+            <!-- Email (RIGHT EMPTY SPACE) -->
+              <div class="col-md-4">
+                <label class="form-label fw-semibold text-center w-100">
+                  Email
+                </label>
+                <input class="form-control uniform-input" type="email"  v-model="form.email"/>
+              </div>
+            </div>
                   </div>
+
+                  <!-- MODAL FOOTER -->
+                  <div class="modal-footer border-0 justify-content-end px-4 pb-4">
+                    <button class="btn btn-outline-secondary" @click="closeModal">
+                      Cancel
+                    </button>
+                    <button class="btn btn-primary" @click="saveUser">
+                      Add User
+                    </button>
+                  </div>
+
                 </div>
               </div>
             </div>
 
+            </div>
+
             <div class="row my-4">
-              <div class="col-12">
+              <div class="col-10">
                 <div class="d-flex justify-content-between tab-wrapper position-relative">
                   <p v-for="(tab, index) in tabs" :key="index" class="nav-item" :class="{ active: activeTab === index }"
                     :style="{ width: '25%', color: activeTab === index ? 'rgba(49, 33, 177, 1)' : '#000' }"
@@ -183,10 +159,10 @@
                 </div>
               </div>
             
-              <div class="col-12 mt-4">
+              <div class="col-10 mt-4">
                 <!-- Dynamic Content per Tab -->
                 <div v-for="(tab, index) in tabs" :key="index" v-show="activeTab === index">
-                  <div v-if="isAssignIpTab">
+                  <!-- <div v-if="isAssignIpTab">
                     <div class="team-section mb-5">
                     <table class="table team-table">
                       <thead>
@@ -199,7 +175,7 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <!-- ASSET -->
+                        
                           <td>
                             <div class="hierarchy-dropdown">
                               <div class="dropdown-input" @click.stop="assetDropdownOpen = !assetDropdownOpen">
@@ -225,7 +201,7 @@
                             </div>
                           </td>
 
-                          <!-- USERS -->
+                        
                           <td>
                             <div class="multi-select-dropdown">
                               <div class="dropdown-input" @click="assignUsersOpen = !assignUsersOpen">
@@ -243,7 +219,6 @@
                             </div>
                           </td>
 
-                          <!-- ROLE -->
                           <td>
                             <div class="multi-select-dropdown">
                               <div class="dropdown-input" @click.stop="assignRoleOpen = !assignRoleOpen">
@@ -260,7 +235,6 @@
                             </div>
                           </td>
 
-                          <!-- ACTION -->
                           <td>
                             <a class="remove-btn">
                               <i class="bi bi-dash-circle me-1"></i> Remove
@@ -270,8 +244,8 @@
                       </tbody>
                     </table>
                     </div>
-                  </div>
-                  <div v-else>
+                  </div> -->
+                  <!-- <div v-else> -->
                     <!-- ================= INTERNAL SECTION ================= -->
                     <div class="team-section mb-5">
                       <div class="subtab-header">
@@ -289,7 +263,7 @@
 
                               <th style="width: 25%;">Email</th>
                               <th style="width: 22%;">Role</th>
-                              <th style="width: 13%;">Action</th>
+                              <!-- <th style="width: 13%;">Action</th> -->
                             </tr>
                           </thead>
 
@@ -314,9 +288,44 @@
 
 
                               <td class="email-cell">{{ user.email }}</td>
-
-
                               <td>
+  <div class="role-dropdown-wrapper">
+    <!-- DROPDOWN -->
+    <div class="multi-select-dropdown">
+      <div class="dropdown-input" @click="toggleDropdown(user._id)">
+        <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+
+      <div class="dropdown-list" v-show="isOpen[user._id]">
+        <label v-for="option in roleOptions" :key="option.short">
+          <input
+            type="checkbox"
+            :value="option.short"
+            v-model="selectedRoles[user._id]"
+            @change="handleRoleChange($event, user, option)"
+          />
+          {{ option.full }}
+        </label>
+      </div>
+    </div>
+
+    <!-- INFO ICON (OUTSIDE) -->
+    <div class="info-wrapper">
+      <i class="bi bi-info-circle info-icon"></i>
+
+      <div class="info-tooltip">
+        <strong>Role Assignment</strong>
+        <p>✔ Check a role to assign it</p>
+        <p>✖ Uncheck a role to remove it</p>
+      </div>
+    </div>
+  </div>
+</td>
+
+
+
+                              <!-- <td>
                                 <div class="multi-select-dropdown">
                                   <div class="dropdown-input" @click="toggleDropdown(user._id)">
                                     <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
@@ -331,13 +340,13 @@
                                     </label>
                                   </div>
                                 </div>
-                              </td>
+                              </td> -->
 
-                              <td>
+                              <!-- <td>
                                 <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
                                   <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
-                              </td>
+                              </td> -->
                             </tr>
                           </tbody>
                         </table>
@@ -359,7 +368,7 @@
 
                               <th style="width: 25%;">Email</th>
                               <th style="width: 22%;">Role</th>
-                              <th style="width: 13%;">Action</th>
+                              <!-- <th style="width: 13%;">Action</th> -->
                             </tr>
                           </thead>
 
@@ -401,18 +410,18 @@
                                 </div>
                               </td>
 
-                              <td>
+                              <!-- <td>
                                 <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
                                   <i class="bi bi-dash-circle me-1"></i> Remove
                                 </a>
-                              </td>
+                              </td> -->
                             </tr>
                           </tbody>
                         </table>
                       </div>
 
                     </div>
-                  </div>
+                  <!-- </div> -->
                 </div>
               </div>
 
@@ -460,7 +469,7 @@ export default {
         { name: "Configuration Management" },
         { name: "Network Security" },
         { name: "Architectural Flaws" },
-        { name: "Assign IP to Team" }
+        // { name: "Assign IP to Team" }
       ],
       authStore: useAuthStore(),
       users: [],
@@ -474,44 +483,50 @@ export default {
         "Architectural Flaws": "AF"
       },
       assetDropdownOpen: false,
-      assetHierarchy: [
-        {
-          label: "White Box",
-          open: false,
-          items: [
-            { value: "192.168.1.10", checked: false },
-            { value: "192.168.1.11", checked: false }
-          ]
-        },
-        {
-          label: "Black Box",
-          open: false,
-          items: [
-            { value: "example.com", checked: false },
-            { value: "api.example.com", checked: false }
-          ]
-        },
-        {
-          label: "Grey Box",
-          open: false,
-          items: [
-            { value: "10.0.0.1", checked: false }
-          ]
-        },
-        {
-          label: "Cloud Assets",
-          open: false,
-          items: [
-            { value: "cloud.example.com", checked: false }
-          ]
-        }
-      ],
+      // assetHierarchy: [
+      //   {
+      //     label: "White Box",
+      //     open: false,
+      //     items: [
+      //       { value: "192.168.1.10", checked: false },
+      //       { value: "192.168.1.11", checked: false }
+      //     ]
+      //   },
+      //   {
+      //     label: "Black Box",
+      //     open: false,
+      //     items: [
+      //       { value: "example.com", checked: false },
+      //       { value: "api.example.com", checked: false }
+      //     ]
+      //   },
+      //   {
+      //     label: "Grey Box",
+      //     open: false,
+      //     items: [
+      //       { value: "10.0.0.1", checked: false }
+      //     ]
+      //   },
+      //   {
+      //     label: "Cloud Assets",
+      //     open: false,
+      //     items: [
+      //       { value: "cloud.example.com", checked: false }
+      //     ]
+      //   }
+      // ],
       internalSubTab: "list",
       externalSubTab: "list",
       assignUsersOpen: false,
       selectedAssignUsers: [],
       assignRoles: [],
       assignRoleOpen: false,
+      form: {
+        user_type: "",
+        first_name: "",
+        last_name: "",
+        email: "",
+      }
     };
   },
   computed: {
@@ -560,6 +575,106 @@ export default {
     }
   },
   methods: {
+    openModal() {
+    const modal = new bootstrap.Modal(this.$refs.addUserModal);
+    modal.show();
+  },
+
+  closeModal() {
+    const modal = bootstrap.Modal.getInstance(this.$refs.addUserModal);
+    modal?.hide();
+  },
+
+  async saveUser() {
+  try {
+    // 🔐 Admin ID
+    const adminId = this.authStore.user?._id || this.authStore.user?.id;
+    if (!adminId) {
+      Swal.fire("Error", "Admin not found. Please login again.", "error");
+      return;
+    }
+
+    // 🧠 Role mapping
+    const roleFullMap = {
+      PM: "Patch Management",
+      CM: "Configuration Management",
+      NS: "Network Security",
+      AF: "Architectural Flaws",
+    };
+
+    const memberRoles = this.selectedRoles2.map(
+      short => roleFullMap[short]
+    );
+
+    // ❗ Basic validation
+    if (
+      !this.form.user_type ||
+      !this.form.first_name ||
+      !this.form.last_name ||
+      !this.form.email ||
+      memberRoles.length === 0
+    ) {
+      Swal.fire("Error", "Please fill all fields", "error");
+      return;
+    }
+
+    // 📦 Payload
+    const payload = {
+      admin_id: adminId,
+      user_type: this.form.user_type,
+      first_name: this.form.first_name,
+      last_name: this.form.last_name,
+      email: this.form.email,
+      Member_role: memberRoles,
+    };
+
+    // 🚀 API CALL
+    const res = await this.authStore.createUserDetail(payload);
+
+    if (!res.status) {
+      Swal.fire("Error", res.message, "error");
+      return;
+    }
+
+    // ✅ Success
+    Swal.fire({
+      icon: "success",
+      title: "User Added",
+      text: res.message,
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    // 🔄 Update UI immediately
+const newUser = res.data;
+this.users.unshift(newUser);
+
+// ✅ 🔑 INITIALIZE DROPDOWN STATE FOR NEW USER
+this.selectedRoles[newUser._id] =
+  newUser.Member_role?.map(full => this.roleMapping[full]) || [];
+
+this.selectedRoleText[newUser._id] =
+  this.selectedRoles[newUser._id].join(", ");
+
+this.isOpen[newUser._id] = false;
+
+
+    // 🔁 Reset modal
+    this.form = {
+      user_type: "",
+      first_name: "",
+      last_name: "",
+      email: "",
+    };
+    this.selectedRoles2 = [];
+
+    this.closeModal();
+
+  } catch (err) {
+    console.error("❌ Add user failed:", err);
+    Swal.fire("Error", "Something went wrong", "error");
+  }
+},
     onAssignUserChange() {
 
       this.assignUsersOpen = false;
@@ -667,95 +782,7 @@ export default {
         return matchType && matchRole;
       });
     },
-    async addUser() {
-      try {
-        // ✅ 1️⃣ Get admin ID
-        const adminId = this.authStore.user?._id || this.authStore.user?.id;
-        if (!adminId) {
-          Swal.fire({
-            icon: "error",
-            title: "Missing Admin ID",
-            text: "Please log in again.",
-            timer: 3000,
-            showConfirmButton: false,
-          });
-          return;
-        }
-
-        // ✅ 2️⃣ Map short role codes → full names
-        const roleFullMap = {
-          PM: "Patch Management",
-          CM: "Configuration Management",
-          NS: "Network Security",
-          AF: "Architectural Flaws",
-        };
-
-        // ✅ 3️⃣ Prepare payload
-        this.form.admin_id = adminId;
-        this.form.Member_role = this.selectedRoles1.map(
-          (short) => roleFullMap[short] || short
-        );
-
-        // ✅ 4️⃣ Call API
-        const res = await endpoint.post(
-          "/admin/users_details/add-user-detail/",
-          this.form
-        );
-
-        if (res.data.message === "User detail created successfully") {
-          console.log("✅ User created:", res.data.data);
-
-          Swal.fire({
-            icon: "success",
-            title: "User Added",
-            text: res.data.message,
-            timer: 2500,
-            showConfirmButton: false,
-          });
-
-          // ✅ 5️⃣ Add newly created user to UI immediately
-          const newUser = res.data.data;
-
-          // Initialize usersList if not exists
-          if (!this.usersList) this.usersList = [];
-
-          // Prevent duplicate (based on email)
-          const exists = this.usersList.some(
-            (u) => u.email.toLowerCase() === newUser.email.toLowerCase()
-          );
-
-          if (!exists) {
-            this.usersList.unshift(newUser); // show newly added user first
-          }
-
-          // ✅ 6️⃣ Save in localStorage for persistence
-          localStorage.setItem("addedUsers", JSON.stringify(this.usersList));
-
-          // ✅ 7️⃣ Reset form
-          this.form = {
-            admin_id: "",
-            // location_id: "",
-            first_name: "",
-            last_name: "",
-            user_type: "",
-            email: "",
-            // select_location: "",
-            Member_role: [],
-          };
-          // this.selectedLocation = "";
-          this.selectedRoles1 = [];
-        }
-      } catch (err) {
-        console.error("❌ Error adding user:", err);
-        Swal.fire({
-          icon: "error",
-          title: "Error Adding User",
-          text: err.response?.data?.message || "Please try again.",
-          timer: 3000,
-          showConfirmButton: false,
-        });
-      }
-    },
+    
     //  Remove user from current role tab
     async removeUserFromCurrentTab(user) {
       const roleToRemove = this.tabs[this.activeTab].name; // now matches backend exactly
@@ -918,6 +945,109 @@ export default {
 </script>
 
 <style scoped>
+.modal-icon {
+  width: 36px;
+  height: 36px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon i {
+  font-size: 16px;
+  color: #020617;
+}
+
+.uniform-input {
+  border-radius: 4px;
+}
+
+.modal-multi-select-dropdown {
+  position: relative;
+}
+
+.dropdown-input {
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.dropdown-list {
+  position: absolute;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  z-index: 10;
+  padding: 8px;
+}
+
+
+/* Wrapper aligns dropdown + info icon */
+.role-dropdown-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Dropdown width stays normal */
+.multi-select-dropdown {
+  position: relative;
+  width: 180px;
+}
+
+/* Info icon styles */
+.info-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.info-icon {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+/* Tooltip */
+.info-tooltip {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  background: #020617;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 200px;
+  font-size: 12px;
+  color: #e5e7eb;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-5px);
+  transition: all 0.2s ease;
+}
+
+.info-wrapper:hover .info-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.info-tooltip strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.info-tooltip p {
+  margin: 0;
+  line-height: 1.4;
+}
+
 .hierarchy-dropdown {
   position: relative;
 }
@@ -1015,8 +1145,8 @@ export default {
 }
 
 .dropdown-input {
-  /* width: 100%; */
-  width: 70%;
+  width: 100%;
+  /* width: 70%; */
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;

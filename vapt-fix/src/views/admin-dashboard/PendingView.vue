@@ -26,7 +26,7 @@
                         <div class="row">
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
                                 <div class="d-flex flex-row align-items-center justify-content-start gap-3">
-                                    <button class="btn btn-danger btn-pill other-btn" @click="loadOpenTickets">Open</button>
+                                    <!-- <button class="btn btn-danger btn-pill other-btn" @click="loadOpenTickets">Open</button> -->
                                     <select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;">
                                         <option style="font-size: 15px;" selected disabled>Select Team</option>
                                         <option style="font-size: 15px;" value="patch management">Patch Management</option>
@@ -51,6 +51,7 @@
                                 <table class="table align-middle table-hover">
                                     <thead class="table-light">
                                         <tr>
+                                            <th>S.NO.</th>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
                                             <th scope="col">Description</th>

@@ -28,7 +28,7 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-center ms-3">
                   <div class="d-flex gap-2 my-3">
-                    <form>
+                    <!-- <form>
                       <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;"  v-model="selectedSeverity" @change="currentPage = 1">
                      
                         <option value="all">All</option>
@@ -37,7 +37,7 @@
                         <option value="medium">Medium</option>
                         <option value="low">Low</option>
                       </select>
-                    </form>
+                    </form> -->
                     <!-- <div class="filter-dropdown d-inline">
                      
                       <button class="btn btn-sm py-2 px-3 filter-btn dropdown-toggle"

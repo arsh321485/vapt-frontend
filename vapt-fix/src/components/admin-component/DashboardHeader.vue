@@ -43,9 +43,9 @@
   Add User
 </router-link>
 <router-link
-  :to="{ path: '/uploadreport', query: { returnTo: $route.fullPath } }" class="btn btn-sm btn-outline-primary w-100 mb-2"
+  :to="{ path: '/uploadtarget', query: { returnTo: $route.fullPath } }" class="btn btn-sm btn-outline-primary w-100 mb-2"
 >
-  Upload Report
+  Upload Target
 </router-link>
 
 <!-- <router-link

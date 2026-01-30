@@ -148,7 +148,7 @@ export const useAuthStore = defineStore("auth", {
     }) {
       try {
         const res = await endpoint.post(
-          "/admin/users/signup/send-otp/",
+          "/api/admin/users/signup/send-otp/",
           payload
         );
         return { status: true, data: res.data, message: res.data.message };
@@ -167,7 +167,7 @@ export const useAuthStore = defineStore("auth", {
   async signupVerifyOtp(payload: { email: string; otp: string }) {
       try {
         const res = await endpoint.post(
-          "/admin/users/signup/verify-otp/",
+          "/api/admin/users/signup/verify-otp/",
           payload
         );
 
@@ -205,7 +205,7 @@ export const useAuthStore = defineStore("auth", {
   }) {
     try {
       const res = await endpoint.post(
-        "/admin/users/login/",
+        "/api/admin/users/login/",
         payload
       );
 
@@ -240,7 +240,7 @@ export const useAuthStore = defineStore("auth", {
 
   // ✅ Google login
   async googleLogin(id_token: string) {
-  const res = await endpoint.post("/admin/users/google-oauth/", { id_token });
+  const res = await endpoint.post("/api/admin/users/google-oauth/", { id_token });
   const data = res.data;
 
   if (!data?.tokens?.access || !data?.user) {
@@ -264,7 +264,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Forgot Password
   async forgotPassword(payload: { email: string }) {
       try {
-        const res = await endpoint.post("/admin/users/forgot-password/", payload);
+        const res = await endpoint.post("/api/admin/users/forgot-password/", payload);
         return { status: true, data: res.data };
       } catch (error: any) {
         return {
@@ -279,7 +279,7 @@ export const useAuthStore = defineStore("auth", {
   async resetPassword(payload: { uidb64: string; token: string; password: string; confirm_password: string }) {
       try {
         const { uidb64, token, password, confirm_password } = payload;
-        const res = await endpoint.post(`/admin/users/reset-password/${uidb64}/${token}/`, {
+        const res = await endpoint.post(`/api/admin/users/reset-password/${uidb64}/${token}/`, {
           password,
           confirm_password
         });
@@ -296,7 +296,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Get User Profile
   async getUserProfile() {
       try {
-        const response = await endpoint.get("/admin/users/profile");
+        const response = await endpoint.get("/api/admin/users/profile");
         const data = response.data;
         if (data.status) {
           this.user = data.user;
@@ -313,7 +313,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Change Password
   async changePassword(payload: { old_password: string; new_password: string; confirm_password: string }) {
     try {
-      const res = await endpoint.put("/admin/users/change-password/", payload);
+      const res = await endpoint.put("/api/admin/users/change-password/", payload);
       return { status: true, data: res.data };
     } catch (error: any) {
       return {
@@ -327,7 +327,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Get all countries
   async fetchCountries() {
     try {
-      const res = await endpoint.get("/admin/location/countries/");
+      const res = await endpoint.get("/api/admin/location/countries/");
       const data = res.data;
 
       if (Array.isArray(data.countries)) {
@@ -371,7 +371,7 @@ export const useAuthStore = defineStore("auth", {
         };
 
         const res = await endpoint.post(
-          "/admin/location/add-location/",
+          "/api/admin/location/add-location/",
           payload
         );
         const data = res.data;
@@ -397,7 +397,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchLocationsByAdminId(adminId: string) {
     try {
       const res = await endpoint.get(
-        `/admin/location/locations/admin/${adminId}/`
+        `/api/admin/location/locations/admin/${adminId}/`
       );
 
       const data = res.data;
@@ -444,7 +444,7 @@ export const useAuthStore = defineStore("auth", {
   async getAdminTestingTypes(adminId: string) {
     try {
       const res = await endpoint.get(
-        `/admin/users/${adminId}/testing-type/`
+        `/api/admin/users/${adminId}/testing-type/`
       );
 
       const raw = res.data?.data?.testing_type;
@@ -484,7 +484,7 @@ export const useAuthStore = defineStore("auth", {
       formData.append("file", payload.file);
 
       const res = await endpoint.post(
-        "/admin/upload_report/upload/",
+        "/api/admin/upload_report/upload/",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -519,7 +519,7 @@ export const useAuthStore = defineStore("auth", {
   async deleteUploadReport(reportId: string) {
     try {
       const res = await endpoint.delete(
-        `/admin/upload_report/upload/${reportId}/delete/`
+        `/api/admin/upload_report/upload/${reportId}/delete/`
       );
 
       return {
@@ -542,7 +542,7 @@ export const useAuthStore = defineStore("auth", {
   async getAllUploadReports() {
     try {
       const res = await endpoint.get(
-        "/admin/upload_report/upload/all/"
+        "/api/admin/upload_report/upload/all/"
       );
 
       return {
@@ -565,7 +565,7 @@ export const useAuthStore = defineStore("auth", {
   async getUploadReportById(reportId: string) {
     try {
       const res = await endpoint.get(
-        `/admin/upload_report/upload/${reportId}/`
+        `/api/admin/upload_report/upload/${reportId}/`
       );
 
       return {
@@ -588,7 +588,7 @@ export const useAuthStore = defineStore("auth", {
   async createUserDetail(payload: CreateUserPayload) {
       try {
         const res = await endpoint.post(
-          "/admin/users_details/add-user-detail/",
+          "/api/admin/users_details/add-user-detail/",
           payload
         );
 
@@ -625,7 +625,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.get(
-        `/admin/users_details/admin/${adminId}/user-details/`
+        `/api/admin/users_details/admin/${adminId}/user-details/`
       );
 
       const data = res.data;
@@ -654,7 +654,7 @@ export const useAuthStore = defineStore("auth", {
   async updateUserRoles(userId: string, newRoles: string[]): Promise<any> {
     try {
       const res = await endpoint.patch(
-        `/admin/users_details/user-detail/${userId}/update-role/`,
+        `/api/admin/users_details/user-detail/${userId}/update-role/`,
         { new_roles: newRoles }
       );
 
@@ -693,7 +693,7 @@ export const useAuthStore = defineStore("auth", {
         low: payload.low,
       };
 
-      const res = await endpoint.post("/admin/risk_criteria/add-risk/", body);
+      const res = await endpoint.post("/api/admin/risk_criteria/add-risk/", body);
 
       if (res.status === 200 || res.status === 201) {
       const riskCriteria = res.data.risk_criteria;
@@ -725,7 +725,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.get(
-        `/admin/risk_criteria/risks/${riskCriteriaId}/`
+        `/api/admin/risk_criteria/risks/${riskCriteriaId}/`
       );
 
       return {
@@ -773,7 +773,7 @@ export const useAuthStore = defineStore("auth", {
   },
   async getMicrosoftOAuthUrl(redirectUri: string) {
   const res = await endpoint.get(
-    `/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(
+    `/api/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(
       redirectUri
     )}`
   );
@@ -879,7 +879,7 @@ export const useAuthStore = defineStore("auth", {
 
   async getSlackOAuthUrl(baseUrl: string) {
       const res = await endpoint.post(
-        "/admin/users/slack/oauth-url/",
+        "/api/admin/users/slack/oauth-url/",
         {
           base_url: baseUrl,
         }
@@ -894,7 +894,7 @@ export const useAuthStore = defineStore("auth", {
   // 🔑 Slack Login (THIS SAVES BOT TOKEN)
   async loginWithSlack(code: string, redirectUri: string) {
       const res = await endpoint.post(
-        "/admin/users/slack-oauth/",
+        "/api/admin/users/slack-oauth/",
         {
           code,
           redirect_uri: redirectUri,
@@ -924,7 +924,7 @@ export const useAuthStore = defineStore("auth", {
   // 🧠 Jira OAuth - Get Authorization URL
   async getJiraAuthUrl() {
     try {
-      const res = await endpoint.get("/admin/users/jira/oauth-url/");
+      const res = await endpoint.get("/api/admin/users/jira/oauth-url/");
       const data = res.data;
 
       if (data?.auth_url) {
@@ -949,7 +949,7 @@ export const useAuthStore = defineStore("auth", {
   // 🧠 Jira OAuth - Handle Callback (exchange code for token)
   async handleJiraCallback(code: string, state: string) {
     try {
-      const res = await endpoint.get("/admin/users/jira/callback/", {
+      const res = await endpoint.get("/api/admin/users/jira/callback/", {
         params: { code, state }
       });
       const data = res.data;
@@ -981,7 +981,7 @@ export const useAuthStore = defineStore("auth", {
         return { status: false, message: "No Jira access token found" };
       }
 
-      const res = await endpoint.get("/admin/users/jira/resources/", {
+      const res = await endpoint.get("/api/admin/users/jira/resources/", {
         headers: {
           "Jira-Access-Token": jiraToken
         }
@@ -1006,7 +1006,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.get(
-        `/admin/scope/names/${adminId}/`
+        `/api/admin/scope/names/${adminId}/`
       );
 
       return {
@@ -1036,7 +1036,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.post(
-        `/admin/scope/create/?current_testing_box=${testingType}`,
+        `/api/admin/scope/create/?current_testing_box=${testingType}`,
         formData,
         {
           headers: {
@@ -1076,7 +1076,7 @@ export const useAuthStore = defineStore("auth", {
     }
 
     const res = await endpoint.get(
-      `/admin/scope/data/${adminId}/${encodeURIComponent(projectName)}/`,
+      `/api/admin/scope/data/${adminId}/${encodeURIComponent(projectName)}/`,
       {
         params: {
           testing_type: testingType,
@@ -1106,7 +1106,7 @@ export const useAuthStore = defineStore("auth", {
   async getScopeTargets(testingType: string) {
     try {
       const res = await endpoint.get(
-        `/admin/scope/?current_testing_box=${testingType}`
+        `/api/admin/scope/?current_testing_box=${testingType}`
       );
 
       return {
@@ -1132,7 +1132,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.get(
-        `/admin/scope/testing-type/${adminId}/${encodeURIComponent(scopeName)}/`
+        `/api/admin/scope/testing-type/${adminId}/${encodeURIComponent(scopeName)}/`
       );
 
       return {
@@ -1162,7 +1162,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.get(
-        `/admin/scope/${scopeId}/entries/${entryId}/detail/`
+        `/api/admin/scope/${scopeId}/entries/${entryId}/detail/`
       );
 
       return {
@@ -1195,7 +1195,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.patch(
-        `/admin/scope/${scopeId}/entries/${entryId}/update/`,
+        `/api/admin/scope/${scopeId}/entries/${entryId}/update/`,
         payload
       );
 
@@ -1225,7 +1225,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const res = await endpoint.delete(
-        `/admin/scope/${scopeId}/entries/${entryId}/`
+        `/api/admin/scope/${scopeId}/entries/${entryId}/`
       );
 
       return {
@@ -1251,7 +1251,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchTotalAssets(reportId: string) {
   try {
     const res = await endpoint.get(
-      `/admin/admindashboard/report/${reportId}/total-assets/`
+      `/api/admin/admindashboard/report/${reportId}/total-assets/`
     );
 
     this.totalAssets = res.data.total_assets ?? 0;
@@ -1266,7 +1266,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchAvgScore(reportId: string) {
   try {
     const res = await endpoint.get(
-      `/admin/admindashboard/report/${reportId}/avg-score/`
+      `/api/admin/admindashboard/report/${reportId}/avg-score/`
     );
     this.avgScore = res.data?.avg_score ?? 0;
     return { status: true, data: res.data };
@@ -1284,7 +1284,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchVulnerabilities(reportId: string) {
   try {
     const res = await endpoint.get(
-      `/admin/admindashboard/report/${reportId}/vulnerabilities/`
+      `/api/admin/admindashboard/report/${reportId}/vulnerabilities/`
     );
     this.vulnerabilities = res.data || { critical: 0, high: 0, medium: 0, low: 0 };
     return { status: true, data: res.data };
@@ -1299,7 +1299,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchMitigationTimeline(reportId: string) {
     try {
       const res = await endpoint.get(
-        `/admin/admindashboard/report/${reportId}/mitigation-timeline/`
+        `/api/admin/admindashboard/report/${reportId}/mitigation-timeline/`
       );
 
       this.mitigationTimeline = res.data;
@@ -1318,7 +1318,7 @@ export const useAuthStore = defineStore("auth", {
     console.log("[MTTR] Calling API for reportId:", reportId);
 
     const res = await endpoint.get(
-      `/admin/admindashboard/report/${reportId}/mean-time-remediate/`
+      `/api/admin/admindashboard/report/${reportId}/mean-time-remediate/`
     );
 
     console.log("[MTTR] API response:", res.data);
@@ -1347,7 +1347,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchLocationsByReportId(reportId: string) {
   try {
     const res = await endpoint.get(
-      `/admin/upload_report/upload/locations/${reportId}/`
+      `/api/admin/upload_report/upload/locations/${reportId}/`
     );
 
     if (res.data?.success) {
@@ -1386,7 +1386,7 @@ export const useAuthStore = defineStore("auth", {
     console.log("Fetching Vulnerability Register for:", reportId);
 
     const res = await endpoint.get(
-      `/admin/adminregister/register/${reportId}/vulns/`
+      `/api/admin/adminregister/register/${reportId}/vulns/`
     );
 
     console.log("Vulnerability Register response raw:", res && res.data ? res.data : res);
@@ -1434,7 +1434,7 @@ export const useAuthStore = defineStore("auth", {
   async createFixVulnerability(reportId: string,asset: string,payload: Record<string, any>) {
   try {
     const res = await endpoint.post(
-      `/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
+      `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
       payload
     );
     return {
@@ -1457,7 +1457,7 @@ export const useAuthStore = defineStore("auth", {
   async getFixVulnerabilitySteps(fixVulnerabilityId: string) {
     try {
       const res = await endpoint.get(
-        `/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`
       );
 
       return {
@@ -1488,7 +1488,7 @@ export const useAuthStore = defineStore("auth", {
   ) {
     try {
       const res = await endpoint.post(
-        `/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`,
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`,
         payload
       );
 
@@ -1521,7 +1521,7 @@ export const useAuthStore = defineStore("auth", {
   ) {
     try {
       const res = await endpoint.post(
-        `/admin/adminregister/support-requests/raise/report/${reportId}/vulnerability/${vulnerabilityId}/`,
+        `/api/admin/adminregister/support-requests/raise/report/${reportId}/vulnerability/${vulnerabilityId}/`,
         payload
       );
 
@@ -1545,7 +1545,7 @@ export const useAuthStore = defineStore("auth", {
   async getRaiseSupportRequestByVulnerability(vulnerabilityId: string) {
     try {
       const res = await endpoint.get(
-        `/admin/adminregister/raise-support-requests/vulnerability/${vulnerabilityId}/`
+        `/api/admin/adminregister/raise-support-requests/vulnerability/${vulnerabilityId}/`
       );
 
       return {
@@ -1576,7 +1576,7 @@ export const useAuthStore = defineStore("auth", {
   ) {
     try {
       const res = await endpoint.post(
-        `/admin/adminregister/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
+        `/api/admin/adminregister/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
         payload
       );
 
@@ -1602,7 +1602,7 @@ export const useAuthStore = defineStore("auth", {
       console.log("🔥 Fetching tickets for report:", reportId);
 
       const res = await endpoint.get(
-        `/admin/adminregister/tickets/report/${reportId}/`
+        `/api/admin/adminregister/tickets/report/${reportId}/`
       );
 
       console.log("✅ Tickets API response:", res.data);
@@ -1626,7 +1626,7 @@ export const useAuthStore = defineStore("auth", {
   // GET ALL ASSETS
   async fetchAssets(reportId: string) {
     try {
-      const res = await endpoint.get(`/admin/adminasset/report/${reportId}/assets/`);
+      const res = await endpoint.get(`/api/admin/adminasset/report/${reportId}/assets/`);
       const rows = res.data.assets || [];
       const normalized = rows.map((a: any) => ({
         ...a,
@@ -1653,7 +1653,7 @@ export const useAuthStore = defineStore("auth", {
       console.log("[authStore] searchAssets ->", { reportId, q });
 
       const res = await endpoint.get(
-        `/admin/adminasset/report/${reportId}/assets/`,
+        `/api/admin/adminasset/report/${reportId}/assets/`,
         {
           params: { q }
         }
@@ -1696,7 +1696,7 @@ export const useAuthStore = defineStore("auth", {
   async deleteAsset(reportId: string, assetIp: string) {
     try {
       const res = await endpoint.delete(
-        `/admin/adminasset/report/${reportId}/assets/${assetIp}/`
+        `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/`
       );
 
       console.log("✔ Asset deleted:", res.data);
@@ -1713,7 +1713,7 @@ export const useAuthStore = defineStore("auth", {
   async holdAsset(reportId: string, assetIp: string) {
   try {
     const res = await endpoint.post(
-      `/admin/adminasset/report/${reportId}/assets/${assetIp}/hold/`
+      `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/hold/`
     );
 
     if (typeof res.data?.total_assets === "number") {
@@ -1737,7 +1737,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchHeldAssets(reportId: string) {
   try {
     const res = await endpoint.get(
-      `/admin/adminasset/report/${reportId}/assets/hold-list/`
+      `/api/admin/adminasset/report/${reportId}/assets/hold-list/`
     );
 
     return {
@@ -1758,7 +1758,7 @@ export const useAuthStore = defineStore("auth", {
   async unholdAsset(reportId: string, assetIp: string) {
     try {
       const res = await endpoint.post(
-        `/admin/adminasset/report/${reportId}/assets/${assetIp}/unhold/`
+        `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/unhold/`
       );
 
       if (typeof res.data?.total_assets === "number") {
@@ -1782,7 +1782,7 @@ export const useAuthStore = defineStore("auth", {
   async getSupportRequestsByHost(host: string) {
     try {
       const res = await endpoint.get(
-        `/admin/adminasset/support-requests/host/${host}/`
+        `/api/admin/adminasset/support-requests/host/${host}/`
       );
 
       return {
@@ -1803,7 +1803,7 @@ export const useAuthStore = defineStore("auth", {
   async getClosedFixVulnerabilitiesByHost(host: string) {
     try {
       const res = await endpoint.get(
-        `/admin/adminasset/fix-vulnerabilities/host/${host}/closed/`
+        `/api/admin/adminasset/fix-vulnerabilities/host/${host}/closed/`
       );
 
       return {
@@ -1824,7 +1824,7 @@ export const useAuthStore = defineStore("auth", {
   async fetchSingleAssetVulnerabilities(reportId: string, asset: string) {
     try {
       const res = await endpoint.get(
-        `/admin/adminasset/report/${reportId}/asset/${asset}/vulnerabilities/`
+        `/api/admin/adminasset/report/${reportId}/asset/${asset}/vulnerabilities/`
       );
 
       const vulns = res.data.vulnerabilities || [];
@@ -1851,7 +1851,7 @@ export const useAuthStore = defineStore("auth", {
   console.log("📡 Store API called with:", reportId);
 
   const res = await endpoint.get(
-    `/admin/adminregister/support-requests/report/${reportId}/`
+    `/api/admin/adminregister/support-requests/report/${reportId}/`
   );
 
   return {
@@ -1868,7 +1868,7 @@ export const useAuthStore = defineStore("auth", {
       if (!refreshToken) {
         return { status: false, message: "No refresh token found" };
       }
-      const res = await endpoint.post("/admin/users/logout/", {
+      const res = await endpoint.post("/api/admin/users/logout/", {
         refresh: refreshToken,
       });
       localStorage.removeItem("authorization");

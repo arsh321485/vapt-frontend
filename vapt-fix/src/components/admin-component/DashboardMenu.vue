@@ -38,11 +38,11 @@
          </div>
 
          <!-- REPORT - Restricted during testing -->
-         <div>
+         <!-- <div>
           <button class="btn border-0" :class="{ activeBtn: isActive('/report') }" @click="navigateTo('/report')">
           <i class="bi bi-file-earmark-text nav-menu"></i>
           <p class="menu-heading">Report</p></button>
-         </div>
+         </div> -->
 
         <!-- ASSETS - Restricted during testing -->
         <div>
@@ -59,12 +59,12 @@
         </div>
 
          <!-- MITIGATION STRATEGY - Restricted during testing -->
-         <div>
+         <!-- <div>
           <button class="btn border-0" :class="{ activeBtn: isActive('/mitigationstrategy') }" @click="navigateTo('/mitigationstrategy')">
            <i class="bi bi-diagram-3 nav-menu"></i>
           <p class="menu-heading">Mitigation Strategy</p>
           </button>
-        </div>
+        </div> -->
 
          <!-- SUPPORT REQUESTS - Restricted during testing -->
          <div>

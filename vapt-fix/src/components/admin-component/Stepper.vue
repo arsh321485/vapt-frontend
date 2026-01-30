@@ -82,11 +82,11 @@
     <div
       class="step"
       :class="{
-        active: isActive('/uploadreport'),
+        active: isActive('/uploadtarget'),
         completed: isCompleted(3),
         disabled: !canNavigate(3)
       }"
-      @click="handleStepClick('/uploadreport', 3)"
+      @click="handleStepClick('/uploadtarget', 3)"
     >
       <div class="step-circle">3</div>
       <div class="step-label">Upload<br />Targets</div>
@@ -113,7 +113,7 @@ export default {
       const map = {
         "/location": 1,
         "/riskcriteria": 2,
-        "/uploadreport": 3,
+        "/uploadtarget": 3,
       };
       return map[this.$route.path] || 1;
     }

@@ -263,7 +263,7 @@ export default {
       if (this.isLocked) {
         // Data already exists, mark step as completed and proceed
         auth.markStepCompleted(2);
-        this.$router.push("/uploadreport");
+        this.$router.push("/uploadtarget");
         return;
       }
 
@@ -285,7 +285,7 @@ export default {
             timer: 1800,
             showConfirmButton: false,
           });
-          this.$router.push("/uploadreport");
+          this.$router.push("/uploadtarget");
         } else {
           Swal.fire("Error", res.message || "Failed to save risk criteria", "error");
         }

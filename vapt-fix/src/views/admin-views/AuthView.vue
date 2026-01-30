@@ -91,29 +91,6 @@
                 </div>
 
 
-                <!-- new / ongoin project -->
-                <!-- PROJECT TYPE SELECTION (SECOND LOGIN ONLY) -->
-                <div v-if="
-                  currentRole === 'admin' &&
-                  currentMode === 'signin' &&
-                  hasExistingProject
-                " class="mb-2">
-                  <label class="form-label">Project Type</label>
-
-                  <div class="d-flex gap-2">
-                    <div class="project-card" :class="{ active: projectChoice === 'ongoing' }"
-                      @click="selectOngoingProject">
-                      <strong>Ongoing Project</strong>
-                      <small>Continue previous testing</small>
-                    </div>
-
-                    <div class="project-card" :class="{ active: projectChoice === 'new' }" @click="selectNewProject">
-                      <strong>New Project</strong>
-                      <small>Start fresh testing</small>
-                    </div>
-                  </div>
-                </div>
-
 
                 <!-- TESTING BOX DROPDOWN (Signin only, Admin only) -->
 
@@ -153,10 +130,9 @@
   <div class="position-relative">
     <!-- 🔽 THIS IS WHERE YOUR LINE GOES -->
     <div
-      class="form-control custom-input dropdown-trigger"
-      :class="{ disabled: projectChoice === 'ongoing' }"
-      @click="projectChoice !== 'ongoing' && (isTestingBoxOpen = !isTestingBoxOpen)"
-    >
+  class="form-control custom-input dropdown-trigger"
+  @click="isTestingBoxOpen = !isTestingBoxOpen"
+>
       <span class="dropdown-text">
         {{
           selectedTestingBox.length
@@ -179,14 +155,13 @@
         v-for="option in testingBoxOptions"
         :key="option.value"
         class="dropdown-option"
-        :class="{ disabled: projectChoice === 'ongoing' }"
+        :class="{ disabled: isPreviouslySelected(option.value) }"
       >
         <input
-          type="checkbox"
-          :value="option.value"
-          v-model="selectedTestingBox"
-          :disabled="projectChoice === 'ongoing'"
-        />
+  type="checkbox"
+  :value="option.value"
+  v-model="selectedTestingBox" :disabled="isPreviouslySelected(option.value)"
+/>
         {{ option.label }}
       </label>
     </div>
@@ -283,10 +258,7 @@ export default {
 
   data() {
     return {
-      hasExistingProject: false,
-      projectChoice: null, // "ongoing" | "new"
-      lockedTestingBox: [],
-      previouslySelectedBoxes: [],
+      
       currentRole: "admin",
       currentMode: "signup",
       formData: {
@@ -328,47 +300,18 @@ export default {
       ],
     };
   },
-  // watch: {
-  //   "formData.email"(email) {
-  //     if (
-  //       this.currentRole === "admin" &&
-  //       this.currentMode === "signin" &&
-  //       email
-  //     ) {
-  //       const saved = localStorage.getItem(`testingBox_${email}`);
-  //       if (saved) {
-  //         this.previouslySelectedBoxes = JSON.parse(saved);
-  //         this.selectedTestingBox = [...this.previouslySelectedBoxes]; // auto-select
-  //       } else {
-  //         this.previouslySelectedBoxes = [];
-  //         this.selectedTestingBox = [];
-  //       }
-  //     }
-  //   }
-  // },
-
+  
   watch: {
-    "formData.email"(email) {
-      if (
-        this.currentRole === "admin" &&
-        this.currentMode === "signin" &&
-        email
-      ) {
-        const savedProject = localStorage.getItem(`project_${email}`);
-
-        if (savedProject) {
-          const parsed = JSON.parse(savedProject);
-          this.hasExistingProject = true;
-          this.lockedTestingBox = parsed.testingTypes || [];
-          this.projectChoice = null;
-        } else {
-          this.hasExistingProject = false;
-          this.projectChoice = null;
-          this.lockedTestingBox = [];
-        }
-      }
+  "formData.email"(email) {
+    if (
+      this.currentRole === "admin" &&
+      this.currentMode === "signin" &&
+      email
+    ) {
+      this.fetchPreviousTestingTypes();
     }
-  },
+  }
+},
 
   computed: {
     rightHeadline() {
@@ -443,38 +386,34 @@ hasUploadedTargets(email) {
 
 
 
-    selectOngoingProject() {
-    this.projectChoice = "ongoing";
-
-    // Load old testing types
-    this.selectedTestingBox = [...this.lockedTestingBox];
-
-    // Lock dropdown
-    this.isTestingBoxOpen = false;
-  },
-
-  selectNewProject() {
-    this.projectChoice = "new";
-
-    // Allow fresh selection
-    this.selectedTestingBox = [];
-  },
+  
     isPreviouslySelected(type) {
       return this.previouslySelectedTestingBox.includes(type);
     },
     async fetchPreviousTestingTypes() {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (!user?.id) return;
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
-      const res = await this.authStore.getAdminTestingTypes(user.id);
+  // 🔒 No previous login on this browser
+  if (!storedUser?.id || !storedUser?.email) {
+    this.previouslySelectedTestingBox = [];
+    return;
+  }
 
-      if (res.status && res.data.length) {
-        this.previouslySelectedTestingBox = res.data;
+  // 🔐 IMPORTANT: email must match
+  if (storedUser.email !== this.formData.email) {
+    this.previouslySelectedTestingBox = [];
+    return;
+  }
 
-        // ✅ Preselect old values
-        this.selectedTestingBox = [...res.data];
-      }
-    },
+  const res = await this.authStore.getAdminTestingTypes(storedUser.id);
+
+  if (res.status && Array.isArray(res.testingTypes)) {
+    this.previouslySelectedTestingBox = res.testingTypes;
+
+    // ✅ Auto-select previous testing types
+    this.selectedTestingBox = [...res.testingTypes];
+  }
+},
     switchRole(role) {
       this.currentRole = role;
 
@@ -1004,90 +943,47 @@ hasUploadedTargets(email) {
     //     }
     //   },
 async handleSignin(recaptchaResponse) {
-      /* 🚫 Block until project type is selected on second login */
-      if (this.hasExistingProject && !this.projectChoice) {
-        Swal.fire("Error", "Please select project type", "error");
-        return;
-      }
+  this.loading = true;
 
-      const payload = {
-        email: this.formData.email,
-        password: this.formData.password,
-        testing_type: this.selectedTestingBox,
-        recaptcha: recaptchaResponse
-      };
+  try {
+    const payload = {
+      email: this.formData.email,
+      password: this.formData.password,
+      testing_type: this.selectedTestingBox,
+      recaptcha: recaptchaResponse
+    };
 
-      const result = await this.authStore.login(payload);
+    const result = await this.authStore.login(payload);
 
-      if (!result.status) {
-        Swal.fire(
-          "Login Failed",
-          result.message || "Invalid credentials",
-          "error"
-        );
-        return;
-      }
+    if (!result.status) {
+      Swal.fire("Login Failed", result.message || "Invalid credentials", "error");
+      return;
+    }
 
-      /* =====================================================
-         🧠 PROJECT CONTEXT HANDLING (CRITICAL)
-         ===================================================== */
+    // 🔀 Decide redirect based on targets
+    const testingType = this.selectedTestingBox[0];
 
-      // 🆕 NEW PROJECT → hard reset everything
-      if (!this.hasExistingProject || this.projectChoice === "new") {
+    const res = await this.authStore.getScopeTargets(testingType);
 
-        // 🔹 Save selected testing types for this project
-        localStorage.setItem(
-          `project_${this.formData.email}`,
-          JSON.stringify({
-            testingTypes: this.selectedTestingBox
-          })
-        );
+    if (
+      res.status &&
+      (
+        (Array.isArray(res.data?.data) && res.data.data.length > 0) ||
+        res.data?.count > 0
+      )
+    ) {
+      this.$router.push("/admindashboardonboarding");
+    } else {
+      this.$router.push("/location");
+    }
 
-        // 🔥 Mark as NEW project (used by UploadReportView)
-        localStorage.setItem("isNewProject", "true");
-
-        // 🧹 Clear any previous project leftovers
-        localStorage.removeItem("dashboardTestingInProgress");
-        localStorage.removeItem("testingInProgress");
-        localStorage.removeItem("testingStartTime");
-
-        // 🚀 Always go to fresh upload flow
-        this.$router.push("/location");
-        return;
-      }
-
-      // 🔁 ONGOING PROJECT
-      localStorage.removeItem("isNewProject");
-
-      /* =====================================================
-         🔀 REDIRECT LOGIC (ONGOING PROJECT)
-         ===================================================== */
-
-      try {
-        const testingType = this.selectedTestingBox[0]; // e.g. white_box
-
-        const res = await this.authStore.getScopeTargets(testingType);
-
-        if (
-          res.status &&
-          res.data &&
-          (
-            (Array.isArray(res.data.data) && res.data.data.length > 0) ||
-            res.data.count > 0
-          )
-        ) {
-          // ✅ Targets exist → Dashboard
-          this.$router.push("/admindashboardonboarding");
-        } else {
-          // ❌ No targets → Upload page
-          this.$router.push("/location");
-        }
-
-      } catch (error) {
-        console.error("Scope check failed:", error);
-        this.$router.push("/location");
-      }
-    },
+  } catch (error) {
+    console.error("Login error:", error);
+    Swal.fire("Error", "Something went wrong", "error");
+  } finally {
+    this.loading = false;
+  }
+},
 
     async checkAndRedirect() {
       const reportId = localStorage.getItem('reportId');
