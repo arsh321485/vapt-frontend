@@ -1065,33 +1065,41 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // GET FULL SCOPE DATA BY PROJECT NAME
-  async getFullScopeData(adminId: string, projectName: string) {
-    try {
-      if (!adminId || !projectName) {
-        throw new Error("Admin ID and Project Name are required");
-      }
-
-      const res = await endpoint.get(
-        `/admin/scope/data/${adminId}/${encodeURIComponent(projectName)}/`
-      );
-
-      return {
-        status: true,
-        data: res.data,
-      };
-
-    } catch (err) {
-      const error = err as AxiosError<any>;
-
-      return {
-        status: false,
-        message:
-          (error.response?.data as any)?.message ||
-          error.message ||
-          "Failed to fetch scope data",
-        details: error.response?.data || null,
-      };
+  async getFullScopeData(
+  adminId: string,
+  projectName: string,
+  testingType: string
+) {
+  try {
+    if (!adminId || !projectName || !testingType) {
+      throw new Error("Admin ID, Project Name and Testing Type are required");
     }
+
+    const res = await endpoint.get(
+      `/admin/scope/data/${adminId}/${encodeURIComponent(projectName)}/`,
+      {
+        params: {
+          testing_type: testingType,
+        },
+      }
+    );
+
+    return {
+      status: true,
+      data: res.data,
+    };
+  } catch (err) {
+    const error = err as AxiosError<any>;
+
+    return {
+      status: false,
+      message:
+        (error.response?.data as any)?.message ||
+        error.message ||
+        "Failed to fetch scope data",
+      details: error.response?.data || null,
+    };
+  }
   },
 
   // get all scope targets
@@ -1146,78 +1154,69 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // 🔥 NEW: Get single target by ID
-  // async getScopeTargetById(id: string, testingType: string) {
-  //     try {
-  //       const res = await endpoint.get(
-  //         `/admin/scope/${id}/?current_testing_box=${testingType}`
-  //       );
+  // GET SINGLE SCOPE ENTRY (DETAIL)
+  async getScopeEntryDetail(scopeId: string, entryId: string) {
+    try {
+      if (!scopeId || !entryId) {
+        throw new Error("Scope ID and Entry ID are required");
+      }
 
-  //       return {
-  //         status: true,
-  //         data: res.data.data, // 👈 ONLY target object
-  //       };
-  //     } catch (error: any) {
-  //       return {
-  //         status: false,
-  //         message:
-  //           error.response?.data?.message ||
-  //           error.message ||
-  //           "Failed to fetch target",
-  //       };
-  //     }
-  // },
+      const res = await endpoint.get(
+        `/admin/scope/${scopeId}/entries/${entryId}/detail/`
+      );
 
+      return {
+        status: true,
+        data: res.data,
+      };
+    } catch (err) {
+      const error = err as AxiosError<any>;
 
-  // 🔥 PATCH: Update target (partial)
-  async updateScopeTarget(
-    id: string,
-    testingType: string,
-    payload: Record<string, any>
+      return {
+        status: false,
+        message:
+          (error.response?.data as any)?.message ||
+          error.message ||
+          "Failed to fetch entry detail",
+        details: error.response?.data || null,
+      };
+    }
+  },
+
+  // UPDATE SCOPE ENTRY
+  async updateScopeEntry(
+    scopeId: string,
+    entryId: string,
+    payload: { value: string }
   ) {
     try {
+      if (!scopeId || !entryId) {
+        throw new Error("Scope ID and Entry ID are required");
+      }
+
       const res = await endpoint.patch(
-        `/admin/scope/${id}/?current_testing_box=${testingType}`,
+        `/admin/scope/${scopeId}/entries/${entryId}/update/`,
         payload
       );
 
       return {
         status: true,
-        data: res.data.data,
-        message: res.data.message,
+        data: res.data,
       };
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as AxiosError<any>;
+
       return {
         status: false,
         message:
-          error.response?.data?.message ||
+          (error.response?.data as any)?.message ||
           error.message ||
-          "Failed to update target",
+          "Failed to update scope entry",
+        details: error.response?.data || null,
       };
     }
   },
-
-  // 🔥 DELETE: Delete single scope target
-  // async deleteScopeTarget(id: string, testingType: string) {
-  //   try {
-  //     const res = await endpoint.delete(
-  //       `/admin/scope/${id}/?current_testing_box=${testingType}`
-  //     );
-
-  //     return {
-  //       status: true,
-  //       message: res.data.message,
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       status: false,
-  //       message:
-  //         error.response?.data?.message ||
-  //         error.message ||
-  //         "Failed to delete target",
-  //     };
-  //   }
-  // },
+  
   // DELETE SCOPE ENTRY
   async deleteScopeEntry(scopeId: string, entryId: string) {
     try {

@@ -21,21 +21,14 @@
 
               <!-- project name -->
               <div class="testing-type">
-    <select
-      v-model="projectname"
-      class="form-select testing-select"
-    >
-      <option value="" disabled>Select Project</option>
+                <select v-model="projectname" class="form-select testing-select">
+                  <option value="" disabled>Select Project</option>
 
-      <option
-        v-for="(project, index) in projectList"
-        :key="index"
-        :value="project"
-      >
-        {{ project }}
-      </option>
-    </select>
-  </div>
+                  <option v-for="(project, index) in projectList" :key="index" :value="project">
+                    {{ project }}
+                  </option>
+                </select>
+              </div>
 
               <!-- Testing Type (Unified UI) -->
               <div class="testing-type">
@@ -73,24 +66,15 @@
 
                       <td>
                         {{ item.ip }}
-                        <span
-                          v-if="item.count"
-                          class="subnet-count ms-1"
-                        >
+                        <span v-if="item.count" class="subnet-count ms-1">
                           ({{ item.count }})
                         </span>
                       </td>
 
                       <td class="text-center">
-                        <i
-                          class="bi bi-pencil me-3 action-icon"
-                          @click="openEditModal(item, 'internal')"
-                        ></i>
+                        <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'internal')"></i>
 
-                        <i
-                          class="bi bi-trash action-icon text-danger"
-                          @click="deleteTarget(item.id)"
-                        ></i>
+                        <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
                       </td>
                     </tr>
 
@@ -124,14 +108,8 @@
                       <td>{{ index + 1 }}</td>
                       <td>{{ item.ip }}</td>
                       <td class="text-center">
-                        <i
-                          class="bi bi-pencil me-3 action-icon"
-                          @click="openEditModal(item, 'external')"
-                        ></i>
-                        <i
-                          class="bi bi-trash action-icon text-danger"
-                          @click="deleteTarget(item.id)"
-                        ></i>
+                        <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'external')"></i>
+                        <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
                       </td>
                     </tr>
 
@@ -164,14 +142,8 @@
                       <td>{{ index + 1 }}</td>
                       <td class="text-break">{{ item.url }}</td>
                       <td class="text-center">
-                        <i
-                          class="bi bi-pencil me-3 action-icon"
-                          @click="openEditModal(item, 'web')"
-                        ></i>
-                        <i
-                          class="bi bi-trash action-icon text-danger"
-                          @click="deleteTarget(item.id)"
-                        ></i>
+                        <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'web')"></i>
+                        <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
                       </td>
                     </tr>
 
@@ -204,14 +176,8 @@
                       <td>{{ index + 1 }}</td>
                       <td class="text-break">{{ item.url }}</td>
                       <td class="text-center">
-                        <i
-                          class="bi bi-pencil me-3 action-icon"
-                          @click="openEditModal(item, 'mobile')"
-                        ></i>
-                        <i
-                          class="bi bi-trash action-icon text-danger"
-                          @click="deleteTarget(item.id)"
-                        ></i>
+                        <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'mobile')"></i>
+                        <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
                       </td>
                     </tr>
 
@@ -303,43 +269,50 @@ export default {
     };
   },
   watch: {
-    projectname: {
-    immediate: true,
-    async handler(newProject) {
-      if (!newProject || !this.adminId) return;
+   projectname: {
+  immediate: true,
+  async handler(newProject) {
+    if (!newProject || !this.adminId) return;
 
-      // await this.fetchTestingTypeByProject(newProject);
-      await this.fetchFullScopeData(newProject);
-
-    }
-  },
-  selectedTestingType: {
-  async handler(newType) {
-    if (!newType) return;
-    if (this.isInitialLoad) return; // ⛔ skip on first load
-
-    await this.fetchScopeTargets(newType);
-  },
+    this.isInitialLoad = true;
+    await this.fetchTestingTypeByProject(newProject);
+     this.$nextTick(async () => {
+        await this.fetchFullScopeData(newProject);
+        this.isInitialLoad = false;
+      });
+  }
 },
+selectedTestingType: {
+    async handler(newType) {
+      if (!newType) return;
+      if (this.isInitialLoad) return; // ⛔ prevent double call on load
 
+      // 🔄 reload scope when dropdown changes
+      await this.fetchFullScopeData(this.projectname);
+    },
+  },
+    
   },
   async mounted() {
-  this.authStore = useAuthStore();
+    this.authStore = useAuthStore();
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  this.adminId = user?.id || user?._id;
+    const user = JSON.parse(localStorage.getItem("user"));
+    this.adminId = user?.id || user?._id;
 
-  if (this.adminId) {
-    await this.fetchProjectNames(); // project → full scope
-  } else {
-    console.error("Admin ID missing.");
-  }
+    if (this.adminId) {
+      await this.fetchProjectNames(); // project → full scope
+    } else {
+      console.error("Admin ID missing.");
+    }
   },
   methods: {
-    async fetchFullScopeData(projectName) {
+async fetchFullScopeData(projectName) {
+  if (!this.selectedTestingType) return; // 🔐 guard
+
   const res = await this.authStore.getFullScopeData(
     this.adminId,
-    projectName
+    projectName,
+    this.selectedTestingType
   );
 
   if (!res.status) {
@@ -347,57 +320,52 @@ export default {
     return;
   }
 
-  const scope = res.data;
-  this.scopeId = scope.id;
-  // 🔄 RESET EVERYTHING
+  const data = res.data;
+
+  // ✅ scope id
+  this.scopeId = data.scope_ids?.[0] || null;
+
+  // 🔄 RESET
   this.internalTargets = [];
   this.externalTargets = [];
   this.webAppTargets = [];
   this.mobAppTargets = [];
 
-  // 🔹 Testing Type (single source of truth)
-  this.allowedTestingTypes = [scope.testing_type];
-  this.selectedTestingType = scope.testing_type;
-  this.showTestingDropdown = false;
-  // this.isInitialLoad = false;
-
-  // 🔹 Map entries → UI lists
-  scope.entries.forEach(entry => {
-    switch (entry.entry_type) {
-      case "internal_ip":
-        this.internalTargets.push({
-          id: entry.id,
-          ip: entry.value,
-          count: entry.subnet_mask,
-        });
-        break;
-
-      case "external_ip":
-        this.externalTargets.push({
-          id: entry.id,
-          ip: entry.value,
-        });
-        break;
-
-      case "web_url":
-        this.webAppTargets.push({
-          id: entry.id,
-          url: entry.value,
-        });
-        break;
-
-      case "mobile_url":
-      case "mobile_app":
-        this.mobAppTargets.push({
-          id: entry.id,
-          url: entry.value,
-        });
-        break;
-    }
+  // ✅ normalize new response structure
+  data.entries.internal_targets.forEach(item => {
+    this.internalTargets.push({
+      id: item.id,
+      ip: item.value,
+      count: item.subnet_mask,
+    });
   });
-  this.isInitialLoad = false;
+
+  data.entries.external_targets.forEach(item => {
+    this.externalTargets.push({
+      id: item.id,
+      ip: item.value,
+    });
+  });
+
+  data.entries.web_app_targets.forEach(item => {
+    this.webAppTargets.push({
+      id: item.id,
+      url: item.value,
+    });
+  });
+
+  data.entries.mobile_app_targets.forEach(item => {
+    this.mobAppTargets.push({
+      id: item.id,
+      url: item.value,
+    });
+  });
 },
-    async fetchTestingTypeByProject(projectName) {
+
+
+
+
+async fetchTestingTypeByProject(projectName) {
   const res = await this.authStore.getTestingTypeByScope(
     this.adminId,
     projectName
@@ -408,118 +376,38 @@ export default {
     return;
   }
 
-  const testingType = res.data.testing_type;
+  const { available_types, testing_types } = res.data;
 
-  // 🔄 Reset first
-  this.allowedTestingTypes = [];
-  this.selectedTestingType = "";
-  this.showTestingDropdown = false;
+  this.allowedTestingTypes = available_types;
+  this.selectedTestingType = available_types[0]; // default
 
-  // 🔥 Backend gives single testing type
-  this.allowedTestingTypes = [testingType];
-  this.selectedTestingType = testingType;
-  this.showTestingDropdown = false; // single → no dropdown
+  this.showTestingDropdown = available_types.length > 1;
+
+  const selectedScope = testing_types.find(
+    t => t.testing_type === this.selectedTestingType
+  );
+
+  this.scopeId = selectedScope?.scope_ids?.[0] || null;
 },
+
+
     async fetchProjectNames() {
-    const res = await this.authStore.fetchScopeProjectNames(this.adminId);
+      const res = await this.authStore.fetchScopeProjectNames(this.adminId);
 
-    if (res.status) {
-      this.projectList = res.data.scope_names;
+      if (res.status) {
+        this.projectList = res.data.scope_names;
 
-      // auto select first project
-      if (this.projectList.length && !this.projectname) {
-        this.projectname = this.projectList[0];
+        // auto select first project
+        if (this.projectList.length && !this.projectname) {
+          this.projectname = this.projectList[0];
+        }
+      } else {
+        console.error("Project name fetch failed:", res.message);
       }
-    } else {
-      console.error("Project name fetch failed:", res.message);
-    }
-  },
-  //   async fetchScopeTargets(testingType) {
-  // try {
-  //   const res = await this.authStore.getScopeTargets(testingType);
+    },
+    
 
-  //   if (!res.status) {
-  //     Swal.fire("Error", res.message || "Failed to fetch scope", "error");
-  //     return;
-  //   }
-
-  //   const targets = res.data?.data || [];
-
-  //   // 🔄 RESET
-  //   this.internalTargets = [];
-  //   this.externalTargets = [];
-  //   this.webAppTargets = [];
-  //   this.mobAppTargets = [];
-
-  //   targets.forEach(t => {
-  //     const value = t.target_value;
-
-  //     switch (t.target_type) {
-  //       case "internal_ip":
-  //         this.internalTargets.push({
-  //           id: t._id,
-  //           ip: value,
-  //           count: t.subnet_count || null,
-  //         });
-  //         break;
-
-  //       case "external_ip":
-  //         this.externalTargets.push({
-  //           id: t._id,
-  //           ip: value,
-  //           count: t.subnet_count || null,
-  //         });
-  //         break;
-
-  //       // 🔥 FIX HERE
-  //       case "web_url":
-  //         this.webAppTargets.push({
-  //           id: t._id,
-  //           url: value,
-  //         });
-  //         break;
-
-  //       // 🔥 FIX HERE
-  //       case "mobile_url":
-  //       case "mobile_app":
-  //         this.mobAppTargets.push({
-  //           id: t._id,
-  //           url: value,
-  //         });
-  //         break;
-  //     }
-  //   });
-
-  // } catch (err) {
-  //   Swal.fire("Error", "Something went wrong", "error");
-  //   console.error(err);
-  // }
-  //   },
-    // async fetchTestingTypes() {
-    //   const res = await this.authStore.getAdminTestingTypes(this.adminId);
-
-    //   if (!res.status) {
-    //     Swal.fire(
-    //       "Error",
-    //       res.message || "Unable to fetch testing types",
-    //       "error"
-    //     );
-    //     return;
-    //   }
-
-    //   this.allowedTestingTypes = res.testingTypes || [];
-
-    //   // 🔥 RULES IMPLEMENTATION
-    //   if (this.allowedTestingTypes.length === 1) {
-    //     // Only one → auto select, no dropdown
-    //     this.selectedTestingType = this.allowedTestingTypes[0];
-    //     this.showTestingDropdown = false;
-    //   } else if (this.allowedTestingTypes.length > 1) {
-    //     // Two or more → dropdown, first selected
-    //     this.selectedTestingType = this.allowedTestingTypes[0];
-    //     this.showTestingDropdown = true;
-    //   }
-    // },
+    
     formatTestingType(type) {
       return type
         .replace("_", " ")
@@ -581,41 +469,38 @@ export default {
       this.form = { type: "internal", value: "" };
       this.showModal = true;
     },
-    async openEditModal(item, type) {
+    async openEditModal(item) {
   try {
     this.modalMode = "edit";
     this.editingId = item.id;
     this.showModal = true;
 
-    // 🔄 Fetch latest data from backend
-    const res = await this.authStore.getScopeTargetById(
-      item.id,
-      this.selectedTestingType
+    const res = await this.authStore.getScopeEntryDetail(
+      this.scopeId,
+      item.id
     );
+
     if (!res.status) {
       Swal.fire("Error", res.message, "error");
       this.showModal = false;
       return;
     }
-    const data = res.data;
-    let formType = "internal";
-    if (data.target_type === "external_ip") {
-  formType = "external";
-} 
-else if (data.target_type === "web_url") {
-  formType = "web";
-} 
-else if (
-  data.target_type === "mobile_url" ||
-  data.target_type === "mobile_app"
-) {
-  formType = "mobile";
-}
 
-    // 🔹 Set form values
+    const { entry } = res.data;
+
+    // 🔄 Map backend entry_type → form.type
+    let formType = "internal";
+    if (entry.entry_type === "external_ip") formType = "external";
+    else if (entry.entry_type === "web_url") formType = "web";
+    else if (
+      entry.entry_type === "mobile_url" ||
+      entry.entry_type === "mobile_app"
+    ) formType = "mobile";
+
+    // ✅ Populate modal form
     this.form = {
       type: formType,
-      value: data.target_value,
+      value: entry.value,
     };
 
   } catch (err) {
@@ -623,12 +508,13 @@ else if (
     Swal.fire("Error", "Unable to load target", "error");
     this.showModal = false;
   }
-    },
+},
+
     closeModal() {
       this.showModal = false;
     },
-    async saveTarget() {
-  // ADD MODE (local only – you already have this)
+   async saveTarget() {
+  // ADD MODE (local only)
   if (this.modalMode === "add") {
     const id = Date.now();
     this.pushTarget(id);
@@ -638,37 +524,39 @@ else if (
 
   // 🔥 EDIT MODE → PATCH API
   try {
-    const payload = {};
+    const payload = {
+      value: this.form.value, // ✅ correct key
+    };
 
-    // We are editing VALUE only for now
-    payload["target_value"] = this.form.value;
-
-    // const res = await this.authStore.updateScopeTarget(
-    //   this.editingId,
-    //   this.selectedTestingType,
-    //   payload
-    // );
     const res = await this.authStore.updateScopeEntry(
-  this.scopeId,
-  this.editingId,
-  payload
-);
+      this.scopeId,
+      this.editingId,
+      payload
+    );
 
     if (!res.status) {
       Swal.fire("Error", res.message, "error");
       return;
     }
 
-   
-    await this.fetchScopeTargets(this.selectedTestingType);
+    Swal.fire({
+      icon: "success",
+      title: "Updated",
+      text: res.data?.message || "Entry updated successfully",
+      timer: 1200,
+      showConfirmButton: false,
+    });
 
     this.showModal = false;
+
+    // 🔄 Refresh scope data
+    await this.fetchFullScopeData(this.projectname);
 
   } catch (err) {
     console.error(err);
     Swal.fire("Error", "Update failed", "error");
   }
-    },
+},
     pushTarget(id) {
       if (this.form.type === "internal")
         this.internalTargets.push({ id, ip: this.form.value });
@@ -694,46 +582,46 @@ else if (
         item.ip = this.form.value;
       }
     },
-   deleteTarget(entryId) {
-  Swal.fire({
-    title: "Delete Target?",
-    text: "This action cannot be undone.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#6b7280",
-    confirmButtonText: "Yes, delete",
-  }).then(async (result) => {
-    if (!result.isConfirmed) return;
-
-    try {
-      const res = await this.authStore.deleteScopeEntry(
-        this.scopeId,
-        entryId
-      );
-
-      if (!res.status) {
-        Swal.fire("Error", res.message, "error");
-        return;
-      }
-
+    deleteTarget(entryId) {
       Swal.fire({
-        icon: "success",
-        title: "Deleted",
-        text: res.message,
-        timer: 1200,
-        showConfirmButton: false,
+        title: "Delete Target?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: "Yes, delete",
+      }).then(async (result) => {
+        if (!result.isConfirmed) return;
+
+        try {
+          const res = await this.authStore.deleteScopeEntry(
+            this.scopeId,
+            entryId
+          );
+
+          if (!res.status) {
+            Swal.fire("Error", res.message, "error");
+            return;
+          }
+
+          Swal.fire({
+            icon: "success",
+            title: "Deleted",
+            text: res.message,
+            timer: 1200,
+            showConfirmButton: false,
+          });
+
+          // 🔄 Refresh FULL scope (single source of truth)
+          await this.fetchFullScopeData(this.projectname);
+
+        } catch (err) {
+          console.error(err);
+          Swal.fire("Error", "Delete failed", "error");
+        }
       });
-
-      // 🔄 Refresh FULL scope (single source of truth)
-      await this.fetchFullScopeData(this.projectname);
-
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Delete failed", "error");
-    }
-  });
-},
+    },
 
   }
 };
@@ -742,7 +630,8 @@ else if (
 <style scoped>
 /* Scroll after 5 rows */
 .internal-table-scroll {
-  max-height: 250px; /* ~5 rows */
+  max-height: 250px;
+  /* ~5 rows */
   overflow-y: auto;
 }
 
@@ -777,6 +666,7 @@ else if (
   opacity: 1;
   /* remove faded look */
 }
+
 .testing-type {
   min-width: 200px;
 }
@@ -857,7 +747,7 @@ tr[draggable="true"]:active {
 .scope-table {
   width: 100%;
   font-size: 14px;
-  table-layout: fixed; 
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
@@ -909,7 +799,7 @@ tr[draggable="true"]:active {
 /* .url-cell {
   word-break: break-all;
 } */
- .col-value {
+.col-value {
   word-break: break-word;
   white-space: normal;
 }
@@ -1018,19 +908,20 @@ tr[draggable="true"]:active {
 .col-actions {
   /* width: 90px;
   padding-right: 14px; */
-   width: 229px;
+  width: 229px;
   text-align: center;
 }
 
 .scope-table th.col-actions {
-  width: 135px;        
-  text-align: center; 
+  width: 135px;
+  text-align: center;
 }
 
 .scope-table td.col-actions {
-  width: 196px;        
-  text-align: center; 
+  width: 196px;
+  text-align: center;
 }
+
 /* Header alignment match */
 .scope-table th.col-serial,
 .scope-table td.col-serial {
@@ -1040,14 +931,15 @@ tr[draggable="true"]:active {
 
 .scope-table th.col-value {
   /* padding-left: 28px; */
-  text-align: left;         
-  padding-left: 24px;       
+  text-align: left;
+  padding-left: 24px;
   padding-right: 12px;
   word-break: break-word;
 }
+
 .scope-table td.col-value {
-  text-align: left;          
-  padding-left: 24px;        
+  text-align: left;
+  padding-left: 24px;
   /* padding-right: 12px; */
   word-break: break-word;
 }

@@ -13,8 +13,8 @@
       <div class="content">
         <div class="d-flex justify-content-between">
           <div>
-            <h1>Upload Targets for Assessment</h1>
-            <p>Add IP addresses, URLs, or subnets to begin vulnerability testing and risk analysis.</p>
+            <h1>Upload Targets</h1>
+            <p>Add IP addresses, URLs, or subnets to begin vulnerability <br></br>testing and risk analysis.</p>
           </div>
 
 
@@ -25,7 +25,7 @@
                   class="bi bi-download me-2"></i>Sample File</button>
             </div>
             <div>
-              <input class="form-control"
+              <input class="project_name form-control"
   type="text"
   v-model="name"
   placeholder="Enter project name"
@@ -1409,6 +1409,12 @@ p {
   max-width: 900px;
   margin-bottom: 28px;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+}
+
+.project_name {
+  border-radius: 12px;
+  padding: 11px;
+  max-width: 220px;
 }
 
 .form-select {
