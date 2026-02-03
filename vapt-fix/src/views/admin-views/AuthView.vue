@@ -980,28 +980,22 @@ async handleSignin(recaptchaResponse) {
   this.loading = true;
 
   try {
-    // 🔹 Merge previous + current selections (VERY IMPORTANT)
-    const finalTestingTypes = [
-      ...new Set([
-        ...this.previouslySelectedTestingBox,
-        ...this.selectedTestingBox,
-      ]),
-    ];
-
-    // ❌ Safety check (should not happen due to validation, but safe)
-    if (!finalTestingTypes.length) {
-      Swal.fire("Error", "Please select at least one testing type", "error");
-      return;
-    }
+    /* ===============================
+       🔐 LOGIN
+       =============================== */
 
     const payload = {
       email: this.formData.email,
       password: this.formData.password,
-      testing_type: finalTestingTypes,
+      testing_type: [
+        ...new Set([
+          ...this.previouslySelectedTestingBox,
+          ...this.selectedTestingBox,
+        ]),
+      ],
       recaptcha: recaptchaResponse,
     };
 
-    // 🔐 LOGIN
     const result = await this.authStore.login(payload);
 
     if (!result.status) {
@@ -1013,50 +1007,44 @@ async handleSignin(recaptchaResponse) {
       return;
     }
 
-    /* =====================================================
-       ✅ SAVE USER & TESTING TYPES (FOR NEXT LOGIN)
-       ===================================================== */
+    /* ===============================
+       ✅ SAVE USER
+       =============================== */
 
-    if (result.data?.user) {
-      localStorage.setItem("user", JSON.stringify(result.data.user));
+    const user = result.data?.user;
+
+    if (!user) {
+      Swal.fire("Error", "User data not found", "error");
+      return;
     }
 
-    // Save testing types per email (KEY LOGIC)
-    localStorage.setItem(
-      `testing_types_${this.formData.email}`,
-      JSON.stringify(finalTestingTypes)
-    );
+    localStorage.setItem("user", JSON.stringify(user));
 
-    // Update state immediately (no reselect needed)
-    this.previouslySelectedTestingBox = [...finalTestingTypes];
-    this.selectedTestingBox = [...finalTestingTypes];
-    this.isTestingBoxOpen = false;
+    /* ===============================
+       🔀 PROJECT NAME CHECK (KEY LOGIC)
+       =============================== */
 
-    /* =====================================================
-       🔀 REDIRECT LOGIC (BASED ON TARGETS)
-       ===================================================== */
+    const adminId = user.id; // 🔴 use correct key if different
 
-    // Use FIRST testing type to check scope
-    const testingType = finalTestingTypes[0];
-
-    const res = await this.authStore.getScopeTargets(testingType);
+    const scopeRes = await this.authStore.fetchScopeProjectNames(adminId);
 
     if (
-      res.status &&
+      scopeRes.status &&
       (
-        (Array.isArray(res.data?.data) && res.data.data.length > 0) ||
-        res.data?.count > 0
+        (Array.isArray(scopeRes.data?.scope_names) &&
+          scopeRes.data.scope_names.length > 0) ||
+        scopeRes.data?.count > 0
       )
     ) {
-      // ✅ Targets already exist
+      // ✅ At least 1 project exists
       this.$router.push("/admindashboardonboarding");
     } else {
-      // ❌ No targets → redirect to upload
+      // ❌ No project exists
       this.$router.push("/location");
     }
 
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Signin error:", error);
     Swal.fire("Error", "Something went wrong", "error");
   } finally {
     this.loading = false;
