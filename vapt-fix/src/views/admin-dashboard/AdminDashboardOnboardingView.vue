@@ -572,7 +572,7 @@ import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 
 export default {
   name: 'AdminDashboardOnboardingView',
@@ -618,6 +618,12 @@ export default {
         { id: 3, name: "USA", types: ["External"] },
         { id: 4, name: "Germany", types: ["Internal", "External"] },
       ],
+      // REPORT STATUS CHECK DATA
+      reportStatusChecking: true,
+      hasReport: false,
+      reportStatusMessage: "",
+      reportStatusInterval: null,
+      currentReportId: null,
     };
   },
   computed: {
@@ -678,6 +684,12 @@ export default {
   },
   methods: {
     initTestingOverlay() {
+      // ✅ Skip if report status overlay is already showing (report status takes priority)
+      if (this.reportStatusChecking || !this.authStore.reportStatus.hasReport) {
+        console.log("⏭️ Skipping testing overlay - report status check in progress or no report");
+        return;
+      }
+
       // Clear any existing timer and overlay
       if (this.testingTimer) {
         clearInterval(this.testingTimer);
@@ -901,10 +913,183 @@ export default {
         this.mitigationTimeline = res.data;
       }
     },
+
+    // ==========================================
+    // REPORT STATUS CHECK METHODS
+    // ==========================================
+
+    async checkReportStatus() {
+      console.log("🔍 Checking report status...");
+      const res = await this.authStore.getReportStatus();
+
+      if (res.status) {
+        this.hasReport = res.hasReport;
+        this.reportStatusMessage = res.message;
+
+        if (res.hasReport) {
+          // Report is available
+          console.log("✅ Report available:", res.reportId);
+          this.currentReportId = res.reportId;
+          localStorage.setItem("reportId", res.reportId);
+
+          // Stop polling
+          this.stopReportStatusPolling();
+
+          // Remove overlay and show success
+          this.removeReportStatusOverlay();
+          this.showReportAvailableAlert();
+          this.reportStatusChecking = false;
+
+        } else {
+          // Report not uploaded yet - keep showing overlay
+          console.log("⏳ No report yet:", res.message);
+          this.reportStatusChecking = true;
+          this.updateReportStatusMessage(res.message);
+        }
+      } else {
+        console.error("❌ Report status check failed:", res.message);
+      }
+    },
+
+    startReportStatusPolling() {
+      console.log("🔄 Starting report status polling...");
+
+      // Poll every 5 seconds until report is available
+      this.reportStatusInterval = setInterval(() => {
+        // Check both local and store state
+        if (!this.hasReport && !this.authStore.reportStatus.hasReport) {
+          this.checkReportStatus();
+        } else {
+          this.stopReportStatusPolling();
+          this.removeReportStatusOverlay();
+        }
+      }, 5000); // 5 seconds
+    },
+
+    stopReportStatusPolling() {
+      if (this.reportStatusInterval) {
+        clearInterval(this.reportStatusInterval);
+        this.reportStatusInterval = null;
+        console.log("⏹️ Stopped report status polling");
+      }
+    },
+
+    createReportStatusOverlay() {
+      // Remove existing if any
+      this.removeReportStatusOverlay();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'report-status-overlay';
+      overlay.innerHTML = `
+        <div style="position: fixed; top: 60px; left: 90px; right: 0; bottom: 0; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 900;">
+          <div style="background: #fff; padding: 40px 60px; border-radius: 16px; box-shadow: 0 10px 40px rgba(49,33,177,0.25); text-align: center; border: 2px solid rgba(49,33,177,0.15); max-width: 500px;">
+            <div style="font-size: 48px; color: rgba(49,33,177,1); margin-bottom: 16px;">
+              <i class="bi bi-hourglass-split" style="display: inline-block; animation: spin 2s linear infinite;"></i>
+            </div>
+            <h4 style="font-size: 24px; font-weight: 600; color: #111827; margin-bottom: 8px;">Please Wait</h4>
+            <p id="report-status-message" style="font-size: 16px; color: #6b7280; margin-bottom: 20px; line-height: 1.5;">
+              ${this.reportStatusMessage || 'Checking report status...'}
+            </p>
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <small style="color: #9ca3af; font-size: 13px; display: block; margin-top: 16px;">Checking every 5 seconds...</small>
+          </div>
+        </div>
+        <style>
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        </style>
+      `;
+      document.body.appendChild(overlay);
+      console.log("📋 Report status overlay created");
+    },
+
+    updateReportStatusMessage(message) {
+      const messageEl = document.getElementById('report-status-message');
+      if (messageEl) {
+        messageEl.textContent = message;
+      }
+    },
+
+    removeReportStatusOverlay() {
+      const overlay = document.getElementById('report-status-overlay');
+      if (overlay) {
+        overlay.remove();
+        console.log("📋 Report status overlay removed");
+      }
+    },
+
+    showReportAvailableAlert() {
+      Swal.fire({
+        icon: 'success',
+        title: 'Report Available',
+        text: 'The report has been uploaded. Dashboard is now accessible.',
+        toast: true,
+        position: 'top-end',
+        timer: 4000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        didOpen: (toast) => {
+          toast.style.marginTop = '70px';
+        }
+      });
+    },
+
+    async initReportStatusCheck() {
+      console.log("🚀 Initializing report status check...");
+
+      // ✅ STEP 1: Check if we already know report exists (from store state)
+      if (this.authStore.reportStatus.checked && this.authStore.reportStatus.hasReport) {
+        console.log("✅ Report already confirmed from store");
+        this.hasReport = true;
+        this.currentReportId = this.authStore.reportStatus.reportId;
+        this.reportStatusChecking = false;
+        this.removeReportStatusOverlay();
+        return;
+      }
+
+      // ✅ STEP 2: Show overlay IMMEDIATELY while checking
+      this.reportStatusChecking = true;
+      this.reportStatusMessage = "Checking report status...";
+      this.createReportStatusOverlay();
+
+      // ✅ STEP 3: Now call API to check
+      const res = await this.authStore.getReportStatus();
+
+      if (res.status && res.hasReport) {
+        // Report already exists - remove overlay (no toast, report was already there)
+        console.log("✅ Report already exists:", res.reportId);
+        this.hasReport = true;
+        this.currentReportId = res.reportId;
+        this.reportStatusChecking = false;
+        this.removeReportStatusOverlay();
+        // Don't show toast here - report was already available, not a new upload
+      } else {
+        // No report yet - update overlay message and start polling
+        console.log("⏳ No report yet, starting polling...");
+        this.hasReport = false;
+        this.reportStatusMessage = res.message || "No report uploaded yet. Please wait for Super Admin to upload a report.";
+        this.reportStatusChecking = true;
+
+        // Update overlay message (overlay already created above)
+        this.updateReportStatusMessage(this.reportStatusMessage);
+
+        // Start polling
+        this.startReportStatusPolling();
+      }
+    },
   },
 
 mounted() {
   console.log("=== DASHBOARD MOUNTED ===");
+
+  // ✅ STEP 1: Check report status first
+  this.initReportStatusCheck();
 
   setTimeout(() => {
     this.initTestingOverlay();
@@ -932,7 +1117,7 @@ mounted() {
     this.authStore.fetchDashboardAvgScore(),
     this.authStore.fetchDashboardVulnerabilities(),
     this.authStore.fetchDashboardMitigationTimeline(),
-    this.authStore.fetchDashboardMeanTimeToRemediate(), // ✅ ADD THIS
+    this.authStore.fetchDashboardMeanTimeToRemediate(),
   ])
     .then(() => {
       console.log("✅ All dashboard APIs loaded");
@@ -952,11 +1137,17 @@ mounted() {
       clearInterval(this.testingTimer);
     }
     this.removeOverlayFromDOM();
+
+    // ✅ Clean up report status polling
+    this.stopReportStatusPolling();
+    this.removeReportStatusOverlay();
   },
   // Handle component reactivation (if using keep-alive)
   activated() {
     console.log("=== ACTIVATED hook called ===");
     this.initTestingOverlay();
+    // Re-check report status on reactivation
+    this.initReportStatusCheck();
   },
 };
 </script>

@@ -93,6 +93,7 @@
 
 <script>
 import { RouterLink, useRoute, useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
 
 export default {
@@ -101,16 +102,36 @@ export default {
   setup() {
     const route = useRoute();
     const router = useRouter();
+    const authStore = useAuthStore();
     const isActive = (path) => route.path === path;
 
-    return { route, router, isActive };
+    return { route, router, authStore, isActive };
   },
   data() {
     return {
       activeReportId: localStorage.getItem("reportId") || ""
     };
   },
+  computed: {
+    // ✅ Reactive check using store state
+    hasReport() {
+      return this.authStore.reportStatus.hasReport;
+    }
+  },
   methods: {
+    // ✅ Check if dashboard is blocked (no report uploaded)
+    // Uses BOTH store state (reactive) AND localStorage (fallback)
+    isDashboardBlocked() {
+      // Primary check: use reactive store state
+      if (this.authStore.reportStatus.checked) {
+        return !this.authStore.reportStatus.hasReport;
+      }
+      // Fallback: check localStorage (for cases where store hasn't been checked yet)
+      const reportId = localStorage.getItem("reportId");
+      return !reportId;
+    },
+
+    // ✅ OLD: Check if testing is in progress (kept for backward compatibility)
     isTestingInProgress() {
       const isTesting = localStorage.getItem("testingInProgress") === "true";
       if (!isTesting) return false;
@@ -130,8 +151,37 @@ export default {
       return true;
     },
 
+    // ✅ Alert when no report uploaded
+    showNoReportAlert() {
+      // Get message from store if available
+      const message = this.authStore.reportStatus.message ||
+        "No report uploaded yet. Please wait for Super Admin to upload a report.";
+
+      Swal.fire({
+        title: "Please Wait",
+        text: message,
+        icon: "info",
+        toast: true,
+        position: "top-end",
+        timer: 4000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        didOpen: (toast) => {
+          toast.style.marginTop = '70px';
+          toast.style.zIndex = '999999';
+          if (toast.parentElement) {
+            toast.parentElement.style.zIndex = '999999';
+          }
+          const swalContainer = document.querySelector('.swal2-container');
+          if (swalContainer) {
+            swalContainer.style.zIndex = '999999';
+          }
+        }
+      });
+    },
+
+    // ✅ OLD: Alert when testing in progress (kept for backward compatibility)
     showTestingAlert() {
-      // Use toast-style alert that doesn't block sidebar
       Swal.fire({
         title: "Testing in progress",
         text: "Please wait until testing completes",
@@ -143,12 +193,10 @@ export default {
         showConfirmButton: false,
         didOpen: (toast) => {
           toast.style.marginTop = '70px';
-          // Set z-index on toast and its parent container
           toast.style.zIndex = '999999';
           if (toast.parentElement) {
             toast.parentElement.style.zIndex = '999999';
           }
-          // Also set on swal2 container
           const swalContainer = document.querySelector('.swal2-container');
           if (swalContainer) {
             swalContainer.style.zIndex = '999999';
@@ -158,6 +206,12 @@ export default {
     },
 
     navigateTo(path) {
+      // ✅ Check for no report first (uses reactive store state)
+      if (this.isDashboardBlocked()) {
+        this.showNoReportAlert();
+        return;
+      }
+      // ✅ Then check for testing in progress (backward compatibility)
       if (this.isTestingInProgress()) {
         this.showTestingAlert();
         return;
@@ -166,10 +220,18 @@ export default {
     },
 
     navigateToTickets() {
+      // ✅ Check for no report first (uses reactive store state)
+      if (this.isDashboardBlocked()) {
+        this.showNoReportAlert();
+        return;
+      }
+      // ✅ Then check for testing in progress (backward compatibility)
       if (this.isTestingInProgress()) {
         this.showTestingAlert();
         return;
       }
+      // Get reportId from store or localStorage
+      this.activeReportId = this.authStore.reportStatus.reportId || localStorage.getItem("reportId") || "";
       this.router.push({
         name: 'supportticket',
         params: { reportId: this.activeReportId }

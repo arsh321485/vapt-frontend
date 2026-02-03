@@ -1,0 +1,31 @@
+GET report status in dashboard
+
+METHOD: GET
+URL: http://127.0.0.1:8000/api/admin/admindashboard/dashboard/report-status/
+       
+BODY: 
+RESPONSE:
+
+NOTE:    Super Admin Report Upload – Success Response
+
+{
+    "has_report": true,
+    "show_dashboard": true,
+    "admin_id": "23c8b3b7-9f90-4924-84ed-48f29496c781",
+    "admin_email": "malibharti1702@gmail.com",
+    "report_id": "6981c149fc4143971621e061",
+    "message": "Report available"
+}
+
+NOTE:  Super Admin Report Not Uploaded – API Response
+
+{
+    "has_report": false,
+    "show_dashboard": false,
+    "admin_id": "23c8b3b7-9f90-4924-84ed-48f29496c781",
+    "admin_email": "malibharti1702@gmail.com",
+    "report_id": null,
+    "message": "No report uploaded yet. Please wait for Super Admin to upload a report.
+“
+}
+  

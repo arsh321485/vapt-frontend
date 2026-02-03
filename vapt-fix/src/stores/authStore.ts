@@ -72,6 +72,14 @@ export const useAuthStore = defineStore("auth", {
     projectNames: [] as string[],
     isLoadingProjects: false,
 
+    // ✅ Report Status (reactive state for dashboard blocking)
+    reportStatus: {
+      hasReport: false,
+      reportId: null as string | null,
+      message: "",
+      checked: false,  // true once API has been called at least once
+    },
+
     }),
 
 
@@ -1900,10 +1908,18 @@ async fetchDashboardMeanTimeToRemediate() {
       localStorage.removeItem("google_id_token");
       localStorage.removeItem("isNewUser");
       localStorage.removeItem("completedSteps");
+      localStorage.removeItem("reportId");
       this.user = null;
       this.accessToken = null;
       this.refreshToken = null;
       this.completedSteps = [];
+      // ✅ Reset report status on logout
+      this.reportStatus = {
+        hasReport: false,
+        reportId: null,
+        message: "",
+        checked: false,
+      };
       console.log("🚪 User logged out, localStorage cleared");
 
       return { status: true, data: res.data };
@@ -1967,6 +1983,73 @@ async fetchDashboardMeanTimeToRemediate() {
     this.completedSteps = [];
     localStorage.removeItem('completedSteps');
     console.log('🔄 Completed steps reset');
+  },
+
+  // ✅ GET Report Status (for dashboard - Super Admin upload check)
+  async getReportStatus() {
+    try {
+      const res = await endpoint.get(
+        "/api/admin/admindashboard/dashboard/report-status/"
+      );
+
+      const data = res.data;
+
+      const hasReport = data.has_report ?? false;
+      const reportId = data.report_id || null;
+      const message = data.message || "";
+
+      // ✅ Update reactive store state
+      this.reportStatus.hasReport = hasReport;
+      this.reportStatus.reportId = reportId;
+      this.reportStatus.message = message;
+      this.reportStatus.checked = true;
+
+      // ✅ Also update localStorage for persistence
+      if (hasReport && reportId) {
+        localStorage.setItem("reportId", reportId);
+      } else {
+        localStorage.removeItem("reportId");
+      }
+
+      console.log("📊 Report status updated:", { hasReport, reportId, message });
+
+      return {
+        status: true,
+        hasReport,
+        showDashboard: data.show_dashboard ?? false,
+        reportId,
+        message,
+        adminId: data.admin_id || null,
+        adminEmail: data.admin_email || null,
+      };
+    } catch (error: any) {
+      console.error("❌ Report status check failed:", error);
+
+      // ✅ Update store state on error too
+      this.reportStatus.checked = true;
+      this.reportStatus.hasReport = false;
+      this.reportStatus.message = error.response?.data?.message || "Failed to check report status";
+
+      return {
+        status: false,
+        hasReport: false,
+        showDashboard: false,
+        reportId: null,
+        message:
+          error.response?.data?.message ||
+          "Failed to check report status",
+      };
+    }
+  },
+
+  // ✅ Reset report status (useful for logout)
+  resetReportStatus() {
+    this.reportStatus.hasReport = false;
+    this.reportStatus.reportId = null;
+    this.reportStatus.message = "";
+    this.reportStatus.checked = false;
+    localStorage.removeItem("reportId");
+    console.log("🔄 Report status reset");
   },
 
   },
