@@ -1247,82 +1247,131 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // fetch total assets
-  async fetchTotalAssets(reportId: string) {
+  // ✅ NEW: Dashboard Total Assets (NO reportId)
+    async fetchDashboardTotalAssets() {
+      try {
+        const res = await endpoint.get(
+          "/api/admin/admindashboard/dashboard/total-assets/"
+        );
+
+        this.totalAssets = res.data?.total_assets ?? 0;
+        console.log("Dashboard total assets:", this.totalAssets);
+
+        return { status: true };
+      } catch (error) {
+        console.error("Dashboard total assets error", error);
+        this.totalAssets = 0;
+        return { status: false };
+      }
+    },
+
+
+
+    // 🔹 DASHBOARD AVG SCORE (NO reportId)
+    async fetchDashboardAvgScore() {
+      try {
+        const res = await endpoint.get(
+          "/api/admin/admindashboard/dashboard/avg-score/"
+        );
+
+        this.avgScore = res.data?.avg_score ?? 0;
+        console.log("Dashboard avg score:", this.avgScore);
+
+        return { status: true, data: res.data };
+      } catch (error: any) {
+        console.error(
+          "Dashboard avg score error:",
+          error.response?.data || error.message
+        );
+
+        this.avgScore = 0;
+        return {
+          status: false,
+          message: "Failed to fetch dashboard avg score",
+          details: error.response?.data || null,
+        };
+      }
+    },
+
+
+   
+    // 🔹 DASHBOARD VULNERABILITIES (NO reportId)
+    async fetchDashboardVulnerabilities() {
+      try {
+        const res = await endpoint.get(
+          "/api/admin/admindashboard/dashboard/vulnerabilities/"
+        );
+
+        this.vulnerabilities = {
+          critical: res.data?.critical ?? 0,
+          high: res.data?.high ?? 0,
+          medium: res.data?.medium ?? 0,
+          low: res.data?.low ?? 0,
+        };
+
+        console.log("Dashboard vulnerabilities:", this.vulnerabilities);
+
+        return { status: true, data: res.data };
+      } catch (error: any) {
+        console.error(
+          "Dashboard vulnerabilities error:",
+          error.response?.data || error.message
+        );
+
+        this.vulnerabilities = { critical: 0, high: 0, medium: 0, low: 0 };
+
+        return {
+          status: false,
+          message: "Failed to fetch dashboard vulnerabilities",
+          details: error.response?.data || null,
+        };
+      }
+    },
+
+
+  
+    // 🔹 DASHBOARD MITIGATION TIMELINE
+async fetchDashboardMitigationTimeline() {
   try {
     const res = await endpoint.get(
-      `/api/admin/admindashboard/report/${reportId}/total-assets/`
+      "/api/admin/admindashboard/dashboard/mitigation-timeline/"
     );
 
-    this.totalAssets = res.data.total_assets ?? 0;
-    return { status: true, data: res.data };
-  } catch (error: any) {
-    console.error("Total assets error:", error.response?.data || error.message);
-    return { status: false, message: "Failed to fetch total assets", details: error.response?.data || null };
-  }
-  },
+    this.mitigationTimeline = res.data || null;
 
-  // 🔹 FETCH AVG SCORE
-  async fetchAvgScore(reportId: string) {
-  try {
-    const res = await endpoint.get(
-      `/api/admin/admindashboard/report/${reportId}/avg-score/`
-    );
-    this.avgScore = res.data?.avg_score ?? 0;
     return { status: true, data: res.data };
   } catch (error: any) {
-    console.error("Avg score error:", error.response?.data || error.message);
+    console.error(
+      "Mitigation timeline error:",
+      error.response?.data || error.message
+    );
+
+    this.mitigationTimeline = null;
+
     return {
       status: false,
-      message: error.response?.data?.message || error.message || "Failed to fetch avg score",
-      details: error.response?.data || null,
+      message:
+        error.response?.data?.detail ||
+        "Failed to fetch mitigation timeline",
     };
   }
-  },
+},
 
-  // ✅ ADD THIS
-  async fetchVulnerabilities(reportId: string) {
+
+   
+
+    // ✅ fetch Dashboard Mean Time To Remediate
+async fetchDashboardMeanTimeToRemediate() {
   try {
-    const res = await endpoint.get(
-      `/api/admin/admindashboard/report/${reportId}/vulnerabilities/`
-    );
-    this.vulnerabilities = res.data || { critical: 0, high: 0, medium: 0, low: 0 };
-    return { status: true, data: res.data };
-  } catch (error: any) {
-    console.error("Vulnerabilities error:", error.response?.data || error.message);
-    this.vulnerabilities = { critical: 0, high: 0, medium: 0, low: 0 };
-    return { status: false, message: "Failed to fetch vulnerabilities", details: error.response?.data || null };
-  }
-  },
-
-  // fetch Mitigation Timeline
-  async fetchMitigationTimeline(reportId: string) {
-    try {
-      const res = await endpoint.get(
-        `/api/admin/admindashboard/report/${reportId}/mitigation-timeline/`
-      );
-
-      this.mitigationTimeline = res.data;
-      return { status: true, data: res.data };
-    } catch (error: any) {
-      return {
-        status: false,
-        message: error.response?.data?.detail || "Failed to fetch mitigation timeline",
-      };
-    }
-  },
-
-  // fetch MeanTime To Remediate
-  async fetchMeanTimeToRemediate(reportId: string) {
-  try {
-    console.log("[MTTR] Calling API for reportId:", reportId);
+    console.log("[MTTR] Calling DASHBOARD API");
 
     const res = await endpoint.get(
-      `/api/admin/admindashboard/report/${reportId}/mean-time-remediate/`
+      "/api/admin/admindashboard/dashboard/mean-time-remediate/"
     );
 
     console.log("[MTTR] API response:", res.data);
 
+    // 🔹 Store full response
     this.meanTimeToRemediate = res.data;
 
     console.log("[MTTR] Stored in authStore:", this.meanTimeToRemediate);
@@ -1334,6 +1383,8 @@ export const useAuthStore = defineStore("auth", {
       error.response?.data || error.message
     );
 
+    this.meanTimeToRemediate = null;
+
     return {
       status: false,
       message:
@@ -1341,37 +1392,7 @@ export const useAuthStore = defineStore("auth", {
         "Failed to fetch mean time to remediate",
     };
   }
-  },
-
-  // Fetch locations by upload report id
-  async fetchLocationsByReportId(reportId: string) {
-  try {
-    const res = await endpoint.get(
-      `/api/admin/upload_report/upload/locations/${reportId}/`
-    );
-
-    if (res.data?.success) {
-      // ✅ ALL locations for dropdown
-      this.reportLocations = res.data.locations || [];
-
-      // ✅ Only selected location stored separately
-      this.selectedReportLocation = res.data.selected_location || null;
-
-      console.log("📦 reportLocations:", this.reportLocations);
-      console.log("📍 selectedReportLocation:", this.selectedReportLocation);
-
-      return { status: true };
-    }
-
-    return { status: false };
-  } catch (error: any) {
-    console.error(
-      "❌ fetchLocationsByReportId error:",
-      error.response?.data || error.message
-    );
-    return { status: false };
-  }
-  },
+},
 
   // FETCH Vulnerability Register
   async fetchVulnerabilityRegister(reportId: string) {

@@ -301,17 +301,27 @@ export default {
     };
   },
   
-  watch: {
-  "formData.email"(email) {
-    if (
-      this.currentRole === "admin" &&
-      this.currentMode === "signin" &&
-      email
-    ) {
-      this.fetchPreviousTestingTypes();
+
+watch: {
+  "formData.email": {
+    handler(email) {
+      if (
+        this.currentRole !== "admin" ||
+        this.currentMode !== "signin"
+      ) return;
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) return;
+
+      clearTimeout(this._emailTimer);
+      this._emailTimer = setTimeout(() => {
+        this.restoreTestingTypesByEmail(email);
+      }, 400);
     }
   }
 },
+
+
 
   computed: {
     rightHeadline() {
@@ -350,6 +360,56 @@ export default {
     }
   },
   methods: {
+
+    restoreTestingTypesByEmail(email) {
+  try {
+    const saved = localStorage.getItem(`testing_types_${email}`);
+
+    if (!saved) {
+      // First-time login → allow selection
+      this.previouslySelectedTestingBox = [];
+      this.selectedTestingBox = [];
+      return;
+    }
+
+    const parsed = JSON.parse(saved);
+
+    if (Array.isArray(parsed) && parsed.length) {
+      this.previouslySelectedTestingBox = parsed;
+      this.selectedTestingBox = [...parsed]; // ✅ auto-select
+      this.isTestingBoxOpen = false;
+    }
+  } catch (err) {
+    console.error("Failed to restore testing types", err);
+    this.previouslySelectedTestingBox = [];
+    this.selectedTestingBox = [];
+  }
+},
+
+    async fetchPreviousTestingTypesSafely(email) {
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    // 🔒 No previous login on this browser
+    if (!storedUser?.id || storedUser.email !== email) {
+      this.previouslySelectedTestingBox = [];
+      return;
+    }
+
+    const res = await this.authStore.getAdminTestingTypes(storedUser.id);
+
+    if (res.status && Array.isArray(res.testingTypes)) {
+      this.previouslySelectedTestingBox = res.testingTypes;
+
+      // ✅ Auto-select previous testing types
+      this.selectedTestingBox = [...res.testingTypes];
+    }
+  } catch (err) {
+    console.error("Failed to fetch previous testing types", err);
+    this.previouslySelectedTestingBox = [];
+  }
+},
+
     async checkScopeAndRedirect() {
   const testingType = this.selectedTestingBox[0]; // white_box / grey_box / black_box
 
@@ -611,22 +671,23 @@ hasUploadedTargets(email) {
       //   );
       //   return false;
       // }
-      const finalTestingTypes = [
-        ...new Set([
-          ...this.previouslySelectedTestingBox,
-          ...this.selectedTestingBox,
-        ]),
-      ];
+     const finalTestingTypes = [
+  ...new Set([
+    ...this.previouslySelectedTestingBox,
+    ...this.selectedTestingBox,
+  ]),
+];
 
-      if (
-        this.currentRole === "admin" &&
-        this.currentMode === "signin" &&
-        finalTestingTypes.length === 0
-      ) {
-        Swal.fire("Error", "Please select at least one testing type", "error");
-        return false;
-      }
+if (
+  this.currentRole === "admin" &&
+  this.currentMode === "signin" &&
+  finalTestingTypes.length === 0
+) {
+  Swal.fire("Error", "Please select at least one testing type", "error");
+  return false;
+}
 
+     
 
       // ✅ reCAPTCHA validation (Admin Sign In & Sign Up)
       if (window.grecaptcha && this.recaptchaWidgetId !== null) {
@@ -912,56 +973,71 @@ hasUploadedTargets(email) {
         this.resetRecaptcha();
       }
     },
-    //   async handleSignin(recaptchaResponse) {
-    //     const finalTestingTypes = [
-    //   ...new Set([
-    //     ...this.previouslySelectedTestingBox,
-    //     ...this.selectedTestingBox,
-    //   ]),
-    // ];
-    //     const payload = {
-    //       email: this.formData.email,
-    //       password: this.formData.password,
-    //       testing_type: finalTestingTypes,
-    //       recaptcha: recaptchaResponse
-    //     };
 
-    //     const result = await this.authStore.login(payload);
 
-    //     if (result.status) {
-    //       console.log('✅ Login successful');
-    //       await this.checkAndRedirect();
-    //     } else {
-    //       Swal.fire({
-    //         icon: 'error',
-    //         title: 'Login Failed',
-    //         text: result.message || 'Login failed',
-    //         timer: 3000,
-    //         showConfirmButton: false
-    //       });
-    //       this.resetRecaptcha();
-    //     }
-    //   },
+
 async handleSignin(recaptchaResponse) {
   this.loading = true;
 
   try {
-    const payload = {
-      email: this.formData.email,
-      password: this.formData.password,
-      testing_type: this.selectedTestingBox,
-      recaptcha: recaptchaResponse
-    };
+    // 🔹 Merge previous + current selections (VERY IMPORTANT)
+    const finalTestingTypes = [
+      ...new Set([
+        ...this.previouslySelectedTestingBox,
+        ...this.selectedTestingBox,
+      ]),
+    ];
 
-    const result = await this.authStore.login(payload);
-
-    if (!result.status) {
-      Swal.fire("Login Failed", result.message || "Invalid credentials", "error");
+    // ❌ Safety check (should not happen due to validation, but safe)
+    if (!finalTestingTypes.length) {
+      Swal.fire("Error", "Please select at least one testing type", "error");
       return;
     }
 
-    // 🔀 Decide redirect based on targets
-    const testingType = this.selectedTestingBox[0];
+    const payload = {
+      email: this.formData.email,
+      password: this.formData.password,
+      testing_type: finalTestingTypes,
+      recaptcha: recaptchaResponse,
+    };
+
+    // 🔐 LOGIN
+    const result = await this.authStore.login(payload);
+
+    if (!result.status) {
+      Swal.fire(
+        "Login Failed",
+        result.message || "Invalid credentials",
+        "error"
+      );
+      return;
+    }
+
+    /* =====================================================
+       ✅ SAVE USER & TESTING TYPES (FOR NEXT LOGIN)
+       ===================================================== */
+
+    if (result.data?.user) {
+      localStorage.setItem("user", JSON.stringify(result.data.user));
+    }
+
+    // Save testing types per email (KEY LOGIC)
+    localStorage.setItem(
+      `testing_types_${this.formData.email}`,
+      JSON.stringify(finalTestingTypes)
+    );
+
+    // Update state immediately (no reselect needed)
+    this.previouslySelectedTestingBox = [...finalTestingTypes];
+    this.selectedTestingBox = [...finalTestingTypes];
+    this.isTestingBoxOpen = false;
+
+    /* =====================================================
+       🔀 REDIRECT LOGIC (BASED ON TARGETS)
+       ===================================================== */
+
+    // Use FIRST testing type to check scope
+    const testingType = finalTestingTypes[0];
 
     const res = await this.authStore.getScopeTargets(testingType);
 
@@ -972,8 +1048,10 @@ async handleSignin(recaptchaResponse) {
         res.data?.count > 0
       )
     ) {
+      // ✅ Targets already exist
       this.$router.push("/admindashboardonboarding");
     } else {
+      // ❌ No targets → redirect to upload
       this.$router.push("/location");
     }
 

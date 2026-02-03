@@ -572,7 +572,7 @@ import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
-import Swal from "sweetalert2";
+// import Swal from "sweetalert2";
 
 export default {
   name: 'AdminDashboardOnboardingView',
@@ -587,7 +587,6 @@ export default {
       remainingSeconds: 20,
       progressPercent: 100,
       testingTimer: null,
-      authStore: useAuthStore(),
       showReport: false,
       showCalendar: false,
       currentDate: new Date(),
@@ -601,7 +600,7 @@ export default {
       days: 10,              // default days
       showModal: false,      // modal visibility
       addDays: "",           // input: additional days
-      reason: ""  ,
+      reason: "",
       mitigationTimeline: null,
       selectedLocation: "",
       locationName: "",
@@ -622,6 +621,9 @@ export default {
     };
   },
   computed: {
+    authStore() {
+      return useAuthStore();
+    },
     daysInMonth() {
       const year = this.currentDate.getFullYear();
       const month = this.currentDate.getMonth();
@@ -637,44 +639,44 @@ export default {
         month: "long",
         year: "numeric",
       });
-    
+
     },
-    authStore() {
-      return useAuthStore();
+    // authStore() {
+    //   return useAuthStore();
+    // },
+    //   meanRemediateHuman() {
+    //   const mttr =
+    //     this.authStore.meanTimeToRemediate?.mean_time_to_remediate;
+
+    //   if (!mttr) return "0d 0 hrs";
+
+    //   const days = mttr.days ?? 0;
+    //   const hours = mttr.hours_remaining ?? 0;
+
+    //   return `${days}d ${hours} hrs`;
+    // },
+    meanRemediateHuman() {
+      const mttr =
+        this.authStore.meanTimeToRemediate?.mean_time_to_remediate;
+
+      if (!mttr) return "0w 0d 0hrs";
+
+      const weeks = mttr.weeks ?? 0;
+      const days = mttr.days ?? 0;
+      const hours = mttr.hours_remaining ?? 0;
+
+      return `${weeks}w ${days}d ${hours}hrs`;
     },
-  //   meanRemediateHuman() {
-  //   const mttr =
-  //     this.authStore.meanTimeToRemediate?.mean_time_to_remediate;
-
-  //   if (!mttr) return "0d 0 hrs";
-
-  //   const days = mttr.days ?? 0;
-  //   const hours = mttr.hours_remaining ?? 0;
-
-  //   return `${days}d ${hours} hrs`;
-  // },
-  meanRemediateHuman() {
-    const mttr =
-      this.authStore.meanTimeToRemediate?.mean_time_to_remediate;
-
-    if (!mttr) return "0w 0d 0hrs";
-
-    const weeks = mttr.weeks ?? 0;
-    const days = mttr.days ?? 0;
-    const hours = mttr.hours_remaining ?? 0;
-
-    return `${weeks}w ${days}d ${hours}hrs`;
+    // Display text for selected location
+    selectedLocationDisplay() {
+      if (!this.selectedLocationData) return "";
+      if (this.selectedLocationType) {
+        return `${this.selectedLocationData.name} - ${this.selectedLocationType}`;
+      }
+      return this.selectedLocationData.name;
+    },
   },
-  // Display text for selected location
-  selectedLocationDisplay() {
-    if (!this.selectedLocationData) return "";
-    if (this.selectedLocationType) {
-      return `${this.selectedLocationData.name} - ${this.selectedLocationType}`;
-    }
-    return this.selectedLocationData.name;
-  },
-  },
-   methods: {
+  methods: {
     initTestingOverlay() {
       // Clear any existing timer and overlay
       if (this.testingTimer) {
@@ -697,7 +699,7 @@ export default {
 
         // Start countdown timer
         const self = this;
-        this.testingTimer = setInterval(function() {
+        this.testingTimer = setInterval(function () {
           const now = Date.now();
           const elapsedNow = now - startTimeNum;
           const remainingNow = Math.max(20000 - elapsedNow, 0);
@@ -722,7 +724,7 @@ export default {
       const overlay = document.createElement('div');
       overlay.id = 'testing-overlay-dom';
       overlay.innerHTML = `
-        <div style="position: fixed; top: 60px; left: 90px; right: 0; bottom: 0; background: rgba(255,255,255,0.80); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="position: fixed; top: 60px; left: 90px; right: 0; bottom: 0; background: rgba(255,255,255,0.80); display: flex; align-items: center; justify-content: center; z-index: 900;">
           <div style="background: #fff; padding: 40px 60px; border-radius: 16px; box-shadow: 0 10px 40px rgba(49,33,177,0.25); text-align: center; border: 2px solid rgba(49,33,177,0.15);">
             <div style="font-size: 48px; color: rgba(49,33,177,1); margin-bottom: 16px;">
               <i class="bi bi-hourglass-split"></i>
@@ -797,29 +799,29 @@ export default {
 
     // OLD METHODS (kept for reference)
     toggleDropdown() {
-    this.showDropdown = !this.showDropdown;
-  },
+      this.showDropdown = !this.showDropdown;
+    },
 
-  selectLocation(loc) {
-    this.selectedLocation = loc.id;
-    this.locationName = loc.name;
-    this.showDropdown = false;
-  },
+    selectLocation(loc) {
+      this.selectedLocation = loc.id;
+      this.locationName = loc.name;
+      this.showDropdown = false;
+    },
     formatTimeline(value) {
-    if (!value || !value.raw) return "--";
+      if (!value || !value.raw) return "--";
 
-    const raw = value.raw.toLowerCase();
+      const raw = value.raw.toLowerCase();
 
-    if (raw.includes("week")) {
-      return `${value.days / 7}W`;
-    }
+      if (raw.includes("week")) {
+        return `${value.days / 7}W`;
+      }
 
-    if (raw.includes("day")) {
+      if (raw.includes("day")) {
+        return `${value.days}D`;
+      }
+
       return `${value.days}D`;
-    }
-
-    return `${value.days}D`;
-  },
+    },
     onLocationInput() {
       this.showDropdown = true;
       this.filterCountries();
@@ -847,7 +849,7 @@ export default {
     },
     prevMonth() {
       this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-      this.currentDate = new Date(this.currentDate); 
+      this.currentDate = new Date(this.currentDate);
     },
     nextMonth() {
       this.currentDate.setMonth(this.currentDate.getMonth() + 1);
@@ -872,7 +874,7 @@ export default {
       if (this.vulnerabilities[date]) {
         this.$router.push("/assets");
       }
-    
+
     },
     openModal() {
       this.showModal = true;
@@ -900,52 +902,48 @@ export default {
       }
     },
   },
-  mounted() {
-    console.log("=== MOUNTED ===");
 
-    // Initialize testing overlay with a small delay to ensure DOM is ready
-    setTimeout(() => {
-      this.initTestingOverlay();
-    }, 100);
-    // NEW DROPDOWN - Close on outside click
-    document.addEventListener('click', this.closeLocationDropdown);
+mounted() {
+  console.log("=== DASHBOARD MOUNTED ===");
 
-    this.authStore.fetchCountries();
-    // 🟡 3️⃣ Fetch locations by admin id instead of old fetchLocations()
-      const user =
-        this.authStore.user ||
-        JSON.parse(localStorage.getItem("user") || "null");
+  setTimeout(() => {
+    this.initTestingOverlay();
+  }, 100);
 
-      if (user) {
-        this.authStore.user = user; // keep store in sync
-        const adminId =
-          user.admin_id || user.id || user._id;
+  document.addEventListener("click", this.closeLocationDropdown);
 
-        if (adminId) {
-          this.authStore.fetchLocationsByAdminId(adminId);
-        }
-      }
-       // 🟡 4️⃣ Fetch locations if not loaded
-      if (!this.authStore.locations.length) {
-        this.authStore.fetchLocations();
-      }
+  this.authStore.fetchCountries();
 
-    const reportId = localStorage.getItem("reportId");
-      if (!reportId) return;
-      this.authStore.fetchTotalAssets(reportId);
-      this.authStore.fetchAvgScore(reportId);
-      this.authStore.fetchVulnerabilities(reportId);
-      this.authStore.fetchMitigationTimeline(reportId);
-      this.authStore.fetchMeanTimeToRemediate(reportId);
+  const user =
+    this.authStore.user ||
+    JSON.parse(localStorage.getItem("user") || "null");
 
-      this.authStore.fetchLocationsByReportId(reportId).then(() => {
-    const selected = this.authStore.selectedReportLocation;
-    if (selected) {
-      this.selectedLocation = selected.id;
-      this.locationName = selected.name;
+  if (user) {
+    this.authStore.user = user;
+    const adminId = user.admin_id || user.id || user._id;
+    if (adminId) {
+      this.authStore.fetchLocationsByAdminId(adminId);
     }
-  });
-    },
+  }
+
+  // ✅ DASHBOARD APIs
+  Promise.all([
+    this.authStore.fetchDashboardTotalAssets(),
+    this.authStore.fetchDashboardAvgScore(),
+    this.authStore.fetchDashboardVulnerabilities(),
+    this.authStore.fetchDashboardMitigationTimeline(),
+    this.authStore.fetchDashboardMeanTimeToRemediate(), // ✅ ADD THIS
+  ])
+    .then(() => {
+      console.log("✅ All dashboard APIs loaded");
+    })
+    .catch(err => {
+      console.error("❌ Dashboard API error", err);
+    });
+},
+
+
+
   beforeUnmount() {
     // Clean up event listener
     document.removeEventListener('click', this.closeLocationDropdown);
