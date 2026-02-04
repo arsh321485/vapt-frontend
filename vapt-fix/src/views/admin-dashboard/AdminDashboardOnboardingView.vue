@@ -1095,21 +1095,21 @@ mounted() {
     this.initTestingOverlay();
   }, 100);
 
-  document.addEventListener("click", this.closeLocationDropdown);
+  // document.addEventListener("click", this.closeLocationDropdown);
 
-  this.authStore.fetchCountries();
+  // this.authStore.fetchCountries();
 
   const user =
     this.authStore.user ||
     JSON.parse(localStorage.getItem("user") || "null");
 
-  if (user) {
-    this.authStore.user = user;
-    const adminId = user.admin_id || user.id || user._id;
-    if (adminId) {
-      this.authStore.fetchLocationsByAdminId(adminId);
-    }
-  }
+  // if (user) {
+  //   this.authStore.user = user;
+  //   const adminId = user.admin_id || user.id || user._id;
+  //   if (adminId) {
+  //     this.authStore.fetchLocationsByAdminId(adminId);
+  //   }
+  // }
 
   // ✅ DASHBOARD APIs
   Promise.all([
@@ -1130,9 +1130,9 @@ mounted() {
 
 
   beforeUnmount() {
-    // Clean up event listener
-    document.removeEventListener('click', this.closeLocationDropdown);
-    // Clear testing timer and remove overlay
+   
+    // document.removeEventListener('click', this.closeLocationDropdown);
+   
     if (this.testingTimer) {
       clearInterval(this.testingTimer);
     }

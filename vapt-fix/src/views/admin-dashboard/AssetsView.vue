@@ -82,75 +82,6 @@
                 </div>
 
                 <!-- Asset List -->
-                <!-- <div class="d-flex flex-column gap-3 mt-3">
-                  <div v-for="(asset, index) in assets" :key="index" class="asset-item border-bottom"
-                    :class="{ active: activeIndex === index }"
-                    :style="activeIndex === index ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);' : ''"
-                    @click="setActive(index)">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex justify-content-start gap-3">
-                       
-                        <input v-if="showCheckboxes" type="checkbox" v-model="asset.selected"
-                          class="form-check-input me-2" />
-
-                        
-                        <input v-if="showHoldCheckboxes" type="checkbox" v-model="asset.selected"
-                          class="form-check-input me-2" />
-                        <span :class="{ 'text-muted': asset.held }">{{ asset.name }}</span>
-
-                        
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87); font-size: 22px;">
-                          {{ asset.ip }}
-                        </div>
-                        <div>
-                          <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1"
-                              style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                            <span>Critical</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="align-items-end gap-2">
-                        <div class="d-flex flex-row">
-                          <div>
-                            <i class="bi bi-link-45deg me-1"
-                              style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"></i>
-                          </div>
-                          <div>
-                            <p @click="asset.isInternal = !asset.isInternal" style="cursor: pointer;">
-                              {{ asset.isInternal ? 'Internal' : 'External' }}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #b31c1c"></span>
-                        <span class="text-danger fw-bold">11</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #f44336"></span>
-                        <span class="text-danger fw-bold">4</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #f6b100"></span>
-                        <span class="text-warning fw-bold">8</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #4caf50"></span>
-                        <span class="text-success fw-bold">0</span>
-                      </span>
-                    </div>
-                  </div>
-                </div> -->
-                <!-- Asset List -->
                 <div class="asset-list-wrapper">
                   <div class="d-flex flex-column mt-3">
                     <div v-for="(asset, i) in pagedAssets" :key="asset.id || asset.asset || i"
@@ -294,7 +225,7 @@
                 </div>
 
                 <!-- Hold Vulnerabilities List -->
-                <div v-if="showHeld && heldAssets.length" class=" py-1 px-2 mt-5">
+                <div v-if=" heldAssets.length" class=" py-1 px-2 mt-5">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="mb-0">Mitigation on hold</h4>
                     <i class="bi bi-eye fs-5" @click="toggleUnholdMode" title="Unhold" style="cursor: pointer;"></i>
@@ -960,7 +891,7 @@ export default {
       pageSize: 5,
       query: "",
       isSearching: false,
-      reportId: localStorage.getItem("reportId"),
+      // reportId: localStorage.getItem("reportId"),
       selectedAsset: "",
       activeSeverity: 'All',
       closedFixVulnerabilities: [],   // 👈 ADD
@@ -1067,17 +998,24 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
       });
     },
     pagedHeldAssets() {
-      const start = (this.currentPage - 1) * this.pageSize;
+  return [...this.heldAssets].sort((a, b) => {
+    const aSev = this.getHeldPrioritySeverity(a);
+    const bSev = this.getHeldPrioritySeverity(b);
+    return this.getSeverityRank(aSev) - this.getSeverityRank(bSev);
+  });
+},
+    // pagedHeldAssets() {
+    //   const start = (this.currentPage - 1) * this.pageSize;
 
-      const sorted = [...this.heldAssets].sort((a, b) => {
-        const aSev = this.getHeldPrioritySeverity(a);
-        const bSev = this.getHeldPrioritySeverity(b);
+    //   const sorted = [...this.heldAssets].sort((a, b) => {
+    //     const aSev = this.getHeldPrioritySeverity(a);
+    //     const bSev = this.getHeldPrioritySeverity(b);
 
-        return this.getSeverityRank(aSev) - this.getSeverityRank(bSev);
-      });
+    //     return this.getSeverityRank(aSev) - this.getSeverityRank(bSev);
+    //   });
 
-      return sorted.slice(start, start + this.pageSize);
-    },
+    //   return sorted.slice(start, start + this.pageSize);
+    // },
   },
   watch: {
     pagedAssets: {
@@ -1179,7 +1117,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
     async confirmDelete() {
       const selected = this.authStore.assetRows.filter(a => a.selected);
       for (const asset of selected) {
-        await this.authStore.deleteAsset(this.reportId, asset.asset);
+        await this.authStore.deleteAsset(asset.asset);
       }
       this.showCheckboxes = false;
       this.activeAction = "";
@@ -1188,7 +1126,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
       if (!asset?.asset) return;
       this.activeIndex = asset.asset;
       this.authStore.fetchSingleAssetVulnerabilities(
-        this.reportId,
+        
         asset.asset
       );
       // 🔥 NEW: fetch support requests for this asset
@@ -1273,7 +1211,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
 
       for (const item of selected) {
         const res = await this.authStore.holdAsset(
-          this.reportId,
+         
           item.asset
         );
 
@@ -1343,7 +1281,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
 
       for (const item of selected) {
         const res = await this.authStore.unholdAsset(
-          this.reportId,
+          
           item.ip
         );
 
@@ -1371,7 +1309,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
       this.resetActions();
     },
     async loadHeldAssets() {
-      const res = await this.authStore.fetchHeldAssets(this.reportId);
+      const res = await this.authStore.fetchHeldAssets();
       if (res.status && res.assets.length) {
         this.heldAssets = res.assets.map(a => ({
           asset: a.asset,
@@ -1380,23 +1318,25 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
           name: a.host_information?.["DNS Name"] || "",
           severity_counts: a.severity_counts,
           host_information: a.host_information,
-          // isInternal: true,
           held: true,
           selected: false,
         }));
 
+        this.showHeld = true;
         this.authStore.assetRows = this.authStore.assetRows.filter(
           a => !this.heldAssets.some(h => h.asset === a.asset)
         );
-      }
+      } else {
+    this.showHeld = false;
+    this.heldAssets = [];
+  }  
     },
-    toggleText() {
-      this.isInternal = !this.isInternal;
-    },
-
-    toggleExposure(asset) {
-      asset.isInternal = !asset.isInternal;
-    },
+    // toggleText() {
+    //   this.isInternal = !this.isInternal;
+    // },
+    // toggleExposure(asset) {
+    //   asset.isInternal = !asset.isInternal;
+    // },
     getPrioritySeverity(asset) {
       const s = asset.severity_counts || {};
       if ((s.critical ?? 0) > 0) return "Critical";
@@ -1415,7 +1355,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
 
     // optional: live search (WhatsApp style)
     this.authStore.searchAssets(
-      this.reportId,
+      
       this.query.trim()
     );
     },
@@ -1463,14 +1403,14 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
   async viewFixDetail(item) {
     // payload is optional here, send empty object
     const res = await this.authStore.createFixVulnerability(
-      this.reportId,
+     
       item.host_name,
       {}
     );
 
     if (res.status) {
       this.$router.push(
-        `/vulnerabilitycard/${this.reportId}/${item.host_name}`
+        `/vulnerabilitycard/${item.host_name}`
       );
     } else {
       console.error("Fix vulnerability create failed:", res.message);
@@ -1481,32 +1421,40 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
 
+    // Dropdown code - only run if dropdown element exists in DOM
     const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent;
-        dropdown.classList.remove('show');
-      });
-    });
+    if (dropdown) {
+      const btn = dropdown.querySelector('.dropdown-btn');
+      const options = dropdown.querySelectorAll('.dropdown-content a');
 
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          dropdown.classList.toggle('show');
+        });
       }
-    });
 
-    const reportId = localStorage.getItem("reportId");
-    if (!reportId) return;
-    this.authStore.fetchAssets(reportId);
+      options.forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (btn) btn.textContent = option.textContent;
+          dropdown.classList.remove('show');
+        });
+      });
 
-    this.loadHeldAssets();
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
 
+    console.log("🔥 AssetsView mounted");
+    this.authStore.fetchAssets();
+
+    // Only call loadHeldAssets if fetchHeldAssets method exists in store
+    if (typeof this.authStore.fetchHeldAssets === 'function') {
+      this.loadHeldAssets();
+    }
   },
 };
 </script>
@@ -1533,6 +1481,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
 .asset-item {
   padding: 12px 16px;
   position: relative;
+  cursor: pointer;
 }
 
 .hold-asset {

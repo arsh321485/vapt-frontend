@@ -2,20 +2,12 @@ import { defineStore } from "pinia";
 import endpoint from "../services/apiServices";
 import type { AxiosError } from "axios";
 
-interface Location {
-  _id: string;
-  admin_id: string;
-  location_name: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
 interface CreateUserPayload {
   admin_id: string;
-  location_id: string;
+  // location_id: string;
   user_type: string;
   email: string;
-  select_location: string;
+  // select_location: string;
   Member_role: string;
 }
 
@@ -30,9 +22,9 @@ export const useAuthStore = defineStore("auth", {
     authenticated: localStorage.getItem("authenticated")
       ? JSON.parse(localStorage.getItem("authenticated")!)
       : false,
-    locations: localStorage.getItem("locations") 
-      ? JSON.parse(localStorage.getItem("locations")!)
-      : [] as Location[],
+    // locations: localStorage.getItem("locations") 
+    //   ? JSON.parse(localStorage.getItem("locations")!)
+    //   : [] as Location[],
     accessToken: localStorage.getItem("authorization") || null,
     refreshToken: localStorage.getItem("refreshToken") || null,
     tickets: [] as any[], 
@@ -77,7 +69,7 @@ export const useAuthStore = defineStore("auth", {
       hasReport: false,
       reportId: null as string | null,
       message: "",
-      checked: false,  // true once API has been called at least once
+      checked: false,  
     },
 
     }),
@@ -102,22 +94,6 @@ export const useAuthStore = defineStore("auth", {
 
     return false;
   },
-  // restoreFromStorage() {
-  //     const access = localStorage.getItem("accessToken");
-  //     const refresh = localStorage.getItem("refreshToken");
-  //     const user = localStorage.getItem("user");
-
-  //     if (access && user) {
-  //       this.accessToken = access;
-  //       this.refreshToken = refresh;
-  //       this.user = JSON.parse(user);
-  //       this.authenticated = true;
-  //       console.log("🔄 Session restored from localStorage");
-  //       return true;
-  //     }
-  //     return false;
-  // },
-
   // ✅ Restore auth + auto-fetch locations on refresh
   
   initFromStorage() {
@@ -129,19 +105,19 @@ export const useAuthStore = defineStore("auth", {
         console.log("♻️ Restored user from storage:", this.user);
       }
       // 2️⃣ Restore locations quickly (so UI shows instantly)
-      const savedLocations = localStorage.getItem("locations");
-      if (savedLocations) {
-        this.locations = JSON.parse(savedLocations);
-        console.log("♻️ Restored locations from storage:", this.locations);
-      }
+      // const savedLocations = localStorage.getItem("locations");
+      // if (savedLocations) {
+      //   this.locations = JSON.parse(savedLocations);
+      //   console.log("♻️ Restored locations from storage:", this.locations);
+      // }
 
       // 3️⃣ Then re-fetch fresh locations from API (by admin id)
       const adminId =
         this.user?.admin_id || this.user?.id || this.user?._id;
 
-      if (adminId) {
-        this.fetchLocationsByAdminId(adminId);
-      }
+      // if (adminId) {
+      //   this.fetchLocationsByAdminId(adminId);
+      // }
     } catch (e) {
       console.error("initFromStorage error:", e);
     }
@@ -333,120 +309,120 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Get all countries
-  async fetchCountries() {
-    try {
-      const res = await endpoint.get("/api/admin/location/countries/");
-      const data = res.data;
+  // async fetchCountries() {
+  //   try {
+  //     const res = await endpoint.get("/api/admin/location/countries/");
+  //     const data = res.data;
 
-      if (Array.isArray(data.countries)) {
-        this.countries = data.countries;
-        console.log("🌍 Countries fetched:", this.countries);
-      } else {
-        this.countries = [];
-        console.warn("⚠ No countries array found in response:", data);
-      }
+  //     if (Array.isArray(data.countries)) {
+  //       this.countries = data.countries;
+  //       console.log("🌍 Countries fetched:", this.countries);
+  //     } else {
+  //       this.countries = [];
+  //       console.warn("⚠ No countries array found in response:", data);
+  //     }
 
-      return { status: true, data };
-    } catch (error: any) {
-      console.error(
-        "Fetch countries error:",
-        error.response?.data || error.message
-      );
+  //     return { status: true, data };
+  //   } catch (error: any) {
+  //     console.error(
+  //       "Fetch countries error:",
+  //       error.response?.data || error.message
+  //     );
 
-      return {
-        status: false,
-        message:
-          error.response?.data?.message ||
-          error.message ||
-          "Fetch countries failed",
-        details: error.response?.data || null,
-      };
-    }
-  },
+  //     return {
+  //       status: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         error.message ||
+  //         "Fetch countries failed",
+  //       details: error.response?.data || null,
+  //     };
+  //   }
+  // },
 
   // add location
-  async addLocation(locationName: string) {
-      try {
-        const adminId = this.user?.id || this.user?._id;
+  // async addLocation(locationName: string) {
+  //     try {
+  //       const adminId = this.user?.id || this.user?._id;
 
-        if (!adminId) {
-          throw new Error("Admin ID not found. Please login again.");
-        }
+  //       if (!adminId) {
+  //         throw new Error("Admin ID not found. Please login again.");
+  //       }
 
-        const payload = {
-          admin_id: adminId,
-          location_name: locationName,
-        };
+  //       const payload = {
+  //         admin_id: adminId,
+  //         location_name: locationName,
+  //       };
 
-        const res = await endpoint.post(
-          "/api/admin/location/add-location/",
-          payload
-        );
-        const data = res.data;
+  //       const res = await endpoint.post(
+  //         "/api/admin/location/add-location/",
+  //         payload
+  //       );
+  //       const data = res.data;
 
-        if (data.location) {
-          this.locations.push(data.location);
-          localStorage.setItem("locations", JSON.stringify(this.locations));
-          console.log("📌 New location added & saved:", this.locations);
-        }
+  //       if (data.location) {
+  //         this.locations.push(data.location);
+  //         localStorage.setItem("locations", JSON.stringify(this.locations));
+  //         console.log("📌 New location added & saved:", this.locations);
+  //       }
 
-        return { status: true, data };
-      } catch (error: any) {
-        return {
-          status: false,
-          message:
-            error.response?.data?.message || error.message || "Add location failed",
-          details: error.response?.data || null,
-        };
-      } 
-  }, 
+  //       return { status: true, data };
+  //     } catch (error: any) {
+  //       return {
+  //         status: false,
+  //         message:
+  //           error.response?.data?.message || error.message || "Add location failed",
+  //         details: error.response?.data || null,
+  //       };
+  //     } 
+  // }, 
 
   // ✅ Fetch locations by particular admin ID
-  async fetchLocationsByAdminId(adminId: string) {
-    try {
-      const res = await endpoint.get(
-        `/api/admin/location/locations/admin/${adminId}/`
-      );
+  // async fetchLocationsByAdminId(adminId: string) {
+  //   try {
+  //     const res = await endpoint.get(
+  //       `/api/admin/location/locations/admin/${adminId}/`
+  //     );
 
-      const data = res.data;
+  //     const data = res.data;
 
-      if (Array.isArray(data.locations) && data.locations.length > 0) {
-        this.locations = data.locations;
+  //     if (Array.isArray(data.locations) && data.locations.length > 0) {
+  //       this.locations = data.locations;
 
-        // ✅ Save to localStorage
-        localStorage.setItem("locations", JSON.stringify(this.locations));
+  //       // ✅ Save to localStorage
+  //       localStorage.setItem("locations", JSON.stringify(this.locations));
 
-        console.log("📌 Locations fetched for admin:", adminId, this.locations);
-      } else {
-        console.warn("⚠ No locations found for admin:", adminId);
-        this.locations = [];
-        localStorage.removeItem("locations");
-      }
+  //       console.log("📌 Locations fetched for admin:", adminId, this.locations);
+  //     } else {
+  //       console.warn("⚠ No locations found for admin:", adminId);
+  //       this.locations = [];
+  //       localStorage.removeItem("locations");
+  //     }
 
-      return { status: true, data };
-    } catch (error: any) {
-      console.error("❌ Failed to fetch locations:", error);
+  //     return { status: true, data };
+  //   } catch (error: any) {
+  //     console.error("❌ Failed to fetch locations:", error);
 
-      // ✅ Fallback: load from localStorage
-      const saved = localStorage.getItem("locations");
-      if (saved) {
-        this.locations = JSON.parse(saved);
-        console.log(
-          "📦 Loaded locations from localStorage (offline mode):",
-          this.locations
-        );
-      }
+  //     // ✅ Fallback: load from localStorage
+  //     const saved = localStorage.getItem("locations");
+  //     if (saved) {
+  //       this.locations = JSON.parse(saved);
+  //       console.log(
+  //         "📦 Loaded locations from localStorage (offline mode):",
+  //         this.locations
+  //       );
+  //     }
 
-      return {
-        status: false,
-        message:
-          error.response?.data?.message ||
-          error.message ||
-          "Fetch locations failed",
-        details: error.response?.data || null,
-      };
-    }
-  },
+  //     return {
+  //       status: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         error.message ||
+  //         "Fetch locations failed",
+  //       details: error.response?.data || null,
+  //     };
+  //   }
+  // },
 
   // ✅ Get admin testing types for upload report page
   async getAdminTestingTypes(adminId: string) {
@@ -479,118 +455,118 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Upload report
-  async uploadVulnerabilityReport(payload: {
-    locationId: string;
-    memberType: "internal" | "external" | "both";
-    file: File;
-  }) {
-    try {
-      const formData = new FormData();
+  // async uploadVulnerabilityReport(payload: {
+  //   locationId: string;
+  //   memberType: "internal" | "external" | "both";
+  //   file: File;
+  // }) {
+  //   try {
+  //     const formData = new FormData();
 
-      formData.append("location", payload.locationId);
-      formData.append("member_type", payload.memberType);
-      formData.append("file", payload.file);
+  //     formData.append("location", payload.locationId);
+  //     formData.append("member_type", payload.memberType);
+  //     formData.append("file", payload.file);
 
-      const res = await endpoint.post(
-        "/api/admin/upload_report/upload/",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+  //     const res = await endpoint.post(
+  //       "/api/admin/upload_report/upload/",
+  //       formData,
+  //       { headers: { "Content-Type": "multipart/form-data" } }
+  //     );
 
-      // 🔥 IMPORTANT: detect duplicate from response
-      if (res.data?.errors?.length) {
-        return {
-          status: false,
-          isDuplicate: true,
-          message: res.data.errors[0].error,
-          data: res.data,
-        };
-      }
+  //     // 🔥 IMPORTANT: detect duplicate from response
+  //     if (res.data?.errors?.length) {
+  //       return {
+  //         status: false,
+  //         isDuplicate: true,
+  //         message: res.data.errors[0].error,
+  //         data: res.data,
+  //       };
+  //     }
 
-      return {
-        status: true,
-        data: res.data,
-        message: res.data?.message,
-      };
+  //     return {
+  //       status: true,
+  //       data: res.data,
+  //       message: res.data?.message,
+  //     };
 
-    } catch (error: any) {
-      return {
-        status: false,
-        isDuplicate: false,
-        message: error.response?.data?.message || "Upload failed",
-        data: error.response?.data || null,
-      };
-    }
-  },
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       isDuplicate: false,
+  //       message: error.response?.data?.message || "Upload failed",
+  //       data: error.response?.data || null,
+  //     };
+  //   }
+  // },
 
   // ✅ Delete uploaded report (Admin only)
-  async deleteUploadReport(reportId: string) {
-    try {
-      const res = await endpoint.delete(
-        `/api/admin/upload_report/upload/${reportId}/delete/`
-      );
+  // async deleteUploadReport(reportId: string) {
+  //   try {
+  //     const res = await endpoint.delete(
+  //       `/api/admin/upload_report/upload/${reportId}/delete/`
+  //     );
 
-      return {
-        status: res.data?.success === true,
-        message: res.data?.message,
-        data: res.data,
-      };
-    } catch (error: any) {
-      return {
-        status: false,
-        message:
-          error.response?.data?.message ||
-          "Failed to delete upload report",
-        data: error.response?.data || null,
-      };
-    }
-  },
+  //     return {
+  //       status: res.data?.success === true,
+  //       message: res.data?.message,
+  //       data: res.data,
+  //     };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         "Failed to delete upload report",
+  //       data: error.response?.data || null,
+  //     };
+  //   }
+  // },
 
   // ✅ Get all uploaded reports (Admin only)
-  async getAllUploadReports() {
-    try {
-      const res = await endpoint.get(
-        "/api/admin/upload_report/upload/all/"
-      );
+  // async getAllUploadReports() {
+  //   try {
+  //     const res = await endpoint.get(
+  //       "/api/admin/upload_report/upload/all/"
+  //     );
 
-      return {
-        status: res.data?.success === true,
-        data: res.data?.upload_reports || [],
-        count: res.data?.count || 0,
-      };
-    } catch (error: any) {
-      return {
-        status: false,
-        message:
-          error.response?.data?.message ||
-          "Failed to fetch upload reports",
-        data: [],
-      };
-    }
-  },
+  //     return {
+  //       status: res.data?.success === true,
+  //       data: res.data?.upload_reports || [],
+  //       count: res.data?.count || 0,
+  //     };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         "Failed to fetch upload reports",
+  //       data: [],
+  //     };
+  //   }
+  // },
 
   // ✅ Get upload report by ID (Admin only)
-  async getUploadReportById(reportId: string) {
-    try {
-      const res = await endpoint.get(
-        `/api/admin/upload_report/upload/${reportId}/`
-      );
+  // async getUploadReportById(reportId: string) {
+  //   try {
+  //     const res = await endpoint.get(
+  //       `/api/admin/upload_report/upload/${reportId}/`
+  //     );
 
-      return {
-        status: res.data?.success === true,
-        data: res.data?.upload_report,
-        message: res.data?.message,
-      };
-    } catch (error: any) {
-      return {
-        status: false,
-        message:
-          error.response?.data?.message ||
-          "Failed to fetch upload report",
-        data: null,
-      };
-    }
-  },
+  //     return {
+  //       status: res.data?.success === true,
+  //       data: res.data?.upload_report,
+  //       message: res.data?.message,
+  //     };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         "Failed to fetch upload report",
+  //       data: null,
+  //     };
+  //   }
+  // },
 
   // ✅ Create User Detail
   async createUserDetail(payload: CreateUserPayload) {
@@ -792,98 +768,6 @@ export const useAuthStore = defineStore("auth", {
 
   return { status: false };
   },
-
-  // 🧠 Login with Slack OAuth  
-  // async getSlackOAuthUrl(baseUrl: string) {
-  //     try {
-  //       const res = await endpoint.post("/admin/users/slack/oauth-url/", {
-  //         base_url: baseUrl,
-  //       });
-
-  //       if (res.data.success) {
-  //         console.log("✅ Slack OAuth URL received:", res.data.auth_url);
-  //         return { status: true, data: res.data };
-  //       } else {
-  //         return { status: false, message: "Failed to get Slack OAuth URL" };
-  //       }
-  //     } catch (error: any) {
-  //       console.error("Slack OAuth URL API error:", error);
-  //       return {
-  //         status: false,
-  //         message:
-  //           error.response?.data?.message ||
-  //           error.message ||
-  //           "Slack OAuth URL fetch failed",
-  //         details: error.response?.data || null,
-  //       };
-  //     }
-  // },
-  // async getSlackBotToken(code: string) {
-  //     try {
-  //       const res = await endpoint.get("/admin/users/slack/callback/", {
-  //         params: { code, state: "dummy_state" },
-  //       });
-
-  //       if (res.data.success && res.data.data?.bot?.access_token) {
-  //         const botToken = res.data.data.bot.access_token;
-  //         console.log("🤖 Bot Access Token:", botToken);
-
-  //         // Save it for later use
-  //         localStorage.setItem("slack_user_login", botToken);
-  //         return { status: true, botToken };
-  //       } else {
-  //         return { status: false, message: "Failed to get bot access token" };
-  //       }
-  //     } catch (error: any) {
-  //       console.error("Slack callback API error:", error);
-  //       return {
-  //         status: false,
-  //         message:
-  //           error.response?.data?.message ||
-  //           error.message ||
-  //           "Slack callback failed",
-  //       };
-  //     }
-  // },
-  // async loginWithSlack(botToken: string, code: string, redirectUri: string) {
-  //     try {
-  //       // Debug
-  //       console.log("🚀 Using bot token for login:", botToken);
-
-  //       const res = await endpoint.post("/admin/users/slack-oauth/", {
-  //         code,
-  //         redirect_uri: redirectUri,
-  //       });
-
-  //       const data = res.data;
-
-  //       if (data.success) {
-  //         const slackData = data.data;
-
-  //         // Save user data
-  //         if (slackData.user) {
-  //           this.user = slackData.user;
-  //           localStorage.setItem(
-  //             "slack_user_login_data",
-  //             JSON.stringify(this.user)
-  //           );
-  //           console.log("👤 Slack User Saved:", this.user);
-  //         }
-
-  //         return { status: true, data: slackData };
-  //       }
-  //       return { status: false, message: "Slack login failed" };
-  //     } catch (error: any) {
-  //       console.error("Slack login API error:", error);
-  //       return {
-  //         status: false,
-  //         message:
-  //           error.response?.data?.message ||
-  //           error.message ||
-  //           "Slack login failed",
-  //       };
-  //     }
-  // },
 
   async getSlackOAuthUrl(baseUrl: string) {
       const res = await endpoint.post(
@@ -1273,8 +1157,6 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-
-
     // 🔹 DASHBOARD AVG SCORE (NO reportId)
     async fetchDashboardAvgScore() {
       try {
@@ -1301,8 +1183,6 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-
-   
     // 🔹 DASHBOARD VULNERABILITIES (NO reportId)
     async fetchDashboardVulnerabilities() {
       try {
@@ -1335,367 +1215,339 @@ export const useAuthStore = defineStore("auth", {
         };
       }
     },
-
-
   
     // 🔹 DASHBOARD MITIGATION TIMELINE
-async fetchDashboardMitigationTimeline() {
-  try {
-    const res = await endpoint.get(
-      "/api/admin/admindashboard/dashboard/mitigation-timeline/"
-    );
+    async fetchDashboardMitigationTimeline() {
+      try {
+        const res = await endpoint.get(
+          "/api/admin/admindashboard/dashboard/mitigation-timeline/"
+        );
 
-    this.mitigationTimeline = res.data || null;
+        this.mitigationTimeline = res.data || null;
 
-    return { status: true, data: res.data };
-  } catch (error: any) {
-    console.error(
-      "Mitigation timeline error:",
-      error.response?.data || error.message
-    );
+        return { status: true, data: res.data };
+      } catch (error: any) {
+        console.error(
+          "Mitigation timeline error:",
+          error.response?.data || error.message
+        );
 
-    this.mitigationTimeline = null;
+        this.mitigationTimeline = null;
 
-    return {
-      status: false,
-      message:
-        error.response?.data?.detail ||
-        "Failed to fetch mitigation timeline",
-    };
-  }
-},
-
-
-   
+        return {
+          status: false,
+          message:
+            error.response?.data?.detail ||
+            "Failed to fetch mitigation timeline",
+        };
+      }
+    },
 
     // ✅ fetch Dashboard Mean Time To Remediate
-async fetchDashboardMeanTimeToRemediate() {
-  try {
-    console.log("[MTTR] Calling DASHBOARD API");
-
-    const res = await endpoint.get(
-      "/api/admin/admindashboard/dashboard/mean-time-remediate/"
-    );
-
-    console.log("[MTTR] API response:", res.data);
-
-    // 🔹 Store full response
-    this.meanTimeToRemediate = res.data;
-
-    console.log("[MTTR] Stored in authStore:", this.meanTimeToRemediate);
-
-    return { status: true, data: res.data };
-  } catch (error: any) {
-    console.error(
-      "[MTTR] API error:",
-      error.response?.data || error.message
-    );
-
-    this.meanTimeToRemediate = null;
-
-    return {
-      status: false,
-      message:
-        error.response?.data?.detail ||
-        "Failed to fetch mean time to remediate",
-    };
-  }
-},
-
-  // FETCH Vulnerability Register
-  async fetchVulnerabilityRegister(reportId: string) {
-  try {
-    if (!reportId) {
-      console.warn("Vulnerability Register → Missing reportId");
-      this.vulnerabilityRows = [];
-      this.vulnerabilityCount = 0;
-      return { status: false, message: "No reportId provided" };
-    }
-
-    console.log("Fetching Vulnerability Register for:", reportId);
-
-    const res = await endpoint.get(
-      `/api/admin/adminregister/register/${reportId}/vulns/`
-    );
-
-    console.log("Vulnerability Register response raw:", res && res.data ? res.data : res);
-
-    // Try a few likely response shapes:
-    const rows =
-      res.data?.rows ??
-      res.data?.data?.rows ??
-      res.data?.results ??
-      res.data?.vulnerabilities ??
-      res.data ??
-      [];
-
-    // If rows is an object with keys (not an array), try to extract an array
-    const finalRows = Array.isArray(rows) ? rows : Array.isArray(res.data?.rows) ? res.data.rows : [];
-
-    this.vulnerabilityRows = finalRows;
-    this.vulnerabilityCount = this.vulnerabilityRows.length;
-
-    console.log("Vulnerability Count:", this.vulnerabilityCount);
-
-    return { status: true, data: this.vulnerabilityRows };
-  } catch (error: any) {
-    console.error(
-      "Vulnerability Register error:",
-      error.response?.status,
-      error.response?.data || error.message
-    );
-
-    this.vulnerabilityRows = [];
-    this.vulnerabilityCount = 0;
-
-    return {
-      status: false,
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch vulnerability register",
-      details: error.response?.data || null,
-    };
-  }
-  },
-
-  // FIX Vulnerability
-  async createFixVulnerability(reportId: string,asset: string,payload: Record<string, any>) {
-  try {
-    const res = await endpoint.post(
-      `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
-      payload
-    );
-    return {
-      status: true,
-      data: res.data.data,
-      message: res.data.message
-    };
-  } catch (error) {
-    const err = error as AxiosError<any>;
-    return {
-      status: false,
-      message:
-        err.response?.data?.message || "Fix vulnerability failed",
-      details: err.response?.data || null
-    };
-  }
-  },
-
-  // Get step completion status for fix vulnerability
-  async getFixVulnerabilitySteps(fixVulnerabilityId: string) {
+  async fetchDashboardMeanTimeToRemediate() {
     try {
-      const res = await endpoint.get(
-        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`
-      );
-
-      return {
-        status: true,
-        data: {
-          fix_vulnerability_id: res.data.fix_vulnerability_id,
-          vulnerability_status: res.data.status,
-          steps: res.data.steps || []
-        }
-      };
-    } catch (error) {
-      const err = error as AxiosError<any>;
-      return {
-        status: false,
-        message: err.response?.data?.message || "Failed to fetch step completion data",
-        details: err.response?.data || null
-      };
-    }
-  },
-
-  // Mark a step as complete
-  async completeFixVulnerabilityStep(
-    fixVulnerabilityId: string,
-    payload: {
-      step_number: number;
-      comment: string;
-    }
-  ) {
-    try {
-      const res = await endpoint.post(
-        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`,
-        payload
-      );
-
-      return {
-        status: true,
-        data: {
-          message: res.data.message,
-          vulnerability_status: res.data.status,
-          completed_steps: res.data.completed_steps
-        }
-      };
-    } catch (error) {
-      const err = error as AxiosError<any>;
-      return {
-        status: false,
-        message: err.response?.data?.message || "Failed to complete step",
-        details: err.response?.data || null
-      };
-    }
-  },
-
-  // create Raise Support Request (UPDATED API)
-  async raiseSupportRequest(
-    reportId: string,
-    vulnerabilityId: string,
-    payload: {
-      step: string;
-      description: string;
-    }
-  ) {
-    try {
-      const res = await endpoint.post(
-        `/api/admin/adminregister/support-requests/raise/report/${reportId}/vulnerability/${vulnerabilityId}/`,
-        payload
-      );
-
-      return {
-        status: true,
-        data: res.data.data,
-        message: res.data.message
-      };
-    } catch (error) {
-      const err = error as AxiosError<any>;
-      return {
-        status: false,
-        message:
-          err.response?.data?.message || "Failed to raise support request",
-        details: err.response?.data || null
-      };
-    }
-  },
-
-  // Get raise support request by vulnerability ID
-  async getRaiseSupportRequestByVulnerability(vulnerabilityId: string) {
-    try {
-      const res = await endpoint.get(
-        `/api/admin/adminregister/raise-support-requests/vulnerability/${vulnerabilityId}/`
-      );
-
-      return {
-        status: true,
-        exists: res.data.exists,
-        data: res.data.data || null
-      };
-    } catch (error: any) {
-      return {
-        status: false,
-        exists: false,
-        message:
-          error.response?.data?.message ||
-          "Failed to fetch support request"
-      };
-    }
-  },
-
-  // Create new ticket (updated API)
-  async createTicket(
-    reportId: string,
-    fixVulnerabilityId: string,
-    payload: {
-      category: string;
-      subject: string;
-      description: string;
-    }
-  ) {
-    try {
-      const res = await endpoint.post(
-        `/api/admin/adminregister/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
-        payload
-      );
-
-      return {
-        status: true,
-        data: res.data.data,
-        message: res.data.message
-      };
-    } catch (error) {
-      const err = error as AxiosError<any>;
-      return {
-        status: false,
-        message:
-          err.response?.data?.message || "Failed to create ticket",
-        details: err.response?.data || null
-      };
-    }
-  },
-
-  // Get all tickets by report id
-  async getTicketsByReport(reportId: string) {
-    try {
-      console.log("🔥 Fetching tickets for report:", reportId);
+      console.log("[MTTR] Calling DASHBOARD API");
 
       const res = await endpoint.get(
-        `/api/admin/adminregister/tickets/report/${reportId}/`
+        "/api/admin/admindashboard/dashboard/mean-time-remediate/"
       );
 
-      console.log("✅ Tickets API response:", res.data);
+      console.log("[MTTR] API response:", res.data);
 
-      return {
-        status: true,
-        data: res.data.results
-      };
-    } catch (error) {
-      const err = error as AxiosError<any>;
-      console.error("❌ Tickets API error:", err.response?.data || err);
+      // 🔹 Store full response
+      this.meanTimeToRemediate = res.data;
 
-      return {
-        status: false,
-        message:
-          err.response?.data?.message || "Failed to fetch tickets"
-      };
-    }
-  },
+      console.log("[MTTR] Stored in authStore:", this.meanTimeToRemediate);
 
-  // GET ALL ASSETS
-  async fetchAssets(reportId: string) {
-    try {
-      const res = await endpoint.get(`/api/admin/adminasset/report/${reportId}/assets/`);
-      const rows = res.data.assets || [];
-      const normalized = rows.map((a: any) => ({
-        ...a,
-        selected: !!a.selected || false,
-        held: !!a.held || false,
-        isInternal: (a.exposure || "").toLowerCase() === "internal",
-        host_information: a.host_information || {},
-        severity_counts: a.severity_counts || { critical: 0, high: 0, medium: 0, low: 0 },
-      }));
-      this.assetRows = normalized;
-      this.assetCount = res.data.count ?? normalized.length;
-      this.memberType = res.data.member_type;
-      console.log("[authStore] assetRows length:", this.assetRows.length);
       return { status: true, data: res.data };
     } catch (error: any) {
-      console.error("[authStore] fetchAssets error:", error.response?.data || error.message);
-      return { status: false, error: error.response?.data || error.message };
+      console.error(
+        "[MTTR] API error:",
+        error.response?.data || error.message
+      );
+
+      this.meanTimeToRemediate = null;
+
+      return {
+        status: false,
+        message:
+          error.response?.data?.detail ||
+          "Failed to fetch mean time to remediate",
+      };
     }
   },
 
-  // search assets (UPDATED for new API)
-  async searchAssets(reportId: string, q: string) {
-    try {
-      console.log("[authStore] searchAssets ->", { reportId, q });
+  // FETCH Vulnerability Register
+  // async fetchVulnerabilityRegister(reportId: string) {
+  // try {
+  //   if (!reportId) {
+  //     console.warn("Vulnerability Register → Missing reportId");
+  //     this.vulnerabilityRows = [];
+  //     this.vulnerabilityCount = 0;
+  //     return { status: false, message: "No reportId provided" };
+  //   }
 
+  //   console.log("Fetching Vulnerability Register for:", reportId);
+
+  //   const res = await endpoint.get(
+  //     `/api/admin/adminregister/register/${reportId}/vulns/`
+  //   );
+
+  //   console.log("Vulnerability Register response raw:", res && res.data ? res.data : res);
+
+  //   // Try a few likely response shapes:
+  //   const rows =
+  //     res.data?.rows ??
+  //     res.data?.data?.rows ??
+  //     res.data?.results ??
+  //     res.data?.vulnerabilities ??
+  //     res.data ??
+  //     [];
+
+  //   // If rows is an object with keys (not an array), try to extract an array
+  //   const finalRows = Array.isArray(rows) ? rows : Array.isArray(res.data?.rows) ? res.data.rows : [];
+
+  //   this.vulnerabilityRows = finalRows;
+  //   this.vulnerabilityCount = this.vulnerabilityRows.length;
+
+  //   console.log("Vulnerability Count:", this.vulnerabilityCount);
+
+  //   return { status: true, data: this.vulnerabilityRows };
+  // } catch (error: any) {
+  //   console.error(
+  //     "Vulnerability Register error:",
+  //     error.response?.status,
+  //     error.response?.data || error.message
+  //   );
+
+  //   this.vulnerabilityRows = [];
+  //   this.vulnerabilityCount = 0;
+
+  //   return {
+  //     status: false,
+  //     message:
+  //       error.response?.data?.message ||
+  //       error.message ||
+  //       "Failed to fetch vulnerability register",
+  //     details: error.response?.data || null,
+  //   };
+  // }
+  // },
+
+  // FIX Vulnerability
+  // async createFixVulnerability(reportId: string,asset: string,payload: Record<string, any>) {
+  // try {
+  //   const res = await endpoint.post(
+  //     `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
+  //     payload
+  //   );
+  //   return {
+  //     status: true,
+  //     data: res.data.data,
+  //     message: res.data.message
+  //   };
+  // } catch (error) {
+  //   const err = error as AxiosError<any>;
+  //   return {
+  //     status: false,
+  //     message:
+  //       err.response?.data?.message || "Fix vulnerability failed",
+  //     details: err.response?.data || null
+  //   };
+  // }
+  // },
+
+  // Get step completion status for fix vulnerability
+  // async getFixVulnerabilitySteps(fixVulnerabilityId: string) {
+  //   try {
+  //     const res = await endpoint.get(
+  //       `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`
+  //     );
+
+  //     return {
+  //       status: true,
+  //       data: {
+  //         fix_vulnerability_id: res.data.fix_vulnerability_id,
+  //         vulnerability_status: res.data.status,
+  //         steps: res.data.steps || []
+  //       }
+  //     };
+  //   } catch (error) {
+  //     const err = error as AxiosError<any>;
+  //     return {
+  //       status: false,
+  //       message: err.response?.data?.message || "Failed to fetch step completion data",
+  //       details: err.response?.data || null
+  //     };
+  //   }
+  // },
+
+  // Mark a step as complete
+  // async completeFixVulnerabilityStep(
+  //   fixVulnerabilityId: string,
+  //   payload: {
+  //     step_number: number;
+  //     comment: string;
+  //   }
+  // ) {
+  //   try {
+  //     const res = await endpoint.post(
+  //       `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`,
+  //       payload
+  //     );
+
+  //     return {
+  //       status: true,
+  //       data: {
+  //         message: res.data.message,
+  //         vulnerability_status: res.data.status,
+  //         completed_steps: res.data.completed_steps
+  //       }
+  //     };
+  //   } catch (error) {
+  //     const err = error as AxiosError<any>;
+  //     return {
+  //       status: false,
+  //       message: err.response?.data?.message || "Failed to complete step",
+  //       details: err.response?.data || null
+  //     };
+  //   }
+  // },
+
+  // create Raise Support Request (UPDATED API)
+  // async raiseSupportRequest(
+  //   reportId: string,
+  //   vulnerabilityId: string,
+  //   payload: {
+  //     step: string;
+  //     description: string;
+  //   }
+  // ) {
+  //   try {
+  //     const res = await endpoint.post(
+  //       `/api/admin/adminregister/support-requests/raise/report/${reportId}/vulnerability/${vulnerabilityId}/`,
+  //       payload
+  //     );
+
+  //     return {
+  //       status: true,
+  //       data: res.data.data,
+  //       message: res.data.message
+  //     };
+  //   } catch (error) {
+  //     const err = error as AxiosError<any>;
+  //     return {
+  //       status: false,
+  //       message:
+  //         err.response?.data?.message || "Failed to raise support request",
+  //       details: err.response?.data || null
+  //     };
+  //   }
+  // },
+
+  // Get raise support request by vulnerability ID
+  // async getRaiseSupportRequestByVulnerability(vulnerabilityId: string) {
+  //   try {
+  //     const res = await endpoint.get(
+  //       `/api/admin/adminregister/raise-support-requests/vulnerability/${vulnerabilityId}/`
+  //     );
+
+  //     return {
+  //       status: true,
+  //       exists: res.data.exists,
+  //       data: res.data.data || null
+  //     };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       exists: false,
+  //       message:
+  //         error.response?.data?.message ||
+  //         "Failed to fetch support request"
+  //     };
+  //   }
+  // },
+
+  // Create new ticket (updated API)
+  // async createTicket(
+  //   reportId: string,
+  //   fixVulnerabilityId: string,
+  //   payload: {
+  //     category: string;
+  //     subject: string;
+  //     description: string;
+  //   }
+  // ) {
+  //   try {
+  //     const res = await endpoint.post(
+  //       `/api/admin/adminregister/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
+  //       payload
+  //     );
+
+  //     return {
+  //       status: true,
+  //       data: res.data.data,
+  //       message: res.data.message
+  //     };
+  //   } catch (error) {
+  //     const err = error as AxiosError<any>;
+  //     return {
+  //       status: false,
+  //       message:
+  //         err.response?.data?.message || "Failed to create ticket",
+  //       details: err.response?.data || null
+  //     };
+  //   }
+  // },
+
+  // Get all tickets by report id
+  // async getTicketsByReport(reportId: string) {
+  //   try {
+  //     console.log("🔥 Fetching tickets for report:", reportId);
+
+  //     const res = await endpoint.get(
+  //       `/api/admin/adminregister/tickets/report/${reportId}/`
+  //     );
+
+  //     console.log("✅ Tickets API response:", res.data);
+
+  //     return {
+  //       status: true,
+  //       data: res.data.results
+  //     };
+  //   } catch (error) {
+  //     const err = error as AxiosError<any>;
+  //     console.error("❌ Tickets API error:", err.response?.data || err);
+
+  //     return {
+  //       status: false,
+  //       message:
+  //         err.response?.data?.message || "Failed to fetch tickets"
+  //     };
+  //   }
+  // },
+
+  // GET ALL ASSETS (NEW API)
+  async fetchAssets() {
+    console.log("🚀 fetchAssets called");
+    try {
       const res = await endpoint.get(
-        `/api/admin/adminasset/report/${reportId}/assets/`,
-        {
-          params: { q }
-        }
+        `/api/admin/adminasset/assets/`
       );
 
-      const assets = res.data.assets || [];
+      const rows = res.data.assets || [];
 
-      // normalize same as fetchAssets
-      const normalized = assets.map((a: any) => ({
+      const normalized = rows.map((a: any) => ({
         ...a,
+
+        // UI state flags
         selected: false,
         held: false,
-        isInternal: (a.exposure || "").toLowerCase() === "internal",
+
+        // NEW: member type comes from top-level response
+        isInternal: res.data.member_type === "internal",
+
+        // safety defaults
         host_information: a.host_information || {},
         severity_counts: a.severity_counts || {
           critical: 0,
@@ -1705,101 +1557,207 @@ async fetchDashboardMeanTimeToRemediate() {
         }
       }));
 
-      this.assetSearchResults = normalized;
-      this.assetSearchCount =
-        res.data.total_assets ?? normalized.length;
+      // 🔥 store assignments
+      this.assetRows = normalized;
+      this.assetCount = res.data.total_assets ?? normalized.length;
+      this.memberType = res.data.member_type;
 
-      console.log("[authStore] searchAssets results:", normalized);
+      console.log("[authStore] assetRows length:", this.assetRows.length);
 
-      return { status: true, data: normalized };
+      return { status: true, data: res.data };
     } catch (error: any) {
       console.error(
-        "[authStore] searchAssets error:",
+        "[authStore] fetchAssets error:",
         error.response?.data || error.message
       );
       return { status: false, error: error.response?.data || error.message };
     }
   },
 
-  // DELETE Asset from report
-  async deleteAsset(reportId: string, assetIp: string) {
+  // search assets (UPDATED for new API)
+  // async searchAssets(reportId: string, q: string) {
+  //   try {
+  //     console.log("[authStore] searchAssets ->", { reportId, q });
+
+  //     const res = await endpoint.get(
+  //       `/api/admin/adminasset/report/${reportId}/assets/`,
+  //       {
+  //         params: { q }
+  //       }
+  //     );
+
+  //     const assets = res.data.assets || [];
+
+  //     // normalize same as fetchAssets
+  //     const normalized = assets.map((a: any) => ({
+  //       ...a,
+  //       selected: false,
+  //       held: false,
+  //       isInternal: (a.exposure || "").toLowerCase() === "internal",
+  //       host_information: a.host_information || {},
+  //       severity_counts: a.severity_counts || {
+  //         critical: 0,
+  //         high: 0,
+  //         medium: 0,
+  //         low: 0
+  //       }
+  //     }));
+
+  //     this.assetSearchResults = normalized;
+  //     this.assetSearchCount =
+  //       res.data.total_assets ?? normalized.length;
+
+  //     console.log("[authStore] searchAssets results:", normalized);
+
+  //     return { status: true, data: normalized };
+  //   } catch (error: any) {
+  //     console.error(
+  //       "[authStore] searchAssets error:",
+  //       error.response?.data || error.message
+  //     );
+  //     return { status: false, error: error.response?.data || error.message };
+  //   }
+  // },
+
+  // DELETE Asset from report (UPDATED)
+  async deleteAsset(assetIp: string) {
     try {
+      const reportId = localStorage.getItem("reportId");
+
+      if (!reportId) {
+        return {
+          status: false,
+          message: "Report ID not found",
+        };
+      }
+
       const res = await endpoint.delete(
         `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/`
       );
 
       console.log("✔ Asset deleted:", res.data);
-      this.assetRows = this.assetRows.filter(a => a.asset !== assetIp);
 
-      return { status: true, data: res.data };
-    } catch (error: any) {
-      console.error("❌ Delete Asset Error:", error.response?.data || error.message);
-      return { status: false, error: error.response?.data || error.message };
-    }
-  },
-
-  // HOLD asset
-  async holdAsset(reportId: string, assetIp: string) {
-  try {
-    const res = await endpoint.post(
-      `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/hold/`
-    );
-
-    if (typeof res.data?.total_assets === "number") {
-      this.assetCount = res.data.total_assets;
-    }
-
-    return {
-      status: true,
-      heldAsset: res.data.asset,
-      data: res.data,
-    };
-  } catch (error: any) {
-    return {
-      status: false,
-      message: error.response?.data?.detail || "Failed to hold asset",
-    };
-  }
-  },
-
-  //  fetch held assets list
-  async fetchHeldAssets(reportId: string) {
-  try {
-    const res = await endpoint.get(
-      `/api/admin/adminasset/report/${reportId}/assets/hold-list/`
-    );
-
-    return {
-      status: true,
-      assets: res.data.assets || [],
-      count: res.data.count || 0,
-    };
-  } catch (error: any) {
-    return {
-      status: false,
-      assets: [],
-      message: error.response?.data?.detail || "Failed to fetch held assets",
-    };
-  }
-  },
-
-  // UNHOLD asset
-  async unholdAsset(reportId: string, assetIp: string) {
-    try {
-      const res = await endpoint.post(
-        `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/unhold/`
+      // ✅ remove from main assets list
+      this.assetRows = this.assetRows.filter(
+        a => a.asset !== assetIp
       );
 
+      return {
+        status: true,
+        data: res.data,
+      };
+    } catch (error: any) {
+      console.error(
+        "❌ Delete Asset Error:",
+        error.response?.data || error.message
+      );
+      return {
+        status: false,
+        message:
+          error.response?.data?.detail ||
+          "Failed to delete asset",
+      };
+    }
+  },
+
+  // HOLD asset (UPDATED API)
+  async holdAsset(assetIp: string) {
+    try {
+      const reportId = localStorage.getItem("reportId");
+
+      if (!reportId) {
+        return {
+          status: false,
+          message: "Report ID not found",
+        };
+      }
+
+      const res = await endpoint.post(
+        `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/hold/`
+      );
+
+      // ✅ update asset count (top Assets number)
       if (typeof res.data?.total_assets === "number") {
         this.assetCount = res.data.total_assets;
       }
 
       return {
         status: true,
-        restoredAsset: res.data.asset, // ✅ important
+        heldAsset: res.data.asset, // 👈 SAME SHAPE AS OLD CODE EXPECTS
         data: res.data,
       };
     } catch (error: any) {
+      console.error("Hold asset error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.detail || "Failed to hold asset",
+      };
+    }
+  },
+
+  // FETCH HELD ASSETS LIST (UPDATED)
+  async fetchHeldAssets() {
+    try {
+      const reportId = localStorage.getItem("reportId");
+
+      if (!reportId) {
+        return {
+          status: false,
+          assets: [],
+          count: 0,
+          message: "Report ID not found",
+        };
+      }
+
+      const res = await endpoint.get(
+        `/api/admin/adminasset/report/${reportId}/assets/hold-list/`
+      );
+
+      return {
+        status: true,
+        assets: res.data.assets || [],
+        count: res.data.count || 0,
+        data: res.data,
+      };
+    } catch (error: any) {
+      console.error("Fetch held assets error:", error);
+      return {
+        status: false,
+        assets: [],
+        count: 0,
+        message: error.response?.data?.detail || "Failed to fetch held assets",
+      };
+    }
+  },
+
+  // UNHOLD asset (UPDATED – matches new API)
+  async unholdAsset(assetIp: string) {
+    try {
+      const reportId = localStorage.getItem("reportId");
+
+      if (!reportId) {
+        return {
+          status: false,
+          message: "Report ID not found",
+        };
+      }
+
+      const res = await endpoint.post(
+        `/api/admin/adminasset/report/${reportId}/assets/${assetIp}/unhold/`
+      );
+
+      // ✅ update asset count
+      if (typeof res.data?.total_assets === "number") {
+        this.assetCount = res.data.total_assets;
+      }
+
+      return {
+        status: true,
+        restoredAsset: res.data.asset, // 👈 REQUIRED by component
+        data: res.data,
+      };
+    } catch (error: any) {
+      console.error("Unhold asset error:", error);
       return {
         status: false,
         message: error.response?.data?.detail || "Failed to unhold asset",
@@ -1808,58 +1766,66 @@ async fetchDashboardMeanTimeToRemediate() {
   },
 
   // Get support requests by host for assets page
-  async getSupportRequestsByHost(host: string) {
-    try {
-      const res = await endpoint.get(
-        `/api/admin/adminasset/support-requests/host/${host}/`
-      );
+  // async getSupportRequestsByHost(host: string) {
+  //   try {
+  //     const res = await endpoint.get(
+  //       `/api/admin/adminasset/support-requests/host/${host}/`
+  //     );
 
-      return {
-        status: true,
-        data: res.data.results || [],
-        count: res.data.count || 0
-      };
-    } catch (error: any) {
-      return {
-        status: false,
-        data: [],
-        count: 0
-      };
-    }
-  },
+  //     return {
+  //       status: true,
+  //       data: res.data.results || [],
+  //       count: res.data.count || 0
+  //     };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       data: [],
+  //       count: 0
+  //     };
+  //   }
+  // },
 
   // Get closed fix vulnerabilities by host
-  async getClosedFixVulnerabilitiesByHost(host: string) {
-    try {
-      const res = await endpoint.get(
-        `/api/admin/adminasset/fix-vulnerabilities/host/${host}/closed/`
-      );
+  // async getClosedFixVulnerabilitiesByHost(host: string) {
+  //   try {
+  //     const res = await endpoint.get(
+  //       `/api/admin/adminasset/fix-vulnerabilities/host/${host}/closed/`
+  //     );
 
-      return {
-        status: true,
-        data: res.data.results || [],
-        count: res.data.count || 0
-      };
-    } catch (error) {
-      return {
-        status: false,
-        data: [],
-        count: 0
-      };
-    }
-  },
+  //     return {
+  //       status: true,
+  //       data: res.data.results || [],
+  //       count: res.data.count || 0
+  //     };
+  //   } catch (error) {
+  //     return {
+  //       status: false,
+  //       data: [],
+  //       count: 0
+  //     };
+  //   }
+  // },
 
-  // fetch single asset
-  async fetchSingleAssetVulnerabilities(reportId: string, asset: string) {
+  // FETCH vulnerabilities for single asset (UPDATED)
+  async fetchSingleAssetVulnerabilities(asset: string) {
     try {
+      const reportId = localStorage.getItem("reportId");
+
+      if (!reportId) {
+        return { status: false };
+      }
+
       const res = await endpoint.get(
         `/api/admin/adminasset/report/${reportId}/asset/${asset}/vulnerabilities/`
       );
 
       const vulns = res.data.vulnerabilities || [];
 
+      // ✅ vulnerabilities list
       this.selectedAssetVulnerabilities = vulns;
 
+      // ✅ asset summary (top card)
       this.selectedAssetDetail = {
         asset: res.data.asset,
         exposure: vulns[0]?.exposure || "",
@@ -1867,8 +1833,12 @@ async fetchDashboardMeanTimeToRemediate() {
         severity: vulns[0]?.severity || "",
       };
 
-      return { status: true };
+      return {
+        status: true,
+        count: res.data.count,
+      };
     } catch (error) {
+      console.error("Fetch single asset vulnerabilities failed:", error);
       this.selectedAssetDetail = null;
       this.selectedAssetVulnerabilities = [];
       return { status: false };
@@ -1876,19 +1846,19 @@ async fetchDashboardMeanTimeToRemediate() {
   },
 
   // Get all support requests by report id
-  async getSupportRequestsByReport(reportId: string) {
-  console.log("📡 Store API called with:", reportId);
+  // async getSupportRequestsByReport(reportId: string) {
+  // console.log("📡 Store API called with:", reportId);
 
-  const res = await endpoint.get(
-    `/api/admin/adminregister/support-requests/report/${reportId}/`
-  );
+  // const res = await endpoint.get(
+  //   `/api/admin/adminregister/support-requests/report/${reportId}/`
+  // );
 
-  return {
-    status: true,
-    data: res.data.results,
-    count: res.data.count
-  };
-  },
+  // return {
+  //   status: true,
+  //   data: res.data.results,
+  //   count: res.data.count
+  // };
+  // },
 
   // ✅ Logout user
   async logout() {
@@ -1904,22 +1874,22 @@ async fetchDashboardMeanTimeToRemediate() {
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       localStorage.removeItem("authenticated");
-      localStorage.removeItem("locations");
+      // localStorage.removeItem("locations");
       localStorage.removeItem("google_id_token");
       localStorage.removeItem("isNewUser");
       localStorage.removeItem("completedSteps");
-      localStorage.removeItem("reportId");
+      // localStorage.removeItem("reportId");
       this.user = null;
       this.accessToken = null;
       this.refreshToken = null;
       this.completedSteps = [];
       // ✅ Reset report status on logout
-      this.reportStatus = {
-        hasReport: false,
-        reportId: null,
-        message: "",
-        checked: false,
-      };
+      // this.reportStatus = {
+      //   hasReport: false,
+      //   reportId: null,
+      //   message: "",
+      //   checked: false,
+      // };
       console.log("🚪 User logged out, localStorage cleared");
 
       return { status: true, data: res.data };
@@ -1933,27 +1903,22 @@ async fetchDashboardMeanTimeToRemediate() {
   },
 
   // ✅ Set Auth
-  setAuth(token: string, user: any, locations: Location[] = []) {
+  setAuth(token: string, user: any) {
       this.token = token;
       this.user = user;
       this.authenticated = true;
 
-      if (locations.length > 0) {
-        this.locations = locations;
-      } else {
-        const savedLocations = localStorage.getItem("locations");
-        this.locations = savedLocations ? JSON.parse(savedLocations) : [];
-      }
+     
 
       localStorage.setItem("authorization", token);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("authenticated", JSON.stringify(true));
-      localStorage.setItem("locations", JSON.stringify(this.locations));
+      // localStorage.setItem("locations", JSON.stringify(this.locations));
 
       console.log("Access Token saved:", token);
       console.log("Refresh Token saved:", localStorage.getItem("refreshToken"));
-      console.log("✅ Locations saved in localStorage:", this.locations);
-      console.log("✅ Auth set successfully:", this.user, this.locations);
+      // console.log("✅ Locations saved in localStorage:", this.locations);
+      // console.log("✅ Auth set successfully:", this.user, this.locations);
   },
 
   getAuthorization() {
