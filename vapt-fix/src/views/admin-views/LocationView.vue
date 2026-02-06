@@ -594,7 +594,9 @@ export default {
       }
     },
     onSlackConnected(event) {
+      console.log("Message received:", event.data);
       if (event.data?.type === "SLACK_CONNECTED") {
+        console.log("SLACK_CONNECTED received! Fetching channels...");
         this.fetchSlackChannels();
         Swal.fire({
           icon: "success",
@@ -606,20 +608,29 @@ export default {
       }
     },
     async startSlackLogin() {
+      console.log("Starting Slack login...");
       const res = await this.authStore.getSlackOAuthUrl(this.backendBase);
+      console.log("getSlackOAuthUrl response:", res);
+
       if (res.status) {
-        window.open(
-          res.data.auth_url.replace(
-            res.data.redirect_uri,
-            `${window.location.origin}/slack/callback`
-          ),
-          "_blank",
-          "width=600,height=700"
-        );
+        const originalUrl = res.data.auth_url;
+        const redirectUri = `${window.location.origin}/slack/callback`;
+        const finalUrl = originalUrl.replace(res.data.redirect_uri, redirectUri);
+
+        console.log("Original auth_url:", originalUrl);
+        console.log("Backend redirect_uri:", res.data.redirect_uri);
+        console.log("Frontend redirect_uri:", redirectUri);
+        console.log("Final URL opening:", finalUrl);
+
+        window.open(finalUrl, "_blank", "width=600,height=700");
+      } else {
+        console.error("Failed to get Slack OAuth URL");
       }
     },
     async fetchSlackChannels() {
+      console.log("fetchSlackChannels called - making API request...");
       const res = await this.authStore.listSlackChannels();
+      console.log("listSlackChannels API response:", res);
       if (res.status) {
         this.slackChannels = res.channels;
         console.log("Slack channels loaded:", this.slackChannels);

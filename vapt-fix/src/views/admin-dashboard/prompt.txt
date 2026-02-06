@@ -1,31 +1,5 @@
-GET report status in dashboard
+https://development-ld64716.slack.com/oauth?client_id=9441923811621.9515115381619&scope=chat%3Awrite%2Cchannels%3Amanage%2Cchannels%3Ajoin%2Cmpim%3Awrite%2Cgroups%3Awrite%2Cim%3Awrite%2Cusers%3Aread%2Cusers%3Aread.email&user_scope=identity.basic%2Cidentity.email%2Cidentity.avatar%2Cidentity.team&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fslack%2Fcallback&state=b0417002-60e4-4226-960f-1edf6f6f1b94&granular_bot_scope=1&single_channel=0&install_redirect=&tracked=1&user_default=0&team=
 
-METHOD: GET
-URL: http://127.0.0.1:8000/api/admin/admindashboard/dashboard/report-status/
-       
-BODY: 
-RESPONSE:
+https://development-ld64716.slack.com/marketplace/A09F53DB7J7-vapt
 
-NOTE:    Super Admin Report Upload – Success Response
-
-{
-    "has_report": true,
-    "show_dashboard": true,
-    "admin_id": "23c8b3b7-9f90-4924-84ed-48f29496c781",
-    "admin_email": "malibharti1702@gmail.com",
-    "report_id": "6981c149fc4143971621e061",
-    "message": "Report available"
-}
-
-NOTE:  Super Admin Report Not Uploaded – API Response
-
-{
-    "has_report": false,
-    "show_dashboard": false,
-    "admin_id": "23c8b3b7-9f90-4924-84ed-48f29496c781",
-    "admin_email": "malibharti1702@gmail.com",
-    "report_id": null,
-    "message": "No report uploaded yet. Please wait for Super Admin to upload a report.
-“
-}
-  
+https://development-ld64716.slack.com/app_redirect?app=A09F53DB7J7

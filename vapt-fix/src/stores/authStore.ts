@@ -771,12 +771,14 @@ export const useAuthStore = defineStore("auth", {
   },
 
   async getSlackOAuthUrl(baseUrl: string) {
+      console.log("Calling POST /api/admin/users/slack/oauth-url/ with baseUrl:", baseUrl);
       const res = await endpoint.post(
         "/api/admin/users/slack/oauth-url/",
         {
           base_url: baseUrl,
         }
       );
+      console.log("Slack OAuth URL response:", res.data);
 
       if (res.data.success) {
         return { status: true, data: res.data };
@@ -786,38 +788,56 @@ export const useAuthStore = defineStore("auth", {
 
   // 🔑 Slack Login (THIS SAVES BOT TOKEN)
   async loginWithSlack(code: string, redirectUri: string) {
-      const res = await endpoint.post(
-        "/api/admin/users/slack-oauth/",
-        {
-          code,
-          redirect_uri: redirectUri,
+      console.log("=== loginWithSlack called ===");
+      console.log("Code:", code);
+      console.log("Redirect URI:", redirectUri);
+
+      try {
+        const res = await endpoint.post(
+          "/api/admin/users/slack-oauth/",
+          {
+            code,
+            redirect_uri: redirectUri,
+          }
+        );
+
+        console.log("slack-oauth API response:", res.data);
+
+        if (res.data.success) {
+          const data = res.data.data;
+
+          // ✅ SAVE BOT TOKEN
+          console.log("Saving bot token:", data.bot_access_token);
+          localStorage.setItem("slack_bot_token", data.bot_access_token);
+
+          if (data.user) {
+            this.user = data.user;
+            localStorage.setItem(
+              "slack_user_login_data",
+              JSON.stringify(data.user)
+            );
+          }
+
+          return { status: true };
         }
-      );
 
-      if (res.data.success) {
-        const data = res.data.data;
-
-        // ✅ SAVE BOT TOKEN
-        localStorage.setItem("slack_bot_token", data.bot_access_token);
-
-        if (data.user) {
-          this.user = data.user;
-          localStorage.setItem(
-            "slack_user_login_data",
-            JSON.stringify(data.user)
-          );
-        }
-
-        return { status: true };
+        console.log("API returned success: false");
+        return { status: false, message: res.data.message || "Login failed" };
+      } catch (error: any) {
+        console.error("loginWithSlack error:", error);
+        return {
+          status: false,
+          message: error.response?.data?.message || "Slack login failed"
+        };
       }
-
-      return { status: false };
   },
 
   // 📢 List Slack Channels
   async listSlackChannels() {
     try {
+      console.log("Calling GET /api/admin/users/slack/channels/list/");
       const res = await endpoint.get("/api/admin/users/slack/channels/list/");
+      console.log("List channels API response:", res.data);
       if (res.data.success) {
         return { status: true, channels: res.data.data.channels };
       }
