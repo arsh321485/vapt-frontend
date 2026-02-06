@@ -618,6 +618,15 @@ export default {
         );
       }
     },
+    async fetchSlackChannels() {
+      const res = await this.authStore.listSlackChannels();
+      if (res.status) {
+        this.slackChannels = res.channels;
+        console.log("Slack channels loaded:", this.slackChannels);
+      } else {
+        console.error("Failed to fetch Slack channels:", res.message);
+      }
+    },
     // ✅ Jira OAuth Login
     async startJiraLogin() {
       try {

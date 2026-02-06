@@ -35,6 +35,7 @@ export const useAuthStore = defineStore("auth", {
     vulnerabilityRegister: [] as any[],
     vulnerabilityCount: 0,
     vulnerabilityRows: [] as any[],
+    latestReportId: null,
     assetRows: [] as any[],
     assetCount: 0,
     memberType: "",
@@ -813,6 +814,50 @@ export const useAuthStore = defineStore("auth", {
       return { status: false };
   },
 
+  // 📢 List Slack Channels
+  async listSlackChannels() {
+    try {
+      const res = await endpoint.get("/api/admin/users/slack/channels/list/");
+      if (res.data.success) {
+        return { status: true, channels: res.data.data.channels };
+      }
+      return { status: false, channels: [] };
+    } catch (error: any) {
+      console.error("List Slack channels error:", error);
+      return {
+        status: false,
+        channels: [],
+        message: error.response?.data?.message || "Failed to fetch channels",
+      };
+    }
+  },
+
+  // 📢 Create Slack Channel
+  async createSlackChannel(name: string, isPrivate: boolean = false) {
+    try {
+      const accessToken = localStorage.getItem("slack_bot_token");
+      const res = await endpoint.post("/api/admin/users/slack/channels/create/", {
+        access_token: accessToken,
+        name,
+        is_private: isPrivate ? "True" : "False",
+      });
+      if (res.data.success) {
+        return {
+          status: true,
+          data: res.data.data,
+          message: res.data.message,
+        };
+      }
+      return { status: false, message: res.data.message };
+    } catch (error: any) {
+      console.error("Create Slack channel error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Failed to create channel",
+      };
+    }
+  },
+
   // 🧠 Jira OAuth - Get Authorization URL
   async getJiraAuthUrl() {
     try {
@@ -1277,62 +1322,49 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // FETCH Vulnerability Register
-  // async fetchVulnerabilityRegister(reportId: string) {
-  // try {
-  //   if (!reportId) {
-  //     console.warn("Vulnerability Register → Missing reportId");
-  //     this.vulnerabilityRows = [];
-  //     this.vulnerabilityCount = 0;
-  //     return { status: false, message: "No reportId provided" };
-  //   }
+  async fetchVulnerabilityRegister() {
+  try {
+    console.log("Fetching Latest Vulnerabilities...");
 
-  //   console.log("Fetching Vulnerability Register for:", reportId);
+    const res = await endpoint.get(
+      `/api/admin/adminregister/register/latest/vulns/`
+    );
 
-  //   const res = await endpoint.get(
-  //     `/api/admin/adminregister/register/${reportId}/vulns/`
-  //   );
+    console.log("Vulnerability Register response:", res.data);
 
-  //   console.log("Vulnerability Register response raw:", res && res.data ? res.data : res);
+    const rows = res.data?.rows ?? [];
+    const count = res.data?.count ?? rows.length;
 
-  //   // Try a few likely response shapes:
-  //   const rows =
-  //     res.data?.rows ??
-  //     res.data?.data?.rows ??
-  //     res.data?.results ??
-  //     res.data?.vulnerabilities ??
-  //     res.data ??
-  //     [];
+    this.vulnerabilityRows = Array.isArray(rows) ? rows : [];
+    this.vulnerabilityCount = count;
 
-  //   // If rows is an object with keys (not an array), try to extract an array
-  //   const finalRows = Array.isArray(rows) ? rows : Array.isArray(res.data?.rows) ? res.data.rows : [];
+    // 👇 ADD HERE
+    this.latestReportId = res.data?.report_id || null;
 
-  //   this.vulnerabilityRows = finalRows;
-  //   this.vulnerabilityCount = this.vulnerabilityRows.length;
+    console.log("Latest Report ID:", this.latestReportId);
 
-  //   console.log("Vulnerability Count:", this.vulnerabilityCount);
+    return { status: true, data: this.vulnerabilityRows };
 
-  //   return { status: true, data: this.vulnerabilityRows };
-  // } catch (error: any) {
-  //   console.error(
-  //     "Vulnerability Register error:",
-  //     error.response?.status,
-  //     error.response?.data || error.message
-  //   );
+  } catch (error: any) {
+    console.error(
+      "Vulnerability Register error:",
+      error.response?.status,
+      error.response?.data || error.message
+    );
 
-  //   this.vulnerabilityRows = [];
-  //   this.vulnerabilityCount = 0;
+    this.vulnerabilityRows = [];
+    this.vulnerabilityCount = 0;
+    this.latestReportId = null; // optional reset
 
-  //   return {
-  //     status: false,
-  //     message:
-  //       error.response?.data?.message ||
-  //       error.message ||
-  //       "Failed to fetch vulnerability register",
-  //     details: error.response?.data || null,
-  //   };
-  // }
-  // },
+    return {
+      status: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch vulnerability register",
+    };
+  }
+  },
 
   // FIX Vulnerability
   // async createFixVulnerability(reportId: string,asset: string,payload: Record<string, any>) {
