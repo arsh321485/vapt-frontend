@@ -20,43 +20,43 @@
                                   <form>
                                     
                                     <label class="ps-1 mt-5 mb-2">Category</label>
-<select
-  v-model="selectedCategory"
-  class="form-select ps-3 py-2"
-  style="background:#f6f6f6;border:none;border-radius:8px;"
->
-  <option value="" disabled>Select a category...</option>
-  <option value="bug">Report a bug</option>
-  <option value="fix">Fix steps not working</option>
-  <option value="other">Other</option>
-</select>
-<label class="ps-1 mt-4 mb-2">Asset</label>
-<input
-  type="text"
-  class="form-control py-2"
-  v-model="selectedAsset"
-  readonly
-  style="background:#f6f6f6;border:none;border-radius:8px;"
-/>
-<label class="ps-1 mt-4 mb-2">Subject</label>
-<input
-  v-model="subject"
-  type="text"
-  class="form-control py-2"
-  placeholder="Write a subject..."
-  style="background:#f6f6f6;border:none;border-radius:8px;"
-/>
-<label class="ps-1 mt-4 mb-2">Description</label>
-<textarea
-  v-model="description"
-  class="form-control py-2"
-  rows="7"
-  :placeholder="descriptionPlaceholder"
-  style="background:#f6f6f6;border:none;border-radius:8px;"
-></textarea>
-                                    </form>
+                                    <select
+                                      v-model="selectedCategory" :disabled="ticketData"
+                                      class="form-select ps-3 py-2"
+                                      style="background:#f6f6f6;border:none;border-radius:8px;"
+                                    >
+                                      <option value="" disabled>Select a category...</option>
+                                      <option value="bug">Report a bug</option>
+                                      <option value="fix">Fix steps not working</option>
+                                      <option value="other">Other</option>
+                                    </select>
+                                    <label class="ps-1 mt-4 mb-2">Asset</label>
+                                    <input
+                                      type="text"
+                                      class="form-control py-2"
+                                      v-model="selectedAsset"
+                                      readonly
+                                      style="background:#f6f6f6;border:none;border-radius:8px;"
+                                    />
+                                    <label class="ps-1 mt-4 mb-2">Subject</label>
+                                    <input
+                                      v-model="subject" :readonly="ticketData"
+                                      type="text"
+                                      class="form-control py-2"
+                                      placeholder="Write a subject..."
+                                      style="background:#f6f6f6;border:none;border-radius:8px;"
+                                    />
+                                    <label class="ps-1 mt-4 mb-2">Description</label>
+                                    <textarea
+                                      v-model="description" :readonly="ticketData"
+                                      class="form-control py-2"
+                                      rows="7"
+                                      :placeholder="descriptionPlaceholder"
+                                      style="background:#f6f6f6;border:none;border-radius:8px;"
+                                    ></textarea>
+                                  </form>
                                    
-                                <button type="submit" class="btn btn-ticket py-2 px-5 mt-5" data-bs-toggle="modal" data-bs-target="#ticketModal"><i class="bi bi-plus-lg"></i> Create a new ticket</button>
+                                <button v-if="!ticketData" type="submit" class="btn btn-ticket py-2 px-5 mt-5" data-bs-toggle="modal" data-bs-target="#ticketModal"><i class="bi bi-plus-lg"></i> Create a new ticket</button>
                             </div>
 
                             <!-- Modal -->
@@ -83,17 +83,7 @@
                             <div class="col-4">
                                 <!-- blank -->
                             </div>
-                            <div class="col-2 pt-4">
-                                <div class="row py-3 px-3">
-                                    <select class="form-select rounded-pill" v-model="selectedLocation">
-                                        <option disabled value="">Select location</option>
-                                        <option value="germany">Germany</option>
-                                        <option value="delhi">Delhi</option>
-                                        <option value="bahrain">Bahrain</option>
-                                        <option value="greece">Greece</option>
-                                    </select>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -116,26 +106,34 @@ export default {
     },
     data() {
     return {
-      selectedLocation: "greece", 
       selectedCategory: "",
       selectedAsset: "",
       subject: "",
       description: "",
       adminId: "", 
       reportId: "", 
-      fixVulnerabilityId: ""
+      fixVulnerabilityId: "",
+      ticketId: "",
+      ticketData: null,
+      loading: false,
     };
-},
-created() {
-  const { reportId, fixVulId, asset } = this.$route.params;
+  },
+  created() {
+    const { reportId, fixVulId, asset, ticketId } = this.$route.params;
 
-  console.log("Ticket Page Params:", reportId, fixVulId, asset);
+  console.log("Ticket Page Params:", reportId, fixVulId, asset, ticketId);
 
   this.reportId = reportId || "";
   this.fixVulnerabilityId = fixVulId || "";
   this.selectedAsset = asset || "";
+
+  // 🔥 FIX: use route ticketId
+  if (ticketId) {
+    this.ticketId = ticketId;
+    this.fetchTicket();
+  }
   },
- computed: {
+  computed: {
     descriptionPlaceholder() {
       if (this.selectedCategory === "fix") {
         return "Please make sure you have followed our steps. What issue are you facing?";
@@ -144,7 +142,33 @@ created() {
     },
   },
   methods: {
+    async fetchTicket() {
+
+  if (!this.ticketId) return;
+
+  this.loading = true;
+
+  const authStore = useAuthStore();
+  const res = await authStore.getTicketById(this.ticketId);
+
+  this.loading = false;
+
+  if (res.status && res.data) {
+
+    this.ticketData = res.data;
+
+    // fill form
+    this.selectedCategory = res.data.category;
+    this.selectedAsset = res.data.host_name;
+    this.subject = res.data.subject;
+    this.description = res.data.description;
+
+  } else {
+    this.ticketData = null; // IMPORTANT → allow create mode
+  }
+},
     async submitTicket() {
+
   if (!this.selectedCategory || !this.subject || !this.description) {
     Swal.fire({
       icon: "warning",
@@ -170,12 +194,30 @@ created() {
   );
 
   if (res.status) {
+
     Swal.fire({
       icon: "success",
       title: "Ticket Created Successfully",
-      timer: 3000,
+      timer: 2000,
       showConfirmButton: false
     });
+
+    // 🔥 CLEAR FORM
+    // this.selectedCategory = "";
+    // this.subject = "";
+    // this.description = "";
+
+    // 🔥 REDIRECT BACK
+    // setTimeout(() => {
+    //   this.$router.push({
+    //     name: "VulFix",
+    //     params: {
+    //       reportId: this.reportId,
+    //       asset: this.selectedAsset
+    //     }
+    //   });
+    // }, 2000);
+
   } else {
     Swal.fire({
       icon: "error",
@@ -185,7 +227,7 @@ created() {
       showConfirmButton: false
     });
   }
-},
+    },
   },
 };
 </script>

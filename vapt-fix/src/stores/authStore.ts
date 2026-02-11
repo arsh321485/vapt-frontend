@@ -1342,6 +1342,7 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // fetch all vul register data 
   async fetchVulnerabilityRegister() {
   try {
     console.log("Fetching Latest Vulnerabilities...");
@@ -1386,171 +1387,313 @@ export const useAuthStore = defineStore("auth", {
   }
   },
 
-  // FIX Vulnerability
-  // async createFixVulnerability(reportId: string,asset: string,payload: Record<string, any>) {
-  // try {
-  //   const res = await endpoint.post(
-  //     `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
-  //     payload
-  //   );
-  //   return {
-  //     status: true,
-  //     data: res.data.data,
-  //     message: res.data.message
-  //   };
-  // } catch (error) {
-  //   const err = error as AxiosError<any>;
-  //   return {
-  //     status: false,
-  //     message:
-  //       err.response?.data?.message || "Fix vulnerability failed",
-  //     details: err.response?.data || null
-  //   };
-  // }
-  // },
+  // FIX Vulnerability CREATE
+  async createFixVulnerability(reportId: string, asset: string, payload: Record<string, any>) {
+    try {
+      const res = await endpoint.post(
+        `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
+        payload
+      );
 
-  // Get step completion status for fix vulnerability
-  // async getFixVulnerabilitySteps(fixVulnerabilityId: string) {
-  //   try {
-  //     const res = await endpoint.get(
-  //       `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`
-  //     );
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
 
-  //     return {
-  //       status: true,
-  //       data: {
-  //         fix_vulnerability_id: res.data.fix_vulnerability_id,
-  //         vulnerability_status: res.data.status,
-  //         steps: res.data.steps || []
-  //       }
-  //     };
-  //   } catch (error) {
-  //     const err = error as AxiosError<any>;
-  //     return {
-  //       status: false,
-  //       message: err.response?.data?.message || "Failed to fetch step completion data",
-  //       details: err.response?.data || null
-  //     };
-  //   }
-  // },
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Fix vulnerability failed",
+        details: err.response?.data || null
+      };
+    }
+  },
 
-  // Mark a step as complete
-  // async completeFixVulnerabilityStep(
-  //   fixVulnerabilityId: string,
-  //   payload: {
-  //     step_number: number;
-  //     comment: string;
-  //   }
-  // ) {
-  //   try {
-  //     const res = await endpoint.post(
-  //       `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`,
-  //       payload
-  //     );
+  // GET Fix Vulnerability Card by report + asset
+  async getFixVulnerabilityByAsset(reportId: string, asset: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`
+      );
 
-  //     return {
-  //       status: true,
-  //       data: {
-  //         message: res.data.message,
-  //         vulnerability_status: res.data.status,
-  //         completed_steps: res.data.completed_steps
-  //       }
-  //     };
-  //   } catch (error) {
-  //     const err = error as AxiosError<any>;
-  //     return {
-  //       status: false,
-  //       message: err.response?.data?.message || "Failed to complete step",
-  //       details: err.response?.data || null
-  //     };
-  //   }
-  // },
+      return {
+        status: true,
+        data: res.data
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch fix vulnerability",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Mark a step as complete (NEW API FORMAT)
+  async completeFixVulnerabilityStep(
+    fixVulnerabilityId: string,
+    payload: {
+      step_number: number;
+      status: string;
+      comment: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`,
+        payload
+      );
+
+      return {
+        status: true,
+        message: res.data.message,
+        vulnerability_status: res.data.status,
+        completed_steps: res.data.completed_steps,
+        step_saved: res.data.step_saved
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      console.log("FULL ERROR:", err.response);   // 👈 ADD
+  console.log("ERROR DATA:", err.response?.data);
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to complete step",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Get step completion status for fix vulnerability (UPDATED)
+  async getFixVulnerabilitySteps(fixVulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/step-complete/`
+      );
+
+      return {
+        status: true,
+        data: {
+          fix_vulnerability_id: res.data.fix_vulnerability_id,
+          vulnerability_status: res.data.status,
+          completed_steps: res.data.completed_steps,
+          total_steps: res.data.total_steps,
+          next_step: res.data.next_step,
+          steps: res.data.steps || []
+        }
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch step completion data",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // CREATE Final Fix Feedback
+  async submitFixFinalFeedback(
+    fixVulnerabilityId: string,
+    payload: {
+      feedback_comment: string;
+      fix_result: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/final-feedback/`,
+        payload
+      );
+
+      return {
+        status: true,
+        message: res.data.message,
+        data: res.data.data
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to submit feedback",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // GET Final Fix Feedback
+  async getFixFinalFeedback(fixVulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/final-feedback/`
+      );
+
+      return {
+        status: true,
+        data: res.data
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch final feedback",
+        details: err.response?.data || null
+      };
+    }
+  },
 
   // create Raise Support Request (UPDATED API)
-  // async raiseSupportRequest(
-  //   reportId: string,
-  //   vulnerabilityId: string,
-  //   payload: {
-  //     step: string;
-  //     description: string;
-  //   }
-  // ) {
-  //   try {
-  //     const res = await endpoint.post(
-  //       `/api/admin/adminregister/support-requests/raise/report/${reportId}/vulnerability/${vulnerabilityId}/`,
-  //       payload
-  //     );
+  async raiseSupportRequest(
+    reportId: string,
+    vulnerabilityId: string,
+    payload: {
+      step: string;
+      description: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/admin/adminregister/support-requests/raise/report/${reportId}/vulnerability/${vulnerabilityId}/`,
+        payload
+      );
 
-  //     return {
-  //       status: true,
-  //       data: res.data.data,
-  //       message: res.data.message
-  //     };
-  //   } catch (error) {
-  //     const err = error as AxiosError<any>;
-  //     return {
-  //       status: false,
-  //       message:
-  //         err.response?.data?.message || "Failed to raise support request",
-  //       details: err.response?.data || null
-  //     };
-  //   }
-  // },
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to raise support request",
+        details: err.response?.data || null
+      };
+    }
+  },
 
-  // Get raise support request by vulnerability ID
-  // async getRaiseSupportRequestByVulnerability(vulnerabilityId: string) {
-  //   try {
-  //     const res = await endpoint.get(
-  //       `/api/admin/adminregister/raise-support-requests/vulnerability/${vulnerabilityId}/`
-  //     );
+  // GET Raise support request by vulnerability id
+  async getRaiseSupportRequestByVulnerability(vulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/raise-support-requests/vulnerability/${vulnerabilityId}/`
+      );
 
-  //     return {
-  //       status: true,
-  //       exists: res.data.exists,
-  //       data: res.data.data || null
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       status: false,
-  //       exists: false,
-  //       message:
-  //         error.response?.data?.message ||
-  //         "Failed to fetch support request"
-  //     };
-  //   }
-  // },
+      return {
+        status: true,
+        exists: res.data.exists,
+        data: res.data.data,
+        message: res.data.message
+      };
 
-  // Create new ticket (updated API)
-  // async createTicket(
-  //   reportId: string,
-  //   fixVulnerabilityId: string,
-  //   payload: {
-  //     category: string;
-  //     subject: string;
-  //     description: string;
-  //   }
-  // ) {
-  //   try {
-  //     const res = await endpoint.post(
-  //       `/api/admin/adminregister/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
-  //       payload
-  //     );
+    } catch (error) {
+      const err = error as AxiosError<any>;
 
-  //     return {
-  //       status: true,
-  //       data: res.data.data,
-  //       message: res.data.message
-  //     };
-  //   } catch (error) {
-  //     const err = error as AxiosError<any>;
-  //     return {
-  //       status: false,
-  //       message:
-  //         err.response?.data?.message || "Failed to create ticket",
-  //       details: err.response?.data || null
-  //     };
-  //   }
-  // },
+      // if no support request exists
+      if (err.response?.status === 404) {
+        return {
+          status: true,
+          exists: false,
+          data: null
+        };
+      }
+
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to fetch support request",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Create new ticket
+  async createTicket(
+    reportId: string,
+    fixVulnerabilityId: string,
+    payload: {
+      category: string;
+      subject: string;
+      description: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/admin/adminregister/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
+        payload
+      );
+
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to create ticket",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // GET Ticket by ID
+  async getTicketById(ticketId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/tickets/${ticketId}/`
+      );
+
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch ticket",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // GET all open tickets by reportId
+  async getOpenTickets(reportId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/reports/${reportId}/tickets/open/`
+      );
+
+      return {
+        status: true,
+        data: res.data.results || [],
+        count: res.data.count || 0,
+        message: res.data.message
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message:
+          err.response?.data?.message || "Failed to fetch open tickets",
+        details: err.response?.data || null
+      };
+    }
+  },
 
   // Get all tickets by report id
   // async getTicketsByReport(reportId: string) {

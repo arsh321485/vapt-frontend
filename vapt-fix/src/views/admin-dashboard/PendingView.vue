@@ -36,12 +36,7 @@
                                         
                                     </select>
                                 </div>
-                                <!-- <div>
-                                    <router-link to="/createnewticket">
-                                        <button type="submit" class="btn btn-ticket py-2 px-5 me-5"><i class="bi bi-plus-lg"></i>
-                                        Create a new ticket</button>
-                                    </router-link>
-                                </div> -->
+                                
                                 
                             </div>
                         </div>
@@ -51,7 +46,7 @@
                                 <table class="table align-middle table-hover">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>S.NO.</th>
+                                            <th>S.No.</th>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
                                             <th scope="col">Description</th>
@@ -62,12 +57,30 @@
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
-                                    <tr v-for="(ticket, i) in tickets" :key="i">
-                                        <td class="text-truncate" style="max-width: 200px;">{{ ticket.subject }}</td>
-                                        <td>{{ ticket.asset }}</td>
-                                        <td style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
-                                        {{ ticket.description }}
-                                        </td>
+                                    <tr v-for="(ticket, index) in tickets" :key="ticket._id">
+                                      <td>{{ index + 1 }}</td>
+                                      <td
+  style="max-width:200px; cursor:pointer;"
+  class="text-truncate"
+  data-bs-toggle="tooltip"
+  data-bs-placement="top"
+  :title="ticket.plugin_name"
+>
+  {{ getShortText(ticket.plugin_name, 4) }}
+</td>
+
+                                        <!-- <td class="text-truncate" style="max-width: 200px;">{{ ticket.plugin_name }}</td> -->
+                                        <td>{{ ticket.host_name }}</td>
+                                        
+                                        <td
+  style="cursor:pointer; font-weight:500;"
+  data-bs-toggle="modal"
+  data-bs-target="#viewRequestsModal"
+  @click="openDescriptionModal(ticket.description)"
+>
+  {{ getShortDesc(ticket.description) }}
+</td>
+
                                         <td>{{ ticket.category }}</td>
                                         <td>{{ ticket.status }}</td>
                                         <td>{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
@@ -81,6 +94,35 @@
                                     </tr>
                                     </tbody>
                                 </table>
+
+                                <!-- view requets  Modal -->
+                      <div class="modal fade" id="viewRequestsModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title">Issues Raised for Support Ticket</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+           
+            <h6 class="fw-semibold">Description</h6>
+           <textarea
+  v-model="selectedDescription"
+  class="form-control rounded-0"
+  rows="4"
+  readonly
+></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
 
                                 <!-- Chat Box -->
   <div v-if="showChat" class="chat-box">
@@ -235,19 +277,96 @@ export default {
       authStore: useAuthStore(),
       tickets: [],
       selectedDescription: "",
+      reportId: ""
     };
   },
-   methods: {
-    async loadOpenTickets() {
-    const res = await this.authStore.getOpenTickets();
-    if (res.status) {
-      this.tickets = this.authStore.tickets;
+  watch: {
+  'authStore.latestReportId': {
+    immediate: true,
+    handler(val) {
+      if (val) {
+        this.reportId = val;
+        this.loadOpenTickets();
+      }
     }
-    },
-   },
-   async mounted() {
-    await this.loadOpenTickets(); 
+  }
+},
+   methods: {
+    getShortText(text, limit = 4) {
+  if (!text) return "";
+
+  const words = text.split(" ");
+  if (words.length <= limit) return text;
+
+  return words.slice(0, limit).join(" ") + " ...";
+},
+    getShortDesc(text) {
+    if (!text) return "";
+
+    const words = text.split(" ");
+    if (words.length <= 4) return text;
+
+    return words.slice(0, 4).join(" ") + " ...";
   },
+    openDescriptionModal(desc) {
+    this.selectedDescription = desc;
+  },
+    async loadOpenTickets() {
+
+      if (!this.reportId) {
+        console.warn("No reportId found");
+        return;
+      }
+
+      const res = await this.authStore.getOpenTickets(this.reportId);
+
+      if (res.status) {
+        this.tickets = res.data;
+        console.log("✅ Open tickets loaded:", this.tickets);
+      } else {
+        console.error("❌ Failed:", res.message);
+      }
+    }
+   },
+async mounted() {
+
+  // 🔥 Bootstrap tooltip init
+  this.$nextTick(() => {
+    const tooltipTriggerList =
+      document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+    [...tooltipTriggerList].map(el =>
+      new bootstrap.Tooltip(el)
+    );
+  });
+
+  // STEP 1 → load vulnerability register (sets reportId)
+  if (!this.authStore.latestReportId) {
+    console.log("📡 Fetching vulnerability register first...");
+    await this.authStore.fetchVulnerabilityRegister();
+  }
+
+  // STEP 2 → get reportId
+  this.reportId = this.authStore.latestReportId;
+  console.log("📡 Using reportId:", this.reportId);
+
+  // STEP 3 → call tickets API
+  if (this.reportId) {
+    await this.loadOpenTickets();
+  } else {
+    console.warn("❌ reportId still missing. Tickets not loaded.");
+  }
+
+  // 🔥 Re-init tooltip AFTER table loads
+  this.$nextTick(() => {
+    const tooltipTriggerList =
+      document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+    [...tooltipTriggerList].map(el =>
+      new bootstrap.Tooltip(el)
+    );
+  });
+},
 };
 </script>
 
