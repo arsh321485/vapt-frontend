@@ -116,11 +116,9 @@
                   </div>
                 </div>
 
-
-
                 <!-- TESTING BOX DROPDOWN -->
                <!-- TESTING BOX DROPDOWN -->
-<div
+<!-- <div
   class="mb-1"
   v-if="currentMode === 'signin' && currentRole === 'admin'"
   ref="testingBoxDropdown"
@@ -128,7 +126,7 @@
   <label class="form-label">Testing Type</label>
 
   <div class="position-relative">
-    <!-- 🔽 THIS IS WHERE YOUR LINE GOES -->
+    
     <div
   class="form-control custom-input dropdown-trigger"
   @click="isTestingBoxOpen = !isTestingBoxOpen"
@@ -149,7 +147,6 @@
       ></i>
     </div>
 
-    <!-- DROPDOWN OPTIONS -->
     <div v-if="isTestingBoxOpen" class="testing-dropdown-list">
       <label
         v-for="option in testingBoxOptions"
@@ -166,9 +163,7 @@
       </label>
     </div>
   </div>
-</div>
-
-
+</div> -->
 
                 <!-- FORGOT PASSWORD (Signin only, Admin only) -->
                 <div class="text-end mb-2" v-if="currentMode === 'signin' && currentRole === 'admin'">
@@ -255,7 +250,6 @@ import Swal from 'sweetalert2';
 
 export default {
   name: "AuthView",
-
   data() {
     return {
       
@@ -290,39 +284,27 @@ export default {
       showForgotPasswordModal: false,
       forgotEmail: "",
       forgotLoading: false,
-      selectedTestingBox: [],
-      isTestingBoxOpen: false,
-      previouslySelectedTestingBox: [],
-      testingBoxOptions: [
-        { value: "white_box", label: "White Box" },
-        { value: "grey_box", label: "Grey Box" },
-        { value: "black_box", label: "Black Box" }
-      ],
+      
     };
   },
-  
+  watch: {
+    "formData.email": {
+      handler(email) {
+        if (
+          this.currentRole !== "admin" ||
+          this.currentMode !== "signin"
+        ) return;
 
-watch: {
-  "formData.email": {
-    handler(email) {
-      if (
-        this.currentRole !== "admin" ||
-        this.currentMode !== "signin"
-      ) return;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) return;
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) return;
-
-      clearTimeout(this._emailTimer);
-      this._emailTimer = setTimeout(() => {
-        this.restoreTestingTypesByEmail(email);
-      }, 400);
+        clearTimeout(this._emailTimer);
+        this._emailTimer = setTimeout(() => {
+          this.restoreTestingTypesByEmail(email);
+        }, 400);
+      }
     }
-  }
-},
-
-
-
+  },
   computed: {
     rightHeadline() {
       if (this.currentRole === "admin") {
@@ -658,37 +640,6 @@ hasUploadedTargets(email) {
         }
       }
 
-      // ✅ Testing Type validation (Admin Sign In only)
-      // if (
-      //   this.currentRole === 'admin' &&
-      //   this.currentMode === 'signin' &&
-      //   (!this.selectedTestingBox || this.selectedTestingBox.length === 0)
-      // ) {
-      //   Swal.fire(
-      //     'Error',
-      //     'Please select at least one testing type',
-      //     'error'
-      //   );
-      //   return false;
-      // }
-     const finalTestingTypes = [
-  ...new Set([
-    ...this.previouslySelectedTestingBox,
-    ...this.selectedTestingBox,
-  ]),
-];
-
-if (
-  this.currentRole === "admin" &&
-  this.currentMode === "signin" &&
-  finalTestingTypes.length === 0
-) {
-  Swal.fire("Error", "Please select at least one testing type", "error");
-  return false;
-}
-
-     
-
       // ✅ reCAPTCHA validation (Admin Sign In & Sign Up)
       if (window.grecaptcha && this.recaptchaWidgetId !== null) {
         const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
@@ -987,12 +938,6 @@ async handleSignin(recaptchaResponse) {
     const payload = {
       email: this.formData.email,
       password: this.formData.password,
-      testing_type: [
-        ...new Set([
-          ...this.previouslySelectedTestingBox,
-          ...this.selectedTestingBox,
-        ]),
-      ],
       recaptcha: recaptchaResponse,
     };
 

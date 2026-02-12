@@ -17,7 +17,6 @@
             <p>Add IP addresses, URLs, or subnets to begin vulnerability <br></br>testing and risk analysis.</p>
           </div>
 
-
           <div class="d-flex justify-content-between gap-2">
             <div>
               <button @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2"
@@ -34,10 +33,11 @@
             </div>
             <!-- Testing Type (Unified UI) -->
             <div class="testing-type">
-              <select v-model="selectedTestingType" class="form-select testing-select" :disabled="!showTestingDropdown">
-                <option v-for="type in allowedTestingTypes" :key="type" :value="type">
-                  {{ formatTestingType(type) }}
-                </option>
+              <select v-model="selectedTestingType" class="form-select">
+                <option disabled value="">Select</option>
+                <option value="white_box">White Box</option>
+                <option value="grey_box">Grey Box</option>
+                <option value="black_box">Black Box</option>
               </select>
             </div>
           </div>
@@ -66,10 +66,6 @@ https://example.com">
               <div class="ip-actions">
                 <input ref="fileInput" type="file" accept=".csv,.xlsx,.xls,.txt" hidden @change="handleFileUpload" />
 
-                <!-- Upload file button (unchanged) -->
-                <!-- <button class="btn btn-primary" @click="$refs.fileInput.click()">
-                  Upload CSV / Excel / Text File
-                </button> -->
                 <button class="btn btn-primary" @click="handleUploadClick">
   Upload CSV / Excel / Text File
 </button>
@@ -302,7 +298,7 @@ export default {
       autoSubmitTimer: null,
       draggedItem: null,
       draggedFrom: null,
-      testingType: "",
+      // testingType: "",
       allowedTestingTypes: [],
       selectedTestingType: "",
       showTestingDropdown: false,
@@ -348,8 +344,6 @@ export default {
     },
 
   },
-  
-
   async mounted() {
     this.authStore = useAuthStore();
 
@@ -371,16 +365,10 @@ export default {
       return;
     }
 
-    // 🔁 OLD / ONGOING PROJECT FLOW
-    if (this.adminId) {
-      await this.fetchTestingTypes();
-    }
-
-    if (this.selectedTestingType) {
-      this.fetchTargetsByTestingType();
-    }
+    // if (this.selectedTestingType) {
+    //   this.fetchTargetsByTestingType();
+    // }
   },
-
   methods: {
   showBackendError(err) {
   const message =
@@ -390,17 +378,15 @@ export default {
     "Something went wrong";
 
   Swal.fire(message);
-},
-
+  },
   handleUploadClick() {
   // ❌ block upload if project name missing
   if (!this.validateProjectName()) return;
 
   // ✅ project name exists → allow file selection
   this.$refs.fileInput.click();
-},
-
-     validateProjectName() {
+  },
+  validateProjectName() {
     if (!this.name || !this.name.trim()) {
       Swal.fire({
         icon: "error",
@@ -412,7 +398,7 @@ export default {
     }
     return true;
   },
-    hasTargetsForTestingType(type) {
+  hasTargetsForTestingType(type) {
       const allTargets = [
         ...this.internalTargets,
         ...this.externalTargets,
@@ -421,10 +407,8 @@ export default {
       ];
 
       return allTargets.some(t => t.testing_type === type);
-    },
-
-
-    resetUploadState() {
+  },
+  resetUploadState() {
       this.ipInput = "";
       this.extractedList = [];
 
@@ -439,76 +423,21 @@ export default {
 
       // ensure dropdown starts clean
       this.selectedTestingType = "";
-    },
-
-
-    redirectToDashboard() {
+  },
+  redirectToDashboard() {
       // 🔐 Mark dashboard as locked
       localStorage.setItem("dashboardTestingInProgress", "true");
       localStorage.setItem("testingInProgress", "true");
       localStorage.setItem("testingStartTime", Date.now().toString());
 
       this.$router.push("/admindashboardonboarding");
-    },
-
-
-    submitManualTargets() {
+  },
+  submitManualTargets() {
      if (!this.validateProjectName()) return;
       this.selectedFile = null; // 🚫 ensure file logic not triggered
       this.submitTargets();     // ✅ reuse existing API logic
-    },
-
-
-
-    //     async fetchTargetsByTestingType() {
-    //   Swal.fire({
-    //     title: "Loading targets",
-    //     allowOutsideClick: false,
-    //     showConfirmButton: false,
-    //     didOpen: () => Swal.showLoading(),
-    //   });
-
-    //   const res = await this.authStore.getScopeTargets(
-    //     this.selectedTestingType
-    //   );
-
-    //   Swal.close();
-
-    //   if (!res.status) {
-    //     Swal.fire("Error", res.message, "error");
-    //     return;
-    //   }
-
-    //   // ✅ Populate ONLY cards
-    //   this.mapGetTargetsResponse(res.data.data || []);
-    // },
-    async fetchTargetsByTestingType() {
-      const isNewProject = localStorage.getItem("isNewProject") === "true";
-      if (isNewProject) return;
-
-      Swal.fire({
-        title: "Loading targets",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => Swal.showLoading(),
-      });
-
-      const res = await this.authStore.getScopeTargets(this.selectedTestingType);
-
-      Swal.close();
-
-      if (!res.status) {
-        Swal.fire("Error", res.message, "error");
-        return;
-      }
-
-      this.mapGetTargetsResponse(res.data.data || []);
-    },
-
-
-
-
-    mapGetTargetsResponse(list) {
+  },
+  mapGetTargetsResponse(list) {
       // 🔄 Reset ONLY cards (not textarea)
       this.internalTargets = [];
       this.externalTargets = [];
@@ -547,8 +476,8 @@ export default {
             break;
         }
       });
-    },
-    mapApiResponse(data) {
+  },
+  mapApiResponse(data) {
   // 🔄 Reset cards
   this.internalTargets = [];
   this.externalTargets = [];
@@ -590,8 +519,8 @@ export default {
         break;
     }
   });
-},
-    handleEnterSubmit() {
+  },
+  handleEnterSubmit() {
       const lines = this.ipInput.split("\n").filter(l => l.trim());
       const last = lines[lines.length - 1];
 
@@ -605,21 +534,19 @@ export default {
       } else {
         Swal.fire("Invalid entry", `"${last}" is invalid`, "error");
       }
-    },
-    handleAutoSubmit() {
+  },
+  handleAutoSubmit() {
       if (!this.ipInput.trim()) return;
       this.triggerAutoSubmit();
-    },
-    triggerAutoSubmit() {
+  },
+  triggerAutoSubmit() {
       clearTimeout(this.autoSubmitTimer);
 
       this.autoSubmitTimer = setTimeout(() => {
         this.submitTargets();
       }, 500); // 0.5 sec debounce
-    },
-
-    
-    downloadExcelTemplate() {
+  },
+  downloadExcelTemplate() {
       // Sample data in the exact format you want
       const sampleData = [
         {
@@ -655,34 +582,7 @@ export default {
 
       // Download file
       XLSX.writeFile(wb, 'Sample_Report.xlsx');
-    },
-
-
-    async fetchTestingTypes() {
-      const res = await this.authStore.getAdminTestingTypes(this.adminId);
-
-      if (!res.status) {
-        Swal.fire(
-          "Error",
-          res.message || "Unable to fetch testing types",
-          "error"
-        );
-        return;
-      }
-
-      this.allowedTestingTypes = res.testingTypes || [];
-
-      // 🔥 RULES IMPLEMENTATION
-      if (this.allowedTestingTypes.length === 1) {
-        // Only one → auto select, no dropdown
-        this.selectedTestingType = this.allowedTestingTypes[0];
-        this.showTestingDropdown = false;
-      } else if (this.allowedTestingTypes.length > 1) {
-        // Two or more → dropdown, first selected
-        this.selectedTestingType = this.allowedTestingTypes[0];
-        this.showTestingDropdown = true;
-      }
-    },
+  },
     formatTestingType(type) {
       return type
         .replace("_", " ")

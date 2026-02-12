@@ -53,12 +53,7 @@
   </button>
 </div>
 
-                                <!-- <div>
-                                    <router-link to="/createnewticket">
-                                        <button type="submit" class="btn btn-ticket py-2 px-5"><i class="bi bi-plus-lg"></i>
-                                        Create a new ticket</button>
-                                    </router-link>
-                                </div> -->
+                                
                             </div>
                         </div>
 
@@ -85,21 +80,28 @@
     <td>{{ i + 1 }}</td>
 
     <!-- Vulnerability name -->
-    <td class="text-truncate" style="max-width: 200px;">
-      {{ ticket.plugin_name }}
-    </td>
+    <td
+  class="text-truncate"
+  style="max-width:200px; cursor:pointer;"
+  data-bs-toggle="tooltip"
+  data-bs-placement="top"
+  :title="ticket.plugin_name"
+>
+  {{ ticket.plugin_name }}
+</td>
 
     <!-- Asset -->
     <td>{{ ticket.host_name }}</td>
 
     <!-- Description -->
     <td
-      style="cursor: pointer;"
-      data-bs-toggle="modal"
-      data-bs-target="#viewRequestsModal"  @click="openTicketModal(ticket)"
-    >
-      {{ ticket.description }}
-    </td>
+  style="cursor:pointer; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+  data-bs-toggle="modal"
+  data-bs-target="#viewRequestsModal"
+  @click="openTicketModal(ticket)"
+>
+  {{ getShortDescription(ticket.description) }}
+</td>
 
     <!-- Category -->
     <td>{{ ticket.category }}</td>
@@ -126,11 +128,16 @@
   </tr>
 
   <!-- Empty state -->
-  <tr v-if="!tickets.length">
+   <tr v-if="!filteredTickets.length">
+  <td colspan="8" class="text-center text-muted py-4">
+    No tickets found
+  </td>
+</tr>
+  <!-- <tr v-if="!tickets.length">
     <td colspan="8" class="text-center text-muted py-4">
       No tickets found
     </td>
-  </tr>
+  </tr> -->
 </tbody>
 
                                 </table>
@@ -265,9 +272,7 @@
           <div class="modal-body">
            
             <h6 class="fw-semibold">Description</h6>
-            <textarea v-model="selectedDescription" class="form-control rounded-0" rows="4" readonly>
-              {{ selectedDescription }}
-            </textarea>
+            <textarea  class="form-control rounded-0" rows="4" readonly>{{ selectedDescription }}</textarea>
           </div>
 
           <div class="modal-footer">
@@ -318,35 +323,49 @@ export default {
       showBox: false,
     };
   },
-  created() {
-  this.loadAllTickets();
-},
+  
 computed: {
+  sortedTickets() {
+    const sorted = [...this.tickets];
+
+    sorted.sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      return dateB - dateA; // newest first
+    });
+
+    return sorted;
+  },
   filteredTickets() {
-    if (this.activeTab === "all") return this.tickets;
-    return this.tickets.filter(t => t.status === this.activeTab);
+    if (this.activeTab === "all") return this.sortedTickets;
+
+    return this.sortedTickets.filter(
+      t => t.status?.toLowerCase() === this.activeTab.toLowerCase()
+    );
   }
 },
   methods: {
+    getShortDescription(desc) {
+  if (!desc) return "";
+  const words = desc.split(" ");
+  return words.length > 4 ? words.slice(0, 4).join(" ") + "..." : desc;
+},  
     async loadAllTickets() {
-    const reportId = this.$route.params.reportId;
+  const reportId = localStorage.getItem("reportId");
 
-    console.log("📌 Loading tickets for report:", reportId);
+  if (!reportId) {
+    console.warn("⚠️ No reportId found");
+    return;
+  }
 
-    if (!reportId) {
-      console.warn("⚠️ No reportId found");
-      return;
-    }
+  const res = await this.authStore.getTicketsByReport(reportId);
 
-    const res = await this.authStore.getTicketsByReport(reportId);
-
-    if (res.status) {
-      this.tickets = res.data;
-      console.log("🎫 Tickets loaded:", this.tickets);
-    } else {
-      console.error("❌ Failed to load tickets");
-    }
-  },
+  if (res.status) {
+    this.tickets = res.data;
+  } else {
+    this.tickets = [];
+  }
+},
   openTicketModal(ticket) {
     this.selectedDescription = ticket.description || "";
   },
@@ -398,6 +417,13 @@ computed: {
       }
     },
   },
+  mounted() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+[...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+
+  console.log("🎫 SupportTicketView mounted");
+  this.loadAllTickets();
+}
 };
 </script>
 

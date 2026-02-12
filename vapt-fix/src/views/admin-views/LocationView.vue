@@ -347,61 +347,9 @@ export default {
         });
       }
     },
-    onLocationInput() {
-      this.showDropdown = true;
-      this.filterCountries();
-    },
-    filterCountries() {
-      const input = this.locationName.toLowerCase().trim();
-      if (!input) {
-        this.filteredCountries = [];
-        return;
-      }
-
-      const allCountries = this.authStore.countries || [];
-      this.filteredCountries = allCountries.filter(country =>
-        country.toLowerCase().includes(input)
-      );
-    },
-    selectCountry(country) {
-      this.locationName = country;
-      this.showDropdown = false;
-    },
-    async handleAddLocation() {
-      if (!this.locationName.trim()) return;
-      const res = await this.authStore.addLocation(this.locationName.trim());
-      if (
-        res.status === false &&
-        res.details?.location_name?.length
-      ) {
-        Swal.fire({
-          icon: "warning", 
-          title: "Duplicate Location",
-          text: res.details.location_name[0],
-          confirmButtonColor: "#5a44ff"
-        });
-        return;
-      }
-      if (res.status === false) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: res.message || "Failed to add location",
-          confirmButtonColor: "#5a44ff"
-        });
-        return;
-      }
-      this.locationName = "";
-      this.filteredCountries = [];
-      this.showDropdown = false;
-      Swal.fire({
-        icon: "success",
-        title: "Location added",
-        text: "Location has been added successfully",
-        timer: 2000,
-        showConfirmButton: false
-      });
-    },
+   
+    
+   
     getInitials(name) {
       if (!name) return "";
       return name.substring(0, 2).toUpperCase();
@@ -712,8 +660,7 @@ export default {
     console.log("Route query:", this.$route.query);
     this.initChipSelection();
 
-    // fetch countries for autocomplete
-    this.authStore.fetchCountries();
+   
 
     // fetch locations for avatars
     const user =
@@ -723,9 +670,7 @@ export default {
     if (user) {
       this.authStore.user = user;
       const adminId = user._id || user.id;
-      if (adminId) {
-        this.authStore.fetchLocationsByAdminId(adminId);
-      }
+     
     }
   },
 

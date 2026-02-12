@@ -19,44 +19,33 @@
                 <router-link to="/pricingplan" class="btn pending-approval-btn rounded-pill text-decoration-none">Go
                   Premium
                   <i class="bi bi-arrow-right"></i></router-link>
-
-                <!-- <div class="dropdown">
-                            <div class="dropdown-btn"> Select location</div>
-                            <div class="dropdown-content">
-                              <a href="#">Greece</a>
-                              <a href="#">Germany</a>
-                              <a href="#">Bahrain</a>
-                            </div>
-                                </div> -->
-                <!-- <div><select class="form-select rounded-pill" v-model="selectedLocation">
-                                        <option disabled value="">Select location</option>
-                                        <option value="germany">Germany</option>
-                                        <option value="delhi">Delhi</option>
-                                        <option value="bahrain">Bahrain</option>
-                                        <option value="greece">Greece</option>
-                                    </select></div> -->
+              
                 <NotificationPanel />
               </div>
             </div>
 
             <div class="row mt-3">
               <div class="d-flex justify-content-start gap-3">
-                <button class="btn rounded-pill border px-4"
-                  style="background-color: rgba(230, 227, 255, 1);color: rgba(49, 33, 177, 1);">All</button>
+                <!-- <button class="btn rounded-pill border px-4"
+                  style="background-color: rgba(230, 227, 255, 1);color: rgba(49, 33, 177, 1);">All</button> -->
                 <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);" @click="toggleSort">
                   <i class="bi bi-arrow-down-up me-1"></i>Sort by Date
                   <i :class="sortOrder === 'desc' ? 'bi bi-arrow-down ms-1' : 'bi bi-arrow-up ms-1'"></i>
                 </button>
-                <!-- <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i
-                    class="bi bi-funnel me-1"></i>Filter</button> -->
+               
                     <div class="">
                     <form>
-                      <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
-                        <option value="all">All</option>
+                      <select  v-model="selectedTeam" class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
+                        <!-- <option value="all">All</option>
                         <option value="patch management">Patch Management</option>
                         <option value="configuration management">Configuration Management</option>
                         <option value="network management">Network Management</option>
-                        <option value="architectural management">Architectural Management</option>
+                        <option value="architectural management">Architectural Management</option> -->
+                         <option value="all">All</option>
+  <option value="Patch Management">Patch Management</option>
+  <option value="Configuration Management">Configuration Management</option>
+  <option value="Network Management">Network Management</option>
+  <option value="Architectural Management">Architectural Management</option>
                       </select>
                     </form>
                     </div>
@@ -80,12 +69,13 @@
                     </tr>
                   </thead>
                   <tbody class="raised-tbody">
-                    <tr v-for="(req, index) in sortedSupportRequests" :key="req._id">
+                    <tr v-for="(req, index) in finalSupportRequests" :key="req._id">
                       <!-- SR NO -->
                       <td>{{ index + 1 }}</td>
 
                       <!-- Vulnerability Name -->
-                      <td class="text-truncate" style="max-width: 200px;">
+                      <td class="text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip"
+    data-bs-placement="top" :title="req.vul_name">
                         {{ req.vul_name }}
                       </td>
 
@@ -93,17 +83,22 @@
                       <td>{{ req.host_name }}</td>
 
                       <!-- Description / Status -->
-                      <td style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#viewRequestsModal" @click="openViewRequestModal(req)">
-                        {{ req.description }}
-                      </td>
+                      <td style="cursor: pointer;"
+    data-bs-toggle="modal"
+    data-bs-target="#viewRequestsModal"
+    @click="openViewRequestModal(req)">
+    
+  {{ getShortDescription(req.description) }}
+</td>
 
                       <!-- Requested By -->
                       <td>{{ req.requested_by }}</td>
 
                       <!-- Requested At -->
+                      
                       <td>
-                        {{ new Date(req.requested_at).toLocaleDateString() }}
-                      </td>
+  {{ req.requested_at ? new Date(req.requested_at).toLocaleDateString() : "-" }}
+</td>
 
                       <!-- Action -->
                       <td>
@@ -115,11 +110,12 @@
                     </tr>
 
                     <!-- Empty State -->
-                    <tr v-if="!supportRequests.length && !loadingRequests">
-                      <td colspan="7" class="text-center text-muted py-4">
-                        No support requests found
-                      </td>
-                    </tr>
+                     <tr v-if="!finalSupportRequests.length && !loadingRequests">
+  <td colspan="7" class="text-center text-muted py-4">
+    No support requests found
+  </td>
+</tr>
+                    
                   </tbody>
                 </table>
                 <!-- view Support Requests Modal -->
@@ -323,15 +319,18 @@ export default {
       ],
       showBox: false,
       selectedLocation: "greece",
-      sortOrder: 'desc' // 'asc' for oldest first, 'desc' for newest first
+      sortOrder: 'desc' ,
+      selectedTeam: "all",
     };
   },
   computed: {
   selectedStepsArray() {
     if (!this.selectedSupportRequest?.step_requested) return [];
 
-    // handles: "Step 1", "Step 1, Step 6", "All Steps"
-    if (this.selectedSupportRequest.step_requested === "All Steps") {
+    const steps = this.selectedSupportRequest.step_requested.toLowerCase();
+
+    // handle "all"
+    if (steps === "all") {
       return ["All Steps"];
     }
 
@@ -339,6 +338,7 @@ export default {
       .split(",")
       .map(s => s.trim());
   },
+
   sortedSupportRequests() {
     const sorted = [...this.supportRequests];
 
@@ -346,141 +346,151 @@ export default {
       const dateA = new Date(a.requested_at);
       const dateB = new Date(b.requested_at);
 
-      if (this.sortOrder === 'asc') {
-        return dateA - dateB;  // Oldest first
-      } else {
-        return dateB - dateA;  // Newest first (default)
-      }
+      return this.sortOrder === 'asc'
+        ? dateA - dateB
+        : dateB - dateA;
     });
 
     return sorted;
+  },
+   finalSupportRequests() {
+    if (this.selectedTeam === "all") {
+      return this.sortedSupportRequests;
+    }
+
+    return this.sortedSupportRequests.filter(req =>
+      req.assigned_team?.toLowerCase() === this.selectedTeam.toLowerCase()
+    );
   }
-},
-  created() {
-    console.log("🔥 SupportRequests created()");
-    this.fetchSupportRequests();
+
   },
   methods: {
-    toggleSort() {
-      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-    },
-    openViewRequestModal(req) {
-    this.selectedSupportRequest = req;
+    getShortDescription(desc) {
+    if (!desc) return "";
+
+    const words = desc.split(" ");
+    return words.length > 4
+      ? words.slice(0, 4).join(" ") + "..."
+      : desc;
   },
-    async fetchSupportRequests() {
-      console.log("➡️ fetchSupportRequests called");
+  async fetchSupportRequests() {
+    console.log("➡️ fetchSupportRequests called");
 
-      const reportId = localStorage.getItem("reportId");
-      console.log("📌 reportId:", reportId);
+    const reportId = localStorage.getItem("reportId");
 
-      if (!reportId) {
-        console.error("❌ reportId missing");
-        return;
-      }
+    if (!reportId) {
+      console.error("❌ reportId missing");
+      return;
+    }
 
+    try {
       this.loadingRequests = true;
 
-      console.log("📡 Calling API...");
       const res = await this.authStore.getSupportRequestsByReport(reportId);
-
-      this.loadingRequests = false;
 
       console.log("⬅️ API response:", res);
 
       if (res.status) {
         this.supportRequests = res.data;
-        console.log("✅ Total requests:", res.data.length);
+      } else {
+        this.supportRequests = [];
       }
-    },
-    toggleChat() {
-      this.showChat = !this.showChat;
 
-      this.$nextTick(() => {
-        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-        [...popoverTriggerList].map(el => {
-          new bootstrap.Popover(el, {
-            container: 'body',
-            html: true,
-            placement: 'right'
-          });
-        });
-      });
-    },
-    closeChat() {
-      this.showChat = false;
-    },
-    minimizeChat() {
-      this.minimized = !this.minimized;
-    },
-    sendMessage() {
-      if (this.newMessage.trim() !== "") {
-        this.messages.push({
-          text: this.newMessage,
-          sender: "user",
-          deletable: true,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
-        this.newMessage = "";
-      }
-    },
-    deleteMessage(index) {
-      this.messages.splice(index, 1);
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.messages.push({
-          text: `${file.name}`,
-          sender: "user",
-          deletable: true,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
-      }
-    },
+    } catch (err) {
+      console.error("❌ Fetch support requests failed:", err);
+      this.supportRequests = [];
+    } finally {
+      this.loadingRequests = false;
+    }
+  },
+
+  openViewRequestModal(req) {
+    this.selectedSupportRequest = req;
+  }
   },
   mounted() {
-    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-    [...popoverTriggerList].map(el => {
-      if (typeof bootstrap !== "undefined" && bootstrap?.Popover) {
-        new bootstrap.Popover(el, {
-          container: "body",
-          html: true,
-          placement: "right",
-        });
-      }
-    });
-    const dropdown = document.querySelector(".dropdown");
-    if (!dropdown) {
-      return;
+  // Bootstrap tooltip init
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+
+  // Dropdown code - only run if dropdown exists
+  const dropdown = document.querySelector('.dropdown');
+  if (dropdown) {
+    const btn = dropdown.querySelector('.dropdown-btn');
+    const options = dropdown.querySelectorAll('.dropdown-content a');
+
+    if (btn) {
+      btn.addEventListener('click', () => {
+        dropdown.classList.toggle('show');
+      });
     }
 
-    const btn = dropdown.querySelector(".dropdown-btn");
-    const options = dropdown.querySelectorAll(".dropdown-content a");
-
-    if (!btn) return;
-    btn.addEventListener("click", () => {
-      dropdown.classList.toggle("show");
-    });
-
-    options.forEach((option) => {
-      option.addEventListener("click", (e) => {
+    options.forEach(option => {
+      option.addEventListener('click', (e) => {
         e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove("show"); // close dropdown
+        if (btn) btn.textContent = option.textContent;
+        dropdown.classList.remove('show');
       });
     });
 
-    document.addEventListener("click", (e) => {
+    document.addEventListener('click', (e) => {
       if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove("show");
+        dropdown.classList.remove('show');
       }
     });
+  }
 
-    console.log("Support Requests View Mounted");
-    this.fetchSupportRequests();
-  },
+  console.log("🔥 Support Requests View mounted");
 
+  // Fetch support requests
+  this.fetchSupportRequests();
 
+  // If any extra store methods added later, safe call pattern
+  if (typeof this.authStore.fetchSupportRequests === 'function') {
+    // future store sync if needed
+  }
+},
+  // mounted() {
+  //   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  //   [...popoverTriggerList].map(el => {
+  //     if (typeof bootstrap !== "undefined" && bootstrap?.Popover) {
+  //       new bootstrap.Popover(el, {
+  //         container: "body",
+  //         html: true,
+  //         placement: "right",
+  //       });
+  //     }
+  //   });
+  //   const dropdown = document.querySelector(".dropdown");
+  //   if (!dropdown) {
+  //     return;
+  //   }
+
+  //   const btn = dropdown.querySelector(".dropdown-btn");
+  //   const options = dropdown.querySelectorAll(".dropdown-content a");
+
+  //   if (!btn) return;
+  //   btn.addEventListener("click", () => {
+  //     dropdown.classList.toggle("show");
+  //   });
+
+  //   options.forEach((option) => {
+  //     option.addEventListener("click", (e) => {
+  //       e.preventDefault();
+  //       btn.textContent = option.textContent; // update button text
+  //       dropdown.classList.remove("show"); // close dropdown
+  //     });
+  //   });
+
+  //   document.addEventListener("click", (e) => {
+  //     if (!dropdown.contains(e.target)) {
+  //       dropdown.classList.remove("show");
+  //     }
+  //   });
+
+  //   console.log("Support Requests View Mounted");
+  //   this.fetchSupportRequests();
+  // },
 };
 </script>
 

@@ -167,7 +167,7 @@
 
         <div class="cta">
           <button class="btn btn-primary" :disabled="loading" @click="submitRiskCriteria">
-            {{ loading ? "Saving..." : "Continue to Vulnerability Report →" }}
+            {{ loading ? "Saving..." : "Continue to Upload Target →" }}
           </button>
         </div>
 

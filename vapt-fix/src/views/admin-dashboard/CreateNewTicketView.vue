@@ -23,7 +23,7 @@
                                     <select
                                       v-model="selectedCategory" :disabled="ticketData"
                                       class="form-select ps-3 py-2"
-                                      style="background:#f6f6f6;border:none;border-radius:8px;"
+                                      
                                     >
                                       <option value="" disabled>Select a category...</option>
                                       <option value="bug">Report a bug</option>
@@ -233,6 +233,17 @@ export default {
 </script>
 
 <style scoped>
+.form-select {
+  background-color: #f6f6f6 !important;
+  border: none !important;
+  border-radius: 8px !important;
+
+  /* restore dropdown arrow */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
 .ticket-head {
     color: rgba(0, 0, 0, 1);
     font-weight: 600;

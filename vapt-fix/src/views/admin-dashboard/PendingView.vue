@@ -26,15 +26,19 @@
                         <div class="row">
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
                                 <div class="d-flex flex-row align-items-center justify-content-start gap-3">
-                                    <!-- <button class="btn btn-danger btn-pill other-btn" @click="loadOpenTickets">Open</button> -->
-                                    <select class="form-select border border-secondary" id="roleSelect" style="border-radius: 50px;">
-                                        <option style="font-size: 15px;" selected disabled>Select Team</option>
-                                        <option style="font-size: 15px;" value="patch management">Patch Management</option>
-                                        <option style="font-size: 15px;" value="architectural flaws">Configuration Management</option>
-                                        <option style="font-size: 15px;" value="patch management">Network Security</option>
-                                        <option style="font-size: 15px;" value="patch management">Architectural Flaws</option>
-                                        
-                                    </select>
+                                   
+                                    <select
+  v-model="selectedRole"
+  class="form-select border border-secondary"
+  style="border-radius:50px;"
+>
+  <option value="all">All Roles</option>
+  <option value="Patch Management">Patch Management</option>
+  <option value="Configuration Management">Configuration Management</option>
+  <option value="Network Security">Network Security</option>
+  <option value="Architectural Flaws">Architectural Flaws</option>
+</select>
+
                                 </div>
                                 
                                 
@@ -57,7 +61,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
-                                    <tr v-for="(ticket, index) in tickets" :key="ticket._id">
+                                    <tr v-for="(ticket, index) in filteredTickets" :key="ticket._id">
                                       <td>{{ index + 1 }}</td>
                                       <td
   style="max-width:200px; cursor:pointer;"
@@ -92,6 +96,11 @@
                                         </router-link>
                                         </td>
                                     </tr>
+                                    <tr v-if="!filteredTickets.length">
+  <td colspan="8" class="text-center text-muted py-4">
+    No tickets found for {{ selectedRole }}
+  </td>
+</tr>
                                     </tbody>
                                 </table>
 
@@ -277,9 +286,21 @@ export default {
       authStore: useAuthStore(),
       tickets: [],
       selectedDescription: "",
-      reportId: ""
+      reportId: "",
+      selectedRole: "all" 
     };
   },
+  computed: {
+  filteredTickets() {
+    if (this.selectedRole === "all") {
+      return this.tickets;
+    }
+
+    return this.tickets.filter(ticket =>
+      ticket.assigned_team?.toLowerCase() === this.selectedRole.toLowerCase()
+    );
+  }
+},
   watch: {
   'authStore.latestReportId': {
     immediate: true,
