@@ -162,90 +162,7 @@
               <div class="col-10 mt-4">
                 <!-- Dynamic Content per Tab -->
                 <div v-for="(tab, index) in tabs" :key="index" v-show="activeTab === index">
-                  <!-- <div v-if="isAssignIpTab">
-                    <div class="team-section mb-5">
-                    <table class="table team-table">
-                      <thead>
-                        <tr>
-                          <th style="width:30%">Asset</th>
-                          <th style="width:30%">Name</th>
-                          <th style="width:20%">Role</th>
-                          <th style="width:20%">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                        
-                          <td>
-                            <div class="hierarchy-dropdown">
-                              <div class="dropdown-input" @click.stop="assetDropdownOpen = !assetDropdownOpen">
-                                {{ selectedAssetsText }}
-                                <i class="bi bi-chevron-down"></i>
-                              </div>
-
-                              <div v-if="assetDropdownOpen" class="dropdown-panel">
-                                <div v-for="box in assetHierarchy" :key="box.label" class="parent-item">
-                                  <div class="parent-label" @click.stop="box.open = !box.open">
-                                    {{ box.label }}
-                                    <i class="bi bi-chevron-right" :class="{ rotate: box.open }"></i>
-                                  </div>
-
-                                  <div v-if="box.open" class="child-list">
-                                    <label v-for="asset in box.items" :key="asset.value" class="child-item">
-                                      <input type="checkbox" v-model="asset.checked" class="me-2" />
-                                      {{ asset.value }}
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-
-                        
-                          <td>
-                            <div class="multi-select-dropdown">
-                              <div class="dropdown-input" @click="assignUsersOpen = !assignUsersOpen">
-                                {{ selectedUsersText }}
-                                <i class="bi bi-chevron-down"></i>
-                              </div>
-
-                              <div v-if="assignUsersOpen" class="dropdown-list">
-                                <label v-for="user in users" :key="user._id">
-                                  <input type="checkbox" :value="user._id"
-                                    v-model="selectedAssignUsers" class="me-2" />
-                                  {{ user.first_name }} {{ user.last_name }}
-                                </label>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td>
-                            <div class="multi-select-dropdown">
-                              <div class="dropdown-input" @click.stop="assignRoleOpen = !assignRoleOpen">
-                                {{ assignRoleText }}
-                                <i class="bi bi-chevron-down"></i>
-                              </div>
-
-                              <div class="dropdown-list" v-show="assignRoleOpen">
-                                <label v-for="option in roleOptions" :key="option.short">
-                                  <input type="checkbox" :value="option.short" v-model="assignRoles" />
-                                  {{ option.full }}
-                                </label>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td>
-                            <a class="remove-btn">
-                              <i class="bi bi-dash-circle me-1"></i> Remove
-                            </a>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    </div>
-                  </div> -->
-                  <!-- <div v-else> -->
+                  
                     <!-- ================= INTERNAL SECTION ================= -->
                     <div class="team-section mb-5">
                       <div class="subtab-header">
@@ -325,28 +242,7 @@
 
 
 
-                              <!-- <td>
-                                <div class="multi-select-dropdown">
-                                  <div class="dropdown-input" @click="toggleDropdown(user._id)">
-                                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-                                    <i class="bi bi-chevron-down"></i>
-                                  </div>
-
-                                  <div class="dropdown-list" v-show="isOpen[user._id]">
-                                    <label v-for="option in roleOptions" :key="option.short">
-                                      <input type="checkbox" :value="option.short" v-model="selectedRoles[user._id]"
-                                        @change="handleRoleChange($event, user, option)" />
-                                      {{ option.full }}
-                                    </label>
-                                  </div>
-                                </div>
-                              </td> -->
-
-                              <!-- <td>
-                                <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
-                                  <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                              </td> -->
+                            
                             </tr>
                           </tbody>
                         </table>
@@ -410,11 +306,7 @@
                                 </div>
                               </td>
 
-                              <!-- <td>
-                                <a href="#" class="remove-btn" @click.prevent="removeUserFromCurrentTab(user)">
-                                  <i class="bi bi-dash-circle me-1"></i> Remove
-                                </a>
-                              </td> -->
+                             
                             </tr>
                           </tbody>
                         </table>
@@ -483,38 +375,7 @@ export default {
         "Architectural Flaws": "AF"
       },
       assetDropdownOpen: false,
-      // assetHierarchy: [
-      //   {
-      //     label: "White Box",
-      //     open: false,
-      //     items: [
-      //       { value: "192.168.1.10", checked: false },
-      //       { value: "192.168.1.11", checked: false }
-      //     ]
-      //   },
-      //   {
-      //     label: "Black Box",
-      //     open: false,
-      //     items: [
-      //       { value: "example.com", checked: false },
-      //       { value: "api.example.com", checked: false }
-      //     ]
-      //   },
-      //   {
-      //     label: "Grey Box",
-      //     open: false,
-      //     items: [
-      //       { value: "10.0.0.1", checked: false }
-      //     ]
-      //   },
-      //   {
-      //     label: "Cloud Assets",
-      //     open: false,
-      //     items: [
-      //       { value: "cloud.example.com", checked: false }
-      //     ]
-      //   }
-      // ],
+     
       internalSubTab: "list",
       externalSubTab: "list",
       assignUsersOpen: false,
@@ -823,66 +684,120 @@ this.isOpen[newUser._id] = false;
       }
     },
     // Handle checkbox change - detect check/uncheck
+    // async handleRoleChange(event, user, option) {
+    //   const isChecked = event.target.checked;
+    //   const roleFullName = option.full; // e.g., "Patch Management"
+
+    //   // Close dropdown before showing alert
+    //   this.isOpen[user._id] = false;
+
+    //   if (!isChecked) {
+    //     // UNCHECKED - Call delete role API
+    //     await this.deleteRoleFromUser(user, roleFullName);
+    //   } else {
+    //     // CHECKED - Call update roles API (add role)
+    //     await this.updateSelectedRoleText(user._id);
+    //   }
+    // },
+
     async handleRoleChange(event, user, option) {
-      const isChecked = event.target.checked;
-      const roleFullName = option.full; // e.g., "Patch Management"
+  const isChecked = event.target.checked;
+  const roleFullName = option.full;
 
-      // Close dropdown before showing alert
-      this.isOpen[user._id] = false;
+  // close dropdown
+  this.isOpen[user._id] = false;
 
-      if (!isChecked) {
-        // UNCHECKED - Call delete role API
-        await this.deleteRoleFromUser(user, roleFullName);
-      } else {
-        // CHECKED - Call update roles API (add role)
-        await this.updateSelectedRoleText(user._id);
-      }
-    },
+  if (!isChecked) {
+    await this.deleteRoleFromUser(user, roleFullName);
+  } else {
+    await this.updateSelectedRoleText(user._id);
+  }
+},
+
 
     // Delete a specific role from user (called when checkbox unchecked)
-    async deleteRoleFromUser(user, roleToRemove) {
-      try {
-        const res = await endpoint.delete(
-          `/admin/users_details/user-detail/${user._id}/delete-role/`,
-          {
-            data: {
-              confirm: true,
-              member_role: roleToRemove,
-            },
-          }
-        );
+    // async deleteRoleFromUser(user, roleToRemove) {
+    //   try {
+    //     const res = await endpoint.delete(
+    //       `/admin/users_details/user-detail/${user._id}/delete-role/`,
+    //       {
+    //         data: {
+    //           confirm: true,
+    //           member_role: roleToRemove,
+    //         },
+    //       }
+    //     );
 
-        if (res.status === 200) {
-          // Update user's roles from response
-          user.Member_role = res.data.remaining_roles || [];
+    //     if (res.status === 200) {
+    //       // Update user's roles from response
+    //       user.Member_role = res.data.remaining_roles || [];
 
-          // Update display text
-          this.selectedRoleText[user._id] = this.selectedRoles[user._id].join(", ");
+    //       // Update display text
+    //       this.selectedRoleText[user._id] = this.selectedRoles[user._id].join(", ");
 
-          Swal.fire({
-            icon: "success",
-            title: "Role Removed",
-            text: `Role '${roleToRemove}' removed successfully from ${user.first_name}.`,
-            timer: 2000,
-            showConfirmButton: false,
-          });
-        }
-      } catch (err) {
-        console.error("❌ Error removing role:", err);
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "Role Removed",
+    //         text: `Role '${roleToRemove}' removed successfully from ${user.first_name}.`,
+    //         timer: 2000,
+    //         showConfirmButton: false,
+    //       });
+    //     }
+    //   } catch (err) {
+    //     console.error("❌ Error removing role:", err);
 
-        // Revert checkbox state on error
-        const shortCode = this.roleMapping[roleToRemove];
-        if (shortCode && !this.selectedRoles[user._id].includes(shortCode)) {
-          this.selectedRoles[user._id].push(shortCode);
-        }
+    //     // Revert checkbox state on error
+    //     const shortCode = this.roleMapping[roleToRemove];
+    //     if (shortCode && !this.selectedRoles[user._id].includes(shortCode)) {
+    //       this.selectedRoles[user._id].push(shortCode);
+    //     }
 
-        Swal.fire({
-          icon: "error",
-          title: "Failed to Remove Role",
-          text: err.response?.data?.message || "Please try again.",
-        });
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Failed to Remove Role",
+    //       text: err.response?.data?.message || "Please try again.",
+    //     });
+    //   }
+    // },
+
+
+async deleteRoleFromUser(user, roleToRemove) {
+  try {
+    const res = await this.authStore.deleteUserRole(user._id, roleToRemove);
+
+    if (!res.status) {
+      Swal.fire("Error", res.message, "error");
+
+      // revert checkbox
+      const shortCode = this.roleMapping[roleToRemove];
+      if (shortCode && !this.selectedRoles[user._id].includes(shortCode)) {
+        this.selectedRoles[user._id].push(shortCode);
       }
-    },
+      return;
+    }
+
+    // ✅ Update UI from store response
+    user.Member_role = res.remaining_roles || [];
+
+    this.selectedRoles[user._id] =
+      user.Member_role.map(full => this.roleMapping[full]) || [];
+
+    this.selectedRoleText[user._id] =
+      this.selectedRoles[user._id].join(", ");
+
+    Swal.fire({
+      icon: "success",
+      title: "Role Removed",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+  } catch (err) {
+    console.log(err);
+    Swal.fire("Error", "Failed to remove role", "error");
+  }
+},
+
 
     async updateSelectedRoleText(userId) {
       this.selectedRoleText[userId] = this.selectedRoles[userId].join(", ");

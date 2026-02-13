@@ -398,6 +398,32 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // Delete member role
+  async deleteUserRole(userId: string, roleToRemove: string): Promise<any> {
+    try {
+      const res = await endpoint.delete(
+        `/api/admin/users_details/user-detail/${userId}/delete-role/`,
+        {
+          data: {
+            confirm: true,
+            member_role: roleToRemove,
+          },
+        }
+      );
+
+      return {
+        status: true,
+        message: res.data.message,
+        remaining_roles: res.data.remaining_roles,
+      };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  },
+
   // Update Member Role
   async updateUserRoles(userId: string, newRoles: string[]): Promise<any> {
     try {
@@ -1413,11 +1439,11 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // GET Ticket by ID
-  async getTicketById(ticketId: string) {
+  // GET Ticket by fix_vulnerability_id + ticket_id
+  async getTicketById(fixVulnerabilityId: string, ticketId: string) {
     try {
       const res = await endpoint.get(
-        `/api/admin/adminregister/tickets/${ticketId}/`
+        `/api/admin/adminregister/tickets/fix/${fixVulnerabilityId}/ticket/${ticketId}/`
       );
 
       return {
@@ -1749,26 +1775,29 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // Get support requests by host for assets page
-  // async getSupportRequestsByHost(host: string) {
-  //   try {
-  //     const res = await endpoint.get(
-  //       `/api/admin/adminasset/support-requests/host/${host}/`
-  //     );
+  // ✅ Get support requests by host_name
+  async getSupportRequestsByHost(host: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/support-requests/host/${host}/`
+      );
 
-  //     return {
-  //       status: true,
-  //       data: res.data.results || [],
-  //       count: res.data.count || 0
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       status: false,
-  //       data: [],
-  //       count: 0
-  //     };
-  //   }
-  // },
+      return {
+        status: true,
+        data: res.data.results || [],
+        count: res.data.count || 0,
+        message: res.data.message
+      };
+
+    } catch (error: any) {
+      return {
+        status: false,
+        data: [],
+        count: 0,
+        message: error?.response?.data?.message || "Failed to fetch support requests"
+      };
+    }
+  },
 
   // Get closed fix vulnerabilities by host
   // async getClosedFixVulnerabilitiesByHost(host: string) {

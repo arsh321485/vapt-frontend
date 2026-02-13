@@ -118,21 +118,41 @@ export default {
       loading: false,
     };
   },
-  created() {
-    const { reportId, fixVulId, asset, ticketId } = this.$route.params;
 
-  console.log("Ticket Page Params:", reportId, fixVulId, asset, ticketId);
+  watch: {
+  '$route.params.ticketId': {
+    handler(newTicketId) {
+      if (!newTicketId) return;
+
+      console.log("Route ticketId changed:", newTicketId);
+
+      // Re-read all route params (component is reused, created() won't fire again)
+      this.reportId = this.$route.params.reportId || "";
+      this.fixVulnerabilityId = this.$route.params.fixVulId || "";
+      this.ticketId = newTicketId;
+
+      this.fetchTicket();
+    }
+  }
+},
+
+ created() {
+  const { reportId, fixVulId, asset, ticketId } = this.$route.params;
 
   this.reportId = reportId || "";
   this.fixVulnerabilityId = fixVulId || "";
-  this.selectedAsset = asset || "";
+  this.ticketId = ticketId || "";
+  this.selectedAsset = asset ? decodeURIComponent(asset) : "";
 
-  // 🔥 FIX: use route ticketId
-  if (ticketId) {
-    this.ticketId = ticketId;
+  if (this.ticketId) {
+    // ticketId in URL → fetch that ticket directly
     this.fetchTicket();
+  } else if (this.reportId && this.fixVulnerabilityId) {
+    // no ticketId in URL → check if a ticket already exists for this fixVulnerabilityId
+    this.checkExistingTicket();
   }
-  },
+},
+
   computed: {
     descriptionPlaceholder() {
       if (this.selectedCategory === "fix") {
@@ -142,18 +162,48 @@ export default {
     },
   },
   methods: {
-    async fetchTicket() {
+   async checkExistingTicket() {
+    const authStore = useAuthStore();
+    const res = await authStore.getTicketsByReport(this.reportId);
 
-  if (!this.ticketId) return;
+    if (res.status && res.data?.length > 0) {
+      const existingTicket = res.data.find(
+        t => t.fix_vulnerability_id === this.fixVulnerabilityId ||
+             t.fix_vulnerability === this.fixVulnerabilityId
+      );
+
+      if (existingTicket) {
+        this.ticketId = existingTicket._id || existingTicket.id;
+        console.log("Found existing ticket:", this.ticketId);
+        this.fetchTicket();
+      }
+    }
+   },
+
+   async fetchTicket() {
+
+  if (!this.ticketId || !this.fixVulnerabilityId) {
+    console.log("Missing ids", this.ticketId, this.fixVulnerabilityId);
+    return;
+  }
+
+  console.log("GET ticket API calling...");
+  console.log("Fix ID:", this.fixVulnerabilityId);
+  console.log("Ticket ID:", this.ticketId);
 
   this.loading = true;
 
   const authStore = useAuthStore();
-  const res = await authStore.getTicketById(this.ticketId);
+
+  const res = await authStore.getTicketById(
+    this.fixVulnerabilityId,
+    this.ticketId
+  );
 
   this.loading = false;
 
   if (res.status && res.data) {
+    console.log("Ticket loaded:", res.data);
 
     this.ticketData = res.data;
 
@@ -164,9 +214,11 @@ export default {
     this.description = res.data.description;
 
   } else {
-    this.ticketData = null; // IMPORTANT → allow create mode
+    console.warn("Ticket fetch failed:", res);
+    this.ticketData = null;
   }
 },
+
     async submitTicket() {
 
   if (!this.selectedCategory || !this.subject || !this.description) {
@@ -202,22 +254,21 @@ export default {
       showConfirmButton: false
     });
 
-    // 🔥 CLEAR FORM
-    // this.selectedCategory = "";
-    // this.subject = "";
-    // this.description = "";
+    // redirect to same page with ticketId (view mode)
+    const newTicketId = res.data?._id || res.data?.id;
+    console.log("Redirecting after create:", newTicketId);
 
-    // 🔥 REDIRECT BACK
-    // setTimeout(() => {
-    //   this.$router.push({
-    //     name: "VulFix",
-    //     params: {
-    //       reportId: this.reportId,
-    //       asset: this.selectedAsset
-    //     }
-    //   });
-    // }, 2000);
-
+    if (newTicketId) {
+      this.$router.replace({
+        name: "CreateTicket",
+        params: {
+          reportId: this.reportId,
+          fixVulId: this.fixVulnerabilityId,
+          asset: encodeURIComponent(this.selectedAsset),
+          ticketId: newTicketId
+        },
+      });
+    }
   } else {
     Swal.fire({
       icon: "error",

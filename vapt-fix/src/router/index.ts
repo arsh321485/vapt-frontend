@@ -163,7 +163,7 @@ const router = createRouter({
     //   component: CreateNewTicketView,
     // },
     {
-  path: "/ticket/:reportId/:fixVulId/:asset",
+  path: "/ticket/:reportId/:fixVulId/:asset?/:ticketId?",
   name: "CreateTicket",
   component: CreateNewTicketView,
 },

@@ -611,18 +611,14 @@
       </button>
     </div>
   </div>
-</div>
+                        </div>
                       </div>
                     </div>
 
-                    <!-- Exception Requests -->
+                    <!-- Support Requests -->
                     <div v-if="activeTab === 'exceptions'">
-                      
-                      <div
-  v-for="(req, i) in supportRequestsByHost"
-  :key="req._id"
-  class="d-flex justify-content-between align-items-center py-2 border-bottom"
->
+                      <div v-if="supportRequestsByHost.length">
+    <div v-for="(req, i) in supportRequestsByHost"  :key="req._id" class="d-flex justify-content-between align-items-center py-2 border-bottom">
   <!-- LEFT -->
   <div class="d-flex align-items-center gap-3">
 
@@ -670,6 +666,10 @@
     </button>
   </div>
 </div>
+</div>
+<div v-else class="text-muted py-3">
+  No support requests raised for this asset.
+</div>
                       <!-- view Requests Modal -->
                       <div class="modal fade" id="viewRequestsModal" tabindex="-1"
                         aria-labelledby="viewRequestsModalLabel" aria-hidden="true">
@@ -716,9 +716,10 @@
                         </div>
                       </div>
 
-                      <div v-if="!supportRequestsByHost.length" class="text-muted py-3">
+                      
+                      <!-- <div v-if="!supportRequestsByHost.length" class="text-muted py-3">
   No support requests raised for this asset.
-</div>
+</div> -->
 
                     </div>
 
@@ -872,8 +873,8 @@ export default {
   data() {
     return {
       authStore: useAuthStore(),
-      supportRequestsByHost: [],   // 👈 ADD
-      supportRequestCount: 0,      // 👈 ADD
+      supportRequestsByHost: [],
+      supportRequestCount: 0,
       loadingSupportRequests: false,
       selectedSupportRequest: null,
       activeIndex: null,
@@ -1131,18 +1132,17 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
       );
       // 🔥 NEW: fetch support requests for this asset
   this.loadingSupportRequests = true;
-
   const res = await this.authStore.getSupportRequestsByHost(asset.asset);
 
-  this.loadingSupportRequests = false;
+this.loadingSupportRequests = false;
 
-  if (res.status) {
-    this.supportRequestsByHost = res.data;
-    this.supportRequestCount = res.count;
-  } else {
-    this.supportRequestsByHost = [];
-    this.supportRequestCount = 0;
-  }
+if (res.status) {
+  this.supportRequestsByHost = res.data;
+  this.supportRequestCount = res.count;
+} else {
+  this.supportRequestsByHost = [];
+  this.supportRequestCount = 0;
+}
   // 🔥 NEW: closed fix vulnerabilities
   this.loadingClosedFix = true;
 
