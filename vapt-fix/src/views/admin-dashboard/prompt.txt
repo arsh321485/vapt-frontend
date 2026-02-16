@@ -1,5 +1,122 @@
-https://development-ld64716.slack.com/oauth?client_id=9441923811621.9515115381619&scope=chat%3Awrite%2Cchannels%3Amanage%2Cchannels%3Ajoin%2Cmpim%3Awrite%2Cgroups%3Awrite%2Cim%3Awrite%2Cusers%3Aread%2Cusers%3Aread.email&user_scope=identity.basic%2Cidentity.email%2Cidentity.avatar%2Cidentity.team&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fslack%2Fcallback&state=b0417002-60e4-4226-960f-1edf6f6f1b94&granular_bot_scope=1&single_channel=0&install_redirect=&tracked=1&user_default=0&team=
-
-https://development-ld64716.slack.com/marketplace/A09F53DB7J7-vapt
-
-https://development-ld64716.slack.com/app_redirect?app=A09F53DB7J7
+in my assets page when i click fix now to staus open vul so create api is hitting but showing 
+https://vaptbackend.secureitlab.com/api/admin/adminregister/fix-vulnerability/report/698f03639fa14fe1579f410e/asset/192.168.0.26/create/
+Request Method
+POST
+Status Code
+400 Bad Request
+response shows - {"id":["This field is required."]}
+my api response is below 
+{
+    "message": "Fix vulnerabilities fetched successfully",
+    "report_id": "698f0eeb7fb1889ff0a4b206",
+    "host_name": "161.126.58.86",
+    "count": 3,
+    "results": [
+        {
+            "_id": "699050eb318beca2dbbe5903",
+            "report_id": "698f0eeb7fb1889ff0a4b206",
+            "admin_id": "23c8b3b7-9f90-4924-84ed-48f29496c781",
+            "admin_email": "malibharti1702@gmail.com",
+            "id": "a86c2177-d8b0-4fc0-b756-bc8ec81e7502",
+            "vulnerability_name": "SNMP 'GETBULK' Reflection DDoS -",
+            "asset": "161.126.58.86",
+            "severity": "Medium",
+            "port": "",
+            "protocol": "",
+            "description": "The remote SNMP daemon is responding with a large amount of data to a 'GETBULK' request with a larger than normal value for 'max-repetitions'. A remote attacker can use this SNMP server to conduct a reflected distributed denial of service attack on an arbitrary remote host.",
+            "synopsis": "The remote SNMP daemon is affected by a vulnerability that allows a reflected distributed denial of service attack.",
+            "solution": "Disable the SNMP service on the remote host if you do not use it. Otherwise, restrict and monitor access to this service, and consider changing the default 'public' community string.",
+            "status": "open",
+            "vulnerability_type": "SQL Injection",
+            "affected_ports_ranges": "N/A",
+            "file_path": "N/A",
+            "vendor_fix_available": true,
+            "assigned_team": "Patch Management",
+            "assigned_team_members": [
+                {
+                    "user_id": "698b16ef57ff57cc4fca61e1",
+                    "name": "sona mali",
+                    "email": "sona12@gmail.com"
+                },
+                {
+                    "user_id": "698b172e57ff57cc4fca61e2",
+                    "name": "sona mali",
+                    "email": "ganeshmali182018@gmail.com"
+                }
+            ],
+            "created_at": "2026-02-14T10:39:39.119000-06:00",
+            "created_by": "23c8b3b7-9f90-4924-84ed-48f29496c781"
+        },
+        {
+            "_id": "6990404cb683fc1b75d885c0",
+            "report_id": "698f0eeb7fb1889ff0a4b206",
+            "admin_id": "23c8b3b7-9f90-4924-84ed-48f29496c781",
+            "admin_email": "malibharti1702@gmail.com",
+            "id": "cd749d70-a137-4fe8-b4e1-2f5ac20ca7a6",
+            "vulnerability_name": "SNMP Agent Default Community Name (public) -",
+            "asset": "161.126.58.86",
+            "severity": "High",
+            "port": "",
+            "protocol": "",
+            "description": "It is possible to obtain the default community name of the remote SNMP server.\nAn attacker may use this information to gain more knowledge about the remote host, or to change the configuration of the remote system (if the default community allows such modifications).",
+            "synopsis": "The community name of the remote SNMP server can be guessed.",
+            "solution": "Disable the SNMP service on the remote host if you do not use it. Either filter incoming UDP packets going to this port, or change the default community string.",
+            "status": "open",
+            "vulnerability_type": "SQL Injection",
+            "affected_ports_ranges": "N/A",
+            "file_path": "N/A",
+            "vendor_fix_available": true,
+            "assigned_team": "Patch Management",
+            "assigned_team_members": [
+                {
+                    "user_id": "698b16ef57ff57cc4fca61e1",
+                    "name": "sona mali",
+                    "email": "sona12@gmail.com"
+                },
+                {
+                    "user_id": "698b172e57ff57cc4fca61e2",
+                    "name": "sona mali",
+                    "email": "ganeshmali182018@gmail.com"
+                }
+            ],
+            "created_at": "2026-02-14T09:28:44.444000-06:00",
+            "created_by": "23c8b3b7-9f90-4924-84ed-48f29496c781"
+        },
+        {
+            "_id": "698f11077fb1889ff0a4b213",
+            "report_id": "698f0eeb7fb1889ff0a4b206",
+            "admin_id": "23c8b3b7-9f90-4924-84ed-48f29496c781",
+            "admin_email": "malibharti1702@gmail.com",
+            "id": null,
+            "vulnerability_name": "SNMP Agent Default Community Name (public) -",
+            "asset": "161.126.58.86",
+            "severity": "High",
+            "port": "",
+            "protocol": "",
+            "description": "It is possible to obtain the default community name of the remote SNMP server.\nAn attacker may use this information to gain more knowledge about the remote host, or to change the configuration of the remote system (if the default community allows such modifications).",
+            "synopsis": "The community name of the remote SNMP server can be guessed.",
+            "solution": "Disable the SNMP service on the remote host if you do not use it. Either filter incoming UDP packets going to this port, or change the default community string.",
+            "status": "open",
+            "vulnerability_type": "SQL Injection",
+            "affected_ports_ranges": "N/A",
+            "file_path": "N/A",
+            "vendor_fix_available": true,
+            "assigned_team": "Patch Management",
+            "assigned_team_members": [
+                {
+                    "user_id": "698b16ef57ff57cc4fca61e1",
+                    "name": "sona mali",
+                    "email": "sona12@gmail.com"
+                },
+                {
+                    "user_id": "698b172e57ff57cc4fca61e2",
+                    "name": "sona mali",
+                    "email": "ganeshmali182018@gmail.com"
+                }
+            ],
+            "created_at": "2026-02-13T11:54:47.181000-06:00",
+            "created_by": "23c8b3b7-9f90-4924-84ed-48f29496c781"
+        }
+    ]
+}
+so check why id error 

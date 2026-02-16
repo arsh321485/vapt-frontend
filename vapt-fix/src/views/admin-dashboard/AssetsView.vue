@@ -523,11 +523,44 @@
                                   </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                  <router-link to="/vulnerabilitycard"
+                                  <!-- <router-link
+                                    v-if="authStore.latestReportId"
+                                    :to="{
+                                      name: 'VulFix',
+                                      params: {
+                                        reportId: authStore.latestReportId,
+                                        asset: authStore.selectedAssetDetail?.asset,
+                                      },
+                                      query: {
+                                        id: getVulRegisterId(v),
+                                        plugin_name: v.vul_name,
+                                        risk_factor: v.severity
+                                      }
+                                    }"
                                     class="btn rounded-pill px-3 text-decoration-none"
                                     style="background-color: rgba(49, 33, 177, 1);color: white;"><i
-                                      class="bi bi-magic"></i> Fix Now</router-link>
-                                </div>
+                                      class="bi bi-magic"></i> Fix Now</router-link> -->
+                                <router-link
+  v-if="authStore.latestReportId"
+  :to="{
+    name: 'VulFix',
+    params: {
+      reportId: authStore.latestReportId,
+      asset: authStore.selectedAssetDetail?.asset,
+    },
+    query: {
+      id: getVulRegisterId(v),   // 🔥 FIXED HERE
+      plugin_name: v.vul_name,
+      risk_factor: v.severity
+    }
+  }"
+  class="btn rounded-pill px-3 text-decoration-none"
+  style="background-color: rgba(49, 33, 177, 1);color: white;"
+>
+  <i class="bi bi-magic"></i> Fix Now
+</router-link>
+
+                                    </div>
 
                               </div>
                               <div class="d-flex flex-column">
@@ -1035,6 +1068,25 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
     },
   },
   methods: {
+    getVulRegisterId(v) {
+  const asset = this.authStore.selectedAssetDetail?.asset;
+
+  const match = this.authStore.vulnerabilityRows.find(
+    row =>
+      (row.vul_name === v.vul_name || row.vulnerability_name === v.vul_name) &&
+      row.asset === asset
+  );
+
+  // return UUID from vulnerability register
+  return match?.id || v.id || "";
+},
+    // getVulRegisterId(v) {
+    //   const asset = this.authStore.selectedAssetDetail?.asset;
+    //   const match = this.authStore.vulnerabilityRows.find(
+    //     row => row.vul_name === v.vul_name && row.asset === asset
+    //   );
+    //   return match?.id || v.id || '';
+    // },
     getSeverityRank(sev) {
       if (sev === "Critical") return 1;
       if (sev === "High") return 2;
@@ -1148,8 +1200,24 @@ if (res.status) {
   if (reportId) {
     const fixRes = await this.authStore.getClosedVulnerabilities(reportId, asset.asset);
     this.loadingClosedFix = false;
-    this.closedFixVulnerabilities = fixRes.status && fixRes.data?.results ? fixRes.data.results : [];
-    this.closedFixCount = fixRes.status ? fixRes.data?.count || 0 : 0;
+    if (fixRes.status && fixRes.data?.results) {
+
+  // 🔥 only keep CLOSED ones
+  const closedOnly = fixRes.data.results.filter(
+    v => v.status?.toLowerCase() === "closed"
+  );
+
+  this.closedFixVulnerabilities = closedOnly;
+  this.closedFixCount = closedOnly.length;
+
+} else {
+  this.closedFixVulnerabilities = [];
+  this.closedFixCount = 0;
+}
+
+
+    // this.closedFixVulnerabilities = fixRes.status && fixRes.data?.results ? fixRes.data.results : [];
+    // this.closedFixCount = fixRes.status ? fixRes.data?.count || 0 : 0;
   } else {
     this.loadingClosedFix = false;
     this.closedFixVulnerabilities = [];
@@ -1403,24 +1471,26 @@ if (res.status) {
     this.selectedSupportRequest = req;
   },
   viewFixDetail(item) {
-    const reportId = this.authStore.latestReportId;
-    if (!reportId) {
-      console.error("No report ID available");
-      return;
+  const reportId = this.authStore.latestReportId;
+  if (!reportId) {
+    console.error("No report ID available");
+    return;
+  }
+
+  this.$router.push({
+    name: 'VulFix',
+    params: {
+      reportId: reportId,
+      asset: item.asset,
+    },
+    query: {
+      id: item.id,
+      plugin_name: item.vulnerability_name,
+      risk_factor: item.severity,
+      status: item.status   // 🔥 ADD THIS
     }
-    this.$router.push({
-      name: 'VulFix',
-      params: {
-        reportId: reportId,
-        asset: item.asset,
-      },
-      query: {
-        id: item.id,
-        plugin_name: item.vulnerability_name,
-        risk_factor: item.severity
-      }
-    });
-  },
+  });
+},
   },
   mounted() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -1456,8 +1526,8 @@ if (res.status) {
     console.log("🔥 AssetsView mounted");
     this.authStore.fetchAssets();
 
-    // Ensure latestReportId is available for closed vulnerabilities API
-    if (!this.authStore.latestReportId) {
+    // Ensure latestReportId and vulnerabilityRows are available
+    if (!this.authStore.latestReportId || !this.authStore.vulnerabilityRows.length) {
       this.authStore.fetchVulnerabilityRegister();
     }
 
