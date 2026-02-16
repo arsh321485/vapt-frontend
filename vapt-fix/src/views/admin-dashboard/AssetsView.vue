@@ -562,7 +562,7 @@
 
       <!-- name -->
       <p class="mb-0 fw-semibold" style="font-size:15px;">
-        {{ item.plugin_name }}
+        {{ item.vulnerability_name }}
       </p>
     </div>
 
@@ -572,8 +572,8 @@
 <span
   class="badge d-flex align-items-center gap-1"
   :style="{
-    background: getSeverityBg(item.risk_factor),
-    color: getSeverityColor(item.risk_factor),
+    background: getSeverityBg(item.severity),
+    color: getSeverityColor(item.severity),
     fontSize: '12px'
   }"
 >
@@ -582,10 +582,10 @@
     :style="{
       width: '6px',
       height: '6px',
-      backgroundColor: getSeverityColor(item.risk_factor)
+      backgroundColor: getSeverityColor(item.severity)
     }"
   ></span>
-  {{ item.risk_factor }}
+  {{ item.severity }}
 </span>
 
 
@@ -717,9 +717,7 @@
                       </div>
 
                       
-                      <!-- <div v-if="!supportRequestsByHost.length" class="text-muted py-3">
-  No support requests raised for this asset.
-</div> -->
+        
 
                     </div>
 
@@ -1146,13 +1144,17 @@ if (res.status) {
   // 🔥 NEW: closed fix vulnerabilities
   this.loadingClosedFix = true;
 
-  const fixRes =
-    await this.authStore.getClosedFixVulnerabilitiesByHost(asset.asset);
-
-  this.loadingClosedFix = false;
-
-  this.closedFixVulnerabilities = fixRes.status ? fixRes.data : [];
-  this.closedFixCount = fixRes.status ? fixRes.count : 0;
+  const reportId = this.authStore.latestReportId;
+  if (reportId) {
+    const fixRes = await this.authStore.getClosedVulnerabilities(reportId, asset.asset);
+    this.loadingClosedFix = false;
+    this.closedFixVulnerabilities = fixRes.status && fixRes.data?.results ? fixRes.data.results : [];
+    this.closedFixCount = fixRes.status ? fixRes.data?.count || 0 : 0;
+  } else {
+    this.loadingClosedFix = false;
+    this.closedFixVulnerabilities = [];
+    this.closedFixCount = 0;
+  }
     },
     toggleHoldMode() {
       // Prevent if delete is already active
@@ -1400,21 +1402,24 @@ if (res.status) {
     openSupportRequestModal(req) {
     this.selectedSupportRequest = req;
   },
-  async viewFixDetail(item) {
-    // payload is optional here, send empty object
-    const res = await this.authStore.createFixVulnerability(
-     
-      item.host_name,
-      {}
-    );
-
-    if (res.status) {
-      this.$router.push(
-        `/vulnerabilitycard/${item.host_name}`
-      );
-    } else {
-      console.error("Fix vulnerability create failed:", res.message);
+  viewFixDetail(item) {
+    const reportId = this.authStore.latestReportId;
+    if (!reportId) {
+      console.error("No report ID available");
+      return;
     }
+    this.$router.push({
+      name: 'VulFix',
+      params: {
+        reportId: reportId,
+        asset: item.asset,
+      },
+      query: {
+        id: item.id,
+        plugin_name: item.vulnerability_name,
+        risk_factor: item.severity
+      }
+    });
   },
   },
   mounted() {
@@ -1450,6 +1455,11 @@ if (res.status) {
 
     console.log("🔥 AssetsView mounted");
     this.authStore.fetchAssets();
+
+    // Ensure latestReportId is available for closed vulnerabilities API
+    if (!this.authStore.latestReportId) {
+      this.authStore.fetchVulnerabilityRegister();
+    }
 
     // Only call loadHeldAssets if fetchHeldAssets method exists in store
     if (typeof this.authStore.fetchHeldAssets === 'function') {

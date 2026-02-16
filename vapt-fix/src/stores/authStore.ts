@@ -1204,10 +1204,11 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // GET Fix Vulnerability Card by report + asset
-  async getFixVulnerabilityByAsset(reportId: string, asset: string) {
+  async getFixVulnerabilityByAsset(reportId: string, asset: string, id?: string) {
     try {
       const res = await endpoint.get(
-        `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`
+        `/api/admin/adminregister/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
+        { params: id ? { id } : {} }
       );
 
       return {
@@ -1220,6 +1221,29 @@ export const useAuthStore = defineStore("auth", {
       return {
         status: false,
         message: err.response?.data?.message || "Failed to fetch fix vulnerability",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Get fix vulnerability card details by ID
+  // Get complete fix vulnerability details (card view)
+  async getFixVulnerabilityCard(fixVulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/detail/`
+      );
+
+      return {
+        status: true,
+        data: res.data.data
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch fix vulnerability detail",
         details: err.response?.data || null
       };
     }
@@ -1799,6 +1823,27 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // Get support requests by host for assets page
+  // async getSupportRequestsByHost(host: string) {
+  //   try {
+  //     const res = await endpoint.get(
+  //       `/api/admin/adminasset/support-requests/host/${host}/`
+  //     );
+
+  //     return {
+  //       status: true,
+  //       data: res.data.results || [],
+  //       count: res.data.count || 0
+  //     };
+  //   } catch (error: any) {
+  //     return {
+  //       status: false,
+  //       data: [],
+  //       count: 0
+  //     };
+  //   }
+  // },
+
   // Get closed fix vulnerabilities by host
   // async getClosedFixVulnerabilitiesByHost(host: string) {
   //   try {
@@ -2001,6 +2046,88 @@ export const useAuthStore = defineStore("auth", {
         message:
           error.response?.data?.message ||
           "Failed to check report status",
+      };
+    }
+  },
+
+  // Get all closed vulnerabilities for a report + asset
+  async getClosedVulnerabilities(reportId: string, asset: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/closed-vulnerabilities/report/${reportId}/asset/${asset}/`
+      );
+
+      return {
+        status: true,
+        data: res.data
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch closed vulnerabilities",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Get dashboard vulnerabilities fixed summary
+  async getDashboardVulnerabilitiesFixed() {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/admindashboard/dashboard/vulnerabilities-fixed/`
+      );
+      return {
+        status: true,
+        data: res.data
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch vulnerabilities fixed",
+      };
+    }
+  },
+
+  // Get dashboard support requests summary
+  async getDashboardSupportRequests() {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/admindashboard/dashboard/support-requests/`
+      );
+      return {
+        status: true,
+        data: res.data
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch support requests",
+      };
+    }
+  },
+
+  // Get vulnerabilities for a specific host, grouped by risk factor
+  async getHostVulnerabilities(hostName: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/register/host/${hostName}/vulns/`
+      );
+
+      return {
+        status: true,
+        data: res.data
+      };
+
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch host vulnerabilities",
+        details: err.response?.data || null
       };
     }
   },

@@ -295,26 +295,26 @@
                     <p class="assets-para">Total Vulnerabilities Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-5 ps-3">
-                    <h1 class="text-78">00</h1>
+                    <h1 class="text-78">{{ String(vulFixedTotal).padStart(2, '0') }}</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">0</div>
+                        <div class="fs-5 fw-semibold">{{ vulFixedCritical }}</div>
                         <div class="bar maroon vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: maroon;">● Critical<br> fixed</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">0</div>
+                        <div class="fs-5 fw-semibold">{{ vulFixedHigh }}</div>
                         <div class="bar red vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: red;">● High <br> fixed</small>
                       </div>
-                      
+
                       <div class="text-center">
-                        <div id="mediumAge" class="fs-5 fw-semibold">0</div>
+                        <div class="fs-5 fw-semibold">{{ vulFixedMedium }}</div>
                         <div class="bar yellow vul-bar mt-1"></div>
                         <small class="text-warning mt-1 d-block">● Medium<br> fixed</small>
                       </div>
                       <div class="text-center">
-                        <div id="lowAge" class="fs-5 fw-semibold">0</div>
+                        <div class="fs-5 fw-semibold">{{ vulFixedLow }}</div>
                         <div class="bar green vul-bar mt-1"></div>
                         <small class="text-success mt-1 d-block">● Low<br> fixed</small>
                       </div>
@@ -343,18 +343,18 @@
                     <p class="assets-para">Support Requests<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row gap-5 py-3">
-                    <h1 class="text-78">00</h1>
+                    <h1 class="text-78">{{ String(supportTotal).padStart(2, '0') }}</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">0</div>
+                        <div class="fs-5 fw-semibold">{{ supportPending }}</div>
                         <div class="bar dark-yellow vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: yellow;">● Pending</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">0</div>
+                        <div class="fs-5 fw-semibold">{{ supportClosed }}</div>
                         <div class="bar light-green vul-bar mt-1" style="color: blue;"></div>
                         <small class="mt-1 d-block" style="color: rgb(71, 199, 71);">● Closed</small>
-                      </div> 
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -624,6 +624,14 @@ export default {
       reportStatusMessage: "",
       reportStatusInterval: null,
       currentReportId: null,
+      supportTotal: 0,
+      supportPending: 0,
+      supportClosed: 0,
+      vulFixedTotal: 0,
+      vulFixedCritical: 0,
+      vulFixedHigh: 0,
+      vulFixedMedium: 0,
+      vulFixedLow: 0,
     };
   },
   computed: {
@@ -1118,6 +1126,22 @@ mounted() {
     this.authStore.fetchDashboardVulnerabilities(),
     this.authStore.fetchDashboardMitigationTimeline(),
     this.authStore.fetchDashboardMeanTimeToRemediate(),
+    this.authStore.getDashboardVulnerabilitiesFixed().then(res => {
+      if (res.status) {
+        this.vulFixedTotal = res.data.total_fixed || 0;
+        this.vulFixedCritical = res.data.critical_fixed || 0;
+        this.vulFixedHigh = res.data.high_fixed || 0;
+        this.vulFixedMedium = res.data.medium_fixed || 0;
+        this.vulFixedLow = res.data.low_fixed || 0;
+      }
+    }),
+    this.authStore.getDashboardSupportRequests().then(res => {
+      if (res.status) {
+        this.supportTotal = res.data.total || 0;
+        this.supportPending = res.data.pending || 0;
+        this.supportClosed = res.data.closed || 0;
+      }
+    }),
   ])
     .then(() => {
       console.log("✅ All dashboard APIs loaded");
