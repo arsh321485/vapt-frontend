@@ -594,9 +594,15 @@
       </div>
 
       <!-- name -->
-      <p class="mb-0 fw-semibold" style="font-size:15px;">
+       <p
+  class="mb-0 fw-semibold vul-name"
+  :title="item.vulnerability_name"
+>
+  {{ item.vulnerability_name }}
+</p>
+      <!-- <p class="mb-0 fw-semibold" style="font-size:15px;">
         {{ item.vulnerability_name }}
-      </p>
+      </p> -->
     </div>
 
     <!-- RIGHT -->
@@ -1540,6 +1546,14 @@ if (res.status) {
 </script>
 
 <style scoped>
+.vul-name {
+  font-size: 15px;
+  max-width: 260px;     /* adjust based on layout */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
 .asset-list-wrapper {
   display: flex;
   flex-direction: column;
