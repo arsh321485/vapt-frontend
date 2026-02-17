@@ -1003,7 +1003,7 @@ export default {
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
-            <small style="color: #9ca3af; font-size: 13px; display: block; margin-top: 16px;">Checking every 5 seconds...</small>
+            
           </div>
         </div>
         <style>

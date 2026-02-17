@@ -40,7 +40,7 @@
                                     />
                                     <label class="ps-1 mt-4 mb-2">Subject</label>
                                     <input
-                                      v-model="subject" :readonly="ticketData"
+                                      v-model="subject" :readonly="!!ticketData"
                                       type="text"
                                       class="form-control py-2"
                                       placeholder="Write a subject..."
@@ -48,7 +48,7 @@
                                     />
                                     <label class="ps-1 mt-4 mb-2">Description</label>
                                     <textarea
-                                      v-model="description" :readonly="ticketData"
+                                      v-model="description" :readonly="!!ticketData"
                                       class="form-control py-2"
                                       rows="7"
                                       :placeholder="descriptionPlaceholder"
@@ -118,41 +118,18 @@ export default {
       loading: false,
     };
   },
-
   watch: {
-  '$route.params.ticketId': {
-    handler(newTicketId) {
-      if (!newTicketId) return;
-
-      console.log("Route ticketId changed:", newTicketId);
-
-      // Re-read all route params (component is reused, created() won't fire again)
-      this.reportId = this.$route.params.reportId || "";
-      this.fixVulnerabilityId = this.$route.params.fixVulId || "";
-      this.ticketId = newTicketId;
-
-      this.fetchTicket();
+  '$route': {
+    handler() {
+      this.loadPage();
     }
   }
 },
 
- created() {
-  const { reportId, fixVulId, asset, ticketId } = this.$route.params;
-
-  this.reportId = reportId || "";
-  this.fixVulnerabilityId = fixVulId || "";
-  this.ticketId = ticketId || "";
-  this.selectedAsset = asset ? decodeURIComponent(asset) : "";
-
-  if (this.ticketId) {
-    // ticketId in URL → fetch that ticket directly
-    this.fetchTicket();
-  } else if (this.reportId && this.fixVulnerabilityId) {
-    // no ticketId in URL → check if a ticket already exists for this fixVulnerabilityId
-    this.checkExistingTicket();
-  }
+mounted() {
+  console.log("CreateTicket component mounted");
+  this.loadPage();
 },
-
   computed: {
     descriptionPlaceholder() {
       if (this.selectedCategory === "fix") {
@@ -162,23 +139,80 @@ export default {
     },
   },
   methods: {
-   async checkExistingTicket() {
-    const authStore = useAuthStore();
-    const res = await authStore.getTicketsByReport(this.reportId);
+    loadPage() {
+      const route = this.$route;
 
-    if (res.status && res.data?.length > 0) {
-      const existingTicket = res.data.find(
-        t => t.fix_vulnerability_id === this.fixVulnerabilityId ||
-             t.fix_vulnerability === this.fixVulnerabilityId
-      );
+      this.reportId = route.params.reportId || "";
+      this.fixVulnerabilityId = route.params.fixVulId || "";
+      this.ticketId = route.params.ticketId || "";
+      this.selectedAsset = route.params.asset
+        ? decodeURIComponent(route.params.asset)
+        : "";
 
-      if (existingTicket) {
-        this.ticketId = existingTicket._id || existingTicket.id;
-        console.log("Found existing ticket:", this.ticketId);
+      console.log("loadPage called");
+      console.log("reportId:", this.reportId);
+      console.log("fixVulnerabilityId:", this.fixVulnerabilityId);
+      console.log("ticketId:", this.ticketId);
+      console.log("asset:", this.selectedAsset);
+
+      if (this.ticketId && this.fixVulnerabilityId) {
+        // ticketId in URL → fetch ticket via GET API
         this.fetchTicket();
+      } else if (this.reportId && this.fixVulnerabilityId) {
+        // No ticketId → check if ticket already exists via CREATE API
+        this.ticketData = null;
+        this.selectedCategory = "";
+        this.subject = "";
+        this.description = "";
+        this.checkExistingTicket();
+      } else {
+        // No params — empty form
+        this.ticketData = null;
+        this.selectedCategory = "";
+        this.subject = "";
+        this.description = "";
       }
-    }
-   },
+    },
+
+    async checkExistingTicket() {
+      const authStore = useAuthStore();
+
+      console.log("=== checkExistingTicket ===");
+      console.log("reportId:", this.reportId);
+      console.log("fixVulnerabilityId:", this.fixVulnerabilityId);
+      console.log("asset:", this.selectedAsset);
+
+      const res = await authStore.getOpenTickets(this.reportId);
+
+      if (res.status && res.data?.length) {
+        // 1) Try exact match by fix_vulnerability_id
+        let existingTicket = res.data.find(
+          t => t.fix_vulnerability_id === this.fixVulnerabilityId
+        );
+
+        // 2) Fallback: match by host_name (same asset/IP)
+        if (!existingTicket && this.selectedAsset) {
+          existingTicket = res.data.find(
+            t => t.host_name === this.selectedAsset
+          );
+          if (existingTicket) {
+            console.log("Matched ticket by host_name fallback:", existingTicket._id);
+          }
+        }
+
+        if (existingTicket) {
+          console.log("Ticket found:", existingTicket._id);
+          this.ticketId = existingTicket._id || existingTicket.id;
+          // Use the ticket's own fix_vulnerability_id for GET API
+          this.fixVulnerabilityId = existingTicket.fix_vulnerability_id;
+          this.fetchTicket();
+          return;
+        }
+      }
+
+      console.log("No existing ticket, showing empty form");
+      this.ticketData = null;
+    },
 
    async fetchTicket() {
 
@@ -206,7 +240,6 @@ export default {
     console.log("Ticket loaded:", res.data);
 
     this.ticketData = res.data;
-
     // fill form
     this.selectedCategory = res.data.category;
     this.selectedAsset = res.data.host_name;

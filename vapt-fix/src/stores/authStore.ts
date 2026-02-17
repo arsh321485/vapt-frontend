@@ -1564,20 +1564,26 @@ export const useAuthStore = defineStore("auth", {
   // Get all tickets by report id
   async getTicketsByReport(reportId: string) {
     try {
-      console.log("🔥 Fetching tickets for report:", reportId);
+      console.log("Fetching tickets for report:", reportId);
 
       const res = await endpoint.get(
         `/api/admin/adminregister/tickets/report/${reportId}/`
       );
 
+      const tickets = res?.data?.results
+        || (Array.isArray(res?.data?.data) ? res.data.data : null)
+        || (Array.isArray(res?.data) ? res.data : []);
+
+      console.log("Tickets fetched:", tickets.length);
+
       return {
         status: true,
-        data: res?.data?.results || [],
-        count: res?.data?.count || 0
+        data: tickets,
+        count: res?.data?.count || tickets.length
       };
 
     } catch (error) {
-      console.error("❌ Tickets API error:", error);
+      console.error("Tickets API error:", error);
       return {
         status: false,
         data: [],
@@ -1632,51 +1638,6 @@ export const useAuthStore = defineStore("auth", {
       return { status: false, error: error.response?.data || error.message };
     }
   },
-
-  // search assets (UPDATED for new API)
-  // async searchAssets(reportId: string, q: string) {
-  //   try {
-  //     console.log("[authStore] searchAssets ->", { reportId, q });
-
-  //     const res = await endpoint.get(
-  //       `/api/admin/adminasset/report/${reportId}/assets/`,
-  //       {
-  //         params: { q }
-  //       }
-  //     );
-
-  //     const assets = res.data.assets || [];
-
-  //     // normalize same as fetchAssets
-  //     const normalized = assets.map((a: any) => ({
-  //       ...a,
-  //       selected: false,
-  //       held: false,
-  //       isInternal: (a.exposure || "").toLowerCase() === "internal",
-  //       host_information: a.host_information || {},
-  //       severity_counts: a.severity_counts || {
-  //         critical: 0,
-  //         high: 0,
-  //         medium: 0,
-  //         low: 0
-  //       }
-  //     }));
-
-  //     this.assetSearchResults = normalized;
-  //     this.assetSearchCount =
-  //       res.data.total_assets ?? normalized.length;
-
-  //     console.log("[authStore] searchAssets results:", normalized);
-
-  //     return { status: true, data: normalized };
-  //   } catch (error: any) {
-  //     console.error(
-  //       "[authStore] searchAssets error:",
-  //       error.response?.data || error.message
-  //     );
-  //     return { status: false, error: error.response?.data || error.message };
-  //   }
-  // },
 
   // DELETE Asset from report (UPDATED)
   async deleteAsset(assetIp: string) {
