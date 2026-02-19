@@ -162,11 +162,9 @@ import asanaIcon from "@/assets/images/asana.png";
 
 export default {
   name: "LocationView",
-
   components: {
     Stepper
   },
-
   data() {
     return {
       authStore: useAuthStore(),
@@ -347,9 +345,6 @@ export default {
         });
       }
     },
-   
-    
-   
     getInitials(name) {
       if (!name) return "";
       return name.substring(0, 2).toUpperCase();
@@ -520,7 +515,8 @@ export default {
 
     if (res.status && res.data.auth_url) {
       // ✅ Open Microsoft OAuth in NEW TAB
-      window.open(res.data.auth_url, "_blank");
+      // window.open(res.data.auth_url, "_blank");
+      window.location.href = res.data.auth_url;
     } else {
       Swal.fire("Error", "Failed to start Microsoft login", "error");
     }
@@ -629,14 +625,18 @@ export default {
       }
     },
   },
-
   mounted() {
     window.addEventListener("message", this.onTeamsConnected);
 
-  const teamsToken = localStorage.getItem("teams_access_token");
-  if (teamsToken) {
-    this.fetchTeams();
-  }
+    const graphToken = localStorage.getItem("microsoft_graph_token");
+    if (graphToken) {
+      this.fetchTeams();
+    }
+
+  // const teamsToken = localStorage.getItem("teams_access_token");
+  // if (teamsToken) {
+  //   this.fetchTeams();
+  // }
 
     window.addEventListener("message", this.onSlackConnected);
 
@@ -659,21 +659,14 @@ export default {
     document.addEventListener("click", this.closeOnOutside);
     console.log("Route query:", this.$route.query);
     this.initChipSelection();
-
-   
-
-    // fetch locations for avatars
     const user =
       this.authStore.user ||
       JSON.parse(localStorage.getItem("user") || "null");
-
     if (user) {
       this.authStore.user = user;
       const adminId = user._id || user.id;
-     
     }
   },
-
   beforeUnmount() {
     document.removeEventListener("click", this.closeOnOutside);
     window.removeEventListener("message", this.onSlackConnected);

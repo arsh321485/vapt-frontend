@@ -46,6 +46,7 @@ import JiraCallbackView from '../views/admin-views/JiraCallbackView.vue'
 import SlackCallbackView from '../views/admin-views/SlackCallbackView.vue'
 import ReportView from '../views/admin-dashboard/ReportView.vue'
 import ScopeView from '../views/admin-dashboard/ScopeView.vue'
+import MicrosoftCallbackView from '../views/admin-views/MicrosoftCallbackView.vue'
 
 
 const router = createRouter({
@@ -86,6 +87,11 @@ const router = createRouter({
       path: '/location',
       name: 'location',
       component: LocationView,
+    },
+    {
+      path: "/microsoft/callback",
+      name: "MicrosoftCallback",
+      component: MicrosoftCallbackView
     },
     {
       path: '/riskcriteria',

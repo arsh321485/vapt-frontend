@@ -526,40 +526,57 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  async microsoftLogin(authCode: string, state: string) {
+  //Microsoft Teams
+  async getMicrosoftOAuthUrl(redirectUri: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(
+          redirectUri
+        )}`
+      );
+
+      if (res.data?.auth_url) {
+        return { status: true, data: res.data };
+      }
+
+      return { status: false, message: "Auth URL not received" };
+    } catch (error) {
+      console.error("Microsoft OAuth API error:", error);
+      return { status: false, message: "API failed" };
+    }
+  },
+  async microsoftLogin(accessToken: string) {
+    try {
       const response = await endpoint.post(
         "/api/admin/users/microsoft-teams-oauth/",
         {
-          code: authCode,
-          state,
+          access_token: accessToken,
         }
       );
 
       const data = response.data;
 
       if (data?.tokens && data?.user) {
+        // save JWT tokens (your app auth)
         localStorage.setItem("teams_access_token", data.tokens.access);
         localStorage.setItem("teams_refresh_token", data.tokens.refresh);
+
+        // Microsoft user
         localStorage.setItem("teams_user", JSON.stringify(data.user));
+
+        // Microsoft graph token
+        localStorage.setItem("microsoft_graph_token", data.access_token);
+
         localStorage.setItem("teams_connected", "true");
 
         return { status: true, data };
       }
 
       return { status: false };
-  },
-  async getMicrosoftOAuthUrl(redirectUri: string) {
-  const res = await endpoint.get(
-    `/api/admin/users/microsoft-teams/oauth-url/?redirect_uri=${encodeURIComponent(
-      redirectUri
-    )}`
-  );
-
-  if (res.data?.auth_url) {
-    return { status: true, data: res.data };
-  }
-
-  return { status: false };
+    } catch (error) {
+      console.error("Microsoft login API error:", error);
+      return { status: false };
+    }
   },
 
   async getSlackOAuthUrl(baseUrl: string) {
@@ -577,7 +594,6 @@ export const useAuthStore = defineStore("auth", {
       }
       return { status: false };
   },
-
   // 🔑 Slack Login (THIS SAVES BOT TOKEN)
   async loginWithSlack(code: string, redirectUri: string) {
       console.log("=== loginWithSlack called ===");
@@ -623,7 +639,6 @@ export const useAuthStore = defineStore("auth", {
         };
       }
   },
-
   // 📢 List Slack Channels
   async listSlackChannels() {
     try {
@@ -643,7 +658,6 @@ export const useAuthStore = defineStore("auth", {
       };
     }
   },
-
   // 📢 Create Slack Channel
   async createSlackChannel(name: string, isPrivate: boolean = false) {
     try {
@@ -694,7 +708,6 @@ export const useAuthStore = defineStore("auth", {
       };
     }
   },
-
   // 🧠 Jira OAuth - Handle Callback (exchange code for token)
   async handleJiraCallback(code: string, state: string) {
     try {
@@ -721,7 +734,6 @@ export const useAuthStore = defineStore("auth", {
       };
     }
   },
-
   // 🧠 Jira - Get Accessible Resources (Cloud IDs)
   async getJiraResources() {
     try {
