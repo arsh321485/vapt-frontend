@@ -68,7 +68,7 @@
 
          <!-- SUPPORT REQUESTS - Restricted during testing -->
          <div>
-          <button class="btn border-0" :class="{ activeBtn: isActive('/exceptions') }" @click="navigateTo('/exceptions')">
+          <button class="btn border-0" :class="{ activeBtn: isActive('/supportrequests') }" @click="navigateTo('/supportrequests')">
           <i class="bi bi-exclamation-circle nav-menu"></i>
           <p class="menu-heading">Support Requests</p></button>
         </div>

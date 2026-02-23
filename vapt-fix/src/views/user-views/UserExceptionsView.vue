@@ -16,14 +16,7 @@
                                 <h2 class="ticket-head">Support Requests</h2>
                             </div>
                             <div class="d-flex flex-row">
-                                <div class="dropdown">
-                                <div class="dropdown-btn"> Select location</div>
-                                <div class="dropdown-content">
-                                <a href="#">Greece</a>
-                                <a href="#">Germany</a>
-                                <a href="#">Bahrain</a>
-                                </div>
-                                </div>
+                                
                                 <NotificationPanel />
                             </div>
                         </div>
@@ -33,7 +26,7 @@
                                 <button class="btn rounded-pill border px-4" style="background-color: rgba(230, 227, 255, 1);color: rgba(49, 33, 177, 1);">All</button>
                                 
                                 <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-arrow-down-up me-1"></i>Sort by</button>
-                                <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button>
+                                <!-- <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);"><i class="bi bi-funnel me-1"></i>Filter</button> -->
                                 
                             </div>
                         </div>
@@ -41,9 +34,10 @@
                         <div class="row mt-4">
                             <!-- <h6 class="fw-semibold mb-3">Requested earlier this week</h6> -->
                             <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
+                                <table class="table align-middle table-hover">
+                                    <thead class="table-light">
                                         <tr>
+                                            <th>S.NO.</th>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
                                             <th scope="col">Description</th>
@@ -53,6 +47,7 @@
                                     </thead>
                                     <tbody class="raised-tbody">
                                         <tr>
+                                            <td>1</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -65,6 +60,7 @@
                                             </router-link></td>
                                         </tr>
                                         <tr>
+                                            <td>2</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -77,6 +73,7 @@
 
                                         </tr>
                                         <tr>
+                                            <td>3</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -88,6 +85,7 @@
                                             </router-link></td>
                                         </tr>
                                         <tr>
+                                            <td>4</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -99,6 +97,7 @@
                                             </router-link></td>
                                         </tr>
                                         <tr>
+                                            <td>5</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -110,6 +109,7 @@
                                             </router-link></td>
                                         </tr>
                                         <tr>
+                                            <td>6</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>

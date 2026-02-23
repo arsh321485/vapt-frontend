@@ -19,14 +19,7 @@
                                 <h2 class="ticket-head mt-3">Pending mitigations</h2>
                             </div>
                             <div class="d-flex flex-row mt-2">
-                              <div class="dropdown">
-                            <div class="dropdown-btn"> Select location</div>
-                            <div class="dropdown-content">
-                              <a href="#">Greece</a>
-                              <a href="#">Germany</a>
-                              <a href="#">Bahrain</a>
-                            </div>
-                            </div>
+                             
                             <NotificationPanel />
                             </div>
                         </div>
@@ -47,9 +40,10 @@
                         </div>
                         <div class="row mt-5">
                             <div class="table-responsive">
-                                <table class="table align-middle table-borderless">
-                                    <thead class="raised-table">
+                                <table class="table align-middle table-hover">
+                                    <thead class="table-light">
                                         <tr>
+                                          <th>S.NO.</th>
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Assets</th>
                                             <th scope="col">OS</th>
@@ -62,6 +56,7 @@
                                     </thead>
                                     <tbody class="raised-tbody">
                                         <tr>
+                                          <td>1</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -133,6 +128,7 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                          <td>2</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -150,6 +146,7 @@
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
+                                          <td>3</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -167,6 +164,7 @@
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
+                                          <td>4</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -184,6 +182,7 @@
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
+                                          <td>5</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -201,6 +200,7 @@
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
+                                          <td>6</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
@@ -218,6 +218,7 @@
                                             <td><button class="btn fw-semibold" style="color: rgba(49, 33, 177, 1);">Fix Now <i class="bi bi-arrow-right-circle-fill ms-2"></i></button></td>
                                         </tr>
                                         <tr>
+                                          <td>7</td>
                                             <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
                                                 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>

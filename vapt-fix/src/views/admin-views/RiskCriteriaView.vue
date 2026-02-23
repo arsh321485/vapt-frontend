@@ -20,13 +20,7 @@
               <div class="risk-header">
                 <span class="dot critical-bg"></span>
                 Critical<span class="text-danger">*</span>
-                <!-- <span class="info-tooltip">
-                  <span class="info-icon">i</span>
-                  <span class="tooltip-text">
-                    Please choose the remediation timeframe corresponding to the assigned
-                    Critical according to best practices (2 or 5 days).
-                  </span>
-                </span> -->
+               
               </div>
               
               <select class="form-select" v-model="form.critical" :disabled="isLocked">
@@ -39,12 +33,7 @@
               <div class="risk-header">
                 <span class="dot high-bg"></span>
                 High<span class="text-danger">*</span>
-                <!-- <span class="info-tooltip">
-                  <span class="info-icon">i</span>
-                  <span class="tooltip-text">
-                    High-risk vulnerabilities should be remediated within defined SLA timelines.
-                  </span>
-                </span> -->
+                
               </div>
              
 
@@ -62,12 +51,7 @@
               <div class="risk-header">
                 <span class="dot medium-bg"></span>
                 Medium<span class="text-danger">*</span>
-                <!-- <span class="info-tooltip">
-                  <span class="info-icon">i</span>
-                  <span class="tooltip-text">
-                    Medium vulnerabilities have moderate impact and flexible remediation windows.
-                  </span>
-                </span> -->
+                
               </div>
              
 
@@ -84,12 +68,7 @@
               <div class="risk-header">
                 <span class="dot low-bg"></span>
                 Low<span class="text-danger">*</span>
-                <!-- <span class="info-tooltip">
-                  <span class="info-icon">i</span>
-                  <span class="tooltip-text">
-                    Low-risk vulnerabilities can be remediated during routine maintenance cycles.
-                  </span>
-                </span> -->
+               
               </div>
               
               <select class="form-select" v-model="form.low" :disabled="isLocked">
@@ -102,6 +81,7 @@
             </div>
           </div>
 
+          <!-- security level -->
           <div class="risk-card security-card area-security security-card-bg">
             <div class="security-header-wrapper">
               <i class="bi bi-shield-check security-icon"></i>
@@ -156,14 +136,7 @@
 
             </div>
           </div>
-
-
         </div>
-
-        <!-- <div class="cta">
-          <router-link to="/uploadreport" class="btn btn-primary text-decoration-none">Continue to Vulnerability Report
-            →</router-link>
-        </div> -->
 
         <div class="cta">
           <button class="btn btn-primary" :disabled="loading" @click="submitRiskCriteria">
@@ -171,14 +144,11 @@
           </button>
         </div>
 
-
       </div>
 
     </div>
   </main>
 </template>
-
-
 
 <script>
 import Stepper from '@/components/admin-component/Stepper.vue';
@@ -190,24 +160,20 @@ export default {
   components: { Stepper },
 
   data() {
-
     return {
-
-      
-    timeOptions: [
-  "1 Day",
-  "2 Days",
-  "3 Days",
-  "4 Days",
-  "5 Days",
-  "6 Days",
-  "1 Week",
-  "2 Weeks",
-  "3 Weeks",
-  "4 Weeks",
-  "5 Weeks",
-],
-
+      timeOptions: [
+        "1 Day",
+        "2 Days",
+        "3 Days",
+        "4 Days",
+        "5 Days",
+        "6 Days",
+        "1 Week",
+        "2 Weeks",
+        "3 Weeks",
+        "4 Weeks",
+        "5 Weeks",
+      ],
       form: {
         critical: "",
         high: "",
@@ -217,10 +183,12 @@ export default {
       loading: false,
       isLocked: false,
     };
-
-    
   },
-
+  computed: {
+    isEditMode() {
+      return !!this.$route.query.returnTo;
+    }
+  },
   methods: {
     convertToDays(value) {
       if (!value) return 0;
@@ -229,9 +197,8 @@ export default {
       const num = parseInt(match[1]);
       return value.includes("Week") ? num * 7 : num;
     },
-
-    // 🔽 ADD THIS METHOD HERE
     isOptionDisabled(selectedValue, optionValue) {
+      if (this.isEditMode) return false;
       if (!selectedValue) return false;
       return this.convertToDays(optionValue) < this.convertToDays(selectedValue);
     },
@@ -256,46 +223,65 @@ export default {
       }
       return true;
     },
-
     async submitRiskCriteria() {
-      const auth = useAuthStore();
+  const auth = useAuthStore();
 
-      if (this.isLocked) {
-        // Data already exists, mark step as completed and proceed
-        auth.markStepCompleted(2);
-        this.$router.push("/uploadtarget");
-        return;
+  // normal locked flow
+  if (this.isLocked && !this.isEditMode) {
+    auth.markStepCompleted(2);
+    this.$router.push("/uploadtarget");
+    return;
+  }
+
+  if (!this.validateRiskCriteria()) return;
+
+  try {
+    this.loading = true;
+
+    // 🔥 EDIT MODE FLOW
+    if (this.isEditMode) {
+
+      const res = await auth.updateRiskCriteria(this.form); // PUT API
+
+      if (res.status) {
+        await Swal.fire({
+          icon: "success",
+          title: "Updated!",
+          text: res.message,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+
+        // redirect back
+        this.$router.push(this.$route.query.returnTo || "/admindashboardonboarding");
       }
 
-      if (!this.validateRiskCriteria()) return;
+      return;
+    }
 
-      try {
-        this.loading = true;
+    // 🔥 NORMAL CREATE FLOW
+    const res = await auth.addRiskCriteria(this.form);
 
-        const res = await auth.addRiskCriteria(this.form);
+    if (res.status) {
+      auth.markStepCompleted(2);
 
-        if (res.status) {
-          // Mark step 2 as completed after successful save
-          auth.markStepCompleted(2);
+      await Swal.fire({
+        icon: "success",
+        title: "Saved!",
+        text: res.message,
+        timer: 1500,
+        showConfirmButton: false,
+      });
 
-          await Swal.fire({
-            icon: "success",
-            title: "Saved!",
-            text: res.message,
-            timer: 1800,
-            showConfirmButton: false,
-          });
-          this.$router.push("/uploadtarget");
-        } else {
-          Swal.fire("Error", res.message || "Failed to save risk criteria", "error");
-        }
-      } catch (err) {
-        Swal.fire("Error", "Something went wrong", "error");
-      } finally {
-        this.loading = false;
-      }
+      this.$router.push("/uploadtarget");
+    }
+
+  } catch (err) {
+    Swal.fire("Error", "Something went wrong", "error");
+  } finally {
+    this.loading = false;
+  }
     },
-
     async getRiskCriteria() {
       try {
         const auth = useAuthStore();
@@ -303,18 +289,23 @@ export default {
 
         if (res.status && res.data?.risk_criteria) {
           const d = res.data.risk_criteria;
+
           this.form.critical = d.critical;
           this.form.high = d.high;
           this.form.medium = d.medium;
           this.form.low = d.low;
-          this.isLocked = true;
+
+          // 🔥 store ids here
+          localStorage.setItem("riskId", d._id);
+          localStorage.setItem("adminId", d.admin_id);
+
+          this.isLocked = !this.isEditMode;
         }
       } catch (err) {
         console.error("Risk criteria fetch error", err);
       }
     },
   },
-
   mounted() {
     this.getRiskCriteria();
   },

@@ -154,11 +154,12 @@
                     </div>
 
                 <div class="dropdown">
-                          <div class="dropdown-btn"> Select location</div>
+                          <div class="dropdown-btn"> Select team</div>
                           <div class="dropdown-content">
-                              <a href="#">Greece</a>
-                              <a href="#">Germany</a>
-                              <a href="#">Bahrain</a>
+                              <a href="#">Patch Management</a>
+                              <a href="#">Configuration Management</a>
+                              <a href="#">Network Security</a>
+                              <a href="#">Architectural Flaws</a>
                           </div>
                 </div>
                 <NotificationPanel />
@@ -1125,16 +1126,17 @@ export default {
 .dropdown {
     position: relative;
     display: inline-block;
-    width: 200px;
+    width: 250px;
 }
 
 .dropdown-btn {
     background-color: white;
     border: 1px solid rgba(0, 0, 0, 0.16);
     border-radius: 50px;
-    padding: 8px 40px 8px 16px; /* extra right padding for the arrow */
+    padding: 8px 40px 8px 16px; 
     cursor: pointer;
     position: relative;
+    font-size: 14px;
 }
 
 .dropdown-btn::after {
@@ -1165,6 +1167,7 @@ export default {
     text-decoration: none;
     color: black;
     border-radius: 8px;
+    font-size: 15px;
 }
 
 .dropdown-content a:hover {

@@ -20,64 +20,11 @@
                       <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" :class="{ 'text-muted': activeAction !== '' && activeAction !== 'hold' }"  @click="toggleHoldMode" title="Hold mitigation"></i>
                     </div>
                   </div>
-                <div class="d-flex justify-content-between align-items-center ms-3">
-                    <div class="d-flex gap-2 my-3">
-                    <form>
-                      <select class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
-                        <option value="" selected disabled>Sort by</option>
-                        <option value="internal">Internal</option>
-                        <option value="external">External</option>
-                      </select>
-                    </form>
-                    <div class="filter-dropdown d-inline">
-                    <!-- Filter Button -->
-                    <button
-                      class="btn btn-sm py-2 px-3 filter-btn dropdown-toggle"
-                      style="border-radius: 20px; border-color: rgba(0, 0, 0, 0.12);"
-                      data-bs-toggle="dropdown"
-                    >
-                      <i class="bi bi-funnel me-1"></i>
-                      {{ filterLabel }}
-                    </button>
-
-                    <!-- Filter Options -->
-                    <div class="dropdown-menu p-3 filter-content" style="min-width: 250px;">
-                      <!-- Severity -->
-                      <div class="mb-3">
-                        <label class="form-label fw-bold">Severity</label>
-                        <select class="form-select" v-model="selectedSeverity">
-                          <option value="all">All</option>
-                          <option value="critical">Critical</option>
-                          <option value="high">High</option>
-                          <option value="medium">Medium</option>
-                          <option value="low">Low</option>
-                        </select>
-                      </div>
-                      <!-- IP Address -->
-                      <div class="mb-3">
-                        <label class="form-label fw-bold">IP Address</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          placeholder="Enter IP address"
-                          v-model="ipAddress"
-                          @input="formatIP"
-                          @keypress="validateIPInput"
-                        />
-                      </div>
-                      <!-- Apply Button -->
-                      <button class="btn btn-primary w-100 btn-sm" @click="applyFilters">
-                        Apply Filters
-                      </button>
-                    </div>
-                    </div> 
-                    </div>
-                    
-                </div>
-                <div class="mb-4 pe-3 ms-3">
+                
+                <div class="mb-4 pe-3 ms-3 mt-3">
                   <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" style="padding-top: 6px;padding-bottom: 6px;">
-                    <button class="btn btn-sm btn-secondary" type="submit">Search</button>
+                    <!-- <button class="btn btn-sm btn-secondary" type="submit">Search</button> -->
                   </form>
                 </div>
 
@@ -368,14 +315,7 @@
                         <div class="d-flex justify-content-between">
                           <p class="mt-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
                           <div class="d-flex justify-content-between">
-                            <div class="dropdown">
-                          <div class="dropdown-btn"> Select location</div>
-                          <div class="dropdown-content">
-                              <a href="#">Greece</a>
-                              <a href="#">Germany</a>
-                              <a href="#">Bahrain</a>
-                          </div>
-                            </div>
+                            
                           <NotificationPanel />
                           </div>
                         </div>

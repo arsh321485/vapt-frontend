@@ -17,14 +17,7 @@
                     <button class="my-4" style="color: rgba(49, 33, 177, 1);background-color: white;border: 0;"><i class="bi bi-arrow-left"></i> Back</button>
                     </router-link>
                     <div class="d-flex flex-row mt-3">
-                        <div class="dropdown">
-                      <div class="dropdown-btn"> Select location</div>
-                      <div class="dropdown-content">
-                          <a href="#">Greece</a>
-                          <a href="#">Germany</a>
-                          <a href="#">Bahrain</a>
-                      </div>
-                    </div>
+                        
                     <NotificationPanel />
                     </div>
                 </div>

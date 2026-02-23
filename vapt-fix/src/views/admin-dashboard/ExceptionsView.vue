@@ -26,8 +26,7 @@
 
             <div class="row mt-3">
               <div class="d-flex justify-content-start gap-3">
-                <!-- <button class="btn rounded-pill border px-4"
-                  style="background-color: rgba(230, 227, 255, 1);color: rgba(49, 33, 177, 1);">All</button> -->
+              
                 <button class="btn btn-sm py-1 px-2" style="border-radius: 20px;border-color: rgba(0, 0, 0, 0.12);" @click="toggleSort">
                   <i class="bi bi-arrow-down-up me-1"></i>Sort by Date
                   <i :class="sortOrder === 'desc' ? 'bi bi-arrow-down ms-1' : 'bi bi-arrow-up ms-1'"></i>
@@ -36,11 +35,7 @@
                     <div class="">
                     <form>
                       <select  v-model="selectedTeam" class="form-select" style="width: auto; border-radius: 20px; display: inline-block;">
-                        <!-- <option value="all">All</option>
-                        <option value="patch management">Patch Management</option>
-                        <option value="configuration management">Configuration Management</option>
-                        <option value="network management">Network Management</option>
-                        <option value="architectural management">Architectural Management</option> -->
+                        
                          <option value="all">All</option>
   <option value="Patch Management">Patch Management</option>
   <option value="Configuration Management">Configuration Management</option>
@@ -319,7 +314,7 @@ export default {
       ],
       showBox: false,
       selectedLocation: "greece",
-      sortOrder: 'desc' ,
+      sortOrder: 'asc' ,
       selectedTeam: "all",
     };
   },
@@ -365,6 +360,9 @@ export default {
 
   },
   methods: {
+    toggleSort() {
+  this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+},
     getShortDescription(desc) {
     if (!desc) return "";
 
@@ -449,48 +447,7 @@ export default {
   if (typeof this.authStore.fetchSupportRequests === 'function') {
     // future store sync if needed
   }
-},
-  // mounted() {
-  //   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  //   [...popoverTriggerList].map(el => {
-  //     if (typeof bootstrap !== "undefined" && bootstrap?.Popover) {
-  //       new bootstrap.Popover(el, {
-  //         container: "body",
-  //         html: true,
-  //         placement: "right",
-  //       });
-  //     }
-  //   });
-  //   const dropdown = document.querySelector(".dropdown");
-  //   if (!dropdown) {
-  //     return;
-  //   }
-
-  //   const btn = dropdown.querySelector(".dropdown-btn");
-  //   const options = dropdown.querySelectorAll(".dropdown-content a");
-
-  //   if (!btn) return;
-  //   btn.addEventListener("click", () => {
-  //     dropdown.classList.toggle("show");
-  //   });
-
-  //   options.forEach((option) => {
-  //     option.addEventListener("click", (e) => {
-  //       e.preventDefault();
-  //       btn.textContent = option.textContent; // update button text
-  //       dropdown.classList.remove("show"); // close dropdown
-  //     });
-  //   });
-
-  //   document.addEventListener("click", (e) => {
-  //     if (!dropdown.contains(e.target)) {
-  //       dropdown.classList.remove("show");
-  //     }
-  //   });
-
-  //   console.log("Support Requests View Mounted");
-  //   this.fetchSupportRequests();
-  // },
+  },
 };
 </script>
 

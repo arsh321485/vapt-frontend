@@ -515,8 +515,8 @@ export default {
 
     if (res.status && res.data.auth_url) {
       // ✅ Open Microsoft OAuth in NEW TAB
-      // window.open(res.data.auth_url, "_blank");
-      window.location.href = res.data.auth_url;
+       window.open(res.data.auth_url, "_blank");
+      // window.location.href = res.data.auth_url;
     } else {
       Swal.fire("Error", "Failed to start Microsoft login", "error");
     }

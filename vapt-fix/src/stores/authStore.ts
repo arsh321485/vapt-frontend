@@ -9,6 +9,13 @@ interface CreateUserPayload {
   Member_role: string;
 }
 
+interface RiskCriteriaPayload {
+  critical: string;
+  high: string;
+  medium: string;
+  low: string;
+}
+
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: localStorage.getItem("user")
@@ -524,6 +531,30 @@ export const useAuthStore = defineStore("auth", {
         isNotFound: is404,
       };
     }
+  },
+
+  // update Risk Criteria
+  async updateRiskCriteria(payload: RiskCriteriaPayload) {
+  try {
+    const riskId = localStorage.getItem("riskId");
+    const adminId = localStorage.getItem("adminId");
+
+    const res = await endpoint.put(
+      `/api/admin/risk_criteria/risks/${riskId}/update/`,
+      {
+        admin_id: adminId,
+        critical: payload.critical,
+        high: payload.high,
+        medium: payload.medium,
+        low: payload.low,
+      }
+    );
+
+    return { status: true, message: res.data.message, data: res.data };
+
+  } catch (err: any) {
+    return { status: false, message: err?.response?.data?.message };
+  }
   },
 
   //Microsoft Teams

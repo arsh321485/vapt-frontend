@@ -196,7 +196,7 @@ const router = createRouter({
       component: FixesView,
     },
     {
-      path: '/exceptions',
+      path: '/supportrequests',
       name: 'exceptions',
       component: ExceptionsView,
     },

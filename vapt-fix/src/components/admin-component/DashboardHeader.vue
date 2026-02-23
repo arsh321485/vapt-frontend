@@ -29,13 +29,6 @@
         <div class="mb-2 text-muted text-center">
           {{ userEmail }}
         </div>
-
-        
-        <!-- <router-link
-  :to="{ path: '/location', query: { from: 'dashboard' } }" class="btn btn-sm btn-outline-primary w-100 mb-2"
->
-  Add Location
-</router-link> -->
 <router-link
   :to="{ path: '/location', query: { returnTo: $route.fullPath } }"
   class="btn btn-sm btn-outline-primary w-100 mb-2"
@@ -43,16 +36,16 @@
   Add User
 </router-link>
 <router-link
+  :to="{ path: '/riskcriteria', query: { returnTo: $route.fullPath } }"
+  class="btn btn-sm btn-outline-primary w-100 mb-2"
+>
+  Risk Criteria
+</router-link>
+<router-link
   :to="{ path: '/uploadtarget', query: { returnTo: $route.fullPath } }" class="btn btn-sm btn-outline-primary w-100 mb-2"
 >
   Upload Target
 </router-link>
-
-<!-- <router-link
-  :to="{ path: '/uploadreport', query: { from: 'dashboard' } }" class="btn btn-sm btn-outline-primary w-100 mb-2"
->
-  Upload Report
-</router-link> -->
 
         <!-- Upgrade -->
         <router-link to="/pricingplan" class="btn btn-sm btn-outline-dark w-100 mb-2">
@@ -141,7 +134,7 @@ export default {
       .charAt(0)
       .toUpperCase();
   }
-},
+    },
     async handleLogout() {
       const authStore = useAuthStore();
 

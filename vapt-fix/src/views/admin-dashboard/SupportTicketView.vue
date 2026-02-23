@@ -17,10 +17,12 @@
                             </div>
                             <div class="d-flex flex-row mt-4">
                                 <div>
-                                <button type="button" class="btn pending-approval-btn rounded-pill">
+                                  <routerlink to="/pricingplan" class="btn pending-approval-btn rounded-pill">Go Premium
+                                <i class="bi bi-arrow-right ms-1 fs-5"></i></routerlink>
+                                <!-- <button type="button" class="btn pending-approval-btn rounded-pill">
                                 Go Premium
                                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
-                                </button>
+                                </button> -->
                             </div>
                             <NotificationPanel />
                             </div>
