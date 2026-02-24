@@ -16,6 +16,12 @@ interface RiskCriteriaPayload {
   low: string;
 }
 
+interface SlackMessageResponse {
+  status: boolean;
+  data?: any;
+  message?: string;
+}
+
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: localStorage.getItem("user")
@@ -343,34 +349,68 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Create User Detail
+  // async createUserDetail(payload: CreateUserPayload) {
+  //     try {
+  //       const res = await endpoint.post(
+  //         "/api/admin/users_details/add-user-detail/",
+  //         payload
+  //       );
+  //       const data = res.data;
+  //       console.log("✅ User created successfully:", data);
+
+  //       return {
+  //         status: true,
+  //         message: data.message || "User created successfully",
+  //         data: data.data || {},
+  //       };
+  //     } catch (error: unknown) {
+  //       const err = error as any;
+  //       console.error("❌ Failed to create user detail:", err);
+
+  //       return {
+  //         status: false,
+  //         message:
+  //           err.response?.data?.message ||
+  //           err.message ||
+  //           "Create user detail failed",
+  //         details: err.response?.data || null,
+  //       };
+  //     }
+  // },
+  // ✅ Create User Detail + Slack Sync
   async createUserDetail(payload: CreateUserPayload) {
-      try {
-        const res = await endpoint.post(
-          "/api/admin/users_details/add-user-detail/",
-          payload
-        );
+    try {
+      const res = await endpoint.post(
+        "/api/admin/users_details/add-user-detail/",
+        payload
+      );
 
-        const data = res.data;
-        console.log("✅ User created successfully:", data);
+      const data = res.data;
 
-        return {
-          status: true,
-          message: data.message || "User created successfully",
-          data: data.data || {},
-        };
-      } catch (error: unknown) {
-        const err = error as any;
-        console.error("❌ Failed to create user detail:", err);
+      console.log("✅ User created + Slack sync:", data);
 
-        return {
-          status: false,
-          message:
-            err.response?.data?.message ||
-            err.message ||
-            "Create user detail failed",
-          details: err.response?.data || null,
-        };
-      }
+      return {
+        status: true,
+        message: data.message || "User created successfully",
+        data: data.data || {},
+        slack_sync: data.slack_sync || [],   // 🔥 NEW
+        email_sent: data.email_sent || false // 🔥 NEW
+      };
+
+    } catch (error: unknown) {
+      const err = error as any;
+
+      console.error("❌ Failed to create user detail:", err);
+
+      return {
+        status: false,
+        message:
+          err.response?.data?.message ||
+          err.message ||
+          "Create user detail failed",
+        details: err.response?.data || null,
+      };
+    }
   },
 
   // ✅ Fetch  UsersByAdminid
@@ -610,6 +650,7 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // Slack 
   async getSlackOAuthUrl(baseUrl: string) {
       console.log("Calling POST /api/admin/users/slack/oauth-url/ with baseUrl:", baseUrl);
       const res = await endpoint.post(
@@ -625,61 +666,100 @@ export const useAuthStore = defineStore("auth", {
       }
       return { status: false };
   },
-  // 🔑 Slack Login (THIS SAVES BOT TOKEN)
-  async loginWithSlack(code: string, redirectUri: string) {
-      console.log("=== loginWithSlack called ===");
-      console.log("Code:", code);
-      console.log("Redirect URI:", redirectUri);
+  async loginWithSlack(botToken: string, userToken: string) {
+    console.log("=== loginWithSlack called ===");
+    console.log("Bot Token:", botToken);
+    console.log("User Token:", userToken);
 
-      try {
-        const res = await endpoint.post(
-          "/api/admin/users/slack-oauth/",
-          {
-            code,
-            redirect_uri: redirectUri,
-          }
-        );
+    try {
+      const res = await endpoint.post(
+        "/api/admin/users/slack/login/",
+        {
+          bot_access_token: botToken,
+          user_access_token: userToken
+        }
+      );
 
-        console.log("slack-oauth API response:", res.data);
+      console.log("Slack login API response:", res.data);
 
-        if (res.data.success) {
-          const data = res.data.data;
+      if (res.data.success) {
+        const data = res.data.data;
 
-          // ✅ SAVE BOT TOKEN
-          console.log("Saving bot token:", data.bot_access_token);
-          localStorage.setItem("slack_bot_token", data.bot_access_token);
+        // ✅ Save tokens
+        localStorage.setItem("slack_bot_token", data.bot_access_token);
+        localStorage.setItem("slack_user_token", data.user_access_token);
 
-          if (data.user) {
-            this.user = data.user;
-            localStorage.setItem(
-              "slack_user_login_data",
-              JSON.stringify(data.user)
-            );
-          }
-
-          return { status: true };
+        // ✅ Save team info
+        if (data.team) {
+          localStorage.setItem("slack_team", JSON.stringify(data.team));
         }
 
-        console.log("API returned success: false");
-        return { status: false, message: res.data.message || "Login failed" };
-      } catch (error: any) {
-        console.error("loginWithSlack error:", error);
-        return {
-          status: false,
-          message: error.response?.data?.message || "Slack login failed"
-        };
+        // ✅ Save channels
+        if (data.channels) {
+          localStorage.setItem("slack_channels", JSON.stringify(data.channels));
+        }
+
+        // ✅ Save Slack user
+        if (data.user) {
+          this.user = data.user;
+          localStorage.setItem("slack_user_login_data", JSON.stringify(data.user));
+        }
+
+        // ✅ Save local app user
+        if (data.local_user) {
+          localStorage.setItem("local_user", JSON.stringify(data.local_user));
+        }
+
+        return { status: true, data };
       }
+
+      return {
+        status: false,
+        message: res.data.message || "Slack login failed"
+      };
+
+    } catch (error: any) {
+      console.error("loginWithSlack error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Slack login failed"
+      };
+    }
   },
-  // 📢 List Slack Channels
+  async validateSlackToken(accessToken: string) {
+  try {
+    const res = await endpoint.post(
+      "/api/admin/users/slack/validate-token/",
+      {
+        access_token: accessToken,
+      }
+    );
+
+    return res.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: "Slack token validation failed",
+    };
+  }
+  },
   async listSlackChannels() {
     try {
-      console.log("Calling GET /api/admin/users/slack/channels/list/");
       const res = await endpoint.get("/api/admin/users/slack/channels/list/");
-      console.log("List channels API response:", res.data);
-      if (res.data.success) {
-        return { status: true, channels: res.data.data.channels };
+
+      if (res.data?.success) {
+        return {
+          status: true,
+          channels: res.data.data?.channels || []
+        };
       }
-      return { status: false, channels: [] };
+
+      return {
+        status: false,
+        channels: [],
+        message: res.data?.message || "Failed to fetch channels"
+      };
+
     } catch (error: any) {
       console.error("List Slack channels error:", error);
       return {
@@ -689,28 +769,187 @@ export const useAuthStore = defineStore("auth", {
       };
     }
   },
-  // 📢 Create Slack Channel
-  async createSlackChannel(name: string, isPrivate: boolean = false) {
-    try {
-      const accessToken = localStorage.getItem("slack_bot_token");
-      const res = await endpoint.post("/api/admin/users/slack/channels/create/", {
+  async sendSlackMessage(
+  accessToken: string,
+  channel: string,
+  text: string
+): Promise<SlackMessageResponse> {
+  try {
+    const res = await endpoint.post(
+      "/api/admin/users/slack/messages/send/",
+      {
         access_token: accessToken,
-        name,
-        is_private: isPrivate ? "True" : "False",
-      });
-      if (res.data.success) {
+        channel,
+        text,
+      }
+    );
+
+    if (res.data?.success) {
+      return {
+        status: true,
+        data: res.data.data,
+      };
+    }
+
+    return {
+      status: false,
+      message: res.data?.message,
+    };
+
+  } catch (error: any) {
+    return {
+      status: false,
+      message:
+        error.response?.data?.message || "Failed to send Slack message",
+    };
+  }
+  },
+  async listSlackUsers(accessToken: string) {
+    try {
+      console.log("Calling Slack Users List API...");
+
+      const res = await endpoint.post(
+        "/api/admin/users/slack/users/list/",
+        {
+          access_token: accessToken,
+        }
+      );
+
+      console.log("Slack users response:", res.data);
+
+      if (res.data?.success) {
         return {
           status: true,
-          data: res.data.data,
-          message: res.data.message,
+          users: res.data.users || []
         };
       }
-      return { status: false, message: res.data.message };
-    } catch (error: any) {
-      console.error("Create Slack channel error:", error);
+
       return {
         status: false,
-        message: error.response?.data?.message || "Failed to create channel",
+        users: []
+      };
+
+    } catch (error: any) {
+      console.error("Slack users fetch error:", error);
+      return {
+        status: false,
+        users: [],
+        message:
+          error.response?.data?.message || "Failed to fetch Slack users",
+      };
+    }
+  },
+  async addUserToSlackChannel(
+    accessToken: string,
+    channel: string,
+    userId: string
+  ) {
+    try {
+      console.log("Calling Add User to Slack Channel API...");
+      const res = await endpoint.post(
+        "/api/admin/users/slack/channel/add-user/",
+        {
+          access_token: accessToken,
+          channel: channel,
+          user_id: userId,
+        }
+      );
+      console.log("Add user response:", res.data);
+      if (res.data?.success) {
+        return {
+          status: true,
+          data: res.data.data
+        };
+      }
+      return {
+        status: false,
+        message: res.data?.message
+      };
+
+    } catch (error: any) {
+      console.error("Add user to channel error:", error);
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to add user to Slack channel",
+      };
+    }
+  },
+  async inviteUsersToSlackChannel(
+    accessToken: string,
+    channel: string,
+    users: string[]
+  ) {
+    try {
+      console.log("Calling Invite Users to Slack Channel API...");
+
+      const res = await endpoint.post(
+        "/api/admin/users/slack/channel/invite/",
+        {
+          access_token: accessToken,
+          channel: channel,
+          users: users,
+        }
+      );
+
+      console.log("Invite users response:", res.data);
+
+      if (res.data?.success) {
+        return {
+          status: true,
+          data: res.data.data
+        };
+      }
+
+      return {
+        status: false,
+        message: res.data?.message
+      };
+
+    } catch (error: any) {
+      console.error("Invite users error:", error);
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to invite users to Slack channel",
+      };
+    }
+  },
+  async joinSlackChannel(accessToken: string, channel: string) {
+    try {
+      console.log("Calling Join Slack Channel API...");
+
+      const res = await endpoint.post(
+        "/api/admin/users/slack/channel/join/",
+        {
+          access_token: accessToken,
+          channel: channel,
+        }
+      );
+
+      console.log("Join channel response:", res.data);
+
+      if (res.data?.success) {
+        return {
+          status: true,
+          data: res.data.data
+        };
+      }
+
+      return {
+        status: false,
+        message: res.data?.message
+      };
+
+    } catch (error: any) {
+      console.error("Join channel error:", error);
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to join Slack channel",
       };
     }
   },

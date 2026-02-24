@@ -41,54 +41,6 @@
           </div>
         </div>
 
-        <!-- Location -->
-        <!-- <div class="section">
-          <div class="section-title">Location</div>
-
-          <div class="d-flex gap-3 flex-wrap align-items-start">
-           
-            <div style="position: relative; width: 50%;">
-              <input class="form-control" placeholder="e.g. India, Bahrain" v-model="locationName"
-                @input="onLocationInput" @focus="onLocationInput" />
-
-           
-              <ul v-if="showDropdown && filteredCountries.length" class="list-group" style="
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          z-index: 20;
-          max-height: 200px;
-          overflow-y: auto;
-        ">
-                <li v-for="country in filteredCountries" :key="country" class="list-group-item list-group-item-action"
-                  @click="selectCountry(country)" style="cursor: pointer;">
-                  {{ country }}
-                </li>
-              </ul>
-            </div>
-
-           
-            <button class="btn btn-primary" @click="handleAddLocation">
-              Add location
-            </button>
-
-           
-            <div class="d-flex gap-2 align-items-center flex-wrap location-circle">
-              <div v-for="(loc, index) in authStore.locations" :key="loc._id || index"
-                class="rounded-circle d-flex align-items-center justify-content-center" :style="{
-                  width: '42px',
-                  height: '42px',
-                  background: avatarColors[index % avatarColors.length],
-                  color: '#fff',
-                  fontWeight: '600'
-                }" :title="loc.location_name">
-                {{ getInitials(loc.location_name) }}
-              </div>
-            </div>
-          </div>
-        </div> -->
-
         <!-- Users -->
         <div class="section">
           <div class="section-title">Users</div>
@@ -211,6 +163,7 @@ export default {
       ],
       slackPopup: null,
       slackChannels: [],
+      slackUsers: [],
       teams: [],
       backendBase: "https://vaptbackend.secureitlab.com",
       jiraResources: [],
@@ -277,73 +230,139 @@ export default {
           });
         });
     },
+    // async addUser() {
+    //   // 1️⃣ Get admin id
+    //   const adminId =
+    //     this.authStore.user?._id ||
+    //     this.authStore.user?.id;
+
+    //   if (!adminId) {
+    //     Swal.fire("Error", "Please login again", "error");
+    //     return;
+    //   }
+
+    //   // 2️⃣ Build payload (❌ location removed)
+    //   const payload = {
+    //     admin_id: adminId,                 // ✅ required
+    //     first_name: this.form.first_name,
+    //     last_name: this.form.last_name,
+    //     email: this.form.email,
+    //     user_type: this.form.user_type,
+    //     Member_role: this.selectedRoles.map(
+    //       r => this.roleOptions.find(o => o.short === r)?.full
+    //     )                                  // ✅ full role names
+    //   };
+
+    //   // 🧪 Debug
+    //   console.log("FINAL PAYLOAD 👉", payload);
+
+    //   // 3️⃣ API call
+    //   const res = await this.authStore.createUserDetail(payload);
+
+    //   if (res.status) {
+    //     Swal.fire({
+    //       icon: "success",
+    //       title: "User added successfully",
+    //       timer: 1800,
+    //       showConfirmButton: false,
+    //       allowOutsideClick: false
+    //     });
+
+    //     // 🔄 reset form
+    //     this.form.first_name = "";
+    //     this.form.last_name = "";
+    //     this.form.email = "";
+    //     this.form.user_type = "";
+    //     this.selectedRoles = [];
+    //     this.isRoleOpen = false;
+
+    //   } else {
+    //     let errorMessage = "User detail with this email already exists";
+
+    //     if (
+    //       res.details &&
+    //       res.details.detail &&
+    //       res.details.detail.email &&
+    //       Array.isArray(res.details.detail.email)
+    //     ) {
+    //       errorMessage = "User detail with this email already exists";
+    //     } else if (res.message && !res.message.includes("500")) {
+    //       errorMessage = res.message;
+    //     }
+
+    //     Swal.fire({
+    //       icon: "warning",
+    //       title: "User already exists",
+    //       text: errorMessage,
+    //       confirmButtonColor: "#5a44ff"
+    //     });
+    //   }
+    // },
     async addUser() {
-      // 1️⃣ Get admin id
-      const adminId =
-        this.authStore.user?._id ||
-        this.authStore.user?.id;
 
-      if (!adminId) {
-        Swal.fire("Error", "Please login again", "error");
-        return;
-      }
+  const adminId =
+    this.authStore.user?._id ||
+    this.authStore.user?.id;
 
-      // 2️⃣ Build payload (❌ location removed)
-      const payload = {
-        admin_id: adminId,                 // ✅ required
-        first_name: this.form.first_name,
-        last_name: this.form.last_name,
-        email: this.form.email,
-        user_type: this.form.user_type,
-        Member_role: this.selectedRoles.map(
-          r => this.roleOptions.find(o => o.short === r)?.full
-        )                                  // ✅ full role names
-      };
+  if (!adminId) {
+    Swal.fire("Error", "Please login again", "error");
+    return;
+  }
 
-      // 🧪 Debug
-      console.log("FINAL PAYLOAD 👉", payload);
+  const botToken = localStorage.getItem("slack_bot_token");
 
-      // 3️⃣ API call
-      const res = await this.authStore.createUserDetail(payload);
+  if (!botToken) {
+    Swal.fire("Error", "Slack not connected", "error");
+    return;
+  }
 
-      if (res.status) {
-        Swal.fire({
-          icon: "success",
-          title: "User added successfully",
-          timer: 1800,
-          showConfirmButton: false,
-          allowOutsideClick: false
-        });
+  const payload = {
+    admin_id: adminId,
+    first_name: this.form.first_name,
+    last_name: this.form.last_name,
+    email: this.form.email,
+    user_type: this.form.user_type,
 
-        // 🔄 reset form
-        this.form.first_name = "";
-        this.form.last_name = "";
-        this.form.email = "";
-        this.form.user_type = "";
-        this.selectedRoles = [];
-        this.isRoleOpen = false;
+    Member_role: this.selectedRoles.map(
+      r => this.roleOptions.find(o => o.short === r)?.full
+    ),
 
-      } else {
-        let errorMessage = "User detail with this email already exists";
+    // 🔥 NEW FIELDS FOR SLACK SYNC
+    slack_bot_token: botToken,
+    slack_user_id: this.selectedSlackUserId  // must come from mapping
+  };
 
-        if (
-          res.details &&
-          res.details.detail &&
-          res.details.detail.email &&
-          Array.isArray(res.details.detail.email)
-        ) {
-          errorMessage = "User detail with this email already exists";
-        } else if (res.message && !res.message.includes("500")) {
-          errorMessage = res.message;
-        }
+  console.log("FINAL PAYLOAD 👉", payload);
 
-        Swal.fire({
-          icon: "warning",
-          title: "User already exists",
-          text: errorMessage,
-          confirmButtonColor: "#5a44ff"
-        });
-      }
+  const res = await this.authStore.createUserDetail(payload);
+
+  if (res.status) {
+
+    console.log("Slack sync result:", res.slack_sync);
+
+    Swal.fire({
+      icon: "success",
+      title: "User added & invited to Slack",
+      timer: 2000,
+      showConfirmButton: false
+    });
+
+    // reset form
+    this.form.first_name = "";
+    this.form.last_name = "";
+    this.form.email = "";
+    this.form.user_type = "";
+    this.selectedRoles = [];
+    this.isRoleOpen = false;
+
+  } else {
+    Swal.fire({
+      icon: "warning",
+      title: "User already exists",
+      text: res.message,
+      confirmButtonColor: "#5a44ff"
+    });
+  }
     },
     getInitials(name) {
       if (!name) return "";
@@ -537,51 +556,213 @@ export default {
         this.fetchTeams();
       }
     },
-    onSlackConnected(event) {
-      console.log("Message received:", event.data);
-      if (event.data?.type === "SLACK_CONNECTED") {
-        console.log("SLACK_CONNECTED received! Fetching channels...");
-        this.fetchSlackChannels();
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Slack connected successfully",
-          timer: 2000,
-          showConfirmButton: false
-        });
-      }
-    },
+    // slack start
     async startSlackLogin() {
-      console.log("Starting Slack login...");
-      const res = await this.authStore.getSlackOAuthUrl(this.backendBase);
-      console.log("getSlackOAuthUrl response:", res);
+  try {
+    const res = await this.authStore.getSlackOAuthUrl(this.backendBase);
 
-      if (res.status) {
-        const originalUrl = res.data.auth_url;
-        const redirectUri = `${window.location.origin}/slack/callback`;
-        const finalUrl = originalUrl.replace(res.data.redirect_uri, redirectUri);
+    if (res.status && res.data?.auth_url) {
 
-        console.log("Original auth_url:", originalUrl);
-        console.log("Backend redirect_uri:", res.data.redirect_uri);
-        console.log("Frontend redirect_uri:", redirectUri);
-        console.log("Final URL opening:", finalUrl);
+      const width = 1000;
+      const height = 700;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
 
-        window.open(finalUrl, "_blank", "width=600,height=700");
-      } else {
-        console.error("Failed to get Slack OAuth URL");
+      const popup = window.open(
+        res.data.auth_url,
+        "SlackOAuth",
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!popup) {
+        alert("Popup blocked! Please allow popups for this site.");
       }
+
+    } else {
+      Swal.fire("Error", "Unable to start Slack login", "error");
+    }
+  } catch (error) {
+    Swal.fire("Error", "Something went wrong while connecting Slack", "error");
+  }
+    },
+    handleSlackMessage(event) {
+
+  console.log("Message received from popup:", event);
+
+  const allowedOrigins = [
+    window.location.origin,
+    "https://vaptbackend.secureitlab.com"
+  ];
+
+  if (!allowedOrigins.includes(event.origin)) {
+    console.warn("Blocked message origin:", event.origin);
+    return;
+  }
+
+  if (event.data?.type === "SLACK_CONNECTED") {
+
+    console.log("SLACK_CONNECTED event received");
+
+    // 🔹 CALL VALIDATE TOKEN
+    console.log("Calling validate token API...");
+    this.checkSlackConnection();
+    // 🔹 CALL CHANNEL LIST
+    console.log("Calling list channels API...");
+    this.fetchSlackChannels();
+    this.fetchSlackUsers();
+  }
+    },
+    async checkSlackConnection() {
+  try {
+    console.log("checkSlackConnection started");
+
+    const botToken = localStorage.getItem("slack_bot_token");
+    console.log("Bot token from storage:", botToken);
+
+    if (!botToken) {
+      console.warn("No Slack token found");
+      return;
+    }
+
+    const res = await this.authStore.validateSlackToken(botToken);
+
+    console.log("validateSlackToken response:", res);
+
+    if (res.success) {
+      this.slackConnected = true;
+    } else {
+      this.slackConnected = false;
+    }
+
+  } catch (err) {
+    console.error("Slack validation error:", err);
+  }
     },
     async fetchSlackChannels() {
-      console.log("fetchSlackChannels called - making API request...");
-      const res = await this.authStore.listSlackChannels();
-      console.log("listSlackChannels API response:", res);
-      if (res.status) {
-        this.slackChannels = res.channels;
-        console.log("Slack channels loaded:", this.slackChannels);
-      } else {
-        console.error("Failed to fetch Slack channels:", res.message);
-      }
+  try {
+    console.log("fetchSlackChannels started");
+
+    const res = await this.authStore.listSlackChannels();
+
+    console.log("listSlackChannels response:", res);
+
+    if (res.status) {
+      this.slackChannels = res.channels;
+    }
+
+  } catch (err) {
+    console.error("Slack channels fetch error:", err);
+  }
     },
+    async sendTestMessage(channelId) {
+  try {
+    console.log("sendTestMessage triggered");
+
+    const botToken = localStorage.getItem("slack_bot_token");
+
+    if (!botToken) {
+      Swal.fire("Error", "Slack not connected", "error");
+      return;
+    }
+
+    const res = await this.authStore.sendSlackMessage(
+      botToken,
+      channelId,
+      "🚀 Message sent from VAPT Project"
+    );
+
+    if (res.status) {
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent",
+        text: "Slack message delivered successfully",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } else {
+      Swal.fire("Error", "Failed to send message", "error");
+    }
+
+  } catch (err) {
+    console.error("Send message error:", err);
+  }
+    },
+    async fetchSlackUsers() {
+  try {
+    console.log("fetchSlackUsers started");
+
+    const botToken = localStorage.getItem("slack_bot_token");
+
+    if (!botToken) {
+      console.warn("No Slack token found");
+      return;
+    }
+
+    const res = await this.authStore.listSlackUsers(botToken);
+
+    console.log("Slack users API result:", res);
+
+    if (res.status) {
+      this.slackUsers = res.users;
+    }
+
+  } catch (err) {
+    console.error("Slack users error:", err);
+  }
+    },
+    async addUserToProjectSlack(channelId, slackUserId) {
+  try {
+    const botToken = localStorage.getItem("slack_bot_token");
+
+    if (!botToken) {
+      console.warn("Slack not connected");
+      return;
+    }
+
+    const res = await this.authStore.addUserToSlackChannel(
+      botToken,
+      channelId,
+      slackUserId
+    );
+
+    console.log("Slack add user result:", res);
+
+  } catch (err) {
+    console.error("Slack add user error:", err);
+  }
+    },
+    async inviteProjectTeam(channelId, slackUserIds) {
+  const botToken = localStorage.getItem("slack_bot_token");
+  if (!botToken) return;
+  await this.authStore.inviteUsersToSlackChannel(
+    botToken,
+    channelId,
+    slackUserIds
+  );
+    },
+    async handleVulnerabilitySlack(channelId, slackUserIds) {
+  const botToken = localStorage.getItem("slack_bot_token");
+
+  if (!botToken) return;
+
+  // Step 1: bot joins
+  await this.authStore.joinSlackChannel(botToken, channelId);
+
+  // Step 2: invite team
+  await this.authStore.inviteUsersToSlackChannel(
+    botToken,
+    channelId,
+    slackUserIds
+  );
+
+  // Step 3: send alert
+  await this.authStore.sendSlackMessage(
+    botToken,
+    channelId,
+    "🚨 New vulnerability detected"
+  );
+    },
+    // slack end 
     // ✅ Jira OAuth Login
     async startJiraLogin() {
       try {
@@ -633,17 +814,8 @@ export default {
       this.fetchTeams();
     }
 
-  // const teamsToken = localStorage.getItem("teams_access_token");
-  // if (teamsToken) {
-  //   this.fetchTeams();
-  // }
-
-    window.addEventListener("message", this.onSlackConnected);
-
-    const token = localStorage.getItem("slack_bot_token");
-    if (token) {
-      this.fetchSlackChannels();
-    }
+    window.addEventListener("message", this.handleSlackMessage);
+    console.log("Slack message listener attached");
 
     // ✅ Jira event listener
     window.addEventListener("message", this.onJiraConnected);
@@ -669,7 +841,7 @@ export default {
   },
   beforeUnmount() {
     document.removeEventListener("click", this.closeOnOutside);
-    window.removeEventListener("message", this.onSlackConnected);
+     window.removeEventListener("message", this.handleSlackMessage);
     window.removeEventListener("message", this.onTeamsConnected);
     window.removeEventListener("message", this.onJiraConnected);
   },
