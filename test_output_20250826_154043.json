@@ -1,0 +1,47 @@
+[
+  {
+    "Image URL":"https:\/\/cdn.shopify.com\/s\/files\/1\/1109\/3312\/files\/dylan-and-davids-long-sleeve-sequin-formal-beaded-dress-the-dress-outlet-12_d05f5465-76d2-4608-ac03-a8268725b85c.jpg?v=1752249843",
+    "Neckline":"Unknown",
+    "Silhouette":"Unknown",
+    "Waistline":"Unknown",
+    "Sleeves":"Unknown",
+    "Caption":"a woman in a silver dress with a slit slit",
+    "Confidence_Score":0.0
+  },
+  {
+    "Image URL":"https:\/\/invalid-url-example.com\/nonexistent.jpg",
+    "Neckline":"Unknown",
+    "Silhouette":"Unknown",
+    "Waistline":"Unknown",
+    "Sleeves":"Unknown",
+    "Caption":"",
+    "Confidence_Score":0.0
+  },
+  {
+    "Image URL":"https:\/\/cdn.shopify.com\/s\/files\/1\/1109\/3312\/files\/randm-richards-358260-plus-size-long-mother-of-the-bride-dress-17.jpg?v=1742949333",
+    "Neckline":"Unknown",
+    "Silhouette":"Unknown",
+    "Waistline":"Unknown",
+    "Sleeves":"Unknown",
+    "Caption":"plus size mother of the bride dresses",
+    "Confidence_Score":0.0
+  },
+  {
+    "Image URL":"not-a-valid-url",
+    "Neckline":"Unknown",
+    "Silhouette":"Unknown",
+    "Waistline":"Unknown",
+    "Sleeves":"Unknown",
+    "Caption":"",
+    "Confidence_Score":0.0
+  },
+  {
+    "Image URL":"https:\/\/cdn.shopify.com\/s\/files\/1\/1109\/3312\/files\/randm-richards-1993w-plus-size-mother-of-the-bride-pant-suit-47.jpg?v=1740420605",
+    "Neckline":"Unknown",
+    "Silhouette":"Unknown",
+    "Waistline":"Unknown",
+    "Sleeves":"Puff Sleeves",
+    "Caption":"a woman standing in front of balloons and balloons",
+    "Confidence_Score":25.0
+  }
+]

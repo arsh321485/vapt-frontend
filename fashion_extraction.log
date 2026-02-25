@@ -1,0 +1,56 @@
+2025-08-26 15:40:32,340 - INFO - Loading BLIP model...
+2025-08-26 15:40:37,685 - INFO - Starting processing of test_sample.xlsx
+2025-08-26 15:40:37,689 - INFO - Loaded 5 records from test_sample.xlsx
+2025-08-26 15:40:37,690 - INFO - 🔄 Processing 1/5
+2025-08-26 15:40:37,690 - INFO -    🔗 URL: https://cdn.shopify.com/s/files/1/1109/3312/files/dylan-and-davids-long-sleeve-sequin-formal-beaded-dress-the-dress-outlet-12_d05f5465-76d2-4608-ac03-a8268725b85c.jpg?v=1752249843
+2025-08-26 15:40:39,408 - INFO - ✅ Row 0 COMPLETED - Extracted attributes:
+2025-08-26 15:40:39,408 - INFO -    📝 Caption: a woman in a silver dress with a slit slit
+2025-08-26 15:40:39,408 - INFO -    👔 Neckline: Unknown
+2025-08-26 15:40:39,408 - INFO -    👗 Silhouette: Unknown
+2025-08-26 15:40:39,408 - INFO -    ⚡ Waistline: Unknown
+2025-08-26 15:40:39,408 - INFO -    👕 Sleeves: Unknown
+2025-08-26 15:40:39,409 - INFO -    📊 Confidence: 0.0% (0/4 attributes identified)
+2025-08-26 15:40:39,409 - INFO - --------------------------------------------------------------------------------
+2025-08-26 15:40:39,909 - INFO - 🔄 Processing 2/5
+2025-08-26 15:40:39,909 - INFO -    🔗 URL: https://invalid-url-example.com/nonexistent.jpg
+2025-08-26 15:40:39,936 - WARNING - ⚠️  INVALID URL at row 1
+2025-08-26 15:40:39,936 - WARNING -    🔗 URL: https://invalid-url-example.com/nonexistent.jpg
+2025-08-26 15:40:39,936 - WARNING -    ❌ Skipping this row
+2025-08-26 15:40:39,936 - WARNING - --------------------------------------------------------------------------------
+2025-08-26 15:40:39,936 - INFO - 🔄 Processing 3/5
+2025-08-26 15:40:39,936 - INFO -    🔗 URL: https://cdn.shopify.com/s/files/1/1109/3312/files/randm-richards-358260-plus-size-long-mother-of-the-bride-dress-17.jpg?v=1742949333
+2025-08-26 15:40:41,564 - INFO - ✅ Row 2 COMPLETED - Extracted attributes:
+2025-08-26 15:40:41,564 - INFO -    📝 Caption: plus size mother of the bride dresses
+2025-08-26 15:40:41,564 - INFO -    👔 Neckline: Unknown
+2025-08-26 15:40:41,565 - INFO -    👗 Silhouette: Unknown
+2025-08-26 15:40:41,565 - INFO -    ⚡ Waistline: Unknown
+2025-08-26 15:40:41,565 - INFO -    👕 Sleeves: Unknown
+2025-08-26 15:40:41,565 - INFO -    📊 Confidence: 0.0% (0/4 attributes identified)
+2025-08-26 15:40:41,565 - INFO - --------------------------------------------------------------------------------
+2025-08-26 15:40:42,065 - INFO - 🔄 Processing 4/5
+2025-08-26 15:40:42,065 - INFO -    🔗 URL: not-a-valid-url
+2025-08-26 15:40:42,065 - WARNING - ⚠️  INVALID URL at row 3
+2025-08-26 15:40:42,065 - WARNING -    🔗 URL: not-a-valid-url
+2025-08-26 15:40:42,065 - WARNING -    ❌ Skipping this row
+2025-08-26 15:40:42,065 - WARNING - --------------------------------------------------------------------------------
+2025-08-26 15:40:42,065 - INFO - 🔄 Processing 5/5
+2025-08-26 15:40:42,065 - INFO -    🔗 URL: https://cdn.shopify.com/s/files/1/1109/3312/files/randm-richards-1993w-plus-size-mother-of-the-bride-pant-suit-47.jpg?v=1740420605
+2025-08-26 15:40:43,129 - INFO - ✅ Row 4 COMPLETED - Extracted attributes:
+2025-08-26 15:40:43,129 - INFO -    📝 Caption: a woman standing in front of balloons and balloons
+2025-08-26 15:40:43,129 - INFO -    👔 Neckline: Unknown
+2025-08-26 15:40:43,129 - INFO -    👗 Silhouette: Unknown
+2025-08-26 15:40:43,130 - INFO -    ⚡ Waistline: Unknown
+2025-08-26 15:40:43,130 - INFO -    👕 Sleeves: Puff sleeves
+2025-08-26 15:40:43,130 - INFO -    📊 Confidence: 25.0% (1/4 attributes identified)
+2025-08-26 15:40:43,130 - INFO - --------------------------------------------------------------------------------
+2025-08-26 15:40:43,630 - INFO - Cleaning and standardizing data...
+2025-08-26 15:40:43,631 - INFO - Removed 0 duplicate URLs
+2025-08-26 15:40:43,641 - INFO - Saved Excel file: test_output_20250826_154043.xlsx
+2025-08-26 15:40:43,642 - INFO - Saved CSV file: test_output_20250826_154043.csv
+2025-08-26 15:40:43,642 - INFO - Saved JSON file: test_output_20250826_154043.json
+2025-08-26 15:40:43,643 - INFO - Generating summary report and visualizations...
+2025-08-26 15:40:43,644 - INFO - Saved summary report: summary_report_20250826_154043.json
+2025-08-26 15:40:44,243 - INFO - Saved visualizations: summary_report_20250826_154043_distributions.png
+2025-08-26 15:40:44,415 - INFO - Saved confidence distribution: summary_report_20250826_154043_confidence.png
+2025-08-26 16:03:35,874 - INFO - Loading BLIP model...
+2025-08-26 16:04:04,255 - INFO - Loading BLIP model...
