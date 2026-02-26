@@ -75,47 +75,47 @@ export default {
       return;
     }
 
-    // 🔹 Call NEW Slack login API
+    // 🔹 STEP 1 — Save tokens IMMEDIATELY (before any API calls)
+    localStorage.setItem("slack_bot_token", botToken);
+    localStorage.setItem("slack_user_token", userToken);
+    console.log("Slack tokens saved to localStorage");
+
+    // 🔹 STEP 2 — Call Slack login API
     const res = await this.authStore.loginWithSlack(botToken, userToken);
 
     if (res.status) {
-  console.log("Slack login API success");
+      console.log("Slack login API success");
 
-  // 🔹 STEP 1 — Validate token
-  const validateRes = await this.authStore.validateSlackToken(botToken);
+      // 🔹 STEP 3 — Validate token & save workspace info
+      const validateRes = await this.authStore.validateSlackToken(botToken);
 
-  if (!validateRes.success) {
-    this.status = "error";
-    this.errorMessage = "Slack token validation failed.";
-    return;
-  }
+      if (validateRes.success && validateRes.data) {
+        console.log("Slack token valid:", validateRes.data);
+        localStorage.setItem("slack_team_id", validateRes.data.team_id);
+        localStorage.setItem("slack_team_name", validateRes.data.team);
+      }
 
-  console.log("Slack token valid:", validateRes.data);
+      this.status = "success";
 
-  // 🔹 STEP 2 — Save token + workspace info
-  localStorage.setItem("slack_bot_token", botToken);
-  localStorage.setItem("slack_team_id", validateRes.data.team_id);
-  localStorage.setItem("slack_team_name", validateRes.data.team);
+      // 🔹 STEP 4 — Notify parent window
+      if (window.opener) {
+        console.log("Sending message to parent...");
+        window.opener.postMessage(
+          {
+            type: "SLACK_CONNECTED",
+            team: validateRes?.data?.team || "",
+            user: validateRes?.data?.user?.name || ""
+          },
+          "*"
+        );
+      } else {
+        console.log("window.opener is NULL");
+      }
 
-  this.status = "success";
-
-  // 🔹 STEP 3 — Notify parent window
-  if (window.opener) {
-    console.log("Sending message to parent...");
-    window.opener.postMessage(
-      {
-        type: "SLACK_CONNECTED",
-        team: validateRes.data.team,
-        user: validateRes.data.user.name
-      },
-      "*"
-    );
-  }else {
-  console.log("window.opener is NULL");
-}
-  // 🔹 STEP 4 — Close popup
-  setTimeout(() => window.close(), 1200);
-} else {
+      // 🔹 STEP 5 — Close popup
+      setTimeout(() => window.close(), 1200);
+    } else {
+      // Login API failed but tokens are already saved in localStorage
       this.status = "error";
       this.errorMessage = res.message || "Slack login failed.";
     }

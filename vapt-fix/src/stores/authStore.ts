@@ -78,7 +78,10 @@ export const useAuthStore = defineStore("auth", {
       message: "",
       checked: false,  
     },
-
+    teams: [],
+    channels: [],
+    selectedTeam: null,
+    lastMessageMeta: null,
     }),
 
 
@@ -609,43 +612,205 @@ export const useAuthStore = defineStore("auth", {
       if (res.data?.auth_url) {
         return { status: true, data: res.data };
       }
-
       return { status: false, message: "Auth URL not received" };
     } catch (error) {
       console.error("Microsoft OAuth API error:", error);
       return { status: false, message: "API failed" };
     }
   },
-  async microsoftLogin(accessToken: string) {
+ async microsoftLogin(accessToken: string) {
+  try {
+    const response = await endpoint.post(
+      "/api/admin/users/microsoft-teams-oauth/",
+      {
+        access_token: accessToken,
+      }
+    );
+
+    const data = response.data;
+
+    // basic validation
+    if (!data || !data.tokens || !data.user) {
+      return { status: false, message: "Invalid login response" };
+    }
+
+    // 🔐 Save app JWT tokens
+    localStorage.setItem("teams_access_token", data.tokens.access);
+    localStorage.setItem("teams_refresh_token", data.tokens.refresh);
+
+    // 👤 Save Microsoft user
+    localStorage.setItem("teams_user", JSON.stringify(data.user));
+
+    // 🧠 Save Microsoft graph token (used for Teams APIs)
+    localStorage.setItem("microsoft_graph_token", data.access_token);
+
+    // 🏢 Save default VAPTFIX team info
+    if (data?.vaptfix_team) {
+      localStorage.setItem(
+        "vaptfix_team",
+        JSON.stringify(data.vaptfix_team)
+      );
+
+      // save default channels if present
+      if (data.vaptfix_team.channels) {
+        localStorage.setItem(
+          "vaptfix_channels",
+          JSON.stringify(data.vaptfix_team.channels)
+        );
+      }
+    }
+
+    // 🆕 Save new user flag
+    localStorage.setItem("is_new_teams_user", String(data.is_new_user));
+
+    // mark Teams connected
+    localStorage.setItem("teams_connected", "true");
+
+    return {
+      status: true,
+      data,
+    };
+
+  } catch (error) {
+    console.error("Microsoft login API error:", error);
+    return { status: false, message: "Microsoft login failed" };
+  }
+},
+  // async microsoftLogin(accessToken: string) {
+  //   try {
+  //     const response = await endpoint.post(
+  //       "/api/admin/users/microsoft-teams-oauth/",
+  //       {
+  //         access_token: accessToken,
+  //       }
+  //     );
+  //     const data = response.data;
+  //     if (data?.tokens && data?.user) {
+  //       // save JWT tokens (your app auth)
+  //       localStorage.setItem("teams_access_token", data.tokens.access);
+  //       localStorage.setItem("teams_refresh_token", data.tokens.refresh);
+
+  //       // Microsoft user
+  //       localStorage.setItem("teams_user", JSON.stringify(data.user));
+
+  //       // Microsoft graph token
+  //       localStorage.setItem("microsoft_graph_token", data.access_token);
+
+  //       localStorage.setItem("teams_connected", "true");
+
+  //       return { status: true, data };
+  //     }
+
+  //     return { status: false };
+  //   } catch (error) {
+  //     console.error("Microsoft login API error:", error);
+  //     return { status: false };
+  //   }
+  // },
+  async fetchMicrosoftTeams() {
     try {
+      const graphToken = localStorage.getItem("microsoft_graph_token");
+
+      if (!graphToken) {
+        return { status: false, message: "Graph token missing" };
+      }
+
       const response = await endpoint.post(
-        "/api/admin/users/microsoft-teams-oauth/",
+        "/api/admin/users/teams/list/",
+        {},
         {
-          access_token: accessToken,
+          headers: {
+            Authorization: `Bearer ${graphToken}`,
+          },
         }
       );
 
       const data = response.data;
 
-      if (data?.tokens && data?.user) {
-        // save JWT tokens (your app auth)
-        localStorage.setItem("teams_access_token", data.tokens.access);
-        localStorage.setItem("teams_refresh_token", data.tokens.refresh);
-
-        // Microsoft user
-        localStorage.setItem("teams_user", JSON.stringify(data.user));
-
-        // Microsoft graph token
-        localStorage.setItem("microsoft_graph_token", data.access_token);
-
-        localStorage.setItem("teams_connected", "true");
-
-        return { status: true, data };
+      if (data?.teams) {
+        localStorage.setItem("microsoft_teams_list", JSON.stringify(data.teams));
+        return { status: true, teams: data.teams };
       }
 
       return { status: false };
     } catch (error) {
-      console.error("Microsoft login API error:", error);
+      console.error("Teams list API error:", error);
+      return { status: false };
+    }
+  },
+  async fetchTeamChannels(teamId: string) {
+    try {
+      const graphToken = localStorage.getItem("microsoft_graph_token");
+
+      if (!graphToken) {
+        return { status: false, message: "Graph token missing" };
+      }
+
+      const response = await endpoint.post(
+        "/api/admin/users/teams/channels/list/",
+        {
+          access_token: graphToken,
+          team_id: teamId,
+        }
+      );
+
+      const data = response.data;
+
+      if (data?.channels) {
+        // save channels for later use
+        localStorage.setItem(
+          `teams_channels_${teamId}`,
+          JSON.stringify(data.channels)
+        );
+
+        return { status: true, channels: data.channels };
+      }
+
+      return { status: false };
+    } catch (error) {
+      console.error("Teams channels API error:", error);
+      return { status: false };
+    }
+  },
+  async sendMessageToTeamsChannel({
+    teamId,
+    channelId,
+    message,
+  }: {
+    teamId: string;
+    channelId: string;
+    message: string;
+  }) {
+    try {
+      const graphToken = localStorage.getItem("microsoft_graph_token");
+
+      if (!graphToken) {
+        return { status: false, message: "Graph token missing" };
+      }
+
+      const response = await endpoint.post(
+        "/api/admin/users/teams/messages/send/",
+        {
+          access_token: graphToken,
+          team_id: teamId,
+          channel_id: channelId,
+          message: message,
+        }
+      );
+
+      const data = response.data;
+
+      if (data?.messageDetails) {
+        return {
+          status: true,
+          messageId: data.messageDetails.id,
+          createdAt: data.messageDetails.createdDateTime,
+        };
+      }
+
+      return { status: false };
+    } catch (error) {
+      console.error("Send Teams message API error:", error);
       return { status: false };
     }
   },

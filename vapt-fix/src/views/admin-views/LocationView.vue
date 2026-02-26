@@ -165,6 +165,8 @@ export default {
       slackChannels: [],
       slackUsers: [],
       teams: [],
+      channels: [],
+      selectedTeamId: null,
       backendBase: "https://vaptbackend.secureitlab.com",
       jiraResources: [],
       jiraConnected: false,
@@ -177,43 +179,43 @@ export default {
     isFromOnboarding() {
       return !this.returnTo;
     },
-    generatedInviteLink() {
-      const base = "https://vaptbackend.secureitlab.com";
+    // generatedInviteLink() {
+    //   const base = "https://vaptbackend.secureitlab.com";
 
-      // default: show base url
-      if (!this.externalLocation) {
-        return base;
-      }
+    //   // default: show base url
+    //   if (!this.externalLocation) {
+    //     return base;
+    //   }
 
-      const locationObj = this.authStore.locations.find(
-        loc => loc._id === this.externalLocation
-      );
+    //   const locationObj = this.authStore.locations.find(
+    //     loc => loc._id === this.externalLocation
+    //   );
 
-      if (!locationObj) return base;
+    //   if (!locationObj) return base;
 
-      const locationSlug = locationObj.location_name
-        .toLowerCase()
-        .replace(/\s+/g, "");
+    //   const locationSlug = locationObj.location_name
+    //     .toLowerCase()
+    //     .replace(/\s+/g, "");
 
-      // only location selected
-      if (!this.selectedSecondaryRoles.length) {
-        return `${base}/${locationSlug}`;
-      }
+    //   // only location selected
+    //   if (!this.selectedSecondaryRoles.length) {
+    //     return `${base}/${locationSlug}`;
+    //   }
 
-      // location + roles
-      const roleSlugs = this.selectedSecondaryRoles
-        .map(role =>
-          this.roleOptions.find(r => r.short === role)?.full
-            .toLowerCase()
-            .replace(/\s+/g, "")
-        )
-        .join("/");
+    //   // location + roles
+    //   const roleSlugs = this.selectedSecondaryRoles
+    //     .map(role =>
+    //       this.roleOptions.find(r => r.short === role)?.full
+    //         .toLowerCase()
+    //         .replace(/\s+/g, "")
+    //     )
+    //     .join("/");
 
-      return `${base}/${locationSlug}/${roleSlugs}`;
-    },
-    canCopyInviteLink() {
-      return !!this.externalLocation || this.selectedSecondaryRoles.length > 0;
-    }
+    //   return `${base}/${locationSlug}/${roleSlugs}`;
+    // },
+    // canCopyInviteLink() {
+    //   return !!this.externalLocation || this.selectedSecondaryRoles.length > 0;
+    // }
   },
   methods: {
     initChipSelection() {
@@ -526,12 +528,12 @@ export default {
       // Navigate to next page
       this.$router.push('/riskcriteria');
     },
+
+    // Teams Start
     async startMicrosoftLogin() {
   try {
     const redirectUri = `${window.location.origin}/microsoft/callback`;
-
     const res = await this.authStore.getMicrosoftOAuthUrl(redirectUri);
-
     if (res.status && res.data.auth_url) {
       // ✅ Open Microsoft OAuth in NEW TAB
        window.open(res.data.auth_url, "_blank");
@@ -556,6 +558,60 @@ export default {
         this.fetchTeams();
       }
     },
+    async fetchTeams() {
+      const res = await this.authStore.fetchMicrosoftTeams();
+      if (res?.status) {
+        this.teams = res.teams;
+
+        // Auto-fetch channels for the VAPTFIX team using the saved team ID
+        const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
+        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+        if (teamId) {
+          await this.fetchChannels(teamId);
+        }
+      } else {
+        // Token expired or invalid — clear stale data and prompt reconnect
+        localStorage.removeItem("microsoft_graph_token");
+        localStorage.removeItem("teams_connected");
+        localStorage.removeItem("vaptfix_team");
+        localStorage.removeItem("vaptfix_channels");
+        this.selectedCommunication = null;
+        this.teams = [];
+        this.channels = [];
+        Swal.fire({
+          icon: "warning",
+          title: "Microsoft Teams Session Expired",
+          text: "Please reconnect Microsoft Teams to continue.",
+          confirmButtonColor: "#5a44ff"
+        });
+      }
+    },
+    async fetchChannels(teamId) {
+    this.selectedTeamId = teamId;
+
+    const res = await this.authStore.fetchTeamChannels(teamId);
+
+    if (res?.status) {
+      this.channels = res.channels;
+    } else {
+      console.log("Channels not fetched");
+    }
+    },
+    async sendTeamsMessage(teamId, channelId, message) {
+    const res = await this.authStore.sendMessageToTeamsChannel({
+      teamId,
+      channelId,
+      message,
+    });
+
+    if (res.status) {
+      console.log("Message sent successfully", res);
+    } else {
+      console.log("Message sending failed");
+    }
+    },
+    // Teams End
+
     // slack start
     async startSlackLogin() {
   try {
@@ -763,6 +819,7 @@ export default {
   );
     },
     // slack end 
+
     // ✅ Jira OAuth Login
     async startJiraLogin() {
       try {
@@ -811,11 +868,29 @@ export default {
 
     const graphToken = localStorage.getItem("microsoft_graph_token");
     if (graphToken) {
-      this.fetchTeams();
+      this.selectedCommunication = "teams";
+
+      // Restore saved channels from login response immediately
+      const savedChannels = localStorage.getItem("vaptfix_channels");
+      if (savedChannels) {
+        this.channels = JSON.parse(savedChannels);
+      }
+
+      this.fetchTeams(); // will also re-fetch fresh channels via fetchChannels()
     }
 
     window.addEventListener("message", this.handleSlackMessage);
     console.log("Slack message listener attached");
+
+    // Check if Slack already connected
+    const slackBotToken = localStorage.getItem("slack_bot_token");
+    if (slackBotToken) {
+      this.slackConnected = true;
+      this.selectedCommunication = "slack";
+      this.checkSlackConnection();
+      this.fetchSlackChannels();
+      this.fetchSlackUsers();
+    }
 
     // ✅ Jira event listener
     window.addEventListener("message", this.onJiraConnected);
