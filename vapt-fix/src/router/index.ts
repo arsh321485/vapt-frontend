@@ -47,6 +47,7 @@ import SlackCallbackView from '../views/admin-views/SlackCallbackView.vue'
 import ReportView from '../views/admin-dashboard/ReportView.vue'
 import ScopeView from '../views/admin-dashboard/ScopeView.vue'
 import MicrosoftCallbackView from '../views/admin-views/MicrosoftCallbackView.vue'
+import PerformanceMonitoringView from '../views/admin-dashboard/PerformanceMonitoringView.vue'
 
 
 const router = createRouter({
@@ -214,6 +215,11 @@ const router = createRouter({
       path: '/assets',
       name: 'assets',
       component: AssetsView,
+    },
+    {
+      path: '/performance-monitoring',
+      name: 'performance-monitoring',
+      component: PerformanceMonitoringView,
     },
     {
       path: '/yourteam',

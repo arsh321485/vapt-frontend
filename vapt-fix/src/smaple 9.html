@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerability Management Report - Client XYZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            line-height: 1.7; 
+            color: #2d3748; 
+            background: linear-gradient(135deg, #aab3df 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .page { 
+            max-width: 1600px; 
+            margin: 0 auto 60px; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(20px); 
+            border-radius: 24px; 
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15); 
+            overflow: hidden;
+        }
+        
+        .content { padding: 40px; }
+        
+        .header { 
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); 
+            color: white; 
+            padding: 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before { 
+            content: ''; 
+            position: absolute; 
+            top: -50%; 
+            left: -50%; 
+            width: 200%; 
+            height: 200%; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+        
+        .header-left { display: flex; flex-direction: column; gap: 5px; z-index: 2; }
+        .header-center { flex: 1; text-align: center; position: relative; z-index: 2; }
+        .header-right img { height: 60px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        
+        h2 { font-size: 2rem; font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        
+        /* Executive Summary - Highlighted with Color Band */
+        .executive-summary { 
+            position: relative; 
+            margin-bottom: 40px; 
+            padding: 40px;
+            background: linear-gradient(90deg, #3b82f6 0%, #10b981 33%, #f59e0b 66%, #ef4444 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(59, 130, 246, 0.3);
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .executive-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 24px;
+            z-index: 1;
+        }
+        
+        .executive-summary > * { position: relative; z-index: 2; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .summary-card { background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); transition: all 0.3s; backdrop-filter: blur(10px); }
+        .summary-card:hover { transform: translateY(-8px); box-shadow: 0 25px 60px rgba(0,0,0,0.2); }
+        .summary-title { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin-bottom: 20px; }
+        .chart-container-small { height: 260px; margin-bottom: 15px; }
+        .total-number { font-size: 3rem; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 15px; }
+        
+        /* Charts Section */
+        .charts-section { display: grid; grid-template-columns: 1fr; gap: 30px; margin-bottom: 40px; }
+        .chart-card { background: white; padding: 35px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 1.4rem; font-weight: 600; color: #1e293b; margin-bottom: 25px; text-align: center; }
+        
+        /* Team Overview Cards - 2x2 Grid */
+        .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 40px; }
+        @media (max-width: 1100px) { .teams-grid { grid-template-columns: 1fr; } }
+        .team-card { background: white; padding: 35px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border-left: 8px solid; height: 100%; }
+        .team-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+        .team-icon { font-size: 2.5rem; width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; }
+        .team-name { font-size: 1.5rem; font-weight: 700; color: #1e293b; flex: 1; }
+        .team-total { font-size: 2rem; font-weight: 800; }
+        .team-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .metric-item { text-align: center; padding: 15px 10px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 14px; }
+        .metric-value { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
+        .metric-label { font-size: 0.85rem; color: #64748b; }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
+        .severity-maroon { background: #dc2626; color: white; }
+        .severity-red { background: #ef4444; color: white; }
+        .severity-orange { background: #f97316; color: white; }
+        .severity-darkgreen { background: #166534; color: white; }
+        .status-open { background: #fee2e2; color: #dc2626; }
+        .status-closed { background: #d1fae5; color: #059669; }
+        
+        /* Filters & Table */
+        .filters-section { background: white; padding: 35px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .filter-group { display: flex; gap: 25px; flex-wrap: wrap; align-items: center; }
+        .filter-group label { font-weight: 600; color: #374151; margin-right: 12px; white-space: nowrap; font-size: 0.95rem; }
+        .filter-group select { padding: 14px 24px; border: 2px solid #e5e7eb; border-radius: 14px; font-weight: 500; background: white; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; }
+        .filter-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+        
+        .table-container { background: white; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 22px; font-weight: 600; text-align: left; font-size: 1rem; letter-spacing: 0.5px; }
+        td { padding: 22px; border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
+        tr:hover td { background: #f8fafc; }
+        .team-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .team-network { background: #3b82f6; color: white; }
+        .team-patch { background: #10b981; color: white; }
+        .team-configuration { background: #f97316; color: white; }
+        .team-architectural { background: #dc2626; color: white; }
+        
+        @media (max-width: 768px) {
+            .summary-grid, .charts-section { grid-template-columns: 1fr; }
+            .filter-group { flex-direction: column; align-items: stretch; gap: 15px; }
+            .filter-group select { margin-bottom: 0; }
+            .content { padding: 25px; }
+            .teams-grid { grid-template-columns: 1fr; }
+            .team-metrics { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="header-left">
+                <strong>Client XYZ</strong>
+                <small>Week of Feb 23 - Feb 29, 2026</small>
+            </div>
+            <div class="header-center">
+                <h1 style="font-size: 2.2rem; margin: 0;">
+                    <i class="fas fa-shield-alt"></i>
+                    Vulnerability Management Report
+                </h1>
+            </div>
+            <div class="header-right">
+                <img src="https://via.placeholder.com/240x60/3b82f6/ffffff?text=XYZ+Logo" alt="XYZ Logo">
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Executive Summary - Highlighted with Animated Color Band -->
+            <section class="executive-summary">
+                <h2 style="color: #1e293b; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">📊 Executive Summary</h2>
+                
+                <div class="summary-grid">
+                    <!-- Total Vulns Discovered -->
+                    <div class="summary-card">
+                        <div class="summary-title">Total Vulnerabilities Discovered</div>
+                        <div class="total-number">187</div>
+                        <div class="chart-container-small">
+                            <canvas id="totalVulnsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Open Vulns Status -->
+                    <div class="summary-card">
+                        <div class="summary-title">Open Vulnerabilities Status</div>
+                        <div class="chart-container-small">
+                            <canvas id="openStatusChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Distribution by Team -->
+                    <div class="summary-card">
+                        <div class="summary-title">Distribution by Team</div>
+                        <div class="chart-container-small">
+                            <canvas id="teamDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Main Chart -->
+            <section class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-title">Mitigated Vulnerabilities: Severity vs Team Performance</div>
+                    <canvas id="mitigatedRadarChart" height="450"></canvas>
+                </div>
+            </section>
+            
+            <!-- Team Performance Overview - 2x2 Grid -->
+            <section>
+                <h2><i class="fas fa-users"></i> Team Performance Overview</h2>
+                <div class="teams-grid">
+                    <!-- Row 1: Network Security & Patch Management -->
+                    <div class="team-card" style="border-left-color: #3b82f6;">
+                        <div class="team-header">
+                            <div class="team-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🔗</div>
+                            <div>
+                                <div class="team-name">Network Security</div>
+                                <div class="team-total" style="color: #3b82f6;">48 Total vulns assigned</div>
+                            </div>
+                        </div>
+                        <div class="team-metrics">
+                            <div class="metric-item"><div class="metric-value" style="color: #059669;">38</div><div class="metric-label">Closed</div></div>
+                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">10</div><div class="metric-label">Open</div></div>
+                            <div class="metric-item"><div class="status-badge severity-maroon">3 critical</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-red">15 high</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-orange">20 medium</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-darkgreen">10 low</div><div class="metric-label"></div></div>
+                        </div>
+                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">79% Closure Rate | 4.2 days avg | 2 overdue</div>
+                    </div>
+                    
+                    <div class="team-card" style="border-left-color: #10b981;">
+                        <div class="team-header">
+                            <div class="team-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🔧</div>
+                            <div>
+                                <div class="team-name">Patch Management</div>
+                                <div class="team-total" style="color: #10b981;">62 Total vulns assigned</div>
+                            </div>
+                        </div>
+                        <div class="team-metrics">
+                            <div class="metric-item"><div class="metric-value" style="color: #059669;">52</div><div class="metric-label">Closed</div></div>
+                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">8</div><div class="metric-label">Open</div></div>
+                            <div class="metric-item"><div class="status-badge severity-maroon">8 critical</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-red">22 high</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-orange">25 medium</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-darkgreen">7 low</div><div class="metric-label"></div></div>
+                        </div>
+                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">84% Closure Rate | 3.8 days avg | 0 overdue</div>
+                    </div>
+                    
+                    <!-- Row 2: Configuration Management & Architectural Flaws -->
+                    <div class="team-card" style="border-left-color: #f97316;">
+                        <div class="team-header">
+                            <div class="team-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">⚙️</div>
+                            <div>
+                                <div class="team-name">Configuration Management</div>
+                                <div class="team-total" style="color: #f97316;">42 Total vulns assigned</div>
+                            </div>
+                        </div>
+                        <div class="team-metrics">
+                            <div class="metric-item"><div class="metric-value" style="color: #059669;">35</div><div class="metric-label">Closed</div></div>
+                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">6</div><div class="metric-label">Open</div></div>
+                            <div class="metric-item"><div class="status-badge severity-maroon">2 critical</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-red">12 high</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-orange">18 medium</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-darkgreen">10 low</div><div class="metric-label"></div></div>
+                        </div>
+                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">83% Closure Rate | 5.1 days avg | 1 overdue</div>
+                    </div>
+                    
+                    <div class="team-card" style="border-left-color: #dc2626;">
+                        <div class="team-header">
+                            <div class="team-icon" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">🏗️</div>
+                            <div>
+                                <div class="team-name">Architectural Flaws</div>
+                                <div class="team-total" style="color: #dc2626;">35 Total vulns assigned</div>
+                            </div>
+                        </div>
+                        <div class="team-metrics">
+                            <div class="metric-item"><div class="metric-value" style="color: #059669;">25</div><div class="metric-label">Closed</div></div>
+                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">11</div><div class="metric-label">Open</div></div>
+                            <div class="metric-item"><div class="status-badge severity-maroon">5 critical</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-red">10 high</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-orange">12 medium</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-darkgreen">8 low</div><div class="metric-label"></div></div>
+                        </div>
+                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">71% Closure Rate | 7.3 days avg | 4 overdue</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Filters & Table -->
+            <section>
+                <h2><i class="fas fa-table"></i> Detailed Vulnerabilities</h2>
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label>Team:</label>
+                        <select id="teamFilter">
+                            <option value="all">All Teams</option>
+                            <option value="network">Network Security</option>
+                            <option value="patch">Patch Management</option>
+                            <option value="configuration">Configuration Management</option>
+                            <option value="architectural">Architectural Flaws</option>
+                        </select>
+                        <label>Severity:</label>
+                        <select id="severityFilter">
+                            <option value="all">All</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <label>Status:</label>
+                        <select id="statusFilter">
+                            <option value="all">All</option>
+                            <option value="open">Open</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="vulnsTable">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> S.No.</th>
+                                <th><i class="fas fa-bug"></i> Vulnerability Name</th>
+                                <th><i class="fas fa-server"></i> Asset</th>
+                                <th><i class="fas fa-users"></i> Team</th>
+                                <th><i class="fas fa-exclamation-triangle"></i> Severity</th>
+                                <th><i class="fas fa-calendar"></i> Found Date</th>
+                                <th><i class="fas fa-clock"></i> Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Updated Chart Data with Severity Colors
+        const charts = {
+            totalVulnsChart: {
+                type: 'bar',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        label: 'Total Discovered',
+                        data: [18, 59, 75, 35],
+                        backgroundColor: ['#dc2626', '#ef4444', '#f97316', '#166534'],
+                        borderRadius: 8
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } }
+                }
+            },
+            openStatusChart: {
+                type: 'doughnut',
+                data: {
+                    labels: ['Open', 'Closed'],
+                    datasets: [{ 
+                        data: [62, 125], 
+                        backgroundColor: ['#dc2626', '#059669'], 
+                        borderWidth: 4, 
+                        borderColor: '#ffffff' 
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            },
+            teamDistributionChart: {
+                type: 'doughnut',
+                data: {
+                    labels: ['Network Security', 'Patch Mgmt', 'Config Mgmt', 'Arch Flaws'],
+                    datasets: [{ 
+                        data: [48, 62, 42, 35], 
+                        backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#dc2626'],
+                        borderWidth: 0 
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'right', labels: { padding: 20, usePointStyle: true } } } }
+            },
+            mitigatedRadarChart: {
+                type: 'radar',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [
+                        { label: 'Network Security', data: [25, 35, 45, 28], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)' },
+                        { label: 'Patch Mgmt', data: [45, 55, 62, 35], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)' },
+                        { label: 'Config Mgmt', data: [20, 30, 42, 32], borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.15)' },
+                        { label: 'Arch Flaws', data: [15, 25, 30, 22], borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.15)' }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    scales: { r: { beginAtZero: true, max: 70, pointLabels: { font: { size: 12 } } } },
+                    plugins: { legend: { position: 'top' } }
+                }
+            }
+        };
+
+        // Initialize Charts
+        Object.entries(charts).forEach(([id, config]) => {
+            new Chart(document.getElementById(id).getContext('2d'), config);
+        });
+
+        // Updated Table Data
+        const tableData = [
+            { id: 1, name: 'Unencrypted SNMPv2 Traffic', asset: 'Core-Switch-01', team: 'network', severity: 'critical', found: '2026-02-23', status: 'open' },
+            { id: 2, name: 'Unpatched Windows Server 2019', asset: 'WEB-SRV-Prod-01', team: 'patch', severity: 'high', found: '2026-02-24', status: 'closed' },
+            { id: 3, name: 'Excessive File Permissions (777)', asset: 'DB-Server-Prod-02', team: 'configuration', severity: 'medium', found: '2026-02-25', status: 'closed' },
+            { id: 4, name: 'Hardcoded API Keys in Config', asset: 'App-Config-Repo', team: 'architectural', severity: 'critical', found: '2026-02-23', status: 'open' },
+            { id: 5, name: 'Firewall Rule Allows All Traffic', asset: 'FW-Edge-01', team: 'network', severity: 'high', found: '2026-02-24', status: 'closed' },
+            { id: 6, name: 'Apache HTTPD CVE-2025-1234', asset: 'WEB-SRV-02', team: 'patch', severity: 'critical', found: '2026-02-26', status: 'open' },
+            { id: 7, name: 'Default Admin Passwords Active', asset: 'Cisco-Switch-03', team: 'configuration', severity: 'high', found: '2026-02-25', status: 'open' },
+            { id: 8, name: 'Insecure Direct Object Reference', asset: 'User-Mgmt-API', team: 'architectural', severity: 'high', found: '2026-02-24', status: 'closed' }
+        ];
+
+        function filterTable() {
+            const team = document.getElementById('teamFilter').value;
+            const severity = document.getElementById('severityFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const tbody = document.getElementById('tableBody');
+            
+            tbody.innerHTML = '';
+            tableData.filter(row => 
+                (team === 'all' || row.team === team) &&
+                (severity === 'all' || row.severity === severity) &&
+                (status === 'all' || row.status === status)
+            ).forEach(rowData => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><strong>${rowData.id}</strong></td>
+                    <td>${rowData.name}</td>
+                    <td><strong>${rowData.asset}</strong></td>
+                    <td><span class="team-badge team-${rowData.team}">${rowData.team === 'network' ? 'Network Security' : rowData.team === 'patch' ? 'Patch Management' : rowData.team === 'configuration' ? 'Configuration Management' : 'Architectural Flaws'}</span></td>
+                    <td><span class="status-badge severity-${rowData.severity}">${rowData.severity.charAt(0).toUpperCase() + rowData.severity.slice(1)}</span></td>
+                    <td>${rowData.found}</td>
+                    <td><span class="status-badge ${rowData.status === 'open' ? 'status-open' : 'status-closed'}">${rowData.status === 'open' ? 'Open' : 'Closed'}</span></td>
+                `;
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('teamFilter').addEventListener('change', filterTable);
+        document.getElementById('severityFilter').addEventListener('change', filterTable);
+        document.getElementById('statusFilter').addEventListener('change', filterTable);
+        filterTable();
+    </script>
+</body>
+</html>

@@ -51,6 +51,13 @@
           <p class="menu-heading">Assets</p></button>
         </div>
 
+        <!-- Performance Monitoring - Restricted during testing -->
+        <div>
+          <button class="btn border-0" :class="{ activeBtn: isActive('/performance-monitoring') }" @click="navigateTo('/performance-monitoring')">
+          <i class="bi bi-graph-up-arrow nav-menu"></i>
+          <p class="menu-heading">Performance Monitoring</p></button>
+        </div>
+
         <!-- PENDING - Restricted during testing -->
         <div>
           <button class="btn border-0" :class="{ activeBtn: isActive('/pending') }" @click="navigateTo('/pending')">

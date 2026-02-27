@@ -1,7 +1,0 @@
- "is_new_user": false,
-    "vaptfix_team": {
-        "team_id": "b27dc6d3-f2bc-4b6d-9725-9ab8e914d0d5",
-        "team_name": "VAPTFIX",
-        "status": "already_exists",
-        "channels": []
-    }
