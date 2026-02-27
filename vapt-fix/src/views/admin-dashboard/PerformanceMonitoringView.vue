@@ -177,8 +177,8 @@ export default {
 .team-card { background: white; padding: 35px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border-left: 8px solid; height: 100%; }
 .team-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
 .team-icon { font-size: 2.5rem; width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; }
-.team-name { font-size: 1.5rem; font-weight: 700; color: #1e293b; flex: 1; }
-.team-total { font-size: 2rem; font-weight: 800; }
+.team-name { font-size: 26px; font-weight: 700; color: #1e293b; flex: 1; }
+.team-total { font-size: 22px; font-weight: 800; }
 .team-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
 .metric-item { text-align: center; padding: 15px 10px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 14px; }
 .metric-value { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
