@@ -7,10 +7,10 @@
 
     <div class="app">
       <!-- STEPPER -->
-      <Stepper />
+      <Stepper v-if="!isEditMode" />
 
       <!-- CONTENT -->
-      <div class="content">
+      <div :class="['content', { 'no-stepper': isEditMode }]">
         <h1>Risk Criteria</h1>
         <p>Define the governance framework for timely vulnerability mitigation and risk reduction.</p>
 
@@ -481,6 +481,10 @@ export default {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.content.no-stepper {
+  margin-left: 0;
 }
 
 

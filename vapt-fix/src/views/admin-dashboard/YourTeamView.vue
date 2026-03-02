@@ -1131,6 +1131,11 @@ async deleteRoleFromUser(user, roleToRemove) {
   font-size: 18px;
 }
 
+.nav-item.active {
+  /* text-shadow: 0 2px 8px rgba(49, 33, 177, 0.8), 0 4px 16px rgba(49, 33, 177, 0.5); */
+  text-shadow: 0 2px 10px rgba(49, 33, 177, 0.8);
+}
+
 .nav-item i {
   margin-right: 5px;
 }

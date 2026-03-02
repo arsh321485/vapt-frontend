@@ -56,7 +56,7 @@
                     <tr>
                       <th style="width: 60px;">S.No</th>
                       <th>IP Address</th>
-                      <th style="width: 100px;">Actions</th>
+                      <th v-if="!actionsLocked" style="width: 100px;">Actions</th>
                     </tr>
                   </thead>
 
@@ -71,7 +71,7 @@
                         </span>
                       </td>
 
-                      <td class="text-center">
+                      <td v-if="!actionsLocked" class="text-center">
                         <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'internal')"></i>
 
                         <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
@@ -99,7 +99,7 @@
                     <tr>
                       <th style="width: 60px;">S.No</th>
                       <th>IP Address</th>
-                      <th style="width: 100px;">Actions</th>
+                      <th v-if="!actionsLocked" style="width: 100px;">Actions</th>
                     </tr>
                   </thead>
 
@@ -107,7 +107,7 @@
                     <tr v-for="(item, index) in externalTargets" :key="item.id">
                       <td>{{ index + 1 }}</td>
                       <td>{{ item.ip }}</td>
-                      <td class="text-center">
+                      <td v-if="!actionsLocked" class="text-center">
                         <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'external')"></i>
                         <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
                       </td>
@@ -133,7 +133,7 @@
                     <tr>
                       <th style="width: 60px;">S.No</th>
                       <th>URL</th>
-                      <th style="width: 100px;">Actions</th>
+                      <th v-if="!actionsLocked" style="width: 100px;">Actions</th>
                     </tr>
                   </thead>
 
@@ -141,7 +141,7 @@
                     <tr v-for="(item, index) in webAppTargets" :key="item.id">
                       <td>{{ index + 1 }}</td>
                       <td class="text-break">{{ item.url }}</td>
-                      <td class="text-center">
+                      <td v-if="!actionsLocked" class="text-center">
                         <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'web')"></i>
                         <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
                       </td>
@@ -167,7 +167,7 @@
                     <tr>
                       <th style="width: 60px;">S.No</th>
                       <th>URL</th>
-                      <th style="width: 100px;">Actions</th>
+                      <th v-if="!actionsLocked" style="width: 100px;">Actions</th>
                     </tr>
                   </thead>
 
@@ -175,7 +175,7 @@
                     <tr v-for="(item, index) in mobAppTargets" :key="item.id">
                       <td>{{ index + 1 }}</td>
                       <td class="text-break">{{ item.url }}</td>
-                      <td class="text-center">
+                      <td v-if="!actionsLocked" class="text-center">
                         <i class="bi bi-pencil me-3 action-icon" @click="openEditModal(item, 'mobile')"></i>
                         <i class="bi bi-trash action-icon text-danger" @click="deleteTarget(item.id)"></i>
                       </td>
@@ -266,6 +266,7 @@ export default {
       adminId: null,
       isInitialLoad: true,
       scopeId: null,
+      actionsLocked: false,
     };
   },
   watch: {
@@ -298,6 +299,9 @@ selectedTestingType: {
 
     const user = JSON.parse(localStorage.getItem("user"));
     this.adminId = user?.id || user?._id;
+
+    await this.authStore.fetchDashboardTotalAssets();
+    this.actionsLocked = this.authStore.totalAssets > 0;
 
     if (this.adminId) {
       await this.fetchProjectNames(); // project → full scope

@@ -59,103 +59,213 @@
               
               <div class="d-flex flex-row gap-3 mt-3">
                 <div>
-                <button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-download me-2"></i> Download Report</button>
+                <button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-eye me-2"></i> View Report</button>
                 </div>
 
-                <!-- Overlay Popup -->
-                  <div v-if="showReport" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                  style="background-color: rgba(0, 0, 0, 0.6); z-index: 1050;">
-                  <div class="bg-white p-4 rounded shadow" style="width: 600px; max-height: 90vh; overflow-y: auto; position: relative;">
-                  <!-- Close Button -->
-                  <button @click="showReport = false"
-                  class="btn-close position-absolute top-0 end-0 m-3"
-                  aria-label="Close"></button>
-                  <h2 class="mb-2 text-center">Download Report</h2>
-                    <p class="mb-2 text-center" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Download report</p>
-                    <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3"> June 1 - June 30 <i class="bi bi-calendar-minus"></i>
-                    </button>
+                <!-- Download Report Modal - Full Screen -->
+                <div v-if="showReport" class="report-overlay">
+                  <div class="report-page-wrap">
 
-                    <!-- Accordion -->
-                    <div class="accordion" id="globalReportAccordion">
-                      <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                        <button
-                          class="accordion-button"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#collapseOne"
-                          aria-expanded="true"
-                          aria-controls="collapseOne"
-                        >Assets(11) <span class="text-primary ms-2">4 selected</span>
+                    <!-- Report Header -->
+                    <div class="report-header">
+                      <div class="report-header-left">
+                        <!-- <strong>Client XYZ</strong> -->
+                         <div class="browser-bar">
+        <img src="@/assets/images/vaptfix_white.png" alt="">
+      </div>
+                        <small>Ibdar_int_july_dpeeds</small>
+                      </div>
+                      <div class="report-header-center">
+                        <h1 style="font-size: 2.2rem; margin: 0; color: white;">Vulnerability Management Report</h1>
+                      </div>
+                      <div class="report-header-right">
+                        <button @click="closeReportModal" class="report-close-icon-btn">
+                          <i class="bi bi-x-lg"></i>
                         </button>
-                        </h2>
-                        <div id="collapseOne"
-                        class="accordion-collapse collapse show"
-                        aria-labelledby="headingOne"
-                        data-bs-parent="#globalReportAccordion">
-                        <div class="accordion-body">
-                         Assets
-                        </div>
-                        </div>
-                        </div>
-
-                                    <div class="accordion-item">
-                                      <h2 class="accordion-header" id="headingTwo">
-                                        <button
-                                          class="accordion-button collapsed"
-                                          type="button"
-                                          data-bs-toggle="collapse"
-                                          data-bs-target="#collapseTwo"
-                                          aria-expanded="false"
-                                          aria-controls="collapseTwo"
-                                        >
-                                          Vulnerabilities
-                                        </button>
-                                      </h2>
-                                      <div
-                                        id="collapseTwo"
-                                        class="accordion-collapse collapse"
-                                        aria-labelledby="headingTwo"
-                                        data-bs-parent="#globalReportAccordion"
-                                      >
-                                        <div class="accordion-body">
-                                          Vulnerabilities
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div class="accordion-item">
-                                      <h2 class="accordion-header" id="headingThree">
-                                        <button
-                                          class="accordion-button collapsed"
-                                          type="button"
-                                          data-bs-toggle="collapse"
-                                          data-bs-target="#collapseThree"
-                                          aria-expanded="false"
-                                          aria-controls="collapseThree"
-                                        >
-                                          Team Role
-                                        </button>
-                                      </h2>
-                                      <div
-                                        id="collapseThree"
-                                        class="accordion-collapse collapse"
-                                        aria-labelledby="headingThree"
-                                        data-bs-parent="#globalReportAccordion"
-                                      >
-                                        <div class="accordion-body">
-                                          Team Roles
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    
+                        <button @click="downloadReport" class="report-download-btn">
+                          <i class="bi bi-download"></i>
+                          <span>Download Report</span>
+                        </button>
+                      </div>
                     </div>
 
-                    <button class="btn download-btn btn-sm ms-3 mt-4"><i class="bi bi-download me-2"></i> Download report</button>
+                    <div class="report-content">
+
+                      <!-- Executive Summary -->
+                      <section class="report-exec-summary">
+                        <h2 class="report-h2">📊 Executive Summary</h2>
+                        <div class="report-summary-grid">
+                          <div class="report-summary-card">
+                            <div class="report-summary-title">Total Vulnerabilities Discovered</div>
+                            <div class="report-total-number">187</div>
+                            <div class="report-chart-small"><canvas id="rTotalVulnsChart"></canvas></div>
+                          </div>
+                          <!-- Criticality Status Overview (from sample 8) -->
+                          <div class="report-summary-card">
+                            <div class="report-summary-title">Severity Status Overview</div>
+                            <div class="report-chart-small"><canvas id="rCriticalityStatusChart"></canvas></div>
+                          </div>
+                          <div class="report-summary-card">
+                            <div class="report-summary-title">Distribution by Team</div>
+                            <div class="report-chart-small"><canvas id="rTeamDistributionChart"></canvas></div>
+                          </div>
+                        </div>
+                      </section>
+
+                      <!-- Main Chart -->
+                      <section class="report-charts-section">
+                        <div class="report-chart-card">
+                          <div class="report-chart-title">Mitigated Vulnerabilities: Severity vs Team Performance</div>
+                          <div class="report-chart-wrapper">
+                            <canvas id="rMitigatedRadarChart"></canvas>
+                          </div>
+                        </div>
+                      </section>
+
+                      <!-- Team Performance -->
+                      <section>
+                        <h2 class="report-h2"><i class="bi bi-people"></i> Team Performance Overview</h2>
+                        <div class="report-teams-grid">
+
+                          <div class="report-team-card" style="border-left-color: #3b82f6;">
+                            <div class="report-team-header">
+                              <div class="report-team-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🔗</div>
+                              <div>
+                                <div class="report-team-name">Network Security</div>
+                                <div class="report-team-total" style="color: #3b82f6;">48 Total vulns assigned</div>
+                              </div>
+                            </div>
+                            <div class="report-team-metrics">
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">38</div><div class="report-metric-label">Closed</div></div>
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">10</div><div class="report-metric-label">Open</div></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">3 Critical</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-red">15 High</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">20 Medium</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">10 Low</span></div>
+                            </div>
+                            <div class="report-team-footer">79% Closure Rate | 4.2 days avg | 2 overdue</div>
+                          </div>
+
+                          <div class="report-team-card" style="border-left-color: #10b981;">
+                            <div class="report-team-header">
+                              <div class="report-team-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🔧</div>
+                              <div>
+                                <div class="report-team-name">Patch Management</div>
+                                <div class="report-team-total" style="color: #10b981;">62 Total vulns assigned</div>
+                              </div>
+                            </div>
+                            <div class="report-team-metrics">
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">52</div><div class="report-metric-label">Closed</div></div>
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">8</div><div class="report-metric-label">Open</div></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">8 Critical</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-red">22 High</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">25 Medium</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">7 Low</span></div>
+                            </div>
+                            <div class="report-team-footer">84% Closure Rate | 3.8 days avg | 0 overdue</div>
+                          </div>
+
+                          <div class="report-team-card" style="border-left-color: #f97316;">
+                            <div class="report-team-header">
+                              <div class="report-team-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">⚙️</div>
+                              <div>
+                                <div class="report-team-name">Configuration Management</div>
+                                <div class="report-team-total" style="color: #f97316;">42 Total vulns assigned</div>
+                              </div>
+                            </div>
+                            <div class="report-team-metrics">
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">35</div><div class="report-metric-label">Closed</div></div>
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">6</div><div class="report-metric-label">Open</div></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">2 Critical</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-red">12 High</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">18 Medium</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">10 Low</span></div>
+                            </div>
+                            <div class="report-team-footer">83% Closure Rate | 5.1 days avg | 1 overdue</div>
+                          </div>
+
+                          <div class="report-team-card" style="border-left-color: #dc2626;">
+                            <div class="report-team-header">
+                              <div class="report-team-icon" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">🏗️</div>
+                              <div>
+                                <div class="report-team-name">Architectural Flaws</div>
+                                <div class="report-team-total" style="color: #dc2626;">35 Total vulns assigned</div>
+                              </div>
+                            </div>
+                            <div class="report-team-metrics">
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">25</div><div class="report-metric-label">Closed</div></div>
+                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">11</div><div class="report-metric-label">Open</div></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">5 Critical</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-red">10 High</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">12 Medium</span></div>
+                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">8 Low</span></div>
+                            </div>
+                            <div class="report-team-footer">71% Closure Rate | 7.3 days avg | 4 overdue</div>
+                          </div>
+
+                        </div>
+                      </section>
+
+                      <!-- Detailed Vulnerabilities -->
+                      <section>
+                        <h2 class="report-h2"><i class="bi bi-table"></i> Detailed Vulnerabilities</h2>
+                        <div class="report-filters-section">
+                          <div class="report-filter-group">
+                            <label>Team:</label>
+                            <select v-model="reportTeamFilter">
+                              <option value="all">All Teams</option>
+                              <option value="network">Network Security</option>
+                              <option value="patch">Patch Management</option>
+                              <option value="configuration">Configuration Management</option>
+                              <option value="architectural">Architectural Flaws</option>
+                            </select>
+                            <label>Severity:</label>
+                            <select v-model="reportSeverityFilter">
+                              <option value="all">All</option>
+                              <option value="critical">Critical</option>
+                              <option value="high">High</option>
+                              <option value="medium">Medium</option>
+                              <option value="low">Low</option>
+                            </select>
+                            <label>Status:</label>
+                            <select v-model="reportStatusFilter">
+                              <option value="all">All</option>
+                              <option value="open">Open</option>
+                              <option value="closed">Closed</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="report-table-container">
+                          <table class="report-table">
+                            <thead>
+                              <tr>
+                                <th>S.No.</th>
+                                <th>Vulnerability Name</th>
+                                <th>Asset</th>
+                                <th>Team</th>
+                                <th>Severity</th>
+                                <th>Found Date</th>
+                                <th>Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for="row in filteredReportData" :key="row.id">
+                                <td><strong>{{ row.id }}</strong></td>
+                                <td>{{ row.name }}</td>
+                                <td><strong>{{ row.asset }}</strong></td>
+                                <td><span :class="['rteam-badge', 'rteam-' + row.team]">{{ row.teamLabel }}</span></td>
+                                <td><span :class="['rsev-badge', 'rsev-' + row.severity]">{{ row.severity.charAt(0).toUpperCase() + row.severity.slice(1) }}</span></td>
+                                <td>{{ row.found }}</td>
+                                <td><span :class="row.status === 'open' ? 'rstatus-open' : 'rstatus-closed'">{{ row.status === 'open' ? 'Open' : 'Closed' }}</span></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </section>
 
                     </div>
-                    </div>
+                  </div>
+                </div>
                     
                   <NotificationPanel />
 
@@ -335,7 +445,7 @@
                 </div>
               </div>
               <div class="col-4">
-                <router-link to="/exceptions" class="text-decoration-none">
+                <router-link to="/supportrequests" class="text-decoration-none">
                   <div class="card h-100 pb-2 pt-3 px-3">
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
@@ -573,6 +683,7 @@ import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
+import Chart from 'chart.js/auto';
 
 export default {
   name: 'AdminDashboardOnboardingView',
@@ -632,6 +743,25 @@ export default {
       vulFixedHigh: 0,
       vulFixedMedium: 0,
       vulFixedLow: 0,
+      // Report modal data
+      reportTeamFilter: 'all',
+      reportSeverityFilter: 'all',
+      reportStatusFilter: 'all',
+      reportCharts: [],
+      reportTableData: [
+        { id: 1, name: 'Unencrypted SNMPv2 Traffic', asset: 'Core-Switch-01', team: 'network', teamLabel: 'Network Security', severity: 'critical', found: '2026-02-23', status: 'open' },
+        { id: 2, name: 'Unpatched Windows Server 2019', asset: 'WEB-SRV-Prod-01', team: 'patch', teamLabel: 'Patch Management', severity: 'high', found: '2026-02-24', status: 'closed' },
+        { id: 3, name: 'Excessive File Permissions (777)', asset: 'DB-Server-Prod-02', team: 'configuration', teamLabel: 'Configuration Management', severity: 'medium', found: '2026-02-25', status: 'closed' },
+        { id: 4, name: 'Hardcoded API Keys in Config', asset: 'App-Config-Repo', team: 'architectural', teamLabel: 'Architectural Flaws', severity: 'critical', found: '2026-02-23', status: 'open' },
+        { id: 5, name: 'Firewall Rule Allows All Traffic', asset: 'FW-Edge-01', team: 'network', teamLabel: 'Network Security', severity: 'high', found: '2026-02-24', status: 'closed' },
+        { id: 6, name: 'Apache HTTPD CVE-2025-1234', asset: 'WEB-SRV-02', team: 'patch', teamLabel: 'Patch Management', severity: 'critical', found: '2026-02-26', status: 'open' },
+        { id: 7, name: 'Default Admin Passwords Active', asset: 'Cisco-Switch-03', team: 'configuration', teamLabel: 'Configuration Management', severity: 'high', found: '2026-02-25', status: 'open' },
+        { id: 8, name: 'Insecure Direct Object Reference', asset: 'User-Mgmt-API', team: 'architectural', teamLabel: 'Architectural Flaws', severity: 'high', found: '2026-02-24', status: 'closed' },
+        { id: 9, name: 'SSL Certificate Expired', asset: 'Mail-SRV-01', team: 'network', teamLabel: 'Network Security', severity: 'medium', found: '2026-02-25', status: 'open' },
+        { id: 10, name: 'Outdated OpenSSL Library', asset: 'API-Gateway-01', team: 'patch', teamLabel: 'Patch Management', severity: 'high', found: '2026-02-26', status: 'open' },
+        { id: 11, name: 'Weak Password Policy', asset: 'AD-Server-01', team: 'configuration', teamLabel: 'Configuration Management', severity: 'medium', found: '2026-02-27', status: 'closed' },
+        { id: 12, name: 'Exposed Admin Panel', asset: 'CMS-Prod-01', team: 'architectural', teamLabel: 'Architectural Flaws', severity: 'high', found: '2026-02-27', status: 'open' },
+      ],
     };
   },
   computed: {
@@ -688,6 +818,24 @@ export default {
         return `${this.selectedLocationData.name} - ${this.selectedLocationType}`;
       }
       return this.selectedLocationData.name;
+    },
+    filteredReportData() {
+      return this.reportTableData.filter(row =>
+        (this.reportTeamFilter === 'all' || row.team === this.reportTeamFilter) &&
+        (this.reportSeverityFilter === 'all' || row.severity === this.reportSeverityFilter) &&
+        (this.reportStatusFilter === 'all' || row.status === this.reportStatusFilter)
+      );
+    },
+  },
+  watch: {
+    showReport(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.initReportCharts();
+        });
+      } else {
+        this.destroyReportCharts();
+      }
     },
   },
   methods: {
@@ -1048,6 +1196,102 @@ export default {
       });
     },
 
+    closeReportModal() {
+      this.showReport = false;
+    },
+
+    downloadReport() {
+      const reportContent = document.querySelector('.report-page-wrap');
+      if (!reportContent) return;
+
+      const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vulnerability Management Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; padding: 20px; }
+    ${Array.from(document.styleSheets).filter(s => { try { return s.cssRules; } catch(e) { return false; } }).flatMap(s => Array.from(s.cssRules)).map(r => r.cssText).join('\n')}
+  </style>
+</head>
+<body>
+  ${reportContent.outerHTML}
+</body>
+</html>`;
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vulnerability-management-report.html';
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+
+    destroyReportCharts() {
+      this.reportCharts.forEach(c => c.destroy());
+      this.reportCharts = [];
+    },
+
+    initReportCharts() {
+      this.destroyReportCharts();
+      const chartConfigs = [
+        {
+          id: 'rTotalVulnsChart',
+          type: 'bar',
+          data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{ label: 'Total Discovered', data: [18, 59, 75, 35], backgroundColor: ['maroon', 'red', 'goldenrod', 'green'], borderRadius: 8 }]
+          },
+          options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } } }
+        },
+        {
+          id: 'rCriticalityStatusChart',
+          type: 'doughnut',
+          data: {
+            labels: ['Critical Pending', 'High Pending', 'Medium Pending', 'Low Pending'],
+            datasets: [{ data: [10, 20, 4, 1], backgroundColor: ['maroon', 'red', 'goldenrod', 'green'] }]
+          },
+          options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        },
+        {
+          id: 'rTeamDistributionChart',
+          type: 'doughnut',
+          data: {
+            labels: ['Network Security', 'Patch Management', 'Configuration Management', 'Architectular Flaws'],
+            datasets: [{ data: [48, 62, 42, 35], backgroundColor: ['maroon', 'red', 'goldenrod', 'green'], borderWidth: 0 }]
+          },
+          options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true } } } }
+        },
+        {
+          id: 'rMitigatedRadarChart',
+          type: 'radar',
+          data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [
+              { label: 'Network Security', data: [25, 35, 45, 28], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)' },
+              { label: 'Patch Management', data: [45, 55, 62, 35], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)' },
+              { label: 'Configuration Management', data: [20, 30, 42, 32], borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.15)' },
+              { label: 'Architectural Flaws', data: [15, 25, 30, 22], borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.15)' }
+            ]
+          },
+          options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 70, pointLabels: { font: { size: 12 }, color: ['maroon', 'red', 'goldenrod', 'green'] } } }, plugins: { legend: { position: 'top' } } }
+        }
+      ];
+      chartConfigs.forEach(cfg => {
+        const canvas = document.getElementById(cfg.id);
+        if (canvas) {
+          const chart = new Chart(canvas.getContext('2d'), { type: cfg.type, data: cfg.data, options: cfg.options });
+          this.reportCharts.push(chart);
+        }
+      });
+    },
+
     async initReportStatusCheck() {
       console.log("🚀 Initializing report status check...");
 
@@ -1165,6 +1409,7 @@ mounted() {
     // ✅ Clean up report status polling
     this.stopReportStatusPolling();
     this.removeReportStatusOverlay();
+    this.destroyReportCharts();
   },
   // Handle component reactivation (if using keep-alive)
   activated() {
@@ -1177,7 +1422,9 @@ mounted() {
 </script>
 
 <style scoped>
-
+.browser-bar img {
+  height: 35px; 
+}
 /* Testing Overlay - Only covers col-11 (right side of screen) */
 .testing-overlay {
   position: fixed;
@@ -1521,4 +1768,246 @@ mounted() {
   background-color: #eef0ff;
   color: rgba(49, 33, 177, 1);
 }
+
+/* ===== DOWNLOAD REPORT MODAL ===== */
+.report-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  /* background: linear-gradient(135deg, #aab3df 0%, #764ba2 100%); */
+  z-index: 2000;
+  overflow-y: auto;
+  padding: 40px 20px;
+}
+.report-page-wrap {
+  max-width: 1600px;
+  margin: 0 auto 60px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+.report-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: white;
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.report-header::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: reportFloat 20s ease-in-out infinite;
+}
+@keyframes reportFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
+.report-header-left { display: flex; flex-direction: column; gap: 5px; z-index: 2; }
+.report-header-center { flex: 1; text-align: center; position: relative; z-index: 2; }
+.report-header-right {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.report-close-icon-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.9;
+}
+.report-close-icon-btn:hover { opacity: 1; }
+.report-download-btn {
+  background: none;
+  border: none;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  font-style: normal;
+}
+.report-download-btn:hover { opacity: 0.85; }
+.report-download-btn i { font-size: 1.2rem; font-style: normal; }
+.report-download-btn span { font-style: normal; }
+.report-content { padding: 40px; }
+.report-h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+.report-exec-summary {
+  position: relative;
+  margin-bottom: 40px;
+  padding: 40px;
+  background: linear-gradient(90deg, #3b82f6 0%, #10b981 33%, #f59e0b 66%, #ef4444 100%);
+  background-size: 400% 400%;
+  animation: reportGradientShift 15s ease infinite;
+  border-radius: 24px;
+  box-shadow: 0 25px 60px rgba(59, 130, 246, 0.3);
+}
+@keyframes reportGradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.report-exec-summary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 24px;
+  z-index: 1;
+}
+.report-exec-summary > * { position: relative; z-index: 2; }
+.report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+.report-summary-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+.report-summary-card:hover { transform: translateY(-8px); box-shadow: 0 25px 60px rgba(0,0,0,0.2); }
+.report-summary-title { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin-bottom: 20px; }
+.report-total-number { font-size: 3rem; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 15px; }
+.report-chart-small { height: 260px; margin-bottom: 15px; }
+.report-charts-section { margin-bottom: 40px; }
+.report-chart-wrapper { position: relative; height: 700px; }
+.report-chart-card {
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+.report-chart-title { font-size: 1.4rem; font-weight: 600; color: #1e293b; margin-bottom: 25px; text-align: center; }
+.report-teams-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 40px;
+}
+.report-team-card {
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  border-left: 8px solid;
+}
+.report-team-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+.report-team-icon {
+  font-size: 2rem;
+  width: 60px; height: 60px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.report-team-name { font-size: 1.4rem; font-weight: 700; color: #1e293b; }
+.report-team-total { font-size: 1.1rem; font-weight: 600; }
+.report-team-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.report-metric-item {
+  text-align: center;
+  padding: 12px 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 14px;
+}
+.report-metric-value { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
+.report-metric-label { font-size: 0.85rem; color: #64748b; }
+.report-team-footer { font-size: 0.95rem; color: #64748b; font-weight: 500; }
+/* Severity badges */
+.rsev-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+}
+.rsev-maroon, .rsev-critical { background: maroon; color: white; }
+.rsev-red, .rsev-high { background: red; color: white; }
+.rsev-orange, .rsev-medium { background: goldenrod; color: white; }
+.rsev-darkgreen, .rsev-low { background: green; color: white; }
+/* Filters */
+.report-filters-section {
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+.report-filter-group { display: flex; gap: 25px; flex-wrap: wrap; align-items: center; }
+.report-filter-group label { font-weight: 600; color: #374151; white-space: nowrap; font-size: 0.95rem; }
+.report-filter-group select {
+  padding: 14px 24px;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  font-weight: 500;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+}
+.report-filter-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+/* Table with scroller */
+.report-table-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  overflow: hidden;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.report-table { width: 100%; border-collapse: collapse; }
+.report-table thead th {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 22px;
+  font-weight: 600;
+  text-align: left;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.report-table tbody td { padding: 22px; border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
+.report-table tbody tr:hover td { background: #f8fafc; }
+.rteam-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+.rteam-network { background: #3b82f6; color: white; }
+.rteam-patch { background: #10b981; color: white; }
+.rteam-configuration { background: #f97316; color: white; }
+.rteam-architectural { background: #dc2626; color: white; }
+.rstatus-open { padding: 6px 12px; border-radius: 20px; background: #fee2e2; color: #dc2626; font-size: 0.85rem; font-weight: 600; display: inline-block; }
+.rstatus-closed { padding: 6px 12px; border-radius: 20px; background: #d1fae5; color: #059669; font-size: 0.85rem; font-weight: 600; display: inline-block; }
 </style>

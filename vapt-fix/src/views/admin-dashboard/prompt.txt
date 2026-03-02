@@ -1,0 +1,5 @@
+read vulnerability card code i have <div class="mt-3">
+                      <button class="btn btn-secondary btn-sm" @click="goToRow1">
+                        Mark Steps Incomplete</button>
+                    </div>
+                    in place of this i want linux and windows icon both icon sholud in flex and havne proper gap also 

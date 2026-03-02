@@ -14,7 +14,7 @@
         <div class="d-flex justify-content-between">
           <div>
             <h1>Upload Targets</h1>
-            <p>Add IP addresses, URLs, or subnets to begin vulnerability <br></br>testing and risk analysis.</p>
+            <p>Add IP addresses, URLs, or subnets to begin vulnerability Assessment</p>
           </div>
 
           <div class="d-flex justify-content-between gap-2">
@@ -107,28 +107,27 @@ https://example.com">
         </div>
 
         <!-- TARGET CARDS -->
+
+        <!-- Global upload status -->
+        <div v-if="isUploadingTargets" class="global-upload-status">
+          <span class="loader"></span>
+          <span class="ms-2">Uploading targets...</span>
+        </div>
+        <div v-else-if="uploadSuccess" class="global-upload-status success">
+          <i class="bi bi-check-circle-fill"></i>
+          <span class="ms-2">Uploaded successfully</span>
+        </div>
+
         <div class="files-card-grid">
 
           <!-- INTERNAL TARGETS -->
-          <div class="files-card" v-if="internalTargets.length || isUploadingTargets || uploadSuccess">
+          <div class="files-card" v-if="internalTargets.length">
             <div class="card-header-title">
               Internal Targets
             </div>
 
-            <!-- Uploading -->
-            <div v-if="isUploadingTargets" class="card-status">
-              <span class="loader"></span>
-              <span class="ms-2">Uploading targets...</span>
-            </div>
-
-            <!-- Success -->
-            <div v-else-if="uploadSuccess" class="card-status success">
-              <i class="bi bi-check-circle-fill"></i>
-              <span class="ms-2">Uploaded successfully</span>
-            </div>
-
             <!-- Table -->
-            <table v-if="internalTargets.length && !isUploadingTargets" class="mt-3">
+            <table v-if="internalTargets.length" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
@@ -151,22 +150,12 @@ https://example.com">
           </div>
 
           <!-- EXTERNAL TARGETS -->
-          <div class="files-card" v-if="externalTargets.length || isUploadingTargets || uploadSuccess">
+          <div class="files-card" v-if="externalTargets.length">
             <div class="card-header-title">
               External Targets
             </div>
 
-            <div v-if="isUploadingTargets" class="card-status">
-              <span class="loader"></span>
-              <span class="ms-2">Uploading targets...</span>
-            </div>
-
-            <div v-else-if="uploadSuccess" class="card-status success">
-              <i class="bi bi-check-circle-fill"></i>
-              <span class="ms-2">Uploaded successfully</span>
-            </div>
-
-            <table v-if="externalTargets.length && !isUploadingTargets" class="mt-3">
+            <table v-if="externalTargets.length" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
@@ -189,22 +178,12 @@ https://example.com">
           </div>
 
           <!-- WEB APP TARGETS -->
-          <div class="files-card" v-if="webAppTargets.length || isUploadingTargets || uploadSuccess">
+          <div class="files-card" v-if="webAppTargets.length">
             <div class="card-header-title">
               Web App Targets
             </div>
 
-            <div v-if="isUploadingTargets" class="card-status">
-              <span class="loader"></span>
-              <span class="ms-2">Uploading targets...</span>
-            </div>
-
-            <div v-else-if="uploadSuccess" class="card-status success">
-              <i class="bi bi-check-circle-fill"></i>
-              <span class="ms-2">Uploaded successfully</span>
-            </div>
-
-            <table v-if="webAppTargets.length && !isUploadingTargets" class="mt-3">
+            <table v-if="webAppTargets.length" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
@@ -222,22 +201,12 @@ https://example.com">
           </div>
 
           <!-- MOBILE APP TARGETS -->
-          <div class="files-card" v-if="mobileAppTargets.length || isUploadingTargets || uploadSuccess">
+          <div class="files-card" v-if="mobileAppTargets.length">
             <div class="card-header-title">
               Mobile App Targets
             </div>
 
-            <div v-if="isUploadingTargets" class="card-status">
-              <span class="loader"></span>
-              <span class="ms-2">Uploading targets...</span>
-            </div>
-
-            <div v-else-if="uploadSuccess" class="card-status success">
-              <i class="bi bi-check-circle-fill"></i>
-              <span class="ms-2">Uploaded successfully</span>
-            </div>
-
-            <table v-if="mobileAppTargets.length && !isUploadingTargets" class="mt-3">
+            <table v-if="mobileAppTargets.length" class="mt-3">
               <thead>
                 <tr>
                   <th class="col-serial">S.No.</th>
@@ -391,7 +360,7 @@ export default {
       Swal.fire({
         icon: "error",
         title: "Validation Error",
-        text: "name is required", // 👈 backend-style message
+        text: "Project name is required", // 👈 backend-style message
         confirmButtonColor: "#5a44ff",
       });
       return false;
@@ -943,21 +912,27 @@ export default {
 
 <style scoped>
 /* ..... */
-.card-status {
+.global-upload-status {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 24px 0;
+  padding: 12px 20px;
+  margin-bottom: 16px;
+  border-radius: 12px;
   font-size: 14px;
   color: #5a44ff;
+  background: rgba(90, 68, 255, 0.06);
+  border: 1px solid rgba(90, 68, 255, 0.15);
+  width: fit-content;
 }
 
-.card-status.success {
+.global-upload-status.success {
   color: #22c55e;
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
-.card-status i {
-  font-size: 20px;
+.global-upload-status i {
+  font-size: 18px;
 }
 
 /* ...... */
