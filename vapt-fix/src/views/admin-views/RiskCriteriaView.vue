@@ -140,7 +140,7 @@
 
         <div class="cta">
           <button class="btn btn-primary" :disabled="loading" @click="submitRiskCriteria">
-            {{ loading ? "Saving..." : "Continue to Upload Target →" }}
+            {{ loading ? "Saving..." : (isEditMode ? "Back to Previous Page →" : "Continue to Upload Target →") }}
           </button>
         </div>
 
@@ -295,8 +295,9 @@ export default {
           this.form.medium = d.medium;
           this.form.low = d.low;
 
-          // 🔥 store ids here
+          // 🔥 store ids here — keep both keys in sync
           localStorage.setItem("riskId", d._id);
+          localStorage.setItem("riskCriteriaId", d._id);
           localStorage.setItem("adminId", d.admin_id);
 
           this.isLocked = !this.isEditMode;

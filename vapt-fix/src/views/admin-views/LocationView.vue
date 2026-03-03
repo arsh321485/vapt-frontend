@@ -232,140 +232,140 @@ export default {
           });
         });
     },
-    // async addUser() {
-    //   // 1️⃣ Get admin id
-    //   const adminId =
-    //     this.authStore.user?._id ||
-    //     this.authStore.user?.id;
-
-    //   if (!adminId) {
-    //     Swal.fire("Error", "Please login again", "error");
-    //     return;
-    //   }
-
-    //   // 2️⃣ Build payload (❌ location removed)
-    //   const payload = {
-    //     admin_id: adminId,                 // ✅ required
-    //     first_name: this.form.first_name,
-    //     last_name: this.form.last_name,
-    //     email: this.form.email,
-    //     user_type: this.form.user_type,
-    //     Member_role: this.selectedRoles.map(
-    //       r => this.roleOptions.find(o => o.short === r)?.full
-    //     )                                  // ✅ full role names
-    //   };
-
-    //   // 🧪 Debug
-    //   console.log("FINAL PAYLOAD 👉", payload);
-
-    //   // 3️⃣ API call
-    //   const res = await this.authStore.createUserDetail(payload);
-
-    //   if (res.status) {
-    //     Swal.fire({
-    //       icon: "success",
-    //       title: "User added successfully",
-    //       timer: 1800,
-    //       showConfirmButton: false,
-    //       allowOutsideClick: false
-    //     });
-
-    //     // 🔄 reset form
-    //     this.form.first_name = "";
-    //     this.form.last_name = "";
-    //     this.form.email = "";
-    //     this.form.user_type = "";
-    //     this.selectedRoles = [];
-    //     this.isRoleOpen = false;
-
-    //   } else {
-    //     let errorMessage = "User detail with this email already exists";
-
-    //     if (
-    //       res.details &&
-    //       res.details.detail &&
-    //       res.details.detail.email &&
-    //       Array.isArray(res.details.detail.email)
-    //     ) {
-    //       errorMessage = "User detail with this email already exists";
-    //     } else if (res.message && !res.message.includes("500")) {
-    //       errorMessage = res.message;
-    //     }
-
-    //     Swal.fire({
-    //       icon: "warning",
-    //       title: "User already exists",
-    //       text: errorMessage,
-    //       confirmButtonColor: "#5a44ff"
-    //     });
-    //   }
-    // },
     async addUser() {
+      // 1️⃣ Get admin id
+      const adminId =
+        this.authStore.user?._id ||
+        this.authStore.user?.id;
 
-  const adminId =
-    this.authStore.user?._id ||
-    this.authStore.user?.id;
+      if (!adminId) {
+        Swal.fire("Error", "Please login again", "error");
+        return;
+      }
 
-  if (!adminId) {
-    Swal.fire("Error", "Please login again", "error");
-    return;
-  }
+      // 2️⃣ Build payload (❌ location removed)
+      const payload = {
+        admin_id: adminId,                 // ✅ required
+        first_name: this.form.first_name,
+        last_name: this.form.last_name,
+        email: this.form.email,
+        user_type: this.form.user_type,
+        Member_role: this.selectedRoles.map(
+          r => this.roleOptions.find(o => o.short === r)?.full
+        )                                  // ✅ full role names
+      };
 
-  const botToken = localStorage.getItem("slack_bot_token");
+      // 🧪 Debug
+      console.log("FINAL PAYLOAD 👉", payload);
 
-  if (!botToken) {
-    Swal.fire("Error", "Slack not connected", "error");
-    return;
-  }
+      // 3️⃣ API call
+      const res = await this.authStore.createUserDetail(payload);
 
-  const payload = {
-    admin_id: adminId,
-    first_name: this.form.first_name,
-    last_name: this.form.last_name,
-    email: this.form.email,
-    user_type: this.form.user_type,
+      if (res.status) {
+        Swal.fire({
+          icon: "success",
+          title: "User added successfully",
+          timer: 1800,
+          showConfirmButton: false,
+          allowOutsideClick: false
+        });
 
-    Member_role: this.selectedRoles.map(
-      r => this.roleOptions.find(o => o.short === r)?.full
-    ),
+        // 🔄 reset form
+        this.form.first_name = "";
+        this.form.last_name = "";
+        this.form.email = "";
+        this.form.user_type = "";
+        this.selectedRoles = [];
+        this.isRoleOpen = false;
 
-    // 🔥 NEW FIELDS FOR SLACK SYNC
-    slack_bot_token: botToken,
-    slack_user_id: this.selectedSlackUserId  // must come from mapping
-  };
+      } else {
+        let errorMessage = "User detail with this email already exists";
 
-  console.log("FINAL PAYLOAD 👉", payload);
+        if (
+          res.details &&
+          res.details.detail &&
+          res.details.detail.email &&
+          Array.isArray(res.details.detail.email)
+        ) {
+          errorMessage = "User detail with this email already exists";
+        } else if (res.message && !res.message.includes("500")) {
+          errorMessage = res.message;
+        }
 
-  const res = await this.authStore.createUserDetail(payload);
-
-  if (res.status) {
-
-    console.log("Slack sync result:", res.slack_sync);
-
-    Swal.fire({
-      icon: "success",
-      title: "User added & invited to Slack",
-      timer: 2000,
-      showConfirmButton: false
-    });
-
-    // reset form
-    this.form.first_name = "";
-    this.form.last_name = "";
-    this.form.email = "";
-    this.form.user_type = "";
-    this.selectedRoles = [];
-    this.isRoleOpen = false;
-
-  } else {
-    Swal.fire({
-      icon: "warning",
-      title: "User already exists",
-      text: res.message,
-      confirmButtonColor: "#5a44ff"
-    });
-  }
+        Swal.fire({
+          icon: "warning",
+          title: "User already exists",
+          text: errorMessage,
+          confirmButtonColor: "#5a44ff"
+        });
+      }
     },
+  //   async addUser() {
+
+  // const adminId =
+  //   this.authStore.user?._id ||
+  //   this.authStore.user?.id;
+
+  // if (!adminId) {
+  //   Swal.fire("Error", "Please login again", "error");
+  //   return;
+  // }
+
+  // const botToken = localStorage.getItem("slack_bot_token");
+
+  // if (!botToken) {
+  //   Swal.fire("Error", "Slack not connected", "error");
+  //   return;
+  // }
+
+  // const payload = {
+  //   admin_id: adminId,
+  //   first_name: this.form.first_name,
+  //   last_name: this.form.last_name,
+  //   email: this.form.email,
+  //   user_type: this.form.user_type,
+
+  //   Member_role: this.selectedRoles.map(
+  //     r => this.roleOptions.find(o => o.short === r)?.full
+  //   ),
+
+  //   // 🔥 NEW FIELDS FOR SLACK SYNC
+  //   slack_bot_token: botToken,
+  //   slack_user_id: this.selectedSlackUserId  // must come from mapping
+  // };
+
+  // console.log("FINAL PAYLOAD 👉", payload);
+
+  // const res = await this.authStore.createUserDetail(payload);
+
+  // if (res.status) {
+
+  //   console.log("Slack sync result:", res.slack_sync);
+
+  //   Swal.fire({
+  //     icon: "success",
+  //     title: "User added & invited to Slack",
+  //     timer: 2000,
+  //     showConfirmButton: false
+  //   });
+
+  //   // reset form
+  //   this.form.first_name = "";
+  //   this.form.last_name = "";
+  //   this.form.email = "";
+  //   this.form.user_type = "";
+  //   this.selectedRoles = [];
+  //   this.isRoleOpen = false;
+
+  // } else {
+  //   Swal.fire({
+  //     icon: "warning",
+  //     title: "User already exists",
+  //     text: res.message,
+  //     confirmButtonColor: "#5a44ff"
+  //   });
+  // }
+  //   },
     getInitials(name) {
       if (!name) return "";
       return name.substring(0, 2).toUpperCase();

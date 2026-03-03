@@ -352,69 +352,69 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ Create User Detail
-  // async createUserDetail(payload: CreateUserPayload) {
-  //     try {
-  //       const res = await endpoint.post(
-  //         "/api/admin/users_details/add-user-detail/",
-  //         payload
-  //       );
-  //       const data = res.data;
-  //       console.log("✅ User created successfully:", data);
-
-  //       return {
-  //         status: true,
-  //         message: data.message || "User created successfully",
-  //         data: data.data || {},
-  //       };
-  //     } catch (error: unknown) {
-  //       const err = error as any;
-  //       console.error("❌ Failed to create user detail:", err);
-
-  //       return {
-  //         status: false,
-  //         message:
-  //           err.response?.data?.message ||
-  //           err.message ||
-  //           "Create user detail failed",
-  //         details: err.response?.data || null,
-  //       };
-  //     }
-  // },
-  // ✅ Create User Detail + Slack Sync
   async createUserDetail(payload: CreateUserPayload) {
-    try {
-      const res = await endpoint.post(
-        "/api/admin/users_details/add-user-detail/",
-        payload
-      );
+      try {
+        const res = await endpoint.post(
+          "/api/admin/users_details/add-user-detail/",
+          payload
+        );
+        const data = res.data;
+        console.log("✅ User created successfully:", data);
 
-      const data = res.data;
+        return {
+          status: true,
+          message: data.message || "User created successfully",
+          data: data.data || {},
+        };
+      } catch (error: unknown) {
+        const err = error as any;
+        console.error("❌ Failed to create user detail:", err);
 
-      console.log("✅ User created + Slack sync:", data);
-
-      return {
-        status: true,
-        message: data.message || "User created successfully",
-        data: data.data || {},
-        slack_sync: data.slack_sync || [],   // 🔥 NEW
-        email_sent: data.email_sent || false // 🔥 NEW
-      };
-
-    } catch (error: unknown) {
-      const err = error as any;
-
-      console.error("❌ Failed to create user detail:", err);
-
-      return {
-        status: false,
-        message:
-          err.response?.data?.message ||
-          err.message ||
-          "Create user detail failed",
-        details: err.response?.data || null,
-      };
-    }
+        return {
+          status: false,
+          message:
+            err.response?.data?.message ||
+            err.message ||
+            "Create user detail failed",
+          details: err.response?.data || null,
+        };
+      }
   },
+  // ✅ Create User Detail + Slack Sync
+  // async createUserDetail(payload: CreateUserPayload) {
+  //   try {
+  //     const res = await endpoint.post(
+  //       "/api/admin/users_details/add-user-detail/",
+  //       payload
+  //     );
+
+  //     const data = res.data;
+
+  //     console.log("✅ User created + Slack sync:", data);
+
+  //     return {
+  //       status: true,
+  //       message: data.message || "User created successfully",
+  //       data: data.data || {},
+  //       slack_sync: data.slack_sync || [],   // 🔥 NEW
+  //       email_sent: data.email_sent || false // 🔥 NEW
+  //     };
+
+  //   } catch (error: unknown) {
+  //     const err = error as any;
+
+  //     console.error("❌ Failed to create user detail:", err);
+
+  //     return {
+  //       status: false,
+  //       message:
+  //         err.response?.data?.message ||
+  //         err.message ||
+  //         "Create user detail failed",
+  //       details: err.response?.data || null,
+  //     };
+  //   }
+  // },
 
   // ✅ Fetch  UsersByAdminid
   async fetchUsersByAdmin() {
@@ -541,7 +541,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ GET Risk Criteria (from localStorage)
   async getRiskCriteriaById() {
     try {
-      const riskCriteriaId = localStorage.getItem("riskCriteriaId");
+      const riskCriteriaId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
 
       if (!riskCriteriaId) {
         return {

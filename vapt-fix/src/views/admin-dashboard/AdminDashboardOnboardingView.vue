@@ -1264,7 +1264,7 @@ export default {
           type: 'doughnut',
           data: {
             labels: ['Network Security', 'Patch Management', 'Configuration Management', 'Architectular Flaws'],
-            datasets: [{ data: [48, 62, 42, 35], backgroundColor: ['maroon', 'red', 'goldenrod', 'green'], borderWidth: 0 }]
+            datasets: [{ data: [48, 62, 42, 35], backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#dc2626'], borderWidth: 0 }]
           },
           options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true } } } }
         },
