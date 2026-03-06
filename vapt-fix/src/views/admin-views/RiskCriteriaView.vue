@@ -19,7 +19,16 @@
             <div class="risk-card area-critical risk-card-bg">
               <div class="risk-header">
                 <span class="dot critical-bg"></span>
-                Critical<span class="text-danger">*</span>
+                Critical
+                <!-- <span class="text-danger">*</span> -->
+                 
+<span 
+  class="text-danger ms-1"
+  data-bs-toggle="tooltip"
+  data-bs-placement="top"
+  title="Recommended timeline: Critical – 2 days">
+  *
+</span>
                
               </div>
               
@@ -32,7 +41,16 @@
             <div class="risk-card area-high risk-card-bg">
               <div class="risk-header">
                 <span class="dot high-bg"></span>
-                High<span class="text-danger">*</span>
+
+                <!-- High<span class="text-danger">*</span> -->
+                 High
+<span 
+  class="text-danger ms-1"
+  data-bs-toggle="tooltip"
+  data-bs-placement="top"
+  title="Recommended timeline: High – 4 days">
+  *
+</span>
                 
               </div>
              
@@ -50,7 +68,15 @@
             <div class="risk-card area-medium risk-card-bg">
               <div class="risk-header">
                 <span class="dot medium-bg"></span>
-                Medium<span class="text-danger">*</span>
+                <!-- Medium<span class="text-danger">*</span> -->
+                 Medium
+<span 
+  class="text-danger ms-1"
+  data-bs-toggle="tooltip"
+  data-bs-placement="top"
+  title="Recommended timeline: Medium – 2 weeks">
+  *
+</span>
                 
               </div>
              
@@ -67,7 +93,15 @@
             <div class="risk-card area-low risk-card-bg">
               <div class="risk-header">
                 <span class="dot low-bg"></span>
-                Low<span class="text-danger">*</span>
+                <!-- Low<span class="text-danger">*</span> -->
+                 Low
+<span 
+  class="text-danger ms-1"
+  data-bs-toggle="tooltip"
+  data-bs-placement="top"
+  title="Recommended timeline: Low – 4 weeks">
+  *
+</span>
                
               </div>
               
@@ -154,6 +188,7 @@
 import Stepper from '@/components/admin-component/Stepper.vue';
 import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
+import { Tooltip } from 'bootstrap'
 
 export default {
   name: "RiskCriteriaView",
@@ -308,6 +343,8 @@ export default {
     },
   },
   mounted() {
+     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  tooltipTriggerList.forEach(el => new Tooltip(el))
     this.getRiskCriteria();
   },
 };

@@ -16,7 +16,7 @@
                 <div class="d-flex justify-content-between my-4">
                 <h2>Mitigation Strategy</h2>
                 <div class="d-flex justify-content-between gap-3">
-                  <button class="btn download-report-btn" @click="showPopup = true"><i class="bi bi-download me-2"></i> Download report</button>
+                  <button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="$router.push('/viewreport')"><i class="bi bi-eye me-2"></i> View Report</button>
                   <!-- Overlay Popup -->
                   <div
                     v-if="showPopup"
@@ -159,7 +159,6 @@
                     </div>
                   </div>
                   
-                   <NotificationPanel />
                 </div>
 
                 </div>
@@ -170,13 +169,18 @@
             <div class="row">
                 <div class="col-10">
                 <div class="d-flex justify-content-between tab-wrapper position-relative">
-                    <p class="nav-item active" style="width: 25%;color: rgba(49, 33, 177, 1);"><i class="bi bi-shield-lock"></i> Patch management</p>
-                    <p class="nav-item" style="width: 25%;"><i class="bi bi-wrench"></i> Configuration management</p>
-                    <p class="nav-item" style="width: 25%;"><i class="bi bi-reception-4"></i> Network security</p>
-                    <p class="nav-item" style="width: 25%;"><i class="bi bi-compass"></i> Architectural flaws</p>
+                    <p
+                      v-for="(tab, idx) in tabs"
+                      :key="tab.key"
+                      class="nav-item"
+                      :style="{ width: '25%', color: activeTab === tab.key ? 'rgba(49, 33, 177, 1)' : '' }"
+                      @click="setActiveTab(tab.key, idx)"
+                    >
+                      <i :class="tab.icon"></i> {{ tab.label }}
+                    </p>
 
                     <!-- Blue underline for active tab -->
-                    <div class="tab-line" style="width: 25%; left: 0;"></div>
+                    <div class="tab-line" :style="{ width: '25%', left: (activeTabIndex * 25) + '%' }"></div>
                 </div>
                 <div class="col-2">
                     <!-- blank -->
@@ -186,29 +190,46 @@
 
             <div class="row my-4">
               <div>
-                <span style="color: rgba(0, 0, 0, 0.87);">Assigned to Patch Management team </span> 
+                <span style="color: rgba(0, 0, 0, 0.87);">Assigned to {{ activeTab }} team </span>
               </div>
               <div class="d-flex gap-4 my-3">
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.critical ?? '—' }}  <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" @click="openRiskModal('critical')"></i></button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-danger">High</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.high ?? '—' }}  <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" @click="openRiskModal('high')"></i></button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-warning">Medium</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.medium ?? '—' }} <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" @click="openRiskModal('medium')"></i></button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-success">Low</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.low ?? '—' }}  <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" @click="openRiskModal('low')"></i></button>
                       </div>
+              </div>
+
+              <!-- Update Risk Criteria Modal -->
+              <div v-if="showRiskModal" class="risk-modal-backdrop">
+                <div class="risk-modal-box" @click.stop>
+                  <h5 class="mb-3">Update Days — {{ riskModalSeverityLabel }}</h5>
+                  <div class="mb-3">
+                    <label class="form-label">Days</label>
+                    <input type="text" class="form-control" style="border-radius: 10px;" v-model="riskModalDays" placeholder="e.g. day 1, 3 days, 1 week">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Reason</label>
+                    <textarea class="form-control" style="border-radius: 10px;" rows="2" v-model="riskModalReason"></textarea>
+                  </div>
+                  <div class="d-flex justify-content-end gap-2">
+                    <button class="btn btn-secondary" @click="closeRiskModal">Cancel</button>
+                    <button class="btn btn-primary" :disabled="riskUpdating" @click="submitRiskCriteria">
+                      {{ riskUpdating ? 'Saving...' : 'Submit' }}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -216,135 +237,51 @@
             <div class="row">
                 <div class="col-11">
                     <div class="d-flex justify-content-between">
-                      <p style="color: rgba(0, 0, 0, 0.6);font-weight: 
-                      600;font-size: 15px;">Missing security updates</p>
-                      <p style="cursor: pointer;color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View all</p>
+                      <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">
+                        Vulnerabilities ({{ activeTeamData.count }})
+                      </p>
                     </div>
-                    <div class="row">
-                        <div class="col-3">
-                          <div class="card py-4 px-3" style="border-radius: 12px;">
-                                <div class="d-flex justify-content-between">
-                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
-                                    
-                                </div>
-                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
-                                  VMware ESXi 7.0/8.0 Sandbox Escape...
-                                </h4>
-                                <div class="d-flex justify-content-start mt-2">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                     
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                 <div class="text-end">
-                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
-                                      Details <i class="bi bi-arrow-right"></i>
-                                    </router-link>
-                                 </div>
-                          </div>
-                        </div>
-                        <div class="col-3">
-                          <div class="card py-3 px-3" style="border-radius: 12px;">
-                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
-                                <div class="d-flex justify-content-between">
-                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
-                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
-                                </div>
-                                <div class="d-flex justify-content-start">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                                </div>
-                          </div>
-                        </div>
-                        <div class="col-3">
-                          <div class="card py-3 px-3" style="border-radius: 12px;">
-                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
-                                <div class="d-flex justify-content-between">
-                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
-                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
-                                </div>
-                                <div class="d-flex justify-content-start">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                                </div>
-                          </div>
-                        </div>
-                        <div class="col-3">
-                          <div class="card py-3 px-3" style="border-radius: 12px;">
-                                <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Assets</p>
-                                <div class="d-flex justify-content-between">
-                                    <h1 style="color: rgba(0, 0, 0, 0.87);font-size: 52px;">23</h1>
-                                    <p class="mt-auto" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">Details <i class="bi bi-arrow-right"></i></p>
-                                </div>
-                                <div class="d-flex justify-content-start">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                <div class="d-flex align-items-center gap-3">
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #b31c1c"></span>
-                                <span class="text-danger fw-bold">11</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f44336"></span>
-                                <span class="text-danger fw-bold">4</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #f6b100"></span>
-                                <span class="text-warning fw-bold">8</span>
-                              </span>
-                              <span class="d-flex align-items-center">
-                                <span class="rounded-circle me-1"
-                                  style="width: 6px; height: 6px; background-color: #4caf50"></span>
-                                <span class="text-success fw-bold">0</span>
-                              </span>
-                                </div>
+
+                    <!-- Loading state -->
+                    <div v-if="loading" class="py-4 text-center text-muted">Loading...</div>
+
+                    <!-- No data state -->
+                    <div v-else-if="activeTeamData.vulnerabilities.length === 0" class="py-4 text-muted">
+                      No vulnerabilities assigned to this team.
+                    </div>
+
+                    <!-- Vulnerability cards (first card UI, up to 4) -->
+                    <div v-else class="row align-items-stretch">
+                        <div
+                          v-for="vuln in activeTeamData.vulnerabilities.slice(0, 4)"
+                          :key="vuln.id"
+                          class="col-3 d-flex"
+                        >
+                          <div class="card py-4 px-3 w-100 d-flex flex-column" style="border-radius: 12px;">
+                            <div class="d-flex justify-content-between">
+                              <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">{{ vuln.host_name }}</p>
+                              <span
+                                :style="{ color: riskColor(vuln.risk_factor), fontSize: '12px', fontWeight: '600' }"
+                              >{{ vuln.risk_factor }}</span>
+                            </div>
+                            <h4 class="truncated-text" :title="vuln.plugin_name">
+                              {{ vuln.plugin_name }}
+                            </h4>
+                            <div class="d-flex justify-content-start mt-2">
+                              <i class="bi bi-microsoft me-2"></i>
+                              <h6
+                                :title="vuln.os || 'Unknown OS'"
+                                style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px"
+                                class="truncated-text"
+                              >
+                                {{ vuln.os || 'Unknown OS' }}
+                              </h6>
+                            </div>
+                            <div class="text-end">
+                              <router-link :to="{ path: '/missingsecurityupdates', query: { team: activeTab } }" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                Details <i class="bi bi-arrow-right"></i>
+                              </router-link>
+                            </div>
                           </div>
                         </div>
                     </div>
@@ -355,7 +292,8 @@
             </div>
             </section>
 
-            <div class="row my-5">
+            <!-- Operating system vulnerabilities by version - commented out, separate API pending -->
+            <div v-if="false" class="row my-5">
                 <div class="col-11">
                     <div class="d-flex justify-content-between">
                       <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">Operating system vulnerabilities by version</p>
@@ -509,7 +447,8 @@
                 </div>
             </div>
 
-            <div class="row my-5">
+            <!-- Application vulnerabilities by software packages - commented out, separate API pending -->
+            <div v-if="false" class="row my-5">
                 <div class="col-11">
                     <div class="d-flex justify-content-between">
                       <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">Application vulnerabilities by software packages</p>
@@ -663,7 +602,8 @@
                 </div>
             </div>
 
-            <div class="row my-5">
+            <!-- End of life systems requiring replacement - commented out, separate API pending -->
+            <div v-if="false" class="row my-5">
                 <div class="col-11">
                     <div class="d-flex justify-content-between">
                       <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">End of life systems requiring replacement</p>
@@ -827,47 +767,192 @@
 <script>
 import DashboardMenu from "@/components/admin-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/admin-component/DashboardHeader.vue";
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: "MitigationStrategyView",
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel
   },
   data() {
     return {
       showPopup: false,
+      loading: false,
+      mitigationData: null,
+      activeTab: "Patch Management",
+      activeTabIndex: 0,
+      riskCriteria: { critical: null, high: null, medium: null, low: null },
+      showRiskModal: false,
+      riskUpdating: false,
+      riskModalSeverity: null,
+      riskModalDays: null,
+      riskModalReason: "",
+      tabs: [
+        { key: "Patch Management", label: "Patch management", icon: "bi bi-shield-lock" },
+        { key: "Configuration Management", label: "Configuration management", icon: "bi bi-wrench" },
+        { key: "Network Security", label: "Network security", icon: "bi bi-reception-4" },
+        { key: "Architectural Flaws", label: "Architectural flaws", icon: "bi bi-compass" },
+      ],
     };
   },
- 
-  mounted() {
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
 
-    // Toggle dropdown open/close
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    // Set selected option
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
-      });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
+  computed: {
+    riskModalSeverityLabel() {
+      const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
+      return this.riskModalSeverity ? map[this.riskModalSeverity] : '';
+    },
+    activeTeamData() {
+      if (!this.mitigationData?.teams) return { count: 0, vulnerabilities: [] };
+      return this.mitigationData.teams[this.activeTab] || { count: 0, vulnerabilities: [] };
+    },
   },
+
+  methods: {
+    setActiveTab(key, index) {
+      this.activeTab = key;
+      this.activeTabIndex = index;
+    },
+
+    riskColor(risk) {
+      const map = {
+        Critical: "#b31c1c",
+        High: "#f44336",
+        Medium: "#f6b100",
+        Low: "#4caf50",
+      };
+      return map[risk] || "#666";
+    },
+
+
+    async openRiskModal(severity) {
+      await this.loadRiskCriteria();
+      this.riskModalSeverity = severity;
+      this.riskModalDays = this.riskCriteria[severity] ?? null;
+      this.riskModalReason = "";
+      this.showRiskModal = true;
+    },
+
+    closeRiskModal() {
+      this.showRiskModal = false;
+      this.riskModalSeverity = null;
+      this.riskModalDays = null;
+      this.riskModalReason = "";
+    },
+
+    async submitRiskCriteria() {
+      if (!this.riskModalDays) {
+        alert("Please enter a value");
+        return;
+      }
+      const store = useAuthStore();
+      const updated = {
+        critical: String(this.riskCriteria.critical ?? ''),
+        high: String(this.riskCriteria.high ?? ''),
+        medium: String(this.riskCriteria.medium ?? ''),
+        low: String(this.riskCriteria.low ?? ''),
+        [this.riskModalSeverity]: String(this.riskModalDays),
+      };
+      this.riskUpdating = true;
+      const hasExisting = !!(localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId"));
+      let result;
+      if (hasExisting) {
+        result = await store.updateRiskCriteria(updated);
+        if (result.status && result.data?.risk_criteria?._id) {
+          localStorage.setItem("riskCriteriaId", result.data.risk_criteria._id);
+          localStorage.setItem("riskId", result.data.risk_criteria._id);
+        }
+      } else {
+        result = await store.addRiskCriteria(updated);
+        if (result.status && result.data?._id) {
+          localStorage.setItem("riskCriteriaId", result.data._id);
+          localStorage.setItem("riskId", result.data._id);
+        }
+      }
+      this.riskUpdating = false;
+      if (result.status) {
+        this.riskCriteria = { ...updated };
+        this.closeRiskModal();
+      } else {
+        alert(result.message || "Failed to save risk criteria");
+      }
+    },
+
+    async loadRiskCriteria() {
+      const store = useAuthStore();
+      let result = await store.getRiskCriteriaById();
+      // Fallback: if no stored ID, fetch by admin (also stores the ID)
+      if (!result.status) {
+        result = await store.getRiskCriteriaByAdmin();
+        if (result.status && result.data) {
+          const d = result.data;
+          if (d._id) {
+            localStorage.setItem("riskId", d._id);
+            localStorage.setItem("riskCriteriaId", d._id);
+          }
+          this.riskCriteria = {
+            critical: d.critical ?? null,
+            high: d.high ?? null,
+            medium: d.medium ?? null,
+            low: d.low ?? null,
+          };
+        }
+        return;
+      }
+      if (result.data?.risk_criteria) {
+        const d = result.data.risk_criteria;
+        if (d._id) {
+          localStorage.setItem("riskId", d._id);
+          localStorage.setItem("riskCriteriaId", d._id);
+        }
+        this.riskCriteria = {
+          critical: d.critical ?? null,
+          high: d.high ?? null,
+          medium: d.medium ?? null,
+          low: d.low ?? null,
+        };
+      }
+    },
+
+    async loadMitigationData() {
+      const store = useAuthStore();
+      this.loading = true;
+      const result = await store.fetchMitigationByTeam();
+      if (result.status) {
+        this.mitigationData = result.data;
+      }
+      this.loading = false;
+    },
+  },
+
+  async mounted() {
+    await Promise.all([this.loadMitigationData(), this.loadRiskCriteria()]);
+
+    const dropdown = document.querySelector('.dropdown');
+    if (dropdown) {
+      const btn = dropdown.querySelector('.dropdown-btn');
+      const options = dropdown.querySelectorAll('.dropdown-content a');
+
+      btn.addEventListener('click', () => {
+        dropdown.classList.toggle('show');
+      });
+
+      options.forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.preventDefault();
+          btn.textContent = option.textContent;
+          dropdown.classList.remove('show');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
+  },
+
   watch: {
     showPopup(newVal) {
       if (newVal) {
@@ -876,13 +961,11 @@ export default {
           const btn = dropdown.querySelector('.dropdown-btn');
           const options = dropdown.querySelectorAll('.dropdown-content a');
 
-          // Toggle dropdown open/close
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
             dropdown.classList.toggle('show');
           });
 
-          // Set selected option
           options.forEach(option => {
             option.addEventListener('click', (e) => {
               e.preventDefault();
@@ -891,7 +974,6 @@ export default {
             });
           });
 
-          // Close dropdown when clicking outside
           document.addEventListener('click', (e) => {
             if (!dropdown.contains(e.target)) {
               dropdown.classList.remove('show');
@@ -899,8 +981,8 @@ export default {
           }, { once: true });
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -1008,11 +1090,30 @@ export default {
 
 .truncated-text {
     color: rgba(0, 0, 0, 0.87);
-    white-space: nowrap;       /* Keep text in one line */
-    overflow: hidden;          /* Hide overflowing text */
-    text-overflow: ellipsis;   /* Show "..." */
-    width: 200px;              /* Adjust width as needed */
-    cursor: pointer;           /* Show pointer on hover */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    width: 100%;
+    display: block;
+    cursor: pointer;
+  }
+
+  .risk-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .risk-modal-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 350px;
   }
 
   .tooltip-text {

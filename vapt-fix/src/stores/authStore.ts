@@ -501,19 +501,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Add Risk Criteria
   async addRiskCriteria(payload: any) {
     try {
-      const adminId =
-        this.user?.admin_id ||
-        this.user?.id ||
-        this.user?._id ||
-        this.user?.user?._id ||
-        this.user?.user?.admin_id;
-
-      if (!adminId) {
-        throw new Error("Admin ID not found. Please login again.");
-      }
-
       const body = {
-        admin_id: adminId,
         critical: payload.critical,
         high: payload.high,
         medium: payload.medium,
@@ -535,6 +523,23 @@ export const useAuthStore = defineStore("auth", {
     } catch (error: any) {
       console.error("❌ Error adding Risk Criteria:", error);
       return { status: false, message: error?.response?.data?.message || error.message || "Failed to add Risk Criteria" };
+    }
+  },
+
+  // ✅ GET Risk Criteria by Admin (no stored ID needed)
+  async getRiskCriteriaByAdmin() {
+    try {
+      const res = await endpoint.get(`/api/admin/risk_criteria/by-admin/`);
+      const data = res.data?.risk_criteria || res.data;
+      if (data?._id) {
+        localStorage.setItem("riskCriteriaId", data._id);
+      }
+      return { status: true, data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error?.response?.data?.message || "Failed to fetch risk criteria",
+      };
     }
   },
 
@@ -579,13 +584,12 @@ export const useAuthStore = defineStore("auth", {
   // update Risk Criteria
   async updateRiskCriteria(payload: RiskCriteriaPayload) {
   try {
-    const riskId = localStorage.getItem("riskId");
-    const adminId = localStorage.getItem("adminId");
+    const riskId = localStorage.getItem("riskId") || localStorage.getItem("riskCriteriaId");
+    if (!riskId) return { status: false, message: "Risk criteria ID not found. Please create risk criteria first." };
 
     const res = await endpoint.put(
       `/api/admin/risk_criteria/risks/${riskId}/update/`,
       {
-        admin_id: adminId,
         critical: payload.critical,
         high: payload.high,
         medium: payload.medium,
@@ -598,6 +602,22 @@ export const useAuthStore = defineStore("auth", {
   } catch (err: any) {
     return { status: false, message: err?.response?.data?.message };
   }
+  },
+
+  // ✅ GET Risk Criteria Calendar
+  async fetchRiskCriteriaCalendar(year: number, month: number) {
+    try {
+      const riskCriteriaId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
+      if (!riskCriteriaId) return { status: false, message: "Risk criteria ID not found" };
+      const monthStr = `${year}-${String(month).padStart(2, '0')}`;
+      const res = await endpoint.get(
+        `/api/admin/risk_criteria/risks/${riskCriteriaId}/calendar/`,
+        { params: { month: monthStr } }
+      );
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return { status: false, message: error?.response?.data?.message || "Failed to fetch calendar" };
+    }
   },
 
   //Microsoft Teams
@@ -1725,7 +1745,6 @@ export const useAuthStore = defineStore("auth", {
   async completeFixVulnerabilityStep(
     fixVulnerabilityId: string,
     payload: {
-      step_number: number;
       status: string;
       comment: string;
     }
@@ -1767,11 +1786,22 @@ export const useAuthStore = defineStore("auth", {
         status: true,
         data: {
           fix_vulnerability_id: res.data.fix_vulnerability_id,
+          report_id: res.data.report_id,
+          admin_id: res.data.admin_id,
+          admin_email: res.data.admin_email,
+          vulnerability_name: res.data.vulnerability_name,
+          asset: res.data.asset,
+          severity: res.data.severity,
+          operating_system: res.data.operating_system,
+          assigned_team: res.data.assigned_team,
+          deadline: res.data.deadline,
+          artifacts_tools: res.data.artifacts_tools,
           vulnerability_status: res.data.status,
           completed_steps: res.data.completed_steps,
           total_steps: res.data.total_steps,
           next_step: res.data.next_step,
-          steps: res.data.steps || []
+          steps: res.data.steps || [],
+          post_mitigation_troubleshooting_guide: res.data.post_mitigation_troubleshooting_guide || []
         }
       };
 
@@ -1932,6 +1962,18 @@ export const useAuthStore = defineStore("auth", {
           err.response?.data?.message || "Failed to create ticket",
         details: err.response?.data || null
       };
+    }
+  },
+
+  // GET Vulnerability Timeline
+  async fetchVulnerabilityTimeline(fixVulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/admin/adminregister/fix-vulnerability/${fixVulnerabilityId}/timeline/`
+      );
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return { status: false, message: error?.response?.data?.message || "Failed to fetch timeline" };
     }
   },
 
@@ -2564,6 +2606,18 @@ export const useAuthStore = defineStore("auth", {
   //     };
   //   }
   // },
+
+  async fetchMitigationByTeam() {
+    try {
+      const res = await endpoint.get(`/api/admin/adminmitigationstrategy/by-team/`);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message || "Failed to fetch mitigation data",
+      };
+    }
+  },
 
   // ✅ Reset report status (useful for logout)
   resetReportStatus() {

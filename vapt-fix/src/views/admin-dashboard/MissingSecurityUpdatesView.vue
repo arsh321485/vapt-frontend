@@ -17,8 +17,6 @@
                     <button class="my-4" style="color: rgba(49, 33, 177, 1);background-color: white;border: 0;"><i class="bi bi-arrow-left"></i> Back</button>
                     </router-link>
                     <div class="d-flex flex-row mt-3">
-                        
-                    <NotificationPanel />
                     </div>
                 </div>
             </div>             
@@ -26,10 +24,14 @@
             <div class="row">
                 <h2 class="ticket-head">Missing security updates</h2>
                         <div class="row mt-5">
-                            <h6 class="fw-semibold mb-3"><i class="bi bi-microsoft me-1"></i> Microsoft(23 assets)</h6>
+                            <div v-if="loading" class="py-4 text-center text-muted">Loading...</div>
+                            <template v-else>
+                            <h6 class="fw-semibold mb-3">
+                              <i class="bi bi-microsoft me-1"></i>
+                              Windows ({{ activeVulns.length }} assets)
+                            </h6>
                             <div class="table-responsive">
-                                <!-- <table class="table align-middle table-borderless"> -->
-                                    <table class="table table-hover align-middle">
+                                <table class="table table-hover align-middle">
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col">Vul. name</th>
@@ -37,78 +39,43 @@
                                             <th scope="col">OS</th>
                                             <th scope="col">Criticality</th>
                                             <th scope="col">Status</th>
-                                            
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
-                                            <td>High</td>
-                                            <td>Open</td>
-                                            
-                                            <td>
-                                                <router-link to="/Vulnerabilitycard">
-                                                 <button class="btn fixes-btn border-0">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button> 
-                                                </router-link> 
-                                            </td>
+                                        <tr v-if="activeVulns.length === 0">
+                                            <td colspan="6" class="text-center text-muted py-4">No vulnerabilities found.</td>
                                         </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
-                                            
-                                            <td>Medium</td>
-                                            <td>Close</td>
-                                            <td>
-                                                 <button class="btn fixes-btn">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>  
+                                        <tr v-for="vuln in activeVulns" :key="vuln.id">
+                                            <td class="text-truncate" style="max-width: 200px;" :title="vuln.plugin_name">
+                                              {{ vuln.plugin_name }}
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
-                                            <td>High</td>
-                                            <td>Open</td>
+                                            <td>{{ vuln.host_name }}</td>
+                                            <td :title="vuln.os" class="text-truncate" style="max-width: 150px;">{{ vuln.os || '-' }}</td>
+                                            <td>{{ vuln.risk_factor }}</td>
+                                            <td>{{ vuln.status }}</td>
                                             <td>
-                                                 <button class="btn fixes-btn">
+                                                <router-link :to="{
+                                                  name: 'VulFix',
+                                                  params: { reportId: reportId, asset: vuln.host_name },
+                                                  query: { id: vuln.id, plugin_name: vuln.plugin_name, risk_factor: vuln.risk_factor }
+                                                }">
+                                                  <button class="btn fixes-btn border-0">
                                                     View
                                                     <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>  
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
-                                            <td>High</td>
-                                            <td>Open</td>
-                                            <td>
-                                                 <button class="btn fixes-btn">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>  
+                                                  </button>
+                                                </router-link>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            </template>
                         </div>
             </div>
 
-            <div class="row">
+            <!-- Apple(61 assets) table - commented out, separate API pending -->
+            <div v-if="false" class="row">
                         <div class="row mt-5">
                             <h6 class="fw-semibold mb-3"><i class="bi bi-microsoft me-1"></i> Apple(61 assets)</h6>
                             <div class="table-responsive">
@@ -120,66 +87,17 @@
                                             <th scope="col">OS</th>
                                             <th scope="col">Criticality</th>
                                             <th scope="col">Status</th>
-                                            
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
                                         <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
+                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0 Sandbox Escape...</td>
                                             <td>192.68.1.42</td>
                                             <td>Windows 10</td>
                                             <td>High</td>
                                             <td>Open</td>
-                                            <td>
-                                                 <button class="btn fixes-btn">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>  
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
-                                            <td>High</td>
-                                            <td>Open</td>
-                                            <td>
-                                                 <button class="btn fixes-btn">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>  
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
-                                            <td>High</td>
-                                            <td>Open</td>
-                                            <td>
-                                                 <button class="btn fixes-btn">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>  
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-truncate" style="max-width: 200px;">VMware ESXi 7.0/8.0
-                                                Sandbox Escape...</td>
-                                            <td>192.68.1.42</td>
-                                            <td>Windows 10</td>
-                                            <td>High</td>
-                                            <td>Open</td>
-                                            <td>
-                                                 <button class="btn fixes-btn">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                </button>  
-                                            </td>
+                                            <td><button class="btn fixes-btn">View <i class="bi bi-arrow-right-circle-fill"></i></button></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -197,41 +115,45 @@
 <script>
 import DashboardMenu from "@/components/admin-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/admin-component/DashboardHeader.vue";
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: "MissingSecurityUpdatesView",
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel
   },
-  mounted() {
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
-
-    // Toggle dropdown open/close
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    // Set selected option
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
-      });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
+  data() {
+    return {
+      loading: false,
+      mitigationData: null,
+      reportId: null,
+    };
+  },
+  computed: {
+    activeTeamKey() {
+      return this.$route.query.team || "Patch Management";
+    },
+    activeVulns() {
+      if (!this.mitigationData?.teams) return [];
+      return this.mitigationData.teams[this.activeTeamKey]?.vulnerabilities || [];
+    },
+  },
+  methods: {
+    async loadData() {
+      const store = useAuthStore();
+      this.loading = true;
+      const result = await store.fetchMitigationByTeam();
+      if (result.status) {
+        this.mitigationData = result.data;
+        this.reportId = result.data.report_id;
       }
-    });
-  }
+      this.loading = false;
+    },
+  },
+  async mounted() {
+    await this.loadData();
+  },
 };
 </script>
 

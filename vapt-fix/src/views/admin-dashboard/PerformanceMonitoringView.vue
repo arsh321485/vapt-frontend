@@ -14,7 +14,6 @@
         <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1 position-relative">
             <div class="d-flex justify-content-between mt-4">
               <h2 class="ticket-head mb-3">Performance Monitoring</h2>
-                <NotificationPanel />
             </div>
 
             <!-- both section here  -->
@@ -112,14 +111,14 @@
             </section>
 
             <!-- Main Chart -->
-            <section class="charts-section">
+            <!-- <section class="charts-section">
                 <div class="chart-card">
                     <div class="chart-title">Mitigated Vulnerabilities: Severity vs Team Performance</div>
                     <div class="chart-wrapper">
                       <canvas id="mitigatedRadarChart"></canvas>
                     </div>
                 </div>
-            </section>
+            </section> -->
 
         </div>
         </div>
@@ -131,13 +130,11 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 export default {
   name: 'PerformanceMonitoringView',
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel,
   },
   mounted() {
     const script = document.createElement('script');

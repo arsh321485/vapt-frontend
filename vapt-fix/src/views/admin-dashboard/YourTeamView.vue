@@ -21,7 +21,6 @@
                     <i class="bi bi-person-plus me-2"></i> Add a team member
                   </button>
                 </div>
-                <NotificationPanel />
               </div>
             </div>
 
@@ -330,7 +329,6 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
 import endpoint from "@/services/apiServices";
 
@@ -339,7 +337,6 @@ export default {
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel
   },
   data() {
     return {

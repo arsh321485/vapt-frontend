@@ -20,7 +20,6 @@
                   Premium
                   <i class="bi bi-arrow-right"></i></router-link>
               
-                <NotificationPanel />
               </div>
             </div>
 
@@ -290,7 +289,6 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {
@@ -298,7 +296,6 @@ export default {
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel
   },
   data() {
     return {

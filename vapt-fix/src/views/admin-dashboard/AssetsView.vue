@@ -326,8 +326,6 @@
                     <p class="mt-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability
                       card</p>
                     <div class="d-flex justify-content-between">
-                     
-                      <NotificationPanel />
                     </div>
                   </div>
                   <div class="d-flex justify-content-between">
@@ -897,7 +895,6 @@
 <script>
 import DashboardMenu from "@/components/admin-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/admin-component/DashboardHeader.vue";
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {
@@ -905,7 +902,6 @@ export default {
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel
   },
   data() {
     return {
