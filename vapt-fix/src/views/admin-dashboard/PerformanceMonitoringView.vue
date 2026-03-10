@@ -14,7 +14,6 @@
         <div class="col-11 pt-5 pb-3 pe-4 flex-grow-1 position-relative">
             <div class="d-flex justify-content-between mt-4">
               <h2 class="ticket-head mb-3">Performance Monitoring</h2>
-                <NotificationPanel />
             </div>
 
             <!-- both section here  -->
@@ -23,103 +22,53 @@
 
             <!-- Team Performance Overview - 2x2 Grid -->
             <section>
-                <!-- <h2 class="section-h2"><i class="fas fa-users"></i> Team Performance Overview</h2> -->
-                <div class="teams-grid">
-                    <!-- Row 1: Network Security & Patch Management -->
-                    <div class="team-card" style="border-left-color: #3b82f6;">
+                <div v-if="loading" class="py-4 text-center text-muted">Loading...</div>
+                <div class="teams-grid" v-else>
+                    <div
+                        v-for="cfg in teamConfigs"
+                        :key="cfg.name"
+                        class="team-card"
+                        :style="{ borderLeftColor: cfg.color }"
+                    >
                         <div class="team-header">
-                            <div class="team-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🔗</div>
+                            <div class="team-icon" :style="{ background: cfg.gradient }">{{ cfg.icon }}</div>
                             <div>
-                                <div class="team-name">Network Security Team</div>
-                                <div class="team-total" style="color: #3b82f6;">48 Total Vulnerabilities assigned</div>
+                                <div class="team-name">{{ cfg.name }} Team</div>
+                                <div class="team-total" :style="{ color: cfg.color }">
+                                    {{ (teamDetail[cfg.name] || {}).total ?? '—' }} Total Vulnerabilities assigned
+                                </div>
                             </div>
                         </div>
                         <div class="team-metrics">
-                            <div class="metric-item"><div class="metric-value" style="color: #059669;">38</div><div class="metric-label">Closed</div></div>
-                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">10</div><div class="metric-label">Open</div></div>
-                            <div class="metric-item"><div class="status-badge severity-maroon mt-2">3 Critical</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-red">15 High</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-orange">20 Medium</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-darkgreen">10 Low</div><div class="metric-label"></div></div>
-                        </div>
-                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">79% Closure Rate | 4.2 days avg | 2 overdue</div>
-                    </div>
-
-                    <div class="team-card" style="border-left-color: #10b981;">
-                        <div class="team-header">
-                            <div class="team-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🔧</div>
-                            <div>
-                                <div class="team-name">Patch Management Team</div>
-                                <div class="team-total" style="color: #10b981;">62 Total Vulnerabilities assigned</div>
-                            </div>
-                        </div>
-                        <div class="team-metrics">
-                            <div class="metric-item"><div class="metric-value" style="color: #059669;">52</div><div class="metric-label">Closed</div></div>
-                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">8</div><div class="metric-label">Open</div></div>
-                            <div class="metric-item"><div class="status-badge severity-maroon mt-2">8 Critical</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-red">22 High</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-orange">25 Medium</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-darkgreen">7 Low</div><div class="metric-label"></div></div>
-                        </div>
-                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">84% Closure Rate | 3.8 days avg | 0 overdue</div>
-                    </div>
-
-                    <!-- Row 2: Configuration Management & Architectural Flaws -->
-                    <div class="team-card" style="border-left-color: #f97316;">
-                        <div class="team-header">
-                            <div class="team-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">⚙️</div>
-                            <div>
-                                <div class="team-name">Configuration Management Team</div>
-                                <div class="team-total" style="color: #f97316;">42 Total Vulnerabilities assigned</div>
-                            </div>
-                        </div>
-                        <div class="team-metrics">
-                            <div class="metric-item"><div class="metric-value" style="color: #059669;">35</div><div class="metric-label">Closed</div></div>
-                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">6</div><div class="metric-label">Open</div></div>
-                            <div class="metric-item"><div class="status-badge severity-maroon mt-2">2 Critical</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-red">12 High</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-orange">18 Medium</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-darkgreen">10 Low</div><div class="metric-label"></div></div>
-                        </div>
-                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">83% Closure Rate | 5.1 days avg | 1 overdue</div>
-                    </div>
-
-                    <div class="team-card" style="border-left-color: #dc2626;">
-                        <div class="team-header">
-                            <div class="team-icon" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">🏗️</div>
-                            <div>
-                                <div class="team-name">Architectural Flaws Team</div>
-                                <div class="team-total" style="color: #dc2626;">35 Total Vulnerabilities assigned</div>
-                            </div>
-                        </div>
-                        <div class="team-metrics">
-                            <div class="metric-item"><div class="metric-value" style="color: #059669;">25</div><div class="metric-label">Closed</div></div>
-                            <div class="metric-item"><div class="metric-value" style="color: #dc2626;">11</div><div class="metric-label">Open</div></div>
                             <div class="metric-item">
-                              <div class="status-badge severity-maroon mt-2">5 Critical</div>
-                              <div class="metric-label"></div>
+                                <div class="metric-value" style="color: #059669;">{{ (teamDetail[cfg.name] || {}).closed ?? '—' }}</div>
+                                <div class="metric-label">Closed</div>
                             </div>
                             <div class="metric-item">
-                              <div class="status-badge severity-red">10 High</div>
-                              <div class="metric-label"></div>
+                                <div class="metric-value" style="color: #dc2626;">{{ (teamDetail[cfg.name] || {}).open ?? '—' }}</div>
+                                <div class="metric-label">Open</div>
                             </div>
-                            <div class="metric-item"><div class="status-badge severity-orange">12 Medium</div><div class="metric-label"></div></div>
-                            <div class="metric-item"><div class="status-badge severity-darkgreen">8 Low</div><div class="metric-label"></div></div>
+                            <div class="metric-item"><div class="status-badge severity-maroon">{{ ((teamDetail[cfg.name] || {}).by_risk || {}).Critical ?? 0 }} Critical</div></div>
+                            <div class="metric-item"><div class="status-badge severity-red">{{ ((teamDetail[cfg.name] || {}).by_risk || {}).High ?? 0 }} High</div></div>
+                            <div class="metric-item"><div class="status-badge severity-orange">{{ ((teamDetail[cfg.name] || {}).by_risk || {}).Medium ?? 0 }} Medium</div></div>
+                            <div class="metric-item"><div class="status-badge severity-darkgreen">{{ ((teamDetail[cfg.name] || {}).by_risk || {}).Low ?? 0 }} Low</div></div>
                         </div>
-                        <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">71% Closure Rate | 7.3 days avg | 4 overdue</div>
+                        <div style="font-size: 0.82rem; color: #64748b; font-weight: 500;">
+                            {{ closureRate(cfg.name) }}% Closure Rate
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Main Chart -->
-            <section class="charts-section">
+            <!-- <section class="charts-section">
                 <div class="chart-card">
                     <div class="chart-title">Mitigated Vulnerabilities: Severity vs Team Performance</div>
                     <div class="chart-wrapper">
                       <canvas id="mitigatedRadarChart"></canvas>
                     </div>
                 </div>
-            </section>
+            </section> -->
 
         </div>
         </div>
@@ -131,39 +80,39 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from '@/stores/authStore';
+
 export default {
   name: 'PerformanceMonitoringView',
-  components: {
-    DashboardMenu,
-    DashboardHeader,
-    NotificationPanel,
-  },
-  mounted() {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-    script.onload = () => {
-      new Chart(document.getElementById('mitigatedRadarChart').getContext('2d'), {
-        type: 'radar',
-        data: {
-          labels: ['Critical', 'High', 'Medium', 'Low'],
-          datasets: [
-            { label: 'Network Security', data: [25, 35, 45, 28], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)' },
-            { label: 'Patch Management', data: [45, 55, 62, 35], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)' },
-            { label: 'Configuragtion Management', data: [20, 30, 42, 32], borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.15)' },
-            { label: 'Architectural Flaws', data: [15, 25, 30, 22], borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.15)' }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: { r: { beginAtZero: true, max: 70, pointLabels: { font: { size: 12 }, color: ['maroon', 'red', 'goldenrod', 'green'] } } },
-          plugins: { legend: { position: 'top' } }
-        }
-      });
+  components: { DashboardMenu, DashboardHeader },
+  data() {
+    return {
+      loading: false,
+      teamDetail: {},
+      teamConfigs: [
+        { name: 'Network Security',         color: '#3b82f6', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', icon: '🔗' },
+        { name: 'Patch Management',         color: '#10b981', gradient: 'linear-gradient(135deg, #10b981, #059669)', icon: '🔧' },
+        { name: 'Configuration Management', color: '#f97316', gradient: 'linear-gradient(135deg, #f97316, #ea580c)', icon: '⚙️' },
+        { name: 'Architectural Flaws',      color: '#dc2626', gradient: 'linear-gradient(135deg, #dc2626, #b91c1c)', icon: '🏗️' },
+      ],
     };
-    document.head.appendChild(script);
-  }
+  },
+  methods: {
+    closureRate(teamName) {
+      const t = this.teamDetail[teamName];
+      if (!t || !t.total) return 0;
+      return Math.round((t.closed / t.total) * 100);
+    },
+  },
+  async mounted() {
+    this.loading = true;
+    const store = useAuthStore();
+    const result = await store.fetchDistributionByTeamDetail();
+    if (result.status && result.data?.teams) {
+      this.teamDetail = result.data.teams;
+    }
+    this.loading = false;
+  },
 };
 </script>
 
@@ -184,18 +133,18 @@ export default {
 .chart-title { font-size: 1.4rem; font-weight: 600; color: #1e293b; margin-bottom: 25px; text-align: center; }
 
 /* Team Overview Cards - 2x2 Grid */
-.teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 40px; }
+.teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 30px; }
 @media (max-width: 1100px) { .teams-grid { grid-template-columns: 1fr; } }
-.team-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border-left: 8px solid; height: 100%; }
-.team-header { display: flex; align-items: center; gap: 20px; margin-bottom: 10px; }
-.team-icon { font-size: 2rem; width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; }
-.team-name { font-size: 20px; font-weight: 700; color: #1e293b; flex: 1; }
-.team-total { font-size: 18px; font-weight: 800; }
-.team-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-.metric-item { text-align: center; padding: 10px 10px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 14px; }
-.metric-value { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
-.metric-label { font-size: 0.85rem; color: #64748b; }
-.status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
+.team-card { background: white; padding: 16px 18px; border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.07); border-left: 5px solid; height: 100%; }
+.team-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.team-icon { font-size: 1.4rem; width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+.team-name { font-size: 15px; font-weight: 700; color: #1e293b; }
+.team-total { font-size: 12px; font-weight: 600; }
+.team-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.metric-item { text-align: center; padding: 6px 8px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 10px; }
+.metric-value { font-size: 1.1rem; font-weight: 700; margin-bottom: 2px; }
+.metric-label { font-size: 0.75rem; color: #64748b; }
+.status-badge { padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
 .severity-maroon { background: maroon; color: white; }
 .severity-red { background: red; color: white; }
 .severity-orange { background: goldenrod; color: white; }

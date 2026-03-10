@@ -19,10 +19,16 @@
             <div class="risk-card area-critical risk-card-bg">
               <div class="risk-header">
                 <span class="dot critical-bg"></span>
-                Critical<span class="text-danger">*</span>
-               
+                Critical
+                <!-- <span class="text-danger">*</span> -->
+
+                <span class="text-danger ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                  title="Recommended timeline: Critical – 2 days">
+                  *
+                </span>
+
               </div>
-              
+
               <select class="form-select" v-model="form.critical" :disabled="isLocked">
                 <option value="" disabled>Select</option>
                 <option v-for="opt in timeOptions" :key="opt">{{ opt }}</option>
@@ -32,10 +38,16 @@
             <div class="risk-card area-high risk-card-bg">
               <div class="risk-header">
                 <span class="dot high-bg"></span>
-                High<span class="text-danger">*</span>
-                
+
+                <!-- High<span class="text-danger">*</span> -->
+                High
+                <span class="text-danger ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                  title="Recommended timeline: High – 4 days">
+                  *
+                </span>
+
               </div>
-             
+
 
 
               <select class="form-select" v-model="form.high" :disabled="isLocked">
@@ -50,10 +62,15 @@
             <div class="risk-card area-medium risk-card-bg">
               <div class="risk-header">
                 <span class="dot medium-bg"></span>
-                Medium<span class="text-danger">*</span>
-                
+                <!-- Medium<span class="text-danger">*</span> -->
+                Medium
+                <span class="text-danger ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                  title="Recommended timeline: Medium – 2 weeks">
+                  *
+                </span>
+
               </div>
-             
+
 
               <select class="form-select" v-model="form.medium" :disabled="isLocked">
                 <option value="" disabled>Select</option>
@@ -67,10 +84,15 @@
             <div class="risk-card area-low risk-card-bg">
               <div class="risk-header">
                 <span class="dot low-bg"></span>
-                Low<span class="text-danger">*</span>
-               
+                <!-- Low<span class="text-danger">*</span> -->
+                Low
+                <span class="text-danger ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                  title="Recommended timeline: Low – 4 weeks">
+                  *
+                </span>
+
               </div>
-              
+
               <select class="form-select" v-model="form.low" :disabled="isLocked">
                 <option value="" disabled>Select</option>
                 <option v-for="opt in timeOptions" :key="opt" :disabled="isOptionDisabled(form.medium, opt)">
@@ -154,6 +176,7 @@
 import Stepper from '@/components/admin-component/Stepper.vue';
 import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
+import { Tooltip } from 'bootstrap'
 
 export default {
   name: "RiskCriteriaView",
@@ -224,63 +247,63 @@ export default {
       return true;
     },
     async submitRiskCriteria() {
-  const auth = useAuthStore();
+      const auth = useAuthStore();
 
-  // normal locked flow
-  if (this.isLocked && !this.isEditMode) {
-    auth.markStepCompleted(2);
-    this.$router.push("/uploadtarget");
-    return;
-  }
-
-  if (!this.validateRiskCriteria()) return;
-
-  try {
-    this.loading = true;
-
-    // 🔥 EDIT MODE FLOW
-    if (this.isEditMode) {
-
-      const res = await auth.updateRiskCriteria(this.form); // PUT API
-
-      if (res.status) {
-        await Swal.fire({
-          icon: "success",
-          title: "Updated!",
-          text: res.message,
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        // redirect back
-        this.$router.push(this.$route.query.returnTo || "/admindashboardonboarding");
+      // normal locked flow
+      if (this.isLocked && !this.isEditMode) {
+        auth.markStepCompleted(2);
+        this.$router.push("/uploadtarget");
+        return;
       }
 
-      return;
-    }
+      if (!this.validateRiskCriteria()) return;
 
-    // 🔥 NORMAL CREATE FLOW
-    const res = await auth.addRiskCriteria(this.form);
+      try {
+        this.loading = true;
 
-    if (res.status) {
-      auth.markStepCompleted(2);
+        // 🔥 EDIT MODE FLOW
+        if (this.isEditMode) {
 
-      await Swal.fire({
-        icon: "success",
-        title: "Saved!",
-        text: res.message,
-        timer: 1500,
-        showConfirmButton: false,
-      });
+          const res = await auth.updateRiskCriteria(this.form); // PUT API
 
-      this.$router.push("/uploadtarget");
-    }
+          if (res.status) {
+            await Swal.fire({
+              icon: "success",
+              title: "Updated!",
+              text: res.message,
+              timer: 1500,
+              showConfirmButton: false,
+            });
 
-  } catch (err) {
-    Swal.fire("Error", "Something went wrong", "error");
-  } finally {
-    this.loading = false;
-  }
+            // redirect back
+            this.$router.push(this.$route.query.returnTo || "/admindashboardonboarding");
+          }
+
+          return;
+        }
+
+        // 🔥 NORMAL CREATE FLOW
+        const res = await auth.addRiskCriteria(this.form);
+
+        if (res.status) {
+          auth.markStepCompleted(2);
+
+          await Swal.fire({
+            icon: "success",
+            title: "Saved!",
+            text: res.message,
+            timer: 1500,
+            showConfirmButton: false,
+          });
+
+          this.$router.push("/uploadtarget");
+        }
+
+      } catch (err) {
+        Swal.fire("Error", "Something went wrong", "error");
+      } finally {
+        this.loading = false;
+      }
     },
     async getRiskCriteria() {
       try {
@@ -308,6 +331,8 @@ export default {
     },
   },
   mounted() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    tooltipTriggerList.forEach(el => new Tooltip(el))
     this.getRiskCriteria();
   },
 };
@@ -652,6 +677,7 @@ select.form-select:disabled {
   /* background-color: rgba(117, 100, 248, 0.10); */
   background-color: rgb(236, 235, 235);
 }
+
 .security-card-bg {
   background-color: rgba(117, 100, 248, 0.10);
 }

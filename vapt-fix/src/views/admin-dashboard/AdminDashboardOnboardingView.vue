@@ -22,22 +22,80 @@
                     <button class="btn border-0" @click="toggleCalendar">
                       <i class="bi bi-calendar3 fs-4"></i>
                     </button>
+
+                    <!-- Outside-click backdrop -->
+                    <div
+                      v-if="showCalendar"
+                      style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999;"
+                      @click="showCalendar = false; showMonthPicker = false; showYearPicker = false;"
+                    ></div>
+
                     <div
                       v-if="showCalendar"
                       class="calendar border rounded p-3 shadow"
                       style="width: 320px; position: absolute; background: #fff; z-index: 1000;"
+                      @click.stop
                     >
-                      <div class="d-flex justify-content-between align-items-center mb-2">
+                      <!-- Header: prev | month year | next -->
+                      <div class="d-flex justify-content-between align-items-center mb-2 position-relative">
                         <button class="btn btn-sm btn-light" @click="prevMonth">&lt;</button>
-                        <h6 class="mb-0">
-                          {{ monthYear }}
+                        <h6 class="mb-0 d-flex gap-2">
+                          <span
+                            style="cursor:pointer; text-decoration:underline dotted;"
+                            @click="showMonthPicker = !showMonthPicker; showYearPicker = false;"
+                          >{{ currentMonthName }}</span>
+                          <span
+                            style="cursor:pointer; text-decoration:underline dotted;"
+                            @click="showYearPicker = !showYearPicker; showMonthPicker = false;"
+                          >{{ currentYear }}</span>
                         </h6>
                         <button class="btn btn-sm btn-light" @click="nextMonth">&gt;</button>
+
+                        <!-- Month Picker -->
+                        <div
+                          v-if="showMonthPicker"
+                          class="position-absolute bg-white border rounded shadow p-2"
+                          style="top:100%; left:50%; transform:translateX(-50%); z-index:1100; width:200px;"
+                        >
+                          <div class="d-grid" style="grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                            <button
+                              v-for="(mName, mIdx) in monthNames"
+                              :key="mIdx"
+                              class="btn btn-sm"
+                              :class="mIdx === currentDate.getMonth() ? 'btn-primary' : 'btn-light'"
+                              @click="selectMonth(mIdx)"
+                            >{{ mName.slice(0,3) }}</button>
+                          </div>
+                        </div>
+
+                        <!-- Year Picker -->
+                        <div
+                          v-if="showYearPicker"
+                          class="position-absolute bg-white border rounded shadow p-2"
+                          style="top:100%; left:50%; transform:translateX(-50%); z-index:1100; width:200px;"
+                        >
+                          <div class="d-grid" style="grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                            <button
+                              v-for="y in yearRange"
+                              :key="y"
+                              class="btn btn-sm"
+                              :class="y === currentYear ? 'btn-primary' : 'btn-light'"
+                              @click="selectYear(y)"
+                            >{{ y }}</button>
+                          </div>
+                        </div>
                       </div>
+
+                      <!-- Weekday headers -->
                       <div class="d-grid text-center fw-bold" style="grid-template-columns: repeat(7, 1fr);">
                         <div v-for="day in weekDays" :key="day">{{ day }}</div>
                       </div>
+
+                      <!-- Calendar days -->
+                      <div v-if="calendarLoading" class="text-center py-3 text-muted small">Loading...</div>
+                      <div v-else-if="calendarError" class="text-center py-3 text-danger small">{{ calendarErrorMessage || 'Failed to load calendar data.' }}</div>
                       <div
+                        v-else
                         class="d-grid text-center"
                         style="grid-template-columns: repeat(7, 1fr); gap: 3px;"
                       >
@@ -59,215 +117,8 @@
               
               <div class="d-flex flex-row gap-3 mt-3">
                 <div>
-                <button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-eye me-2"></i> View Report</button>
+                <button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="$router.push('/viewreport')"><i class="bi bi-eye me-2"></i> View Report</button>
                 </div>
-
-                <!-- Download Report Modal - Full Screen -->
-                <div v-if="showReport" class="report-overlay">
-                  <div class="report-page-wrap">
-
-                    <!-- Report Header -->
-                    <div class="report-header">
-                      <div class="report-header-left">
-                        <!-- <strong>Client XYZ</strong> -->
-                         <div class="browser-bar">
-        <img src="@/assets/images/vaptfix_white.png" alt="">
-      </div>
-                        <small>Ibdar_int_july_dpeeds</small>
-                      </div>
-                      <div class="report-header-center">
-                        <h1 style="font-size: 2.2rem; margin: 0; color: white;">Vulnerability Management Report</h1>
-                      </div>
-                      <div class="report-header-right">
-                        <button @click="closeReportModal" class="report-close-icon-btn">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                        <button @click="downloadReport" class="report-download-btn">
-                          <i class="bi bi-download"></i>
-                          <span>Download Report</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div class="report-content">
-
-                      <!-- Executive Summary -->
-                      <section class="report-exec-summary">
-                        <h2 class="report-h2">📊 Executive Summary</h2>
-                        <div class="report-summary-grid">
-                          <div class="report-summary-card">
-                            <div class="report-summary-title">Total Vulnerabilities Discovered</div>
-                            <div class="report-total-number">187</div>
-                            <div class="report-chart-small"><canvas id="rTotalVulnsChart"></canvas></div>
-                          </div>
-                          <!-- Criticality Status Overview (from sample 8) -->
-                          <div class="report-summary-card">
-                            <div class="report-summary-title">Severity Status Overview</div>
-                            <div class="report-chart-small"><canvas id="rCriticalityStatusChart"></canvas></div>
-                          </div>
-                          <div class="report-summary-card">
-                            <div class="report-summary-title">Distribution by Team</div>
-                            <div class="report-chart-small"><canvas id="rTeamDistributionChart"></canvas></div>
-                          </div>
-                        </div>
-                      </section>
-
-                      <!-- Main Chart -->
-                      <section class="report-charts-section">
-                        <div class="report-chart-card">
-                          <div class="report-chart-title">Mitigated Vulnerabilities: Severity vs Team Performance</div>
-                          <div class="report-chart-wrapper">
-                            <canvas id="rMitigatedRadarChart"></canvas>
-                          </div>
-                        </div>
-                      </section>
-
-                      <!-- Team Performance -->
-                      <section>
-                        <h2 class="report-h2"><i class="bi bi-people"></i> Team Performance Overview</h2>
-                        <div class="report-teams-grid">
-
-                          <div class="report-team-card" style="border-left-color: #3b82f6;">
-                            <div class="report-team-header">
-                              <div class="report-team-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🔗</div>
-                              <div>
-                                <div class="report-team-name">Network Security</div>
-                                <div class="report-team-total" style="color: #3b82f6;">48 Total vulns assigned</div>
-                              </div>
-                            </div>
-                            <div class="report-team-metrics">
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">38</div><div class="report-metric-label">Closed</div></div>
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">10</div><div class="report-metric-label">Open</div></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">3 Critical</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-red">15 High</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">20 Medium</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">10 Low</span></div>
-                            </div>
-                            <div class="report-team-footer">79% Closure Rate | 4.2 days avg | 2 overdue</div>
-                          </div>
-
-                          <div class="report-team-card" style="border-left-color: #10b981;">
-                            <div class="report-team-header">
-                              <div class="report-team-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🔧</div>
-                              <div>
-                                <div class="report-team-name">Patch Management</div>
-                                <div class="report-team-total" style="color: #10b981;">62 Total vulns assigned</div>
-                              </div>
-                            </div>
-                            <div class="report-team-metrics">
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">52</div><div class="report-metric-label">Closed</div></div>
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">8</div><div class="report-metric-label">Open</div></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">8 Critical</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-red">22 High</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">25 Medium</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">7 Low</span></div>
-                            </div>
-                            <div class="report-team-footer">84% Closure Rate | 3.8 days avg | 0 overdue</div>
-                          </div>
-
-                          <div class="report-team-card" style="border-left-color: #f97316;">
-                            <div class="report-team-header">
-                              <div class="report-team-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">⚙️</div>
-                              <div>
-                                <div class="report-team-name">Configuration Management</div>
-                                <div class="report-team-total" style="color: #f97316;">42 Total vulns assigned</div>
-                              </div>
-                            </div>
-                            <div class="report-team-metrics">
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">35</div><div class="report-metric-label">Closed</div></div>
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">6</div><div class="report-metric-label">Open</div></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">2 Critical</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-red">12 High</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">18 Medium</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">10 Low</span></div>
-                            </div>
-                            <div class="report-team-footer">83% Closure Rate | 5.1 days avg | 1 overdue</div>
-                          </div>
-
-                          <div class="report-team-card" style="border-left-color: #dc2626;">
-                            <div class="report-team-header">
-                              <div class="report-team-icon" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">🏗️</div>
-                              <div>
-                                <div class="report-team-name">Architectural Flaws</div>
-                                <div class="report-team-total" style="color: #dc2626;">35 Total vulns assigned</div>
-                              </div>
-                            </div>
-                            <div class="report-team-metrics">
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#059669">25</div><div class="report-metric-label">Closed</div></div>
-                              <div class="report-metric-item"><div class="report-metric-value" style="color:#dc2626">11</div><div class="report-metric-label">Open</div></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-maroon mt-3">5 Critical</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-red">10 High</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-orange">12 Medium</span></div>
-                              <div class="report-metric-item"><span class="rsev-badge rsev-darkgreen">8 Low</span></div>
-                            </div>
-                            <div class="report-team-footer">71% Closure Rate | 7.3 days avg | 4 overdue</div>
-                          </div>
-
-                        </div>
-                      </section>
-
-                      <!-- Detailed Vulnerabilities -->
-                      <section>
-                        <h2 class="report-h2"><i class="bi bi-table"></i> Detailed Vulnerabilities</h2>
-                        <div class="report-filters-section">
-                          <div class="report-filter-group">
-                            <label>Team:</label>
-                            <select v-model="reportTeamFilter">
-                              <option value="all">All Teams</option>
-                              <option value="network">Network Security</option>
-                              <option value="patch">Patch Management</option>
-                              <option value="configuration">Configuration Management</option>
-                              <option value="architectural">Architectural Flaws</option>
-                            </select>
-                            <label>Severity:</label>
-                            <select v-model="reportSeverityFilter">
-                              <option value="all">All</option>
-                              <option value="critical">Critical</option>
-                              <option value="high">High</option>
-                              <option value="medium">Medium</option>
-                              <option value="low">Low</option>
-                            </select>
-                            <label>Status:</label>
-                            <select v-model="reportStatusFilter">
-                              <option value="all">All</option>
-                              <option value="open">Open</option>
-                              <option value="closed">Closed</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="report-table-container">
-                          <table class="report-table">
-                            <thead>
-                              <tr>
-                                <th>S.No.</th>
-                                <th>Vulnerability Name</th>
-                                <th>Asset</th>
-                                <th>Team</th>
-                                <th>Severity</th>
-                                <th>Found Date</th>
-                                <th>Status</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr v-for="row in filteredReportData" :key="row.id">
-                                <td><strong>{{ row.id }}</strong></td>
-                                <td>{{ row.name }}</td>
-                                <td><strong>{{ row.asset }}</strong></td>
-                                <td><span :class="['rteam-badge', 'rteam-' + row.team]">{{ row.teamLabel }}</span></td>
-                                <td><span :class="['rsev-badge', 'rsev-' + row.severity]">{{ row.severity.charAt(0).toUpperCase() + row.severity.slice(1) }}</span></td>
-                                <td>{{ row.found }}</td>
-                                <td><span :class="row.status === 'open' ? 'rstatus-open' : 'rstatus-closed'">{{ row.status === 'open' ? 'Open' : 'Closed' }}</span></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </section>
-
-                    </div>
-                  </div>
-                </div>
-                    
-                  <NotificationPanel />
 
                 </div>
             </div>
@@ -279,7 +130,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total assets<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Total assets<span class="info-tooltip" data-tooltip="Total number of assets currently registered and monitored within the platform."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <!-- <h1 class="text-212">212</h1> -->
@@ -307,7 +158,7 @@
                     <div class="d-flex flex-row justify-content-start gap-2">
                       <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                       </div>
-                      <p class="assets-para">Vulnerabilities<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                      <p class="assets-para">Vulnerabilities<span class="info-tooltip" data-tooltip="Total number of identified vulnerabilities across all assets, categorized by severity levels: Critical, High, Medium, and Low."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                     </div>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
@@ -353,7 +204,7 @@
                   <!-- Vulnerability aging -->
                   <div class="col-md-6">
                     <div class="mb-2">
-                      <p class="assets-para">Mitigation Timeline<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                      <p class="assets-para">Mitigation Timeline<span class="info-tooltip" data-tooltip="Displays the remaining remediation time for vulnerabilities based on the defined risk criteria."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                     </div>
                     
                   
@@ -402,7 +253,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total Vulnerabilities Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Total Vulnerabilities Fixed<span class="info-tooltip" data-tooltip="Total count of vulnerabilities that have been successfully remediated and verified as resolved within the system."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-5 ps-3">
                     <h1 class="text-78">{{ String(vulFixedTotal).padStart(2, '0') }}</h1>
@@ -437,7 +288,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Mean time to remediate<span class="info-tooltip" data-tooltip="Represents the average remediation time calculated based on the risk criteria defined for different vulnerability severity levels."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row justify-content-center gap-2 py-3">  
                 <h1 class="">{{ meanRemediateHuman }}</h1>
@@ -450,15 +301,15 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Support Requests<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Support Requests<span class="info-tooltip" data-tooltip="Total number of support requests raised or tickets raised in the system, categorized by their current status such as Pending or Closed."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row gap-5 py-3">
                     <h1 class="text-78">{{ String(supportTotal).padStart(2, '0') }}</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
                         <div class="fs-5 fw-semibold">{{ supportPending }}</div>
-                        <div class="bar dark-yellow vul-bar mt-1"></div>
-                        <small class="mt-1 d-block" style="color: yellow;">● Pending</small>
+                        <div class="bar red vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● Pending</small>
                       </div>
                       <div class="text-center">
                         <div class="fs-5 fw-semibold">{{ supportClosed }}</div>
@@ -478,23 +329,20 @@
                 <div class="card pb-2 pt-3 px-3">
                   <div class="d-flex flex-row align-items-center justify-content-between py-3">
                     <h4 class="fw-semibold">Mitigation Strategy</h4>
-              <router-link to="/supportrequests" class="btn pending-approval-btn rounded-pill text-decoration-none">11 Support requests ongoing
+              <router-link to="/supportrequests" class="btn pending-approval-btn rounded-pill text-decoration-none">{{ supportPending }} Support requests ongoing
                 <i class="bi bi-arrow-right ms-1 fs-5"></i></router-link>
                   </div>
                   <div class="row mt-3">
                     <div class="col-12">
                       <div class="d-flex gap-3">
-                        <button class="btn btn-primary btn-pill active-tab fw-semibold">
-                          Patch Management
-                        </button>
-                        <button class="btn btn-outline-secondary btn-pill other-btn">
-                          Configuration Management
-                        </button>
-                        <button class="btn btn-outline-secondary btn-pill other-btn">
-                          Network Security
-                        </button>
-                        <button class="btn btn-outline-secondary btn-pill other-btn">
-                          Architectural flaws
+                        <button
+                          v-for="tab in mitigationTabs"
+                          :key="tab.key"
+                          class="btn btn-pill fw-semibold"
+                          :class="mitigationActiveTab === tab.key ? 'btn-primary active-tab' : 'btn-outline-secondary other-btn'"
+                          @click="setMitigationTab(tab.key)"
+                        >
+                          {{ tab.label }}
                         </button>
                       </div>
                     </div>
@@ -504,145 +352,82 @@
                     <div class="d-flex justify-content-between">
                         <div class="mt-2 d-flex align-items-center">
                           <span style="color: rgba(0, 0, 0, 0.87);">
-                            Assigned to Patch Management team
+                            Assigned to {{ mitigationActiveTab }} team
                           </span>
-                          <span class="badge rounded-pill bg-primary ms-2 mt-1 d-flex align-items-center justify-content-center" style="width: 80px; height: 18px;">
-                            4 Members
-                          </span>
-                          
                         </div>
-                      <div>
-                        <router-link to="/mitigationstrategy">
-                          <button class="btn border-0" style="color: rgba(49, 33, 177, 1); font-weight: 600;">More details <i class="bi bi-arrow-right"></i></button>
-                        </router-link>
-                      </div>
                     </div>
 
                     <div class="d-flex gap-4 my-3">
                       
                       <div class="d-flex flex-column gap-2">
                         <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
-                      <button class="btn patch-btn rounded-pill text-nowrap d-flex align-items-center justify-content-center w-100">
-  {{ days }} Days
-  <i class="bi bi-plus-circle text-danger ms-2" style="cursor:pointer;" @click.stop="openModal"></i>
-</button></div>
-
-
-
+                        <button class="btn patch-btn rounded-pill text-nowrap d-flex align-items-center justify-content-center w-100">
+                          {{ riskCriteria.critical ?? '—' }} 
+                          <i class="bi bi-plus-circle text-danger ms-2" style="cursor:pointer;" @click.stop="openModal('critical')"></i>
+                        </button>
+                      </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-danger">High</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.high ?? '—' }}  <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" @click.stop="openModal('high')"></i></button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-warning">Medium</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.medium ?? '—' }} <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" @click.stop="openModal('medium')"></i></button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-success">Low</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.low ?? '—' }}  <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" @click.stop="openModal('low')"></i></button>
                       </div>
                     </div>
                   </div>
 
                   <div class="row mb-5">
                     <div class="col-12">
-                    <div class="d-flex justify-content-between">
-                      <p style="font-weight: 
-                      600;">Missing security updates</p>
-                      <!-- <p style="cursor: pointer;color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;">View all</p>   -->
+                    <div class="d-flex justify-content-between align-items-center">
+                      <p style="font-weight: 600;" class="mb-0">
+                        Vulnerabilities ({{ mitigationActiveTeamData.count }})
+                      </p>
+                      <router-link :to="{ path: '/missingsecurityupdates', query: { team: mitigationActiveTab } }">
+                        <button class="btn border-0" style="color: rgba(49, 33, 177, 1); font-weight: 600;">More details <i class="bi bi-arrow-right"></i></button>
+                      </router-link>
                     </div>
-                    <div class="row">
-                        <div class="col-3">
-                          <div class="card py-4 px-3" style="border-radius: 12px;">
-                                <div class="d-flex justify-content-between">
-                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
-                                    
-                                </div>
-                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
-                                  VMware ESXi 7.0/8.0 Sandbox Escape...
-                                </h4>
-                                <div class="d-flex justify-content-start mt-2">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                     
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                 <div class="text-end">
-                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
-                                      Details <i class="bi bi-arrow-right"></i>
-                                    </router-link>
-                                 </div>
-                          </div>
-                        </div>
-                        <div class="col-3">
-                          <div class="card py-4 px-3" style="border-radius: 12px;">
-                                <div class="d-flex justify-content-between">
-                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
-                                    
-                                </div>
-                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
-                                  VMware ESXi 7.0/8.0 Sandbox Escape...
-                                </h4>
-                                <div class="d-flex justify-content-start mt-2">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                     
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                 <div class="text-end">
-                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
-                                      Details <i class="bi bi-arrow-right"></i>
-                                    </router-link>
-                                 </div>
-                          </div>
-                        </div>
-                        <div class="col-3">
-                          <div class="card py-4 px-3" style="border-radius: 12px;">
-                                <div class="d-flex justify-content-between">
-                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
-                                    
-                                </div>
-                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
-                                  VMware ESXi 7.0/8.0 Sandbox Escape...
-                                </h4>
-                                <div class="d-flex justify-content-start mt-2">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                     
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                 <div class="text-end">
-                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
-                                      Details <i class="bi bi-arrow-right"></i>
-                                    </router-link>
-                                 </div>
-                          </div>
-                        </div>
-                        <div class="col-3">
-                          <div class="card py-4 px-3" style="border-radius: 12px;">
-                                <div class="d-flex justify-content-between">
-                                  <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">23 Assets</p>
-                                    
-                                </div>
-                                <h4 class="truncated-text" title="VMware ESXi 7.0/8.0 Sandbox Escape">
-                                  VMware ESXi 7.0/8.0 Sandbox Escape...
-                                </h4>
-                                <div class="d-flex justify-content-start mt-2">
-                                    <i class="bi bi-microsoft me-2"></i>
-                                     
-                                    <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">Microsoft</h6>
-                                </div>
-                                 <div class="text-end">
-                                  <router-link to="/missingsecurityupdates" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
-                                      Details <i class="bi bi-arrow-right"></i>
-                                    </router-link>
-                                 </div>
+
+                    <div v-if="mitigationLoading" class="py-3 text-center text-muted">Loading...</div>
+                    <div v-else-if="mitigationActiveTeamData.vulnerabilities.length === 0" class="py-3 text-muted">
+                      No vulnerabilities assigned to this team.
+                    </div>
+                    <div v-else class="row align-items-stretch">
+                        <div
+                          v-for="vuln in mitigationActiveTeamData.vulnerabilities.slice(0, 4)"
+                          :key="vuln.id"
+                          class="col-3 d-flex"
+                        >
+                          <div class="card py-4 px-3 w-100 d-flex flex-column" style="border-radius: 12px;">
+                            <div class="d-flex justify-content-between">
+                              <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">{{ vuln.host_name }}</p>
+                              <span :style="{ color: getMitigationRiskColor(vuln.risk_factor), fontSize: '12px', fontWeight: '600' }">
+                                {{ vuln.risk_factor }}
+                              </span>
+                            </div>
+                            <h4 class="truncated-text" :title="vuln.plugin_name">
+                              {{ vuln.plugin_name }}
+                            </h4>
+                            <div class="d-flex justify-content-start mt-2">
+                              <i class="bi bi-microsoft me-2"></i>
+                              <h6 :title="vuln.os || 'Unknown OS'" style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px" class="truncated-text">
+                                {{ vuln.os || 'Unknown OS' }}
+                              </h6>
+                            </div>
+                            <div class="text-end">
+                              <router-link :to="{ path: '/missingsecurityupdates', query: { team: mitigationActiveTab } }" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
+                                Details <i class="bi bi-arrow-right"></i>
+                              </router-link>
+                            </div>
                           </div>
                         </div>
                     </div>
                     </div>
 
-                    
                   </div>
                 </div>
                 </div>
@@ -652,26 +437,26 @@
         </div>
       </div>
 
+      <!-- Update Risk Criteria Modal -->
       <div v-if="showModal" class="custom-modal-backdrop">
-  <div class="custom-modal-box">
-    <h5 class="mb-3">Update Days</h5>
-
-    <div class="mb-3">
-      <label class="form-label">Add Days</label>
-      <input type="number" class="form-control" style="border-radius: 10px;" v-model="addDays">
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Reason</label>
-      <textarea class="form-control" style="border-radius: 10px;" rows="2" v-model="reason"></textarea>
-    </div>
-
-    <div class="d-flex justify-content-end gap-2">
-      <button class="btn btn-secondary" @click="closeModal">Cancel</button>
-      <button class="btn btn-primary" @click="submitForm">Submit</button>
-    </div>
-  </div>
-</div>
+        <div class="custom-modal-box" @click.stop>
+          <h5 class="mb-3">Update Days — {{ modalSeverityLabel }}</h5>
+          <div class="mb-3">
+            <label class="form-label">Days</label>
+            <input type="text" class="form-control" style="border-radius: 10px;" v-model="modalDays" placeholder="e.g. day 1, 3 days, 1 week">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Reason</label>
+            <textarea class="form-control" style="border-radius: 10px;" rows="2" v-model="modalReason"></textarea>
+          </div>
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-secondary" @click="closeModal">Cancel</button>
+            <button class="btn btn-primary" :disabled="riskUpdating" @click="submitRiskCriteria">
+              {{ riskUpdating ? 'Saving...' : 'Submit' }}
+            </button>
+          </div>
+        </div>
+      </div>
 
     </section>
   </main>
@@ -680,7 +465,6 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
 import Chart from 'chart.js/auto';
@@ -690,7 +474,6 @@ export default {
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel,
   },
   data() {
     return {
@@ -698,20 +481,22 @@ export default {
       remainingSeconds: 20,
       progressPercent: 100,
       testingTimer: null,
-      showReport: false,
       showCalendar: false,
       currentDate: new Date(),
       weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-      vulnerabilities: {
-        12: "critical",
-        15: "high",
-        20: "medium",
-        23: "low",
-      },
-      days: 10,              // default days
-      showModal: false,      // modal visibility
-      addDays: "",           // input: additional days
-      reason: "",
+      calendarDayData: {},
+      calendarLoading: false,
+      calendarError: false,
+      calendarErrorMessage: '',
+      showMonthPicker: false,
+      showYearPicker: false,
+      monthNames: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+      showModal: false,
+      riskCriteria: { critical: null, high: null, medium: null, low: null },
+      modalSeverity: null,
+      modalDays: null,
+      modalReason: "",
+      riskUpdating: false,
       mitigationTimeline: null,
       selectedLocation: "",
       locationName: "",
@@ -743,30 +528,29 @@ export default {
       vulFixedHigh: 0,
       vulFixedMedium: 0,
       vulFixedLow: 0,
-      // Report modal data
-      reportTeamFilter: 'all',
-      reportSeverityFilter: 'all',
-      reportStatusFilter: 'all',
-      reportCharts: [],
-      reportTableData: [
-        { id: 1, name: 'Unencrypted SNMPv2 Traffic', asset: 'Core-Switch-01', team: 'network', teamLabel: 'Network Security', severity: 'critical', found: '2026-02-23', status: 'open' },
-        { id: 2, name: 'Unpatched Windows Server 2019', asset: 'WEB-SRV-Prod-01', team: 'patch', teamLabel: 'Patch Management', severity: 'high', found: '2026-02-24', status: 'closed' },
-        { id: 3, name: 'Excessive File Permissions (777)', asset: 'DB-Server-Prod-02', team: 'configuration', teamLabel: 'Configuration Management', severity: 'medium', found: '2026-02-25', status: 'closed' },
-        { id: 4, name: 'Hardcoded API Keys in Config', asset: 'App-Config-Repo', team: 'architectural', teamLabel: 'Architectural Flaws', severity: 'critical', found: '2026-02-23', status: 'open' },
-        { id: 5, name: 'Firewall Rule Allows All Traffic', asset: 'FW-Edge-01', team: 'network', teamLabel: 'Network Security', severity: 'high', found: '2026-02-24', status: 'closed' },
-        { id: 6, name: 'Apache HTTPD CVE-2025-1234', asset: 'WEB-SRV-02', team: 'patch', teamLabel: 'Patch Management', severity: 'critical', found: '2026-02-26', status: 'open' },
-        { id: 7, name: 'Default Admin Passwords Active', asset: 'Cisco-Switch-03', team: 'configuration', teamLabel: 'Configuration Management', severity: 'high', found: '2026-02-25', status: 'open' },
-        { id: 8, name: 'Insecure Direct Object Reference', asset: 'User-Mgmt-API', team: 'architectural', teamLabel: 'Architectural Flaws', severity: 'high', found: '2026-02-24', status: 'closed' },
-        { id: 9, name: 'SSL Certificate Expired', asset: 'Mail-SRV-01', team: 'network', teamLabel: 'Network Security', severity: 'medium', found: '2026-02-25', status: 'open' },
-        { id: 10, name: 'Outdated OpenSSL Library', asset: 'API-Gateway-01', team: 'patch', teamLabel: 'Patch Management', severity: 'high', found: '2026-02-26', status: 'open' },
-        { id: 11, name: 'Weak Password Policy', asset: 'AD-Server-01', team: 'configuration', teamLabel: 'Configuration Management', severity: 'medium', found: '2026-02-27', status: 'closed' },
-        { id: 12, name: 'Exposed Admin Panel', asset: 'CMS-Prod-01', team: 'architectural', teamLabel: 'Architectural Flaws', severity: 'high', found: '2026-02-27', status: 'open' },
+      // Mitigation by team
+      mitigationLoading: false,
+      mitigationByTeamData: null,
+      mitigationActiveTab: "Patch Management",
+      mitigationTabs: [
+        { key: "Patch Management", label: "Patch Management" },
+        { key: "Configuration Management", label: "Configuration Management" },
+        { key: "Network Security", label: "Network Security" },
+        { key: "Architectural Flaws", label: "Architectural Flaws" },
       ],
     };
   },
   computed: {
     authStore() {
       return useAuthStore();
+    },
+    mitigationActiveTeamData() {
+      if (!this.mitigationByTeamData?.teams) return { count: 0, vulnerabilities: [] };
+      return this.mitigationByTeamData.teams[this.mitigationActiveTab] || { count: 0, vulnerabilities: [] };
+    },
+    modalSeverityLabel() {
+      const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
+      return this.modalSeverity ? map[this.modalSeverity] : '';
     },
     daysInMonth() {
       const year = this.currentDate.getFullYear();
@@ -777,6 +561,16 @@ export default {
       const year = this.currentDate.getFullYear();
       const month = this.currentDate.getMonth();
       return new Date(year, month, 1).getDay();
+    },
+    currentMonthName() {
+      return this.monthNames[this.currentDate.getMonth()];
+    },
+    currentYear() {
+      return this.currentDate.getFullYear();
+    },
+    yearRange() {
+      const y = this.currentDate.getFullYear();
+      return Array.from({ length: 12 }, (_, i) => y - 5 + i);
     },
     monthYear() {
       return this.currentDate.toLocaleString("default", {
@@ -819,26 +613,24 @@ export default {
       }
       return this.selectedLocationData.name;
     },
-    filteredReportData() {
-      return this.reportTableData.filter(row =>
-        (this.reportTeamFilter === 'all' || row.team === this.reportTeamFilter) &&
-        (this.reportSeverityFilter === 'all' || row.severity === this.reportSeverityFilter) &&
-        (this.reportStatusFilter === 'all' || row.status === this.reportStatusFilter)
-      );
-    },
   },
-  watch: {
-    showReport(val) {
-      if (val) {
-        this.$nextTick(() => {
-          this.initReportCharts();
-        });
-      } else {
-        this.destroyReportCharts();
-      }
-    },
-  },
+  watch: {},
   methods: {
+    setMitigationTab(key) {
+      this.mitigationActiveTab = key;
+    },
+    getMitigationRiskColor(risk) {
+      const map = { Critical: "#b31c1c", High: "#f44336", Medium: "#f6b100", Low: "#4caf50" };
+      return map[risk] || "#666";
+    },
+    async loadMitigationByTeam() {
+      this.mitigationLoading = true;
+      const result = await this.authStore.fetchMitigationByTeam();
+      if (result.status) {
+        this.mitigationByTeamData = result.data;
+      }
+      this.mitigationLoading = false;
+    },
     initTestingOverlay() {
       // ✅ Skip if report status overlay is already showing (report status takes priority)
       if (this.reportStatusChecking || !this.authStore.reportStatus.hasReport) {
@@ -1012,19 +804,78 @@ export default {
       this.locationName = country;
       this.showDropdown = false;
     },
+    async loadCalendarData() {
+      this.calendarLoading = true;
+      this.calendarError = false;
+      this.calendarErrorMessage = '';
+      this.calendarDayData = {};
+      // Ensure riskCriteriaId is in localStorage before calling calendar API
+      if (!localStorage.getItem("riskCriteriaId") && !localStorage.getItem("riskId")) {
+        await this.loadRiskCriteria();
+      }
+      const riskId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
+      if (!riskId) {
+        this.calendarError = true;
+        this.calendarErrorMessage = 'Risk criteria not configured. Please set up your risk criteria first.';
+        this.calendarLoading = false;
+        return;
+      }
+      const year = this.currentDate.getFullYear();
+      const month = this.currentDate.getMonth() + 1;
+      const result = await this.authStore.fetchRiskCriteriaCalendar(year, month);
+      console.log("[Calendar] API result:", result);
+      if (result.status && result.data?.calendar?.days) {
+        const map = {};
+        result.data.calendar.days.forEach(day => {
+          if (day.severities && day.severities.length > 0) {
+            map[day.date] = day.severities[0];
+          }
+        });
+        console.log("[Calendar] Severity map:", map);
+        this.calendarDayData = map;
+      } else {
+        this.calendarError = true;
+        this.calendarErrorMessage = result.message || 'Failed to load calendar data.';
+        console.warn("[Calendar] Failed to load data:", result.message);
+      }
+      this.calendarLoading = false;
+    },
     toggleCalendar() {
       this.showCalendar = !this.showCalendar;
+      if (this.showCalendar) this.loadCalendarData();
     },
     prevMonth() {
-      this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-      this.currentDate = new Date(this.currentDate);
+      const d = new Date(this.currentDate);
+      d.setMonth(d.getMonth() - 1);
+      this.currentDate = d;
+      this.loadCalendarData();
     },
     nextMonth() {
-      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-      this.currentDate = new Date(this.currentDate);
+      const d = new Date(this.currentDate);
+      d.setMonth(d.getMonth() + 1);
+      this.currentDate = d;
+      this.loadCalendarData();
+    },
+    selectMonth(monthIndex) {
+      const d = new Date(this.currentDate);
+      d.setMonth(monthIndex);
+      this.currentDate = d;
+      this.showMonthPicker = false;
+      this.loadCalendarData();
+    },
+    selectYear(year) {
+      const d = new Date(this.currentDate);
+      d.setFullYear(year);
+      this.currentDate = d;
+      this.showYearPicker = false;
+      this.loadCalendarData();
     },
     getSeverityClass(date) {
-      const severity = this.vulnerabilities[date];
+      const year = this.currentDate.getFullYear();
+      const month = String(this.currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(date).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      const severity = this.calendarDayData[dateStr];
       switch (severity) {
         case "critical":
           return "bg-maroon text-white";
@@ -1039,29 +890,97 @@ export default {
       }
     },
     handleDateClick(date) {
-      if (this.vulnerabilities[date]) {
+      const year = this.currentDate.getFullYear();
+      const month = String(this.currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(date).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      if (this.calendarDayData[dateStr]) {
         this.$router.push("/assets");
       }
-
     },
-    openModal() {
+    async openModal(severity) {
+      // Fetch fresh risk criteria data so the current value is pre-filled in the modal
+      await this.loadRiskCriteria();
+      this.modalSeverity = severity;
+      this.modalDays = this.riskCriteria[severity] ?? null;
+      this.modalReason = "";
       this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
-      this.addDays = "";
-      this.reason = "";
+      this.modalSeverity = null;
+      this.modalDays = null;
+      this.modalReason = "";
     },
-    submitForm() {
-      if (!this.addDays) {
-        alert("Please enter number of days");
+    async submitRiskCriteria() {
+      if (!this.modalDays) {
+        alert("Please enter a value");
         return;
       }
-
-      this.days += Number(this.addDays); // update UI days
-      alert("Days updated successfully!");
-
-      this.closeModal();
+      const updated = {
+        critical: String(this.riskCriteria.critical ?? ''),
+        high: String(this.riskCriteria.high ?? ''),
+        medium: String(this.riskCriteria.medium ?? ''),
+        low: String(this.riskCriteria.low ?? ''),
+        [this.modalSeverity]: String(this.modalDays),
+      };
+      this.riskUpdating = true;
+      const hasExisting = !!(localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId"));
+      let result;
+      if (hasExisting) {
+        result = await this.authStore.updateRiskCriteria(updated);
+        if (result.status && result.data?.risk_criteria?._id) {
+          localStorage.setItem("riskCriteriaId", result.data.risk_criteria._id);
+          localStorage.setItem("riskId", result.data.risk_criteria._id);
+        }
+      } else {
+        result = await this.authStore.addRiskCriteria(updated);
+        if (result.status && result.data?._id) {
+          localStorage.setItem("riskCriteriaId", result.data._id);
+          localStorage.setItem("riskId", result.data._id);
+        }
+      }
+      this.riskUpdating = false;
+      if (result.status) {
+        this.riskCriteria = { ...updated };
+        this.closeModal();
+      } else {
+        alert(result.message || "Failed to save risk criteria");
+      }
+    },
+    async loadRiskCriteria() {
+      let result = await this.authStore.getRiskCriteriaById();
+      // Fallback: if no stored ID, fetch by admin (also stores the ID)
+      if (!result.status) {
+        result = await this.authStore.getRiskCriteriaByAdmin();
+        if (result.status && result.data) {
+          const d = result.data;
+          if (d._id) {
+            localStorage.setItem("riskId", d._id);
+            localStorage.setItem("riskCriteriaId", d._id);
+          }
+          this.riskCriteria = {
+            critical: d.critical ?? null,
+            high: d.high ?? null,
+            medium: d.medium ?? null,
+            low: d.low ?? null,
+          };
+        }
+        return;
+      }
+      if (result.data?.risk_criteria) {
+        const d = result.data.risk_criteria;
+        if (d._id) {
+          localStorage.setItem("riskId", d._id);
+          localStorage.setItem("riskCriteriaId", d._id);
+        }
+        this.riskCriteria = {
+          critical: d.critical ?? null,
+          high: d.high ?? null,
+          medium: d.medium ?? null,
+          low: d.low ?? null,
+        };
+      }
     },
     async loadMitigationTimeline() {
       const res = await this.authStore.fetchMitigationTimeline(this.reportId);
@@ -1196,102 +1115,6 @@ export default {
       });
     },
 
-    closeReportModal() {
-      this.showReport = false;
-    },
-
-    downloadReport() {
-      const reportContent = document.querySelector('.report-page-wrap');
-      if (!reportContent) return;
-
-      const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vulnerability Management Report</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
-  <style>
-    body { font-family: 'Inter', sans-serif; background: #f1f5f9; padding: 20px; }
-    ${Array.from(document.styleSheets).filter(s => { try { return s.cssRules; } catch(e) { return false; } }).flatMap(s => Array.from(s.cssRules)).map(r => r.cssText).join('\n')}
-  </style>
-</head>
-<body>
-  ${reportContent.outerHTML}
-</body>
-</html>`;
-
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'vulnerability-management-report.html';
-      a.click();
-      URL.revokeObjectURL(url);
-    },
-
-    destroyReportCharts() {
-      this.reportCharts.forEach(c => c.destroy());
-      this.reportCharts = [];
-    },
-
-    initReportCharts() {
-      this.destroyReportCharts();
-      const chartConfigs = [
-        {
-          id: 'rTotalVulnsChart',
-          type: 'bar',
-          data: {
-            labels: ['Critical', 'High', 'Medium', 'Low'],
-            datasets: [{ label: 'Total Discovered', data: [18, 59, 75, 35], backgroundColor: ['maroon', 'red', 'goldenrod', 'green'], borderRadius: 8 }]
-          },
-          options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } } }
-        },
-        {
-          id: 'rCriticalityStatusChart',
-          type: 'doughnut',
-          data: {
-            labels: ['Critical Pending', 'High Pending', 'Medium Pending', 'Low Pending'],
-            datasets: [{ data: [10, 20, 4, 1], backgroundColor: ['maroon', 'red', 'goldenrod', 'green'] }]
-          },
-          options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-        },
-        {
-          id: 'rTeamDistributionChart',
-          type: 'doughnut',
-          data: {
-            labels: ['Network Security', 'Patch Management', 'Configuration Management', 'Architectular Flaws'],
-            datasets: [{ data: [48, 62, 42, 35], backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#dc2626'], borderWidth: 0 }]
-          },
-          options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true } } } }
-        },
-        {
-          id: 'rMitigatedRadarChart',
-          type: 'radar',
-          data: {
-            labels: ['Critical', 'High', 'Medium', 'Low'],
-            datasets: [
-              { label: 'Network Security', data: [25, 35, 45, 28], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)' },
-              { label: 'Patch Management', data: [45, 55, 62, 35], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)' },
-              { label: 'Configuration Management', data: [20, 30, 42, 32], borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.15)' },
-              { label: 'Architectural Flaws', data: [15, 25, 30, 22], borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.15)' }
-            ]
-          },
-          options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 70, pointLabels: { font: { size: 12 }, color: ['maroon', 'red', 'goldenrod', 'green'] } } }, plugins: { legend: { position: 'top' } } }
-        }
-      ];
-      chartConfigs.forEach(cfg => {
-        const canvas = document.getElementById(cfg.id);
-        if (canvas) {
-          const chart = new Chart(canvas.getContext('2d'), { type: cfg.type, data: cfg.data, options: cfg.options });
-          this.reportCharts.push(chart);
-        }
-      });
-    },
-
     async initReportStatusCheck() {
       console.log("🚀 Initializing report status check...");
 
@@ -1364,6 +1187,8 @@ mounted() {
   // }
 
   // ✅ DASHBOARD APIs
+  this.loadMitigationByTeam();
+  this.loadRiskCriteria();
   Promise.all([
     this.authStore.fetchDashboardTotalAssets(),
     this.authStore.fetchDashboardAvgScore(),
@@ -1409,7 +1234,6 @@ mounted() {
     // ✅ Clean up report status polling
     this.stopReportStatusPolling();
     this.removeReportStatusOverlay();
-    this.destroyReportCharts();
   },
   // Handle component reactivation (if using keep-alive)
   activated() {
@@ -1422,8 +1246,18 @@ mounted() {
 </script>
 
 <style scoped>
+.truncated-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  width: 100%;
+  display: block;
+  cursor: pointer;
+}
+
 .browser-bar img {
-  height: 35px; 
+  height: 35px;
 }
 /* Testing Overlay - Only covers col-11 (right side of screen) */
 .testing-overlay {
@@ -1519,6 +1353,52 @@ mounted() {
 .bg-red {
   background-color: red !important;
 }
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.info-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1e1e2d;
+  color: #fff;
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: normal;
+  width: 230px;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1050;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.info-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1e1e2d;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1050;
+}
+.info-tooltip:hover::after,
+.info-tooltip:hover::before {
+  opacity: 1;
+}
+
 .notification-panel {
   position: fixed;
   top: 0;

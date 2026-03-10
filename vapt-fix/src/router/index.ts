@@ -48,6 +48,7 @@ import ReportView from '../views/admin-dashboard/ReportView.vue'
 import ScopeView from '../views/admin-dashboard/ScopeView.vue'
 import MicrosoftCallbackView from '../views/admin-views/MicrosoftCallbackView.vue'
 import PerformanceMonitoringView from '../views/admin-dashboard/PerformanceMonitoringView.vue'
+import ViewReportPage from '../views/admin-dashboard/ViewReportPage.vue'
 
 
 const router = createRouter({
@@ -220,6 +221,11 @@ const router = createRouter({
       path: '/performance-monitoring',
       name: 'performance-monitoring',
       component: PerformanceMonitoringView,
+    },
+    {
+      path: '/viewreport',
+      name: 'viewreport',
+      component: ViewReportPage,
     },
     {
       path: '/yourteam',

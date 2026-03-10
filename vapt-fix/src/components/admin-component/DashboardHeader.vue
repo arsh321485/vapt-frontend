@@ -10,6 +10,8 @@
       </div>
   
     <!-- Right Section -->
+    <div class="d-flex align-items-center gap-2">
+      <NotificationPanel />
     <div class="position-relative d-inline-block">
       <div 
         class="circle-bottom d-flex align-items-center justify-content-center fw-bold"
@@ -44,7 +46,7 @@
 <router-link
   :to="{ path: '/uploadtarget', query: { returnTo: $route.fullPath } }" class="btn btn-sm btn-outline-primary w-100 mb-2"
 >
-  Upload Target
+ New Project
 </router-link>
 
         <!-- Upgrade -->
@@ -58,7 +60,8 @@
         </button>
       </div>
     </div>
-    
+    </div>
+
     </div>
     <hr class="m-0">
       </div>
@@ -71,9 +74,11 @@
 import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
 import router from "@/router";
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
   name: 'DashboardHeader',
+  components: { NotificationPanel },
   data() {
     return {
       showDropdown: false,

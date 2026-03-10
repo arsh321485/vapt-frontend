@@ -1,0 +1,41 @@
+19:19:39.417 
+19:19:39.418 
+(!) Some chunks are larger than 1000 kB after minification. Consider:
+19:19:39.418 
+- Using dynamic import() to code-split the application
+19:19:39.418 
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+19:19:39.418 
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+19:19:39.424 
+<anonymous_script>:0
+19:19:39.425 
+19:19:39.425 
+19:19:39.425 
+Error: [vite]: Rollup failed to resolve import "bootstrap" from "/vercel/path0/vapt-fix/src/views/admin-views/RiskCriteriaView.vue".
+19:19:39.426 
+This is most likely unintended because it can break your application at runtime.
+19:19:39.426 
+If you do want to externalize this module explicitly add it to
+19:19:39.426 
+`build.rollupOptions.external`
+19:19:39.426 
+    at viteLog (file:///vercel/path0/vapt-fix/node_modules/vite/dist/node/chunks/dep-qLiYD14D.js:33412:57)
+19:19:39.426 
+    at onRollupLog (file:///vercel/path0/vapt-fix/node_modules/vite/dist/node/chunks/dep-qLiYD14D.js:33448:9)
+19:19:39.427 
+    at onLog (file:///vercel/path0/vapt-fix/node_modules/vite/dist/node/chunks/dep-qLiYD14D.js:33221:4)
+19:19:39.427 
+    at file:///vercel/path0/vapt-fix/node_modules/rolldown/dist/shared/src-CVZ9JbCC.mjs:192:26
+19:19:39.427 
+    at logger (file:///vercel/path0/vapt-fix/node_modules/rolldown/dist/shared/src-CVZ9JbCC.mjs:183:3)
+19:19:39.428 
+19:19:39.428 
+Node.js v22.22.0
+19:19:39.516 
+ERROR: "build-only" exited with 1.
+19:19:39.526 
+Error: Command "npm run build" exited with 1
+
+
+i gave this complete zip file of vaptfix to my coleague to push this code on vercel because she have the repository of this so the above error will shown meanse on this cmd it shows that code push properly but on vercel code is not updated there so if there is any issue occur by my code so solve only this 

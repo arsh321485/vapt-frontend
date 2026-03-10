@@ -39,9 +39,9 @@
                 <input type="text" style="display:none" aria-hidden="true">
                 <input type="password" style="display:none" aria-hidden="true">
 
-                <!-- EMAIL (Hidden for User when OTP is sent) -->
+                <!-- EMAIL -->
                 <div class="mb-2"
-                  v-if="(currentRole === 'admin' && !adminOtpSent) || (currentRole === 'user' && !otpSent)">
+                  v-if="(currentRole === 'admin' && !adminOtpSent) || currentRole === 'user'">
                   <label class="form-label">Email</label>
                   <input type="email" class="form-control custom-input" placeholder="name@work.com"
                     v-model="formData.email" autocomplete="off" autocorrect="off" autocapitalize="off"
@@ -49,19 +49,7 @@
                     required />
                 </div>
 
-                <!-- OTP FIELD (Only for User when OTP is sent) -->
-                <div class="mb-3" v-if="currentRole === 'user' && otpSent">
-                  <label class="form-label">Enter OTP</label>
-                  <div class="otp-inputs d-flex justify-content-between gap-2">
-                    <input v-for="(digit, index) in 6" :key="index" type="text" class="form-control otp-box text-center"
-                      maxlength="1" v-model="otpDigits[index]" @input="handleOtpInput($event, index)"
-                      @keydown="handleOtpKeydown($event, index)" @paste="handleOtpPaste($event, index)"
-                      :ref="el => otpRefs[index] = el" autocomplete="off" required />
-                  </div>
-                  <small class="text-light d-block mt-2">OTP has been sent to your email</small>
-                </div>
-
-                <!-- ADMIN OTP FIELD (Signup only - TEMP) -->
+<!-- ADMIN OTP FIELD (Signup only - TEMP) -->
                 <div class="mb-3" v-if="currentRole === 'admin' && currentMode === 'signup' && adminOtpSent">
                   <label class="form-label">Enter OTP</label>
                   <div class="otp-inputs d-flex justify-content-between gap-2">
@@ -172,9 +160,9 @@
                   </a>
                 </div>
 
-                <!-- reCAPTCHA (Admin only) -->
+                <!-- reCAPTCHA -->
                 <div class="mb-2 d-flex justify-content-center" v-if="(currentRole === 'admin' && !adminOtpSent) ||
-                  (currentRole === 'user' && currentMode === 'signin' && !otpSent)">
+                  currentRole === 'user'">
                   <div :id="recaptchaContainerId" :key="recaptchaKey"></div>
                 </div>
 
@@ -269,7 +257,6 @@ export default {
       authStore: null,
       formKey: Date.now(),
       adminOtpSent: false,
-      otpSent: false,
       otp: "",
       otpDigits: ['', '', '', '', '', ''],
       otpRefs: [],
@@ -317,9 +304,8 @@ export default {
         : "Welcome back!";
     },
     submitButtonText() {
-      // User role OTP flow
       if (this.currentRole === 'user') {
-        return this.otpSent ? "Sign In" : "Send OTP";
+        return "Sign In";
       }
 
       // ADMIN SIGNUP TEMP OTP FLOW
@@ -462,8 +448,6 @@ hasUploadedTargets(email) {
       // Auto-select Sign In for User role
       if (role === 'user') {
         this.currentMode = 'signin';
-        this.otpSent = false;
-        this.otp = '';
       }
 
       this.resetForm();
@@ -494,7 +478,6 @@ hasUploadedTargets(email) {
       };
       this.showPassword = false;
       this.showConfirmPassword = false;
-      this.otpSent = false;
       this.adminOtpSent = false;
       this.otp = "";
       this.otpDigits = ['', '', '', '', '', ''];
@@ -582,31 +565,18 @@ hasUploadedTargets(email) {
 
       /* ================= USER ROLE ================= */
       if (this.currentRole === 'user') {
-
-        // STEP 1: Email validation (Before sending OTP)
-        if (!this.otpSent) {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(this.formData.email)) {
-            Swal.fire('Error', 'Please enter a valid email', 'error');
-            return false;
-          }
-
-          // ✅ reCAPTCHA validation (User → Sign In → Send OTP)
-          if (window.grecaptcha && this.recaptchaWidgetId !== null) {
-            const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
-            if (!recaptchaResponse) {
-              Swal.fire('Error', 'Please verify you are not a robot', 'error');
-              return false;
-            }
-          }
-
-          return true;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.formData.email)) {
+          Swal.fire('Error', 'Please enter a valid email', 'error');
+          return false;
         }
 
-        // STEP 2: OTP validation (After OTP is sent)
-        if (!this.otp || this.otp.trim() === '') {
-          Swal.fire('Error', 'Please enter the OTP', 'error');
-          return false;
+        if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+          const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
+          if (!recaptchaResponse) {
+            Swal.fire('Error', 'Please verify you are not a robot', 'error');
+            return false;
+          }
         }
 
         return true;
@@ -661,38 +631,39 @@ hasUploadedTargets(email) {
         if (!this.validateForm()) return;
       }
 
-      /* ================= USER ROLE (OTP FLOW) ================= */
+      /* ================= USER ROLE ================= */
       if (this.currentRole === 'user') {
-        if (!this.otpSent) {
-          Swal.fire({
-            icon: 'success',
-            title: 'OTP Sent',
-            text: `OTP has been sent to ${this.formData.email}`,
-            timer: 2000,
-            showConfirmButton: false
+        this.loading = true;
+        try {
+          const recaptchaResponse = window.grecaptcha
+            ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
+            : "";
+
+          const result = await this.authStore.userLogin({
+            email: this.formData.email,
+            recaptcha: recaptchaResponse,
           });
-          this.otpSent = true;
-          this.resetRecaptcha();
-          return;
-        } else {
-          this.loading = true;
-          setTimeout(() => {
-            this.loading = false;
-            Swal.fire({
+
+          if (result.status) {
+            await Swal.fire({
               icon: 'success',
-              title: 'Success',
-              text: 'Sign in successful!',
-              confirmButtonColor: '#5a44ff',
+              title: 'Login Successful',
+              text: result.message || 'Welcome!',
               timer: 1500,
               showConfirmButton: false
             });
-
-            setTimeout(() => {
-              this.$router.push('/userdashboard');
-            }, 1500);
-          }, 500);
-          return;
+            this.$router.push('/userdashboard');
+          } else {
+            Swal.fire('Login Failed', result.message || 'Invalid credentials', 'error');
+            this.resetRecaptcha();
+          }
+        } catch (error) {
+          Swal.fire('Error', 'Something went wrong. Please try again.', 'error');
+          this.resetRecaptcha();
+        } finally {
+          this.loading = false;
         }
+        return;
       }
 
       /* ================= ADMIN SIGNUP OTP FLOW ================= */

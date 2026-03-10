@@ -7,10 +7,10 @@
 
     <div class="app">
       <!-- STEPPER -->
-      <Stepper />
+      <Stepper v-if="!isEditMode" />
 
       <!-- CONTENT -->
-      <div class="content">
+      <div :class="['content', { 'no-stepper': isEditMode }]">
         <div class="d-flex justify-content-between">
           <div>
             <h1>Upload Targets</h1>
@@ -227,7 +227,7 @@ https://example.com">
 
         <div class="cta">
 
-          <button type="button" class="btn btn-primary" :disabled="!hasTargets" @click="handleUploadAndRedirect">
+          <button type="button" class="btn btn-primary" :disabled="!isEditMode && !hasTargets" @click="handleUploadAndRedirect">
             {{ returnTo ? 'Back to Previous Page →' : 'Continue to Dashboard →' }}
           </button>
         </div>
@@ -299,6 +299,9 @@ export default {
       return this.allowedTestingTypes.filter(
         type => type !== this.selectedTestingType
       );
+    },
+    isEditMode() {
+      return !!this.$route.query.returnTo;
     },
     returnTo() {
       return this.$route.query.returnTo || null;
@@ -862,6 +865,12 @@ export default {
     // },
 
     handleUploadAndRedirect() {
+      // Coming from profile/header → go back
+      if (this.returnTo) {
+        this.$router.push(this.returnTo);
+        return;
+      }
+
       // No multiple testing types → go directly
       if (this.allowedTestingTypes.length <= 1) {
         this.redirectToDashboard();
@@ -1264,6 +1273,13 @@ tr[draggable="true"]:active {
   /* space for topbar */
   height: calc(100vh - 64px);
   padding: 48px 64px;
+}
+
+.content.no-stepper {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1400px;
+  width: 100%;
 }
 
 h1 {

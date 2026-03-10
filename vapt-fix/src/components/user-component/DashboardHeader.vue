@@ -9,8 +9,10 @@
       </div>
   
     <!-- Right Section -->
+    <div class="d-flex align-items-center gap-2">
+      <NotificationPanel />
     <div class="position-relative d-inline-block">
-      <div 
+      <div
         class="circle-bottom d-flex align-items-center justify-content-center fw-bold"
         style="cursor:pointer;"
         @click="toggleDropdown"
@@ -20,8 +22,8 @@
       </div>
 
       <!-- Dropdown -->
-      <div 
-        v-if="showDropdown" 
+      <div
+        v-if="showDropdown"
         class="dropdown-box shadow-lg p-3 rounded"
       >
         <!-- Email -->
@@ -40,7 +42,8 @@
         </button>
       </div>
     </div>
-    
+    </div>
+
     </div>
     <hr class="m-0">
       </div>
@@ -52,9 +55,11 @@
 <script>
 import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
   name: 'DashboardHeader',
+  components: { NotificationPanel },
   data() {
     return {
       showDropdown: false,

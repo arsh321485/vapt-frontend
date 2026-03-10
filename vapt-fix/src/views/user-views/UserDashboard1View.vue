@@ -15,7 +15,7 @@
               <div class="d-flex flex-row gap-2">
                 <div>
                   <h2>Vulnerability Management Program</h2>
-                  <p style="color: rgba(0, 0, 0, 0.6);font-size:16px;font-weight: 500;">Patch management team</p>
+                  <p style="color: rgba(0, 0, 0, 0.6);font-size:16px;font-weight: 500;">{{ selectedTeam === 'both' ? 'All Teams' : selectedTeam }}</p>
                 </div>
                 <div>
                     <button class="btn border-0" @click="toggleCalendar">
@@ -56,13 +56,13 @@
                 </div> 
               </div>
               <div class="d-flex flex-row gap-3">
-                <div><button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-download me-2"></i> Download Report</button></div>
+                <!-- <div><button class="btn fw-semibold px-3 py-2" style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);" @click="showReport = true"><i class="bi bi-download me-2"></i> Download Report</button></div> -->
 
                 <!-- Overlay Popup -->
                   <div v-if="showReport" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
                   style="background-color: rgba(0, 0, 0, 0.6); z-index: 1050;">
                   <div class="bg-white p-4 rounded shadow" style="width: 600px; max-height: 90vh; overflow-y: auto; position: relative;">
-                  <!-- Close Button -->
+                  
                   <button @click="showReport = false"
                   class="btn-close position-absolute top-0 end-0 m-3"
                   aria-label="Close"></button>
@@ -71,7 +71,7 @@
                     <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3"> June 1 - June 30 <i class="bi bi-calendar-minus"></i>
                     </button>
 
-                    <!-- Accordion -->
+                   
                     <div class="accordion" id="globalReportAccordion">
                       <div class="accordion-item">
                         <h2 class="accordion-header" id="headingOne">
@@ -153,16 +153,13 @@
                     </div>
                     </div>
 
-                <div class="dropdown">
-                          <div class="dropdown-btn"> Select team</div>
+                <div class="dropdown" ref="teamDropdown">
+                          <div class="dropdown-btn" @click.stop="toggleTeamDropdown">{{ selectedTeam === 'both' ? 'Both' : selectedTeam || 'Select team' }}</div>
                           <div class="dropdown-content">
-                              <a href="#">Patch Management</a>
-                              <a href="#">Configuration Management</a>
-                              <a href="#">Network Security</a>
-                              <a href="#">Architectural Flaws</a>
+                              <a href="#" @click.prevent="selectTeam('both')">Both</a>
+                              <a v-for="team in userTeams" :key="team" href="#" @click.prevent="selectTeam(team)">{{ team }}</a>
                           </div>
                 </div>
-                <NotificationPanel />
               </div>
             </div>
             
@@ -173,11 +170,13 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total assets assigned <i class="bi bi-info-circle" style="color: rgba(13, 0, 119, 1);font-size: 14px;"></i></p>
+                    <p class="assets-para">Total assets assigned <span class="info-tooltip" data-tooltip="Total number of assets currently registered and monitored within the platform."><i class="bi bi-info-circle" style="color: rgba(13, 0, 119, 1);font-size: 14px;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2">
-                    <h1 class="text-212">212</h1>
-                    
+                    <h1 class="text-212">
+                      <span v-if="assetsLoading" class="spinner-border spinner-border-sm"></span>
+                      <span v-else>{{ totalAssets ?? '—' }}</span>
+                    </h1>
                   </div>
                 </div>
               </div>
@@ -189,27 +188,26 @@
                     <div class="d-flex flex-row justify-content-start gap-2">
                       <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                       </div>
-                      <p class="assets-para">Vulnerabilities<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                      <p class="assets-para">Vulnerabilities<span class="info-tooltip" data-tooltip="Total number of identified vulnerabilities across all assets, categorized by severity levels: Critical, High, Medium, and Low."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                     </div>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <div class="fs-5 fw-semibold">{{ vulns.critical ?? '—' }}</div>
                         <div class="bar maroon vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">56</div>
+                        <div class="fs-5 fw-semibold">{{ vulns.high ?? '—' }}</div>
                         <div class="bar red vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: red;">● High</small>
                       </div>
-                      
                       <div class="text-center">
-                        <div id="mediumAge" class="fs-5 fw-semibold">127</div>
+                        <div class="fs-5 fw-semibold">{{ vulns.medium ?? '—' }}</div>
                         <div class="bar yellow vul-bar mt-1"></div>
                         <small class="text-warning mt-1 d-block">● Medium</small>
                       </div>
                       <div class="text-center">
-                        <div id="lowAge" class="fs-5 fw-semibold">42</div>
+                        <div class="fs-5 fw-semibold">{{ vulns.low ?? '—' }}</div>
                         <div class="bar green vul-bar mt-1"></div>
                         <small class="text-success mt-1 d-block">● Low</small>
                       </div>
@@ -224,26 +222,26 @@
                   <!-- Vulnerability aging -->
                   <div class="col-md-6">
                     <div class="mb-2">
-                      <p class="assets-para">Mitigation Timeline<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                      <p class="assets-para">Mitigation Timeline<span class="info-tooltip" data-tooltip="Displays the remaining remediation time for vulnerabilities based on the defined risk criteria."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                     </div>
                     <div class="d-flex justify-content-between align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highCount" class="fs-4 fw-semibold">1d 10hrs</div>
+                        <div class="fs-4 fw-semibold">{{ mitigation.critical ?? '—' }}</div>
                         <div class="bar maroon w-100 mt-1"></div>
                         <small class="mt-1 d-block" style="color: maroon;">● Critical</small>
                       </div>
                       <div class="text-center">
-                        <div id="highCount" class="fs-4 fw-semibold">2d 11hrs</div>
+                        <div class="fs-4 fw-semibold">{{ mitigation.high ?? '—' }}</div>
                         <div class="bar red w-100 mt-1"></div>
                         <small class="mt-1 d-block" style="color: red;">● High</small>
                       </div>
                       <div class="text-center">
-                        <div id="mediumCount" class="fs-4 fw-semibold">3d 4hrs</div>
+                        <div class="fs-4 fw-semibold">{{ mitigation.medium ?? '—' }}</div>
                         <div class="bar yellow w-100 mt-1"></div>
                         <small class="text-warning mt-1 d-block">● Medium</small>
                       </div>
                       <div class="text-center">
-                        <div id="lowCount" class="fs-4 fw-semibold">2d 2hrs</div>
+                        <div class="fs-4 fw-semibold">{{ mitigation.low ?? '—' }}</div>
                         <div class="bar green w-100 mt-1"></div>
                         <small class="text-success mt-1 d-block">● Low</small>
                       </div>
@@ -259,29 +257,28 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total Vulnerabilities Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Total Vulnerabilities Fixed<span class="info-tooltip" data-tooltip="Total count of vulnerabilities that have been successfully remediated and verified as resolved within the system."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-5 ps-3">
-                    <h1 class="text-78">78</h1>
+                    <h1 class="text-78">{{ vulnsFixed.total ?? '—' }}</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">87</div>
+                        <div class="fs-5 fw-semibold">{{ vulnsFixed.critical ?? '—' }}</div>
                         <div class="bar maroon vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: maroon;">● Critical<br> fixed</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">56</div>
+                        <div class="fs-5 fw-semibold">{{ vulnsFixed.high ?? '—' }}</div>
                         <div class="bar red vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: red;">● High <br> fixed</small>
                       </div>
-                      
                       <div class="text-center">
-                        <div id="mediumAge" class="fs-5 fw-semibold">127</div>
+                        <div class="fs-5 fw-semibold">{{ vulnsFixed.medium ?? '—' }}</div>
                         <div class="bar yellow vul-bar mt-1"></div>
                         <small class="text-warning mt-1 d-block">● Medium<br> fixed</small>
                       </div>
                       <div class="text-center">
-                        <div id="lowAge" class="fs-5 fw-semibold">42</div>
+                        <div class="fs-5 fw-semibold">{{ vulnsFixed.low ?? '—' }}</div>
                         <div class="bar green vul-bar mt-1"></div>
                         <small class="text-success mt-1 d-block">● Low<br> fixed</small>
                       </div>
@@ -294,10 +291,10 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Mean time to remediate<span class="info-tooltip" data-tooltip="Represents the average remediation time calculated based on the risk criteria defined for different vulnerability severity levels."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row justify-content-center gap-2 py-3">
-                    <h1 class="text-78">2d 11 hrs</h1>
+                    <h1 class="text-78">{{ meanTimeRemediate ?? '—' }}</h1>
                   </div>
                 </div>
               </div>
@@ -306,21 +303,21 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Support Requests<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
+                    <p class="assets-para">Support Requests<span class="info-tooltip" data-tooltip="Total number of support requests raised or tickets raised in the system, categorized by their current status such as Pending or Closed."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
                   </div>
                   <div class="d-flex flex-row gap-5 py-3">
-                    <h1 class="text-78">32</h1>
+                    <h1 class="text-78">{{ supportReqs.total ?? '—' }}</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">14</div>
-                        <div class="bar dark-yellow vul-bar mt-1"></div>
-                        <small class="mt-1 d-block" style="color: yellow;">● Pending</small>
+                        <div class="fs-5 fw-semibold">{{ supportReqs.pending ?? '—' }}</div>
+                        <div class="bar red vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: red;">● Pending</small>
                       </div>
                       <div class="text-center">
-                        <div id="highAge" class="fs-5 fw-semibold">18</div>
+                        <div class="fs-5 fw-semibold">{{ supportReqs.closed ?? '—' }}</div>
                         <div class="bar light-green vul-bar mt-1" style="color: blue;"></div>
                         <small class="mt-1 d-block" style="color: rgb(71, 199, 71);">● Closed</small>
-                      </div> 
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -330,9 +327,9 @@
 
             <div class="row mt-4">
               <div class="d-flex justify-content-between">
-                <h4>Patch Management</h4>
+                <h4>{{ selectedTeam === 'both' ? 'All Teams' : selectedTeam }}</h4>
                 <button type="button" class="btn pending-approval-btn rounded-pill">
-                11 Support requests ongoing
+                {{ supportReqs.pending ?? '—' }} Support requests ongoing
                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
               </button>
               </div>
@@ -972,14 +969,13 @@
 <script>
 import DashboardMenu from '@/components/user-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/user-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from '@/stores/authStore';
 
 export default {
   name: 'UserDashboard1View',
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel
   },
   data() {
     return {
@@ -992,6 +988,15 @@ export default {
         20: "medium",
         23: "low",
       },
+      userTeams: [],
+      selectedTeam: '',
+      totalAssets: null,
+      assetsLoading: false,
+      vulns: { critical: null, high: null, medium: null, low: null },
+      vulnsFixed: { total: null, critical: null, high: null, medium: null, low: null },
+      supportReqs: { total: null, pending: null, closed: null },
+      mitigation: { critical: null, high: null, medium: null, low: null },
+      meanTimeRemediate: null,
     };
   },
   computed: {
@@ -1044,31 +1049,133 @@ export default {
       if (this.vulnerabilities[date]) {
         this.$router.push("/userassets");
       }
-    
+    },
+    toggleTeamDropdown() {
+      this.$refs.teamDropdown.classList.toggle('show');
+    },
+    async fetchAssets(team) {
+      this.assetsLoading = true;
+      const store = useAuthStore();
+      const result = await store.fetchUserTotalAssets(team === 'both' ? undefined : team);
+      if (result.status) {
+        this.totalAssets = result.data?.total_assets ?? null;
+      } else {
+        this.totalAssets = null;
+      }
+      this.assetsLoading = false;
+    },
+    async fetchMeanTimeRemediate(team) {
+      const store = useAuthStore();
+      const result = await store.fetchUserMeanTimeRemediate(team);
+      if (result.status) {
+        const m = result.data.mean_time_to_remediate;
+        if (m) {
+          const w = m.weeks ?? 0;
+          const d = m.days ?? 0;
+          const h = m.hours_remaining ?? 0;
+          this.meanTimeRemediate = `${w}w ${d}d ${h}hrs`;
+        } else {
+          this.meanTimeRemediate = null;
+        }
+      } else {
+        this.meanTimeRemediate = null;
+      }
+    },
+    formatMitigationDays(entry) {
+      if (!entry) return null;
+      const days = entry.days ?? 0;
+      if (days < 7) return `${days}d`;
+      const w = Math.floor(days / 7);
+      const d = days % 7;
+      return d > 0 ? `${w}w ${d}d` : `${w}w`;
+    },
+    async fetchMitigation(team) {
+      const store = useAuthStore();
+      const result = await store.fetchUserMitigationTimeline(team);
+      if (result.status) {
+        this.mitigation = {
+          critical: this.formatMitigationDays(result.data.critical),
+          high: this.formatMitigationDays(result.data.high),
+          medium: this.formatMitigationDays(result.data.medium),
+          low: this.formatMitigationDays(result.data.low),
+        };
+      } else {
+        this.mitigation = { critical: null, high: null, medium: null, low: null };
+      }
+    },
+    async fetchSupportReqs(team) {
+      const store = useAuthStore();
+      const result = await store.fetchUserSupportRequests(team);
+      if (result.status) {
+        this.supportReqs = {
+          total: result.data.total ?? null,
+          pending: result.data.pending ?? null,
+          closed: result.data.closed ?? null,
+        };
+      } else {
+        this.supportReqs = { total: null, pending: null, closed: null };
+      }
+    },
+    async fetchVulnsFixed(team) {
+      const store = useAuthStore();
+      const result = await store.fetchUserVulnerabilitiesFixed(team);
+      if (result.status) {
+        this.vulnsFixed = {
+          total: result.data.total_fixed ?? null,
+          critical: result.data.critical_fixed ?? null,
+          high: result.data.high_fixed ?? null,
+          medium: result.data.medium_fixed ?? null,
+          low: result.data.low_fixed ?? null,
+        };
+      } else {
+        this.vulnsFixed = { total: null, critical: null, high: null, medium: null, low: null };
+      }
+    },
+    async fetchVulns(team) {
+      const store = useAuthStore();
+      const result = await store.fetchUserVulnerabilities(team);
+      if (result.status) {
+        this.vulns = {
+          critical: result.data.critical ?? null,
+          high: result.data.high ?? null,
+          medium: result.data.medium ?? null,
+          low: result.data.low ?? null,
+        };
+      } else {
+        this.vulns = { critical: null, high: null, medium: null, low: null };
+      }
+    },
+    async selectTeam(team) {
+      this.selectedTeam = team;
+      this.$refs.teamDropdown.classList.remove('show');
+      const t = team === 'both' ? undefined : team;
+      await Promise.all([this.fetchAssets(team), this.fetchVulns(t), this.fetchVulnsFixed(t), this.fetchSupportReqs(t), this.fetchMitigation(t), this.fetchMeanTimeRemediate(t)]);
     },
   },
-   mounted() {
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
+  async mounted() {
+    // Load user's assigned teams from localStorage
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      this.userTeams = Array.isArray(user.Member_role) ? user.Member_role : [];
+    } catch {
+      this.userTeams = [];
+    }
 
-    // Toggle dropdown open/close
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    // Set selected option
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
-      });
-    });
+    // Default to "Both" on load
+    this.selectedTeam = 'both';
+    await Promise.all([
+      this.fetchAssets('both'),
+      this.fetchVulns(undefined),
+      this.fetchVulnsFixed(undefined),
+      this.fetchSupportReqs(undefined),
+      this.fetchMitigation(undefined),
+      this.fetchMeanTimeRemediate(undefined),
+    ]);
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
+      const dropdown = document.querySelector('.dropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
         dropdown.classList.remove('show');
       }
     });
@@ -1077,6 +1184,52 @@ export default {
 </script>
 
 <style scoped>
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.info-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1e1e2d;
+  color: #fff;
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: normal;
+  width: 230px;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1050;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.info-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1e1e2d;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1050;
+}
+.info-tooltip:hover::after,
+.info-tooltip:hover::before {
+  opacity: 1;
+}
+
 .bg-maroon {
   background-color: maroon !important;
 }

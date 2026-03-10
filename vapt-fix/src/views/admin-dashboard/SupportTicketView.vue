@@ -24,7 +24,6 @@
                                 <i class="bi bi-arrow-right ms-1 fs-5"></i>
                                 </button> -->
                             </div>
-                            <NotificationPanel />
                             </div>
                         </div>
                         <div class="row">
@@ -299,7 +298,6 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {
@@ -307,7 +305,6 @@ export default {
     components: {
         DashboardMenu,
         DashboardHeader,
-        NotificationPanel
     },
     data() {
     return {
