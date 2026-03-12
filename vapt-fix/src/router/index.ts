@@ -38,6 +38,7 @@ import FixedvulnerabilitiesView from '../views/user-views/FixedvulnerabilitiesVi
 import PendingvulnerabilitiesView from '../views/user-views/PendingvulnerabilitiesView.vue'
 import PendingvulnerabilitycardView from '../views/user-views/PendingvulnerabilitycardView.vue'
 import UserVulnerabilityregisterView from '../views/user-views/UserVulnerabilityregisterView.vue'
+import UserVulnerabilityCardView from '../views/user-views/UserVulnerabilityCardView.vue'
 import UserDashboard1View from '../views/user-views/UserDashboard1View.vue'
 import UserSignupView from '../views/user-views/UserSignupView.vue'
 import ChooseAccountView from '../views/admin-views/ChooseAccountView.vue'
@@ -317,6 +318,12 @@ const router = createRouter({
       path: '/userVulnerabilityregister',
       name: 'userVulnerabilityregister',
       component: UserVulnerabilityregisterView,
+    },
+    {
+      path: '/user-vulnerabilitycard/:reportId/:asset',
+      name: 'UserVulFix',
+      component: UserVulnerabilityCardView,
+      props: true
     },
 
   ],

@@ -80,39 +80,39 @@
 <script>
 import DashboardMenu from '@/components/admin-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/admin-component/DashboardHeader.vue';
-import { useAuthStore } from '@/stores/authStore';
-
+import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 export default {
   name: 'PerformanceMonitoringView',
-  components: { DashboardMenu, DashboardHeader },
-  data() {
-    return {
-      loading: false,
-      teamDetail: {},
-      teamConfigs: [
-        { name: 'Network Security',         color: '#3b82f6', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', icon: '🔗' },
-        { name: 'Patch Management',         color: '#10b981', gradient: 'linear-gradient(135deg, #10b981, #059669)', icon: '🔧' },
-        { name: 'Configuration Management', color: '#f97316', gradient: 'linear-gradient(135deg, #f97316, #ea580c)', icon: '⚙️' },
-        { name: 'Architectural Flaws',      color: '#dc2626', gradient: 'linear-gradient(135deg, #dc2626, #b91c1c)', icon: '🏗️' },
-      ],
+  components: {
+    DashboardMenu,
+    DashboardHeader,
+    NotificationPanel,
+  },
+  mounted() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = () => {
+      new Chart(document.getElementById('mitigatedRadarChart').getContext('2d'), {
+        type: 'radar',
+        data: {
+          labels: ['Critical', 'High', 'Medium', 'Low'],
+          datasets: [
+            { label: 'Network Security', data: [25, 35, 45, 28], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)' },
+            { label: 'Patch Management', data: [45, 55, 62, 35], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)' },
+            { label: 'Configuragtion Management', data: [20, 30, 42, 32], borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.15)' },
+            { label: 'Architectural Flaws', data: [15, 25, 30, 22], borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.15)' }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { r: { beginAtZero: true, max: 70, pointLabels: { font: { size: 12 }, color: ['maroon', 'red', 'goldenrod', 'green'] } } },
+          plugins: { legend: { position: 'top' } }
+        }
+      });
     };
-  },
-  methods: {
-    closureRate(teamName) {
-      const t = this.teamDetail[teamName];
-      if (!t || !t.total) return 0;
-      return Math.round((t.closed / t.total) * 100);
-    },
-  },
-  async mounted() {
-    this.loading = true;
-    const store = useAuthStore();
-    const result = await store.fetchDistributionByTeamDetail();
-    if (result.status && result.data?.teams) {
-      this.teamDetail = result.data.teams;
-    }
-    this.loading = false;
-  },
+    document.head.appendChild(script);
+  }
 };
 </script>
 

@@ -44,6 +44,7 @@ export const useAuthStore = defineStore("auth", {
     vulnerabilityCount: 0,
     vulnerabilityRows: [] as any[],
     latestReportId: null,
+    userLatestReportId: null as string | null,
     assetRows: [] as any[],
     assetCount: 0,
     memberType: "",
@@ -1765,7 +1766,45 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // fetch all vul register data 
+  // fetch user vulnerability register data
+  async fetchUserVulnerabilityRegister() {
+    try {
+      const res = await endpoint.get(`/api/user/register/register/latest/vulns/`);
+      const rows = res.data?.rows ?? [];
+      this.userLatestReportId = res.data?.report_id || null;
+      return { status: true, data: Array.isArray(rows) ? rows : [] };
+    } catch (error: any) {
+      return {
+        status: false,
+        data: [],
+        message: error.response?.data?.message || error.message || "Failed to fetch user vulnerability register",
+      };
+    }
+  },
+
+  // FIX Vulnerability CREATE (User)
+  async createUserFixVulnerability(reportId: string, asset: string, payload: Record<string, any>) {
+    try {
+      const res = await endpoint.post(
+        `/api/user/register/fix-vulnerability/report/${reportId}/asset/${asset}/create/`,
+        payload
+      );
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Fix vulnerability failed",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // fetch all vul register data
   async fetchVulnerabilityRegister() {
   try {
     console.log("Fetching Latest Vulnerabilities...");
@@ -1902,6 +1941,34 @@ export const useAuthStore = defineStore("auth", {
   //   }
   // },
 
+  // Mark a step as complete (User)
+  async completeUserFixVulnerabilityStep(
+    fixVulnerabilityId: string,
+    payload: { status: string; comment: string },
+    os: string = 'windows'
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/user/register/fix-vulnerability/${fixVulnerabilityId}/step-complete/?os=${os}`,
+        payload
+      );
+      return {
+        status: true,
+        message: res.data.message,
+        vulnerability_status: res.data.status,
+        completed_steps: res.data.completed_steps,
+        step_saved: res.data.step_saved
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to complete step",
+        details: err.response?.data || null
+      };
+    }
+  },
+
   // Mark a step as complete (NEW API FORMAT)
   async completeFixVulnerabilityStep(
     fixVulnerabilityId: string,
@@ -1931,6 +1998,42 @@ export const useAuthStore = defineStore("auth", {
       return {
         status: false,
         message: err.response?.data?.message || "Failed to complete step",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // Get step completion status for fix vulnerability (User — OS-specific)
+  async getUserFixVulnerabilitySteps(fixVulnerabilityId: string, os: string = 'windows') {
+    try {
+      const res = await endpoint.get(
+        `/api/user/register/fix-vulnerability/${fixVulnerabilityId}/step-complete/?os=${os}`
+      );
+      return {
+        status: true,
+        data: {
+          fix_vulnerability_id: res.data.fix_vulnerability_id,
+          report_id: res.data.report_id,
+          vulnerability_name: res.data.vulnerability_name,
+          asset: res.data.asset,
+          severity: res.data.severity,
+          operating_system: res.data.operating_system,
+          assigned_team: res.data.assigned_team,
+          deadline: res.data.deadline,
+          artifacts_tools: res.data.artifacts_tools,
+          vulnerability_status: res.data.status,
+          completed_steps: res.data.completed_steps,
+          total_steps: res.data.total_steps,
+          next_step: res.data.next_step,
+          steps: res.data.steps || [],
+          post_mitigation_troubleshooting_guide: res.data.post_mitigation_troubleshooting_guide || []
+        }
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch step completion data",
         details: err.response?.data || null
       };
     }
@@ -1971,6 +2074,51 @@ export const useAuthStore = defineStore("auth", {
       return {
         status: false,
         message: err.response?.data?.message || "Failed to fetch step completion data",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // CREATE/UPDATE Final Fix Feedback (User)
+  async submitUserFixFinalFeedback(
+    fixVulnerabilityId: string,
+    payload: { feedback_comment: string; fix_result: string }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/user/register/fix-vulnerability/${fixVulnerabilityId}/final-feedback/`,
+        payload
+      );
+      return {
+        status: true,
+        message: res.data.message,
+        data: res.data.data
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to submit feedback",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // GET Final Fix Feedback (User)
+  async getUserFixFinalFeedback(fixVulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/user/register/fix-vulnerability/${fixVulnerabilityId}/final-feedback/`
+      );
+      return {
+        status: true,
+        data: res.data
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to fetch final feedback",
         details: err.response?.data || null
       };
     }
@@ -2123,6 +2271,18 @@ export const useAuthStore = defineStore("auth", {
           err.response?.data?.message || "Failed to create ticket",
         details: err.response?.data || null
       };
+    }
+  },
+
+  // GET Vulnerability Timeline (User)
+  async fetchUserVulnerabilityTimeline(fixVulnerabilityId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/user/register/fix-vulnerability/${fixVulnerabilityId}/timeline/`
+      );
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return { status: false, message: error?.response?.data?.message || "Failed to fetch timeline" };
     }
   },
 
