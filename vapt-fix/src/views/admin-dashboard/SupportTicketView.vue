@@ -116,16 +116,7 @@
     </td>
 
     <!-- Action -->
-    <td>
-      <button
-        type="button"
-        class="btn fw-semibold border-0"
-        style="color: rgba(49, 33, 177, 1);"
-        @click.stop="toggleChat"
-      >
-        Chat with us <i class="bi bi-chat-dots ms-2"></i>
-      </button>
-    </td>
+    <td></td>
   </tr>
 
   <!-- Empty state -->

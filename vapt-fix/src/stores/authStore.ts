@@ -1651,6 +1651,108 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+    // 🔹 USER ASSET VULNERABILITIES (single asset)
+    async fetchUserSingleAssetVulnerabilities(assetIp: string) {
+      try {
+        const reportId = this.userLatestReportId;
+        if (!reportId) return { status: false };
+        const res = await endpoint.get(`/api/user/asset/report/${reportId}/asset/${assetIp}/vulnerabilities/`);
+        const vulns = res.data.vulnerabilities || [];
+        this.selectedAssetVulnerabilities = vulns;
+        this.selectedAssetDetail = {
+          asset: res.data.asset,
+          exposure: vulns[0]?.exposure || "",
+          owner: vulns[0]?.owner || "",
+          severity: vulns[0]?.severity || "",
+        };
+        return { status: true, count: res.data.count };
+      } catch (error) {
+        this.selectedAssetDetail = null;
+        this.selectedAssetVulnerabilities = [];
+        return { status: false };
+      }
+    },
+
+    // 🔹 USER CLOSED VULNERABILITIES BY HOST
+    async getUserClosedVulnerabilities(hostName: string) {
+      try {
+        const res = await endpoint.get(`/api/user/asset/fix-vulnerabilities/host/${hostName}/closed/`);
+        return { status: true, data: res.data };
+      } catch (error: any) {
+        return { status: false, data: null, message: error.response?.data?.detail || "Failed to fetch closed vulnerabilities" };
+      }
+    },
+
+    // 🔹 USER HOLD ASSET
+    async holdUserAsset(assetIp: string) {
+      try {
+        const reportId = this.userLatestReportId;
+        if (!reportId) return { status: false, message: "Report ID not found" };
+        const res = await endpoint.post(`/api/user/asset/report/${reportId}/assets/${assetIp}/hold/`);
+        if (typeof res.data?.total_assets === "number") this.assetCount = res.data.total_assets;
+        return { status: true, heldAsset: res.data.asset, data: res.data };
+      } catch (error: any) {
+        return { status: false, message: error.response?.data?.detail || "Failed to hold asset" };
+      }
+    },
+
+    // 🔹 USER UNHOLD ASSET
+    async unholdUserAsset(assetIp: string) {
+      try {
+        const reportId = this.userLatestReportId;
+        if (!reportId) return { status: false, message: "Report ID not found" };
+        const res = await endpoint.post(`/api/user/asset/report/${reportId}/assets/${assetIp}/unhold/`);
+        if (typeof res.data?.total_assets === "number") this.assetCount = res.data.total_assets;
+        return { status: true, restoredAsset: res.data.asset, data: res.data };
+      } catch (error: any) {
+        return { status: false, message: error.response?.data?.detail || "Failed to unhold asset" };
+      }
+    },
+
+    // 🔹 USER DELETE ASSET
+    async deleteUserAsset(assetIp: string) {
+      try {
+        const reportId = this.userLatestReportId;
+        if (!reportId) return { status: false, message: "Report ID not found" };
+        const res = await endpoint.delete(`/api/user/asset/report/${reportId}/assets/${assetIp}/delete/`);
+        return { status: true, data: res.data };
+      } catch (error: any) {
+        return { status: false, message: error.response?.data?.detail || "Failed to delete asset" };
+      }
+    },
+
+    // 🔹 USER HELD ASSETS LIST
+    async fetchUserHeldAssets() {
+      try {
+        const reportId = this.userLatestReportId;
+        if (!reportId) return { status: false, assets: [], count: 0, message: "Report ID not found" };
+        const res = await endpoint.get(`/api/user/asset/report/${reportId}/assets/hold-list/`);
+        return { status: true, assets: res.data.assets || [], count: res.data.count || 0, data: res.data };
+      } catch (error: any) {
+        return { status: false, assets: [], count: 0, message: error.response?.data?.detail || "Failed to fetch held assets" };
+      }
+    },
+
+    // 🔹 USER ASSETS
+    async fetchUserAssets() {
+      try {
+        const res = await endpoint.get("/api/user/asset/assets/");
+        const rows = res.data.assets || [];
+        const normalized = rows.map((a: any) => ({
+          ...a,
+          selected: false,
+          held: false,
+          isInternal: a.member_type === "internal",
+          host_information: a.host_information || {},
+          severity_counts: a.severity_counts || { critical: 0, high: 0, medium: 0, low: 0 },
+        }));
+        if (res.data.report_id) this.userLatestReportId = res.data.report_id;
+        return { status: true, data: normalized, total: res.data.total_assets ?? normalized.length };
+      } catch (error: any) {
+        return { status: false, message: "Failed to fetch assets", details: error.response?.data || null };
+      }
+    },
+
     // 🔹 USER LOGIN
     async userLogin(payload: { email: string; recaptcha: string }) {
       try {
@@ -2237,6 +2339,108 @@ export const useAuthStore = defineStore("auth", {
         status: false,
         message:
           err.response?.data?.message || "Failed to fetch support request",
+        details: err.response?.data || null
+      };
+    }
+  },
+
+  // User: Get all support requests by report ID
+  async fetchUserSupportRequestsByReport(reportId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/user/register/support-requests/report/${reportId}/`
+      );
+      return { status: true, data: res.data.results || [], count: res.data.count };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return { status: false, data: [], message: err.response?.data?.message || "Failed to fetch support requests" };
+    }
+  },
+
+  // User: Get all tickets by report ID
+  async fetchUserAllTickets(reportId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/user/register/tickets/report/${reportId}/`
+      );
+      return { status: true, data: res.data.results || [], count: res.data.count };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return { status: false, data: [], message: err.response?.data?.message || "Failed to fetch tickets" };
+    }
+  },
+
+  // User: Get all open tickets by report ID
+  async fetchUserOpenTickets(reportId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/user/register/reports/${reportId}/tickets/open/`
+      );
+      return { status: true, data: res.data.results || [], count: res.data.count };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return { status: false, data: [], message: err.response?.data?.message || "Failed to fetch open tickets" };
+    }
+  },
+
+  // User: Get single ticket detail
+  async getUserTicketById(fixVulnerabilityId: string, ticketId: string) {
+    try {
+      const res = await endpoint.get(
+        `/api/user/register/tickets/fix/${fixVulnerabilityId}/ticket/${ticketId}/`
+      );
+      return { status: true, data: res.data.data };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return { status: false, message: err.response?.data?.message || "Failed to fetch ticket" };
+    }
+  },
+
+  // User: Create ticket
+  async createUserTicket(
+    reportId: string,
+    fixVulnerabilityId: string,
+    payload: {
+      category: string;
+      subject: string;
+      description: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/user/register/tickets/report/${reportId}/fix/${fixVulnerabilityId}/create/`,
+        payload
+      );
+      return { status: true, data: res.data.data, message: res.data.message };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return { status: false, message: err.response?.data?.message || "Failed to create ticket", details: err.response?.data || null };
+    }
+  },
+
+  // User: Raise support request for a fix vulnerability
+  async raiseUserSupportRequest(
+    vulnerabilityId: string,
+    payload: {
+      step: string;
+      description: string;
+    }
+  ) {
+    try {
+      const res = await endpoint.post(
+        `/api/user/register/fix-vulnerability/${vulnerabilityId}/raise-support-request/`,
+        payload
+      );
+      return {
+        status: true,
+        data: res.data.data,
+        message: res.data.message
+      };
+    } catch (error) {
+      const err = error as AxiosError<any>;
+      return {
+        status: false,
+        message: err.response?.data?.message || "Failed to raise support request",
         details: err.response?.data || null
       };
     }

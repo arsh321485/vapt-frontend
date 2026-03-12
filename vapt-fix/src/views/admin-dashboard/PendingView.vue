@@ -85,15 +85,14 @@
 </td>
 
                                         <td>{{ ticket.category }}</td>
-                                        <td>{{ ticket.status }}</td>
-                                        <td>{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
                                         <td>
-                                        <router-link to="" style="text-decoration: none;">
-                                            <button class="btn fw-semibold border-0" style="color: rgba(49,33,177,1);" @click="toggleChat">
-                                            Chat with us <i class="bi bi-chat-dots ms-2"></i>
-                                            </button>
-                                        </router-link>
+                                          <span class="badge rounded-pill px-3 py-2"
+                                            :class="ticket.status === 'open' ? 'bg-danger' : 'bg-success'">
+                                            {{ ticket.status }}
+                                          </span>
                                         </td>
+                                        <td>{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
+                                        <td></td>
                                     </tr>
                                     <tr v-if="!filteredTickets.length">
   <td colspan="8" class="text-center text-muted py-4">

@@ -62,7 +62,7 @@
                   <div v-if="showReport" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
                   style="background-color: rgba(0, 0, 0, 0.6); z-index: 1050;">
                   <div class="bg-white p-4 rounded shadow" style="width: 600px; max-height: 90vh; overflow-y: auto; position: relative;">
-                  
+                  <!-- Close Button -->
                   <button @click="showReport = false"
                   class="btn-close position-absolute top-0 end-0 m-3"
                   aria-label="Close"></button>
@@ -71,7 +71,7 @@
                     <button type="button" class="btn patch-btn rounded-pill text-nowrap ms-3 mb-3"> June 1 - June 30 <i class="bi bi-calendar-minus"></i>
                     </button>
 
-                   
+                    <!-- Accordion -->
                     <div class="accordion" id="globalReportAccordion">
                       <div class="accordion-item">
                         <h2 class="accordion-header" id="headingOne">
@@ -154,11 +154,11 @@
                     </div>
 
                 <div class="dropdown" ref="teamDropdown">
-                          <div class="dropdown-btn" @click.stop="toggleTeamDropdown">{{ selectedTeam === 'both' ? 'Both' : selectedTeam || 'Select team' }}</div>
-                          <div class="dropdown-content">
-                              <a href="#" @click.prevent="selectTeam('both')">Both</a>
-                              <a v-for="team in userTeams" :key="team" href="#" @click.prevent="selectTeam(team)">{{ team }}</a>
-                          </div>
+                  <div class="dropdown-btn" @click="toggleTeamDropdown"> {{ selectedTeam === 'both' ? 'All Teams' : selectedTeam }}</div>
+                  <div class="dropdown-content">
+                    <a href="#" @click.prevent="selectTeam('both')">All Teams</a>
+                    <a v-for="team in userTeams" :key="team" href="#" @click.prevent="selectTeam(team)">{{ team }}</a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -170,13 +170,11 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total assets assigned <span class="info-tooltip" data-tooltip="Total number of assets currently registered and monitored within the platform."><i class="bi bi-info-circle" style="color: rgba(13, 0, 119, 1);font-size: 14px;"></i></span></p>
+                    <p class="assets-para">Total assets assigned <i class="bi bi-info-circle" style="color: rgba(13, 0, 119, 1);font-size: 14px;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-2">
-                    <h1 class="text-212">
-                      <span v-if="assetsLoading" class="spinner-border spinner-border-sm"></span>
-                      <span v-else>{{ totalAssets ?? '—' }}</span>
-                    </h1>
+                    <h1 class="text-212">{{ assetsLoading ? '...' : (totalAssets ?? '—') }}</h1>
+                    
                   </div>
                 </div>
               </div>
@@ -188,7 +186,7 @@
                     <div class="d-flex flex-row justify-content-start gap-2">
                       <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                       </div>
-                      <p class="assets-para">Vulnerabilities<span class="info-tooltip" data-tooltip="Total number of identified vulnerabilities across all assets, categorized by severity levels: Critical, High, Medium, and Low."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
+                      <p class="assets-para">Vulnerabilities<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
@@ -222,7 +220,7 @@
                   <!-- Vulnerability aging -->
                   <div class="col-md-6">
                     <div class="mb-2">
-                      <p class="assets-para">Mitigation Timeline<span class="info-tooltip" data-tooltip="Displays the remaining remediation time for vulnerabilities based on the defined risk criteria."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
+                      <p class="assets-para">Mitigation Timeline<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                     </div>
                     <div class="d-flex justify-content-between align-items-end mb-1">
                       <div class="text-center">
@@ -257,7 +255,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Total Vulnerabilities Fixed<span class="info-tooltip" data-tooltip="Total count of vulnerabilities that have been successfully remediated and verified as resolved within the system."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
+                    <p class="assets-para">Total Vulnerabilities Fixed<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-start gap-5 ps-3">
                     <h1 class="text-78">{{ vulnsFixed.total ?? '—' }}</h1>
@@ -291,7 +289,7 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Mean time to remediate<span class="info-tooltip" data-tooltip="Represents the average remediation time calculated based on the risk criteria defined for different vulnerability severity levels."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
+                    <p class="assets-para">Mean time to remediate<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row justify-content-center gap-2 py-3">
                     <h1 class="text-78">{{ meanTimeRemediate ?? '—' }}</h1>
@@ -303,19 +301,19 @@
                   <div class="d-flex flex-row justify-content-start gap-2">
                     <div class="assets-icon text-center"><i class="bi bi-laptop"></i>
                     </div>
-                    <p class="assets-para">Support Requests<span class="info-tooltip" data-tooltip="Total number of support requests raised or tickets raised in the system, categorized by their current status such as Pending or Closed."><i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></span></p>
+                    <p class="assets-para">Support Requests<i class="bi bi-info-circle ms-1" style="color: rgba(49, 33, 177, 1);font-size: 13px;font-weight: 600;"></i></p>
                   </div>
                   <div class="d-flex flex-row gap-5 py-3">
                     <h1 class="text-78">{{ supportReqs.total ?? '—' }}</h1>
                     <div class="d-flex justify-content-center align-items-end mb-1">
                       <div class="text-center">
                         <div class="fs-5 fw-semibold">{{ supportReqs.pending ?? '—' }}</div>
-                        <div class="bar red vul-bar mt-1"></div>
-                        <small class="mt-1 d-block" style="color: red;">● Pending</small>
+                        <div class="bar dark-yellow vul-bar mt-1"></div>
+                        <small class="mt-1 d-block" style="color: #c8a100;">● Pending</small>
                       </div>
                       <div class="text-center">
                         <div class="fs-5 fw-semibold">{{ supportReqs.closed ?? '—' }}</div>
-                        <div class="bar light-green vul-bar mt-1" style="color: blue;"></div>
+                        <div class="bar light-green vul-bar mt-1"></div>
                         <small class="mt-1 d-block" style="color: rgb(71, 199, 71);">● Closed</small>
                       </div>
                     </div>
@@ -336,23 +334,19 @@
               <div class="d-flex gap-4 my-3">
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ mitigation.critical ?? '—' }}</button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-danger">High</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ mitigation.high ?? '—' }}</button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-warning">Medium</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ mitigation.medium ?? '—' }}</button>
                       </div>
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100 text-success">Low</button>
-                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">10 Days <i class="bi bi-plus-circle text-danger" style="cursor:pointer;" id="plusIcon"></i>
-                        </button>
+                          <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ mitigation.low ?? '—' }}</button>
                       </div>
               </div>
               <div class="row mt-2">
@@ -980,6 +974,7 @@ export default {
   data() {
     return {
       showCalendar: false,
+      showReport: false,
       currentDate: new Date(),
       weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       vulnerabilities: {
@@ -1015,7 +1010,6 @@ export default {
         month: "long",
         year: "numeric",
       });
-    
     },
   },
   methods: {
@@ -1024,7 +1018,7 @@ export default {
     },
     prevMonth() {
       this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-      this.currentDate = new Date(this.currentDate); 
+      this.currentDate = new Date(this.currentDate);
     },
     nextMonth() {
       this.currentDate.setMonth(this.currentDate.getMonth() + 1);
@@ -1149,7 +1143,14 @@ export default {
       this.selectedTeam = team;
       this.$refs.teamDropdown.classList.remove('show');
       const t = team === 'both' ? undefined : team;
-      await Promise.all([this.fetchAssets(team), this.fetchVulns(t), this.fetchVulnsFixed(t), this.fetchSupportReqs(t), this.fetchMitigation(t), this.fetchMeanTimeRemediate(t)]);
+      await Promise.all([
+        this.fetchAssets(team),
+        this.fetchVulns(t),
+        this.fetchVulnsFixed(t),
+        this.fetchSupportReqs(t),
+        this.fetchMitigation(t),
+        this.fetchMeanTimeRemediate(t),
+      ]);
     },
   },
   async mounted() {
@@ -1184,52 +1185,6 @@ export default {
 </script>
 
 <style scoped>
-.info-tooltip {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-.info-tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #1e1e2d;
-  color: #fff;
-  padding: 7px 11px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.5;
-  white-space: normal;
-  width: 230px;
-  text-align: left;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  z-index: 1050;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.info-tooltip::before {
-  content: '';
-  position: absolute;
-  bottom: calc(100% + 2px);
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: #1e1e2d;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  z-index: 1050;
-}
-.info-tooltip:hover::after,
-.info-tooltip:hover::before {
-  opacity: 1;
-}
-
 .bg-maroon {
   background-color: maroon !important;
 }
@@ -1329,5 +1284,51 @@ export default {
 
 .dropdown.show .dropdown-content {
     display: block;
+}
+
+.patch-btn {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 18px;
+  background-color: rgba(230, 227, 255, 1);
+  color: rgba(49, 33, 177, 1);
+  border: none;
+}
+
+.pending-approval-btn {
+  font-weight: 600;
+  font-size: 12px;
+  padding: 8px 15px;
+  background-color: rgba(230, 227, 255, 1);
+  color: rgba(49, 33, 177, 1);
+  border: none;
+}
+
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.info-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1e1e2d;
+  color: #fff;
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  width: 230px;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1050;
+}
+.info-tooltip:hover::after {
+  opacity: 1;
 }
 </style>

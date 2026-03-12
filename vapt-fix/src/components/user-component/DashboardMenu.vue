@@ -49,7 +49,15 @@
            <i class="bi bi-dash-circle-dotted nav-menu"></i>
           <p class="menu-heading">Pending</p></button>
           </router-link>
-        </div>     
+        </div>
+
+        <div>
+          <router-link to="/user-tickets">
+          <button class="btn border-0" :class="{ activeBtn: isActive('/user-tickets') }">
+           <i class="bi bi-question-circle nav-menu"></i>
+          <p class="menu-heading">Tickets</p></button>
+          </router-link>
+        </div>
       </div>
       
     </div>

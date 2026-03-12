@@ -39,6 +39,8 @@ import PendingvulnerabilitiesView from '../views/user-views/Pendingvulnerabiliti
 import PendingvulnerabilitycardView from '../views/user-views/PendingvulnerabilitycardView.vue'
 import UserVulnerabilityregisterView from '../views/user-views/UserVulnerabilityregisterView.vue'
 import UserVulnerabilityCardView from '../views/user-views/UserVulnerabilityCardView.vue'
+import UserCreateTicketView from '../views/user-views/UserCreateTicketView.vue'
+import UserTicketsView from '../views/user-views/UserTicketsView.vue'
 import UserDashboard1View from '../views/user-views/UserDashboard1View.vue'
 import UserSignupView from '../views/user-views/UserSignupView.vue'
 import ChooseAccountView from '../views/admin-views/ChooseAccountView.vue'
@@ -324,6 +326,16 @@ const router = createRouter({
       name: 'UserVulFix',
       component: UserVulnerabilityCardView,
       props: true
+    },
+    {
+      path: '/user-ticket/:reportId/:fixVulId/:asset?/:ticketId?',
+      name: 'UserCreateTicket',
+      component: UserCreateTicketView,
+    },
+    {
+      path: '/user-tickets',
+      name: 'UserTickets',
+      component: UserTicketsView,
     },
 
   ],

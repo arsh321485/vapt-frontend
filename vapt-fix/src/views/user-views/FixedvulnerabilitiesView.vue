@@ -19,8 +19,6 @@
                                 <h2 class="ticket-head mt-3">Fixed vulnerabilities</h2>
                             </div>
                             <div class="d-flex flex-row mt-2">
-                                
-                                <NotificationPanel />
                             </div>
                         </div>
 
@@ -31,9 +29,6 @@
                                 <button class="btn btn-outline-secondary btn-pill text-danger">High</button>
                                 <button class="btn btn-outline-secondary btn-pill text-warning">Medium</button>
                                 <button class="btn btn-outline-secondary btn-pill text-success">Low</button>
-                                <button class="btn btn-outline-secondary btn-pill text-dark">June 1 - June 30 <i
-                                        class="bi bi-calendar-minus ms-2"></i>
-                                    </button>
                                 
                                 
                             </div>
@@ -153,41 +148,13 @@
 <script>
 import DashboardMenu from '@/components/user-component/DashboardMenu.vue';
 import DashboardHeader from '@/components/user-component/DashboardHeader.vue';
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
-
 export default {
     name: 'FixedvulnerabilitiesView',
     components: {
         DashboardMenu,
         DashboardHeader,
-        NotificationPanel
     },
-    mounted() {
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
-
-    // Toggle dropdown open/close
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    // Set selected option
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
-      });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-  },
+    mounted() {},
     
 };
 </script>

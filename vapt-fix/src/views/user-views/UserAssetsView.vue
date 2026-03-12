@@ -14,113 +14,73 @@
             <div class="row">
                 <div class="col-4 p-3 border-end px-0">
                   <div class="d-flex justify-content-between ms-3 pt-3">
-                    <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 28px;">Assigned Assets (210)</h5>
+                    <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 28px;">Assigned Assets ({{ totalAssets }})</h5>
                     <div class="d-flex flex-row gap-3 me-3 mt-1">
                       <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip"  :class="{ 'text-muted': activeAction !== '' && activeAction !== 'delete' }" @click="handleDeleteClick" title="Remove an asset"></i>
                       <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" :class="{ 'text-muted': activeAction !== '' && activeAction !== 'hold' }"  @click="toggleHoldMode" title="Hold mitigation"></i>
                     </div>
                   </div>
-                
+
                 <div class="mb-4 pe-3 ms-3 mt-3">
                   <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" style="padding-top: 6px;padding-bottom: 6px;">
-                    <!-- <button class="btn btn-sm btn-secondary" type="submit">Search</button> -->
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" v-model="searchQuery" style="padding-top: 6px;padding-bottom: 6px;">
                   </form>
                 </div>
 
                 <!-- Asset List -->
-                <div class="d-flex flex-column gap-3 mt-3">
+                <div v-if="loading" class="text-center py-4">
+                  <span class="spinner-border text-primary"></span>
+                </div>
+                <div v-else class="d-flex flex-column gap-3 mt-3">
                   <div
-                    v-for="(asset, index) in assets"
-                    :key="index"
+                    v-for="asset in pagedAssets"
+                    :key="asset.asset"
                     class="asset-item border-bottom"
-                    :class="{ active: activeIndex === index }"
-              :style="activeIndex === index ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);' : ''"
-              @click="setActive(index)"
+                    :class="{ active: activeIndex === asset.asset }"
+                    :style="activeIndex === asset.asset ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);' : ''"
+                    @click="setActive(asset)"
                   >
                     <div class="d-flex justify-content-between">
                       <div class="d-flex justify-content-start gap-3">
-                        <!-- Checkbox (only when showCheckboxes = true) -->
-                        <input
-                          v-if="showCheckboxes"
-                          type="checkbox"
-                          v-model="asset.selected"
-                          class="form-check-input me-2"
-                        />
+                        <input v-if="showCheckboxes" type="checkbox" v-model="asset.selected" class="form-check-input me-2" />
+                        <input v-if="showHoldCheckboxes" type="checkbox" v-model="asset.selected" class="form-check-input me-2" />
 
-                        <!-- Checkbox only when holdMode is true -->
-      <input
-        v-if="showHoldCheckboxes"
-        type="checkbox"
-        v-model="asset.selected"
-        class="form-check-input me-2"
-      />
-      <span :class="{ 'text-muted': asset.held }">{{ asset.name }}</span>
-
-                        <!-- Asset Title -->
-                        <div
-                          class="fw-semibold"
-                          style="color: rgba(0, 0, 0, 0.87); font-size: 22px;"
-                        >
-                          {{ asset.ip }}
+                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87); font-size: 22px;">
+                          {{ asset.asset }}
                         </div>
-                        <div>
+                        <div v-if="getTopSeverity(asset.severity_counts)">
                           <span class="d-flex align-items-center badge-critical">
-                          <span
-                            class="rounded-circle me-1"
-                            style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"
-                          ></span>
-                          <span>Critical</span>
-                        </span>
+                            <span class="rounded-circle me-1" :style="{ width: '6px', height: '6px', backgroundColor: getSeverityColor(getTopSeverity(asset.severity_counts)) }"></span>
+                            <span>{{ getTopSeverity(asset.severity_counts) }}</span>
+                          </span>
                         </div>
                       </div>
 
                       <div class="align-items-end gap-2">
                         <div class="d-flex flex-row">
-                          <div>
-                          <i
-                          class="bi bi-link-45deg me-1"
-                          style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"
-                        ></i>
-                          </div>
-                          <div>
-                            <p @click="asset.isInternal = !asset.isInternal" style="cursor: pointer;">
-  {{ asset.isInternal ? 'Internal' : 'External' }}
-</p>
-                          </div>
+                          <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"></i>
+                          <p class="mb-0">{{ asset.isInternal ? 'Internal' : 'External' }}</p>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Status Row (unchanged design) -->
+                    <!-- Severity counts row -->
                     <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
                       <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #b31c1c"
-                        ></span>
-                        <span class="text-danger fw-bold">11</span>
+                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+                        <span class="text-danger fw-bold">{{ asset.severity_counts?.critical ?? 0 }}</span>
                       </span>
                       <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #f44336"
-                        ></span>
-                        <span class="text-danger fw-bold">4</span>
+                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f44336"></span>
+                        <span class="text-danger fw-bold">{{ asset.severity_counts?.high ?? 0 }}</span>
                       </span>
                       <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #f6b100"
-                        ></span>
-                        <span class="text-warning fw-bold">8</span>
+                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f6b100"></span>
+                        <span class="text-warning fw-bold">{{ asset.severity_counts?.medium ?? 0 }}</span>
                       </span>
                       <span class="d-flex align-items-center">
-                        <span
-                          class="rounded-circle me-1"
-                          style="width: 6px; height: 6px; background-color: #4caf50"
-                        ></span>
-                        <span class="text-success fw-bold">0</span>
+                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #4caf50"></span>
+                        <span class="text-success fw-bold">{{ asset.severity_counts?.low ?? 0 }}</span>
                       </span>
                     </div>
                   </div>
@@ -194,15 +154,18 @@
     </div>
 
                 <!-- Pagination -->
-                <nav class="mt-4 position-relative custom-pagination-wrapper">
-  <ul class="pagination pagination-sm mb-0 custom-pagination">
-    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"><a class="page-link" href="#">4</a></li>
-    <li class="page-item"><a class="page-link" href="#">5</a></li>
-    <li class="page-item"><a class="page-link" href="#">6</a></li>
-  </ul>
+                <nav v-if="totalPages > 1" class="mt-4 position-relative custom-pagination-wrapper">
+                  <ul class="pagination pagination-sm mb-0 custom-pagination">
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                      <a class="page-link" href="#" @click.prevent="prevPage">Prev</a>
+                    </li>
+                    <li v-for="p in pageNumbers" :key="p" class="page-item" :class="{ active: currentPage === p }">
+                      <a class="page-link" href="#" @click.prevent="goToPage(p)">{{ p }}</a>
+                    </li>
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                      <a class="page-link" href="#" @click.prevent="nextPage">Next</a>
+                    </li>
+                  </ul>
                 </nav>
 
                  <!-- Held Vulnerabilities List -->
@@ -240,7 +203,7 @@
             class="fw-semibold text-muted"
             style="color: rgba(0, 0, 0, 0.87); font-size: 18px;"
           >
-            {{ held.ip }}
+            {{ held.asset }}
           </div>
 
           <!-- Badge -->
@@ -276,32 +239,20 @@
       <!-- Status Row (same as assets) -->
       <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-1">
         <span class="d-flex align-items-center">
-          <span
-            class="rounded-circle me-1"
-            style="width: 6px; height: 6px; background-color: #b31c1c"
-          ></span>
-          <span class="text-danger fw-bold">11</span>
+          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #b31c1c"></span>
+          <span class="text-danger fw-bold">{{ held.severity_counts?.critical ?? 0 }}</span>
         </span>
         <span class="d-flex align-items-center">
-          <span
-            class="rounded-circle me-1"
-            style="width: 6px; height: 6px; background-color: #f44336"
-          ></span>
-          <span class="text-danger fw-bold">4</span>
+          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f44336"></span>
+          <span class="text-danger fw-bold">{{ held.severity_counts?.high ?? 0 }}</span>
         </span>
         <span class="d-flex align-items-center">
-          <span
-            class="rounded-circle me-1"
-            style="width: 6px; height: 6px; background-color: #f6b100"
-          ></span>
-          <span class="text-warning fw-bold">8</span>
+          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f6b100"></span>
+          <span class="text-warning fw-bold">{{ held.severity_counts?.medium ?? 0 }}</span>
         </span>
         <span class="d-flex align-items-center">
-          <span
-            class="rounded-circle me-1"
-            style="width: 6px; height: 6px; background-color: #4caf50"
-          ></span>
-          <span class="text-success fw-bold">0</span>
+          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #4caf50"></span>
+          <span class="text-success fw-bold">{{ held.severity_counts?.low ?? 0 }}</span>
         </span>
       </div>
     </div>
@@ -315,41 +266,40 @@
                         <div class="d-flex justify-content-between">
                           <p class="mt-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
                           <div class="d-flex justify-content-between">
-                            
-                          <NotificationPanel />
                           </div>
                         </div>
-                        <div class="d-flex justify-content-between">
+                        <div v-if="selectedAsset" class="d-flex justify-content-between">
                             <div class="d-flex justify-content-start gap-3">
-                            <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">192.168.1.42</div>
-                            <span class="d-flex align-items-center badge-critical">
-                                <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                <span>Critical</span>
+                            <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">{{ selectedAsset.asset }}</div>
+                            <span v-if="getTopSeverity(selectedAsset.severity_counts)" class="d-flex align-items-center badge-critical">
+                                <span class="rounded-circle me-1" :style="{ width: '6px', height: '6px', backgroundColor: getSeverityColor(getTopSeverity(selectedAsset.severity_counts)) }"></span>
+                                <span>{{ getTopSeverity(selectedAsset.severity_counts) }}</span>
                             </span>
-                            <span class="d-flex align-items-center badge-open">
-                                <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: White;"></span>
-                                <span>Open</span>
-                            </span>
-                                </div>
-                            <div>
-                            
-                        </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row px-3 pt-4">
-                    <div class="d-flex justify-content-start gap-5">
+                    <div v-if="selectedAsset" class="row px-3 pt-4">
+                    <div class="d-flex justify-content-start gap-5 flex-wrap">
                         <div class="d-flex flex-column">
                             <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Exposure</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">Internal</p>
+                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.isInternal ? 'Internal' : 'External' }}</p>
                         </div>
-                        <div class="d-flex flex-column">
+                        <div v-if="selectedAsset.host_information?.['Netbios Name']" class="d-flex flex-column">
                             <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Hostname</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">mickeymouse</p>
+                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.host_information['Netbios Name'] }}</p>
                         </div>
-                        <div class="d-flex flex-column">
-                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Owner</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">mickeymouse2</p>
+                        <div v-if="selectedAsset.host_information?.['DNS Name']" class="d-flex flex-column">
+                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">DNS Name</p>
+                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.host_information['DNS Name'] }}</p>
+                        </div>
+                        <div v-if="selectedAsset.host_information?.['OS']" class="d-flex flex-column">
+                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">OS</p>
+                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.host_information['OS'] }}</p>
+                        </div>
+                        <div v-if="selectedAsset.assigned_teams?.length" class="d-flex flex-column">
+                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Teams</p>
+                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.assigned_teams.join(', ') }}</p>
                         </div>
                     </div>
                     </div>
@@ -388,214 +338,132 @@
     <div class="tab-content mt-3">
       <!-- Vulnerabilities -->
       <div v-if="activeTab === 'vulnerabilities'">
-        <div class="d-flex gap-3">
-                                <button class="btn btn-primary btn-pill active-tab fw-semibold">All</button>
-                                <button class="btn btn-pill btn-outline-secondary" style="color: maroon;">Critical</button>
-                                <button class="btn btn-outline-secondary btn-pill text-danger">High</button>
-                                <button class="btn btn-outline-secondary btn-pill text-warning">Medium</button>
-                                <button class="btn btn-outline-secondary btn-pill text-success">Low</button>
-                                
+
+        <!-- Empty state -->
+        <div v-if="authStore.selectedAssetVulnerabilities.length === 0" class="text-center text-muted py-5">
+          No vulnerabilities found for this asset.
         </div>
-        <div class="accordion border-0" id="accordionExample">
-                            <div class="accordion-item border-0 border-bottom">
-                                <h2 class="accordion-header" id="headingOne">
-                                <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                   <div class="d-flex justify-content-start align-items-center gap-3">
-                                    <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                    <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                        <span>High</span>
-                                        
-                                    </span>
-                                    <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
-                              <span>Open</span>
-                              </span>
-                                   </div> 
-                                </button>
-                                </h2>
-                                <div id="collapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                <div class="accordion-body border-top-0">
-                                    <div class="d-flex justify-content-between gap-3">
-                                        
-                                    
-                                    <div class="d-flex justify-content-start gap-5">
-                                        <div class="d-flex flex-column" style="width: 400px;">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
-                                        </div>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <button class="btn rounded-pill px-3" style="background-color: rgba(49, 33, 177, 1);color: white;"><i class="bi bi-magic"></i> Fix Now</button> 
-                                        </div>
-                                        
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item border-0 border-bottom">
-                                <h2 class="accordion-header" id="headingTwo">
-                                <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                   <div class="d-flex justify-content-start align-items-center gap-3">
-                                    <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">2</p>
-                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                    <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                        <span>High</span>
-                                    </span>
-                                    <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
-                              <span>Open</span>
-                              </span>
-                                   </div> 
-                                </button>
-                                </h2>
-                                <div id="collapseTwo" class="accordion-collapse collapse border-top-0" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                                <div class="accordion-body border-top-0">
-                                    <div class="d-flex justify-content-start gap-3">
-                                        <p style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 16px;">View fix(5 steps) <i class="bi bi-arrow-right"></i></p>
-                                        <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 14px;">Estimated effort: 2 days 11 hours</p>
-                                    </div>
-                                    <div class="d-flex justify-content-start gap-5">
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a<br> sandbox escape vulnerability.</p>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item border-0 border-bottom">
-                                <h2 class="accordion-header" id="headingThree">
-                                <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
-                                   <div class="d-flex justify-content-start align-items-center gap-3">
-                                    <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">3</p>
-                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                    <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                        <span>High</span>
-                                    </span>
-                                    <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
-                              <span>Open</span>
-                              </span>
-                                   </div> 
-                                </button>
-                                </h2>
-                                <div id="collapseThree" class="accordion-collapse collapse border-top-0" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                                <div class="accordion-body border-top-0">
-                                    <div class="d-flex justify-content-start gap-3">
-                                        <p style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 16px;">View fix(5 steps) <i class="bi bi-arrow-right"></i></p>
-                                        <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 14px;">Estimated effort: 2 days 11 hours</p>
-                                    </div>
-                                    <div class="d-flex justify-content-start gap-5">
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a<br> sandbox escape vulnerability.</p>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item border-0 border-bottom">
-                                <h2 class="accordion-header" id="headingFour">
-                                <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
-                                   <div class="d-flex justify-content-start align-items-center gap-3">
-                                    <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">4</p>
-                                    <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                    <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                        <span>High</span>
-                                    </span>
-                                    <span class="d-flex align-items-center badge-open" style="margin-top: -17px;">
-                              <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
-                              <span>Open</span>
-                              </span>
-                                   </div> 
-                                </button>
-                                </h2>
-                                <div id="collapseFour" class="accordion-collapse collapse border-top-0" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
-                                <div class="accordion-body border-top-0">
-                                    <div class="d-flex justify-content-start gap-3">
-                                        <p style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 16px;">View fix(5 steps) <i class="bi bi-arrow-right"></i></p>
-                                        <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 14px;">Estimated effort: 2 days 11 hours</p>
-                                    </div>
-                                    <div class="d-flex justify-content-start gap-5">
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Findings</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a<br> sandbox escape vulnerability.</p>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">6.8</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                                        <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">The remote VMware ESXi host is affected by a sandbox escape vulnerability.</p>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
+
+        <!-- Accordion list -->
+        <div v-else class="accordion border-0" id="accordionExample">
+          <div
+            v-for="(vuln, idx) in authStore.selectedAssetVulnerabilities"
+            :key="idx"
+            class="accordion-item border-0 border-bottom"
+          >
+            <h2 class="accordion-header" :id="'heading' + idx">
+              <button
+                class="accordion-button border-bottom-0 collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                :data-bs-target="'#collapse' + idx"
+                aria-expanded="false"
+                :aria-controls="'collapse' + idx"
+              >
+                <div class="d-flex justify-content-start align-items-center gap-3">
+                  <p class="mb-0" style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;flex-shrink:0;">{{ idx + 1 }}</p>
+                  <p class="mb-0" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.vul_name }}</p>
+                  <span class="d-flex align-items-center badge-critical" style="margin-top: 0;" :style="{ color: getSeverityColor(vuln.severity) }">
+                    <span class="rounded-circle me-1" :style="{ width: '6px', height: '6px', backgroundColor: getSeverityColor(vuln.severity) }"></span>
+                    <span>{{ vuln.severity }}</span>
+                  </span>
+                  <span
+                    class="d-flex align-items-center"
+                    :class="vuln.status === 'open' ? 'badge-open' : 'badge-close'"
+                    style="margin-top: 0;"
+                  >
+                    <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
+                    <span>{{ vuln.status }}</span>
+                  </span>
+                </div>
+              </button>
+            </h2>
+            <div
+              :id="'collapse' + idx"
+              class="accordion-collapse collapse border-top-0"
+              :aria-labelledby="'heading' + idx"
+              data-bs-parent="#accordionExample"
+            >
+              <div class="accordion-body border-top-0">
+                <div class="d-flex justify-content-between gap-3">
+                  <div class="d-flex justify-content-start gap-5 flex-wrap">
+                    <div v-if="vuln.description" class="d-flex flex-column" style="max-width: 400px;">
+                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
+                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 15px;">{{ vuln.description }}</p>
+                    </div>
+                    <div v-if="vuln.cvss_score" class="d-flex flex-column">
+                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
+                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.cvss_score }}</p>
+                    </div>
+                    <div v-if="vuln.vendor_fix_available" class="d-flex flex-column">
+                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Vendor Fix</p>
+                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.vendor_fix_available }}</p>
+                    </div>
+                    <div v-if="vuln.assigned_team" class="d-flex flex-column">
+                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Assigned Team</p>
+                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.assigned_team }}</p>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <router-link
+                      v-if="authStore.userLatestReportId"
+                      :to="{
+                        name: 'UserVulFix',
+                        params: {
+                          reportId: authStore.userLatestReportId,
+                          asset: vuln.asset,
+                        },
+                        query: {
+                          plugin_name: vuln.vul_name,
+                          risk_factor: vuln.severity,
+                        }
+                      }"
+                      class="btn rounded-pill px-3 text-decoration-none"
+                      style="background-color: rgba(49, 33, 177, 1);color: white;white-space:nowrap;"
+                    >
+                      <i class="bi bi-magic"></i> Fix Now
+                    </router-link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row mt-3 pt-3 px-3">
-                            <div class="card p-2 my-3">
-                              <h4>Fixed</h4>
-                              <div class="d-flex justify-content-start align-items-center gap-2 mt-2">
-                                  <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-                                  <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                  <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                  <span>High</span>
-                                  </span>
-                                  <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
-                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
-                                  <span>Close</span>
-                                  </span>
-                                  <router-link to="/pendingvulnerabilitycard" class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3" style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
-                                </div> 
-                                
-                                <div class="d-flex justify-content-start align-items-center gap-2">
-                                  <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">5</p>
-                                  <p class="text-muted" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-                                  <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-                                  <span>High</span>
-                                  </span>
-                                  <span class="d-flex align-items-center badge-close" style="margin-top: -17px;">
-                                  <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
-                                  <span>Close</span>
-                                  </span>
-                                  <router-link to="/pendingvulnerabilitycard" class="btn btn-sm text-decoration-none rounded-pill text-light px-3 mb-3" style="background-color:rgba(49, 33, 177, 1) ;">View detail</router-link>
-                                </div>
-                            </div>
-                          </div>
+        <!-- Fixed / Closed vulnerabilities -->
+        <div class="row mt-3 px-1">
+          <div v-if="loadingClosedFix" class="text-center py-3">
+            <span class="spinner-border spinner-border-sm text-secondary"></span>
+          </div>
+          <div v-else-if="closedFixVulnerabilities.length" class="card p-3 my-2">
+            <h5 class="mb-3">Fixed</h5>
+            <div
+              v-for="(item, i) in closedFixVulnerabilities"
+              :key="item.fix_vulnerability_id"
+              class="d-flex justify-content-between align-items-center py-2 border-bottom"
+            >
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center" style="width:30px;height:30px;font-size:14px;flex-shrink:0;">
+                  {{ i + 1 }}
+                </div>
+                <p class="mb-0 fw-semibold" style="font-size:15px;">{{ item.plugin_name }}</p>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="badge d-flex align-items-center gap-1" :style="{ background: getSeverityColor(item.risk_factor) + '22', color: getSeverityColor(item.risk_factor), fontSize: '12px' }">
+                  <span class="rounded-circle" :style="{ width:'6px', height:'6px', backgroundColor: getSeverityColor(item.risk_factor) }"></span>
+                  {{ item.risk_factor }}
+                </span>
+                <span class="badge d-flex align-items-center gap-1" style="background:#0a7d00;color:#fff;font-size:12px;">
+                  <span class="rounded-circle" style="width:6px;height:6px;background:#fff;"></span>
+                  Close
+                </span>
+                <button class="btn btn-sm rounded-pill text-light px-3" style="background-color: rgba(49,33,177,1);" @click="viewFixDetail(item)">
+                  View detail
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
       <!-- Exception Requests -->
       <div v-if="activeTab === 'exceptions'">
@@ -765,230 +633,286 @@
 <script>
 import DashboardMenu from "@/components/user-component/DashboardMenu.vue";
 import DashboardHeader from "@/components/user-component/DashboardHeader.vue";
-import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
   name: "UserAssetsView",
   components: {
     DashboardMenu,
     DashboardHeader,
-    NotificationPanel
   },
-   data() {
+  data() {
     return {
+      authStore: useAuthStore(),
       selectedSeverity: "",
-      ipAddress: "",
+      searchQuery: "",
       activeTab: "vulnerabilities",
       showCheckboxes: false,
-      //  assets: [
-      //   { ip: "192.168.1.42" },
-      //   { ip: "192.168.1.43" },
-      //   { ip: "192.168.1.44" },
-      //   { ip: "192.168.1.45" },
-      //   { ip: "192.168.1.46" },
-      //   { ip: "192.168.1.47" },
-      // ],
-      activeIndex: 0,
-       assets: [
-        { ip: "192.168.1.42",isInternal: true, selected: false, held: false },
-        { ip: "192.168.1.43",isInternal: false, selected: false, held: false },
-        { ip: "192.168.1.44",isInternal: false, selected: false, held: false },
-        { ip: "192.168.1.45",isInternal: true, selected: false, held: false },
-        { ip: "192.168.1.46",isInternal: false, selected: false, held: false },
-        { ip: "192.168.1.47",isInternal: true, selected: false, held: false },
-      ],
+      assets: [],
+      totalAssets: 0,
+      loading: false,
+      activeIndex: null,
       heldAssets: [],
       showHoldCheckboxes: false,
       activeAction: "",
       showHeld: true,
-      isInternal: true,
       showUnholdCheckboxes: false,
-      activeIndex: null
+      currentPage: 1,
+      pageSize: 5,
+      closedFixVulnerabilities: [],
+      loadingClosedFix: false,
     };
   },
   computed: {
-    filterLabel() {
-      if (this.selectedSeverity && this.ipAddress) {
-        return `Filter: ${this.selectedSeverity}, ${this.ipAddress}`;
-      } else if (this.selectedSeverity) {
-        return `Filter: ${this.selectedSeverity}`;
-      } else if (this.ipAddress) {
-        return `Filter: ${this.ipAddress}`;
-      }
-      return "Filter"; // default text
+    filteredAssets() {
+      if (!this.searchQuery) return this.assets;
+      const q = this.searchQuery.toLowerCase();
+      return this.assets.filter(a => a.asset?.toLowerCase().includes(q));
+    },
+    pagedAssets() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.filteredAssets.slice(start, start + this.pageSize);
+    },
+    totalPages() {
+      return Math.ceil(this.filteredAssets.length / this.pageSize);
+    },
+    pageNumbers() {
+      const pages = [];
+      for (let i = 1; i <= this.totalPages; i++) pages.push(i);
+      return pages;
+    },
+    selectedAsset() {
+      if (!this.activeIndex) return null;
+      return this.assets.find(a => a.asset === this.activeIndex) || null;
     },
   },
   methods: {
-    applyFilters() {
-      console.log("Filters applied:", {
-        severity: this.selectedSeverity,
-        ip: this.ipAddress,
+    async loadAssets() {
+      this.loading = true;
+      const result = await this.authStore.fetchUserAssets();
+      if (result.status) {
+        this.assets = result.data;
+        this.totalAssets = result.total;
+        if (this.assets.length > 0) {
+          await this.setActive(this.assets[0]);
+        }
+      }
+      this.loading = false;
+    },
+    async loadHeldAssets() {
+      const res = await this.authStore.fetchUserHeldAssets();
+      if (res.status && res.assets.length) {
+        this.heldAssets = res.assets.map(a => ({
+          asset: a.asset,
+          ip: a.asset,
+          member_type: a.member_type,
+          severity_counts: a.severity_counts,
+          host_information: a.host_information,
+          held: true,
+          selected: false,
+          isInternal: a.member_type === 'internal',
+        }));
+        this.showHeld = true;
+        // Remove held assets from main list to avoid duplicates
+        this.assets = this.assets.filter(a => !this.heldAssets.some(h => h.asset === a.asset));
+      } else {
+        this.showHeld = false;
+        this.heldAssets = [];
+      }
+    },
+    async setActive(asset) {
+      if (!asset?.asset) return;
+      this.activeIndex = asset.asset;
+      this.authStore.fetchUserSingleAssetVulnerabilities(asset.asset);
+      this.loadingClosedFix = true;
+      const res = await this.authStore.getUserClosedVulnerabilities(asset.asset);
+      this.loadingClosedFix = false;
+      if (res.status && res.data?.results) {
+        this.closedFixVulnerabilities = res.data.results.filter(v => v.status?.toLowerCase() === 'closed');
+      } else {
+        this.closedFixVulnerabilities = [];
+      }
+    },
+    viewFixDetail(item) {
+      const reportId = this.authStore.userLatestReportId;
+      if (!reportId) return;
+      this.$router.push({
+        name: 'UserVulFix',
+        params: { reportId, asset: item.host_name },
+        query: {
+          id: item.fix_vulnerability_id,
+          plugin_name: item.plugin_name,
+          risk_factor: item.risk_factor,
+        }
       });
     },
-     validateIPInput(event) {
-    const char = String.fromCharCode(event.which);
-    // Allow only digits and dots
-    if (!/[0-9.]/.test(char)) {
-      event.preventDefault();
-      alert("Only numbers and dots are allowed!");
-    }
-  },
-  formatIP() {
-    // Remove all non-digit characters first
-    let digits = this.ipAddress.replace(/\D/g, "");
-
-    // Insert a dot after every group of up to 3 digits
-    let formatted = digits.match(/.{1,3}/g)?.join(".") || "";
-
-    // Limit to 4 groups (IPv4 style)
-    let parts = formatted.split(".").slice(0, 4);
-
-    this.ipAddress = parts.join(".");
-  },
-   handleDeleteClick() {
-    // ❌ Prevent if hold is already active
-    if (this.activeAction === "hold") {
-      return;
-    }
-
-    // Mark delete as active
-    this.activeAction = "delete";
-
-    if (!this.showCheckboxes) {
-      this.showCheckboxes = true;
-    } else {
-      const selectedAssets = this.assets.filter((a) => a.selected);
-      if (selectedAssets.length > 0) {
-        // Show delete confirmation modal
-        const modal = new bootstrap.Modal(
-          document.getElementById("deleteModal")
-        );
-        modal.show();
-      } else {
-        this.showCheckboxes = false;
-        this.activeAction = ""; // reset if cancelled
+    goToPage(page) {
+      if (page < 1 || page > this.totalPages) return;
+      this.currentPage = page;
+    },
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++;
+    },
+    getTopSeverity(sc) {
+      if (!sc) return null;
+      if (sc.critical > 0) return 'Critical';
+      if (sc.high > 0) return 'High';
+      if (sc.medium > 0) return 'Medium';
+      if (sc.low > 0) return 'Low';
+      return null;
+    },
+    getSeverityColor(sev) {
+      switch (sev?.toLowerCase()) {
+        case 'critical': return 'rgba(173, 0, 0, 1)';
+        case 'high': return '#AD0000';
+        case 'medium': return '#f6b100';
+        case 'low': return '#4caf50';
+        default: return '#888';
       }
-    }
-  },
-    confirmDelete() {
-      this.assets.forEach((a) => (a.selected = false));
+    },
+    handleDeleteClick() {
+      if (this.activeAction === "hold") return;
+      this.activeAction = "delete";
+      if (!this.showCheckboxes) {
+        this.showCheckboxes = true;
+      } else {
+        const selectedAssets = this.assets.filter((a) => a.selected);
+        if (selectedAssets.length > 0) {
+          const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+          modal.show();
+        } else {
+          this.showCheckboxes = false;
+          this.activeAction = "";
+        }
+      }
+    },
+    async confirmDelete() {
+      const selected = this.assets.filter(a => a.selected);
+      for (const item of selected) {
+        const res = await this.authStore.deleteUserAsset(item.asset);
+        if (res.status) {
+          this.assets = this.assets.filter(x => x.asset !== item.asset);
+          if (this.activeIndex === item.asset) {
+            this.activeIndex = this.assets.length ? this.assets[0].asset : null;
+            if (this.activeIndex) this.authStore.fetchUserSingleAssetVulnerabilities(this.activeIndex);
+          }
+        }
+      }
+      this.totalAssets = this.assets.length + this.heldAssets.length;
       this.showCheckboxes = false;
-      // console.log("Deleting selected assets...");
-      this.resetActions(); 
+      this.resetActions();
     },
     cancelDelete() {
-    this.assets.forEach((a) => (a.selected = false));
-    this.showCheckboxes = false;
-    this.resetActions();
-  },
-  setActive(index) {
-      this.activeIndex = index;
+      this.assets.forEach((a) => (a.selected = false));
+      this.showCheckboxes = false;
+      this.resetActions();
     },
     toggleHoldMode() {
-  // ❌ Prevent if delete is already active
-  if (this.activeAction === "delete") {
-    return;
-  }
-
-  // Mark hold as active
-  this.activeAction = "hold";
-
-  if (this.showHoldCheckboxes) {
-    const selectedAssets = this.assets.filter(a => a.selected);
-
-    if (selectedAssets.length > 0) {
-      // ✅ Show confirmation only if something is selected
-      let modal = new bootstrap.Modal(
-        document.getElementById("holdConfirmModal")
-      );
-      modal.show();
-    } else {
-      // ❌ No selection → just reset
-      this.resetActions();
-    }
-  } else {
-    // First click → show checkboxes
-    this.showHoldCheckboxes = true;
-  }
-},
-   toggleUnholdMode() {
-  if (this.activeAction === "hold" || this.activeAction === "delete") return;
-
-  this.activeAction = "unhold";
-
-  if (!this.showUnholdCheckboxes) {
-    // First click → show checkboxes
-    this.showUnholdCheckboxes = true;
-    return;
-  }
-
-  // Second click → perform unhold
-  const selected = this.heldAssets.filter(a => a.selected);
-
-  if (selected.length > 0) {
-    // ✅ Remove selected assets from held list
-    this.heldAssets = this.heldAssets.filter(a => !a.selected);
-  }
-
-  // Reset after action
-  this.resetActions();
-},
-  resetActions() {
-  this.showCheckboxes = false;
-  this.showHoldCheckboxes = false;
-  this.activeAction = "";
-  this.assets.forEach(a => (a.selected = false));
-  this.heldAssets.forEach(a => (a.selected = false));
-  },
-    cancelHold() {
-      // Hide checkboxes without moving anything
-      this.showHoldCheckboxes = false;
-      this.assets.forEach(a => (a.selected = false));
-      this.resetActions();
-    },
-   confirmHold() {
-  let selected = this.assets.filter(a => a.selected);
-  selected.forEach(a => {
-    a.held = true;
-    this.heldAssets.push({ ...a }); // copies isInternal too ✅
-  });
-
-  this.assets = this.assets.map(a => ({ ...a, selected: false }));
-  this.showHoldCheckboxes = false;
-  this.resetActions();
-},
-    toggleText() {
-      this.isInternal = !this.isInternal;
-    },
-  },
-  mounted() {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));  
-
-    const dropdown = document.querySelector('.dropdown');
-    const btn = dropdown.querySelector('.dropdown-btn');
-    const options = dropdown.querySelectorAll('.dropdown-content a');
-
-    // Toggle dropdown open/close
-    btn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    // Set selected option
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.preventDefault();
-        btn.textContent = option.textContent; // update button text
-        dropdown.classList.remove('show'); // close dropdown
-      });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
+      if (this.activeAction === "delete") return;
+      this.activeAction = "hold";
+      if (this.showHoldCheckboxes) {
+        const selectedAssets = this.assets.filter(a => a.selected);
+        if (selectedAssets.length > 0) {
+          let modal = new bootstrap.Modal(document.getElementById("holdConfirmModal"));
+          modal.show();
+        } else {
+          this.resetActions();
+        }
+      } else {
+        this.showHoldCheckboxes = true;
       }
-    });
+    },
+    async toggleUnholdMode() {
+      if (this.activeAction === "hold" || this.activeAction === "delete") return;
+      this.activeAction = "unhold";
+      if (!this.showUnholdCheckboxes) {
+        this.showUnholdCheckboxes = true;
+        return;
+      }
+      const selected = this.heldAssets.filter(a => a.selected);
+      if (!selected.length) {
+        this.resetActions();
+        return;
+      }
+      for (const item of selected) {
+        const res = await this.authStore.unholdUserAsset(item.asset);
+        if (res.status && res.restoredAsset) {
+          const a = res.restoredAsset;
+          this.assets.unshift({
+            asset: a.asset,
+            member_type: a.member_type,
+            severity_counts: a.severity_counts,
+            host_information: a.host_information,
+            isInternal: a.member_type === 'internal',
+            held: false,
+            selected: false,
+          });
+          this.heldAssets = this.heldAssets.filter(h => h.asset !== item.asset);
+        }
+      }
+      this.totalAssets = this.assets.length + this.heldAssets.length;
+      this.showHeld = this.heldAssets.length > 0;
+      this.resetActions();
+    },
+    resetActions() {
+      this.showCheckboxes = false;
+      this.showHoldCheckboxes = false;
+      this.activeAction = "";
+      this.assets.forEach(a => (a.selected = false));
+      this.heldAssets.forEach(a => (a.selected = false));
+    },
+    cancelHold() {
+      this.assets.forEach((a) => (a.selected = false));
+      this.showHoldCheckboxes = false;
+      this.resetActions();
+    },
+    async confirmHold() {
+      const selected = this.assets.filter(a => a.selected);
+      if (!selected.length) {
+        this.showHoldCheckboxes = false;
+        this.resetActions();
+        return;
+      }
+      for (const item of selected) {
+        const res = await this.authStore.holdUserAsset(item.asset);
+        if (res.status && res.heldAsset) {
+          const a = res.heldAsset;
+          this.heldAssets.push({
+            asset: a.asset,
+            ip: a.asset,
+            member_type: a.member_type,
+            severity_counts: a.severity_counts,
+            host_information: a.host_information,
+            isInternal: a.member_type === 'internal',
+            held: true,
+            selected: false,
+          });
+          this.assets = this.assets.filter(x => x.asset !== item.asset);
+          if (this.activeIndex === item.asset) {
+            this.activeIndex = this.assets.length ? this.assets[0].asset : null;
+            if (this.activeIndex) this.authStore.fetchUserSingleAssetVulnerabilities(this.activeIndex);
+          }
+        }
+      }
+      this.totalAssets = this.assets.length + this.heldAssets.length;
+      this.showHeld = this.heldAssets.length > 0;
+      this.showHoldCheckboxes = false;
+      this.resetActions();
+    },
+  },
+  watch: {
+    searchQuery() {
+      this.currentPage = 1;
+    },
+  },
+  async mounted() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+    await this.loadAssets();
+    await this.loadHeldAssets();
   },
 };
 </script>
