@@ -55,6 +55,7 @@
 <script>
 import { useAuthStore } from "@/stores/authStore";
 import Swal from "sweetalert2";
+import router from "@/router";
 import NotificationPanel from "@/components/admin-component/NotificationPanel.vue";
 
 export default {
@@ -73,13 +74,13 @@ export default {
     },
     async fetchUserProfile() {
       const authStore = useAuthStore();
-      const response = await authStore.getUserProfile();
+      const response = await authStore.getMemberProfile();
 
-      if (response.status && response.data.user) {
+      if (response.status && response.data?.user) {
         const user = response.data.user;
-        this.userEmail = user.email;
-        this.userInitial = user.firstname
-          ? user.firstname.charAt(0).toUpperCase()
+        this.userEmail = user.email || "";
+        this.userInitial = user.email
+          ? user.email.charAt(0).toUpperCase()
           : "U";
       }
     },

@@ -410,8 +410,8 @@
 
                     </li>
                     <li class="nav-item">
-                      <button class="nav-link" :class="{ active: activeTab === 'related' }"
-                        @click="activeTab = 'related'">
+                      <button class="nav-link" disabled
+                        style="opacity: 0.5; cursor: not-allowed;">
                         Related
                       </button>
                     </li>

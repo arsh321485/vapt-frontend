@@ -308,7 +308,26 @@ export default {
     async getRiskCriteria() {
       try {
         const auth = useAuthStore();
-        const res = await auth.getRiskCriteriaById();
+        let res = await auth.getRiskCriteriaById();
+
+        // Fallback: if no stored ID or fetch failed, fetch by admin
+        if (!res.status) {
+          res = await auth.getRiskCriteriaByAdmin();
+          if (res.status && res.data) {
+            const d = res.data?.risk_criteria || res.data;
+            if (d._id) {
+              localStorage.setItem("riskId", d._id);
+              localStorage.setItem("riskCriteriaId", d._id);
+            }
+            if (d.admin_id) localStorage.setItem("adminId", d.admin_id);
+            this.form.critical = d.critical;
+            this.form.high = d.high;
+            this.form.medium = d.medium;
+            this.form.low = d.low;
+            this.isLocked = !this.isEditMode;
+          }
+          return;
+        }
 
         if (res.status && res.data?.risk_criteria) {
           const d = res.data.risk_criteria;
@@ -318,7 +337,6 @@ export default {
           this.form.medium = d.medium;
           this.form.low = d.low;
 
-          // 🔥 store ids here — keep both keys in sync
           localStorage.setItem("riskId", d._id);
           localStorage.setItem("riskCriteriaId", d._id);
           localStorage.setItem("adminId", d.admin_id);

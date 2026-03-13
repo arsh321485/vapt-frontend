@@ -20,6 +20,7 @@ import MitigationStrategyView from '../views/admin-dashboard/MitigationStrategyV
 import AssetsView from '../views/admin-dashboard/AssetsView.vue'
 import VulnerabilityExplorerView from '../views/admin-views/VulnerabilityExplorerView.vue'
 import MissingSecurityUpdatesView from '../views/admin-dashboard/MissingSecurityUpdatesView.vue'
+import UserMissingSecurityUpdatesView from '../views/user-views/UserMissingSecurityUpdatesView.vue'
 import VulnerabilityCardView from '../views/admin-dashboard/VulnerabilityCardView.vue'
 import YourTeamView from '../views/admin-dashboard/YourTeamView.vue'
 import PricingplansView from '../views/admin-views/PricingplansView.vue'
@@ -137,6 +138,11 @@ const router = createRouter({
       path: '/missingsecurityupdates',
       name: 'missingsecurityupdates',
       component: MissingSecurityUpdatesView,
+    },
+    {
+      path: '/usermissingsecurityupdates',
+      name: 'usermissingsecurityupdates',
+      component: UserMissingSecurityUpdatesView,
     },
     // {
     //   path: '/vulnerabilitycard',

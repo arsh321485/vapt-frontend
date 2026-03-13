@@ -291,6 +291,18 @@ export const useAuthStore = defineStore("auth", {
       }
   },
 
+  // ✅ Get Member Profile
+  async getMemberProfile() {
+    try {
+      const response = await endpoint.get("/api/admin/users_details/member-profile/");
+      const data = response.data;
+      return { status: true, data };
+    } catch (error) {
+      console.error("Member profile fetch error:", error);
+      return { status: false, message: "Unable to fetch profile" };
+    }
+  },
+
   // ✅ Get User Profile
   async getUserProfile() {
       try {
@@ -3140,6 +3152,58 @@ export const useAuthStore = defineStore("auth", {
       return {
         status: false,
         message: error.response?.data?.message || error.message || "Failed to fetch mitigation data",
+      };
+    }
+  },
+
+  // ✅ User: Mitigation by team
+  async fetchUserMitigationByTeam() {
+    try {
+      const res = await endpoint.get(`/api/user/mitigation/by-team/`);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message || "Failed to fetch user mitigation data",
+      };
+    }
+  },
+
+  // ✅ Admin: Mitigation vuln-asset-count
+  async fetchAdminMitigationVulnAssetCount() {
+    try {
+      const res = await endpoint.get(`/api/admin/adminmitigationstrategy/vuln-asset-count/`);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message || "Failed to fetch admin vuln asset count",
+      };
+    }
+  },
+
+  // ✅ User: Closed vulnerabilities
+  async fetchUserClosedVulns() {
+    try {
+      const res = await endpoint.get(`/api/user/register/closed-vulns/`);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message || "Failed to fetch closed vulnerabilities",
+      };
+    }
+  },
+
+  // ✅ User: Mitigation vuln-asset-count
+  async fetchUserMitigationVulnAssetCount() {
+    try {
+      const res = await endpoint.get(`/api/user/mitigation/vuln-asset-count/`);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message || "Failed to fetch vuln asset count",
       };
     }
   },

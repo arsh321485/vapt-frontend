@@ -325,10 +325,10 @@
         </button>
       </li>
       <li class="nav-item">
-        <button 
-          class="nav-link" 
-          :class="{ active: activeTab === 'related' }" 
-          @click="activeTab = 'related'">
+        <button
+          class="nav-link"
+          disabled
+          style="opacity: 0.5; cursor: not-allowed;">
           Related
         </button>
       </li>
@@ -339,15 +339,34 @@
       <!-- Vulnerabilities -->
       <div v-if="activeTab === 'vulnerabilities'">
 
+        <!-- Severity filters -->
+        <div class="d-flex gap-3 mb-3">
+          <button class="btn btn-pill fw-semibold text-dark"
+            :class="activeSeverity === 'All' ? 'btn-primary active-tab' : 'btn-outline-secondary'"
+            @click="setSeverity('All')">All</button>
+          <button class="btn btn-pill"
+            :class="activeSeverity === 'Critical' ? 'btn-primary active-tab' : 'btn-outline-secondary'"
+            style="color: maroon;" @click="setSeverity('Critical')">Critical</button>
+          <button class="btn btn-pill"
+            :class="activeSeverity === 'High' ? 'btn-primary active-tab' : 'btn-outline-secondary text-danger'"
+            @click="setSeverity('High')">High</button>
+          <button class="btn btn-pill"
+            :class="activeSeverity === 'Medium' ? 'btn-primary active-tab' : 'btn-outline-secondary text-warning'"
+            @click="setSeverity('Medium')">Medium</button>
+          <button class="btn btn-pill"
+            :class="activeSeverity === 'Low' ? 'btn-primary active-tab' : 'btn-outline-secondary text-success'"
+            @click="setSeverity('Low')">Low</button>
+        </div>
+
         <!-- Empty state -->
-        <div v-if="authStore.selectedAssetVulnerabilities.length === 0" class="text-center text-muted py-5">
+        <div v-if="filteredVulnerabilities.length === 0" class="text-center text-muted py-5">
           No vulnerabilities found for this asset.
         </div>
 
         <!-- Accordion list -->
         <div v-else class="accordion border-0" id="accordionExample">
           <div
-            v-for="(vuln, idx) in authStore.selectedAssetVulnerabilities"
+            v-for="(vuln, idx) in filteredVulnerabilities"
             :key="idx"
             class="accordion-item border-0 border-bottom"
           >
@@ -645,6 +664,7 @@ export default {
     return {
       authStore: useAuthStore(),
       selectedSeverity: "",
+      activeSeverity: "All",
       searchQuery: "",
       activeTab: "vulnerabilities",
       showCheckboxes: false,
@@ -664,6 +684,11 @@ export default {
     };
   },
   computed: {
+    filteredVulnerabilities() {
+      const vulns = this.authStore.selectedAssetVulnerabilities;
+      if (this.activeSeverity === 'All') return vulns;
+      return vulns.filter(v => v.severity === this.activeSeverity);
+    },
     filteredAssets() {
       if (!this.searchQuery) return this.assets;
       const q = this.searchQuery.toLowerCase();
@@ -687,6 +712,9 @@ export default {
     },
   },
   methods: {
+    setSeverity(sev) {
+      this.activeSeverity = sev;
+    },
     async loadAssets() {
       this.loading = true;
       const result = await this.authStore.fetchUserAssets();

@@ -404,7 +404,9 @@
                         >
                           <div class="card py-4 px-3 w-100 d-flex flex-column" style="border-radius: 12px;">
                             <div class="d-flex justify-content-between">
-                              <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">{{ vuln.host_name }}</p>
+                              <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">
+                                <i class="bi bi-hdd-network me-1"></i>{{ vulnAssetCountMap[vuln.plugin_name] ?? 1 }} assets
+                              </p>
                               <span :style="{ color: getMitigationRiskColor(vuln.risk_factor), fontSize: '12px', fontWeight: '600' }">
                                 {{ vuln.risk_factor }}
                               </span>
@@ -417,11 +419,6 @@
                               <h6 :title="vuln.os || 'Unknown OS'" style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px" class="truncated-text">
                                 {{ vuln.os || 'Unknown OS' }}
                               </h6>
-                            </div>
-                            <div class="text-end">
-                              <router-link :to="{ path: '/missingsecurityupdates', query: { team: mitigationActiveTab } }" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
-                                Details <i class="bi bi-arrow-right"></i>
-                              </router-link>
                             </div>
                           </div>
                         </div>
@@ -531,6 +528,7 @@ export default {
       // Mitigation by team
       mitigationLoading: false,
       mitigationByTeamData: null,
+      vulnAssetCountData: null,
       mitigationActiveTab: "Patch Management",
       mitigationTabs: [
         { key: "Patch Management", label: "Patch Management" },
@@ -547,6 +545,14 @@ export default {
     mitigationActiveTeamData() {
       if (!this.mitigationByTeamData?.teams) return { count: 0, vulnerabilities: [] };
       return this.mitigationByTeamData.teams[this.mitigationActiveTab] || { count: 0, vulnerabilities: [] };
+    },
+    vulnAssetCountMap() {
+      if (!this.vulnAssetCountData?.vulnerabilities) return {};
+      const map = {};
+      for (const v of this.vulnAssetCountData.vulnerabilities) {
+        map[v.plugin_name] = v.asset_count;
+      }
+      return map;
     },
     modalSeverityLabel() {
       const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
@@ -630,6 +636,12 @@ export default {
         this.mitigationByTeamData = result.data;
       }
       this.mitigationLoading = false;
+    },
+    async loadVulnAssetCount() {
+      const result = await this.authStore.fetchAdminMitigationVulnAssetCount();
+      if (result.status) {
+        this.vulnAssetCountData = result.data;
+      }
     },
     initTestingOverlay() {
       // ✅ Skip if report status overlay is already showing (report status takes priority)
@@ -950,11 +962,11 @@ export default {
     },
     async loadRiskCriteria() {
       let result = await this.authStore.getRiskCriteriaById();
-      // Fallback: if no stored ID, fetch by admin (also stores the ID)
+      // Fallback: if no stored ID or fetch failed, fetch by admin
       if (!result.status) {
         result = await this.authStore.getRiskCriteriaByAdmin();
         if (result.status && result.data) {
-          const d = result.data;
+          const d = result.data?.risk_criteria || result.data;
           if (d._id) {
             localStorage.setItem("riskId", d._id);
             localStorage.setItem("riskCriteriaId", d._id);
@@ -968,8 +980,9 @@ export default {
         }
         return;
       }
-      if (result.data?.risk_criteria) {
-        const d = result.data.risk_criteria;
+      // Handle both { risk_criteria: {...} } and direct object response shapes
+      const d = result.data?.risk_criteria || result.data;
+      if (d) {
         if (d._id) {
           localStorage.setItem("riskId", d._id);
           localStorage.setItem("riskCriteriaId", d._id);
@@ -1188,6 +1201,7 @@ mounted() {
 
   // ✅ DASHBOARD APIs
   this.loadMitigationByTeam();
+  this.loadVulnAssetCount();
   this.loadRiskCriteria();
   Promise.all([
     this.authStore.fetchDashboardTotalAssets(),
