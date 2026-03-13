@@ -11,13 +11,13 @@
 
       <!-- CONTENT -->
       <div :class="['content', { 'no-stepper': isEditMode }]">
-        <div class="d-flex justify-content-between">
+        <div class="page-header">
           <div>
             <h1>Upload Targets</h1>
             <p>Add IP addresses, URLs, or subnets to begin vulnerability Assessment</p>
           </div>
 
-          <div class="d-flex justify-content-between gap-2">
+          <div class="header-controls">
             <div>
               <button @click="downloadExcelTemplate" class="btn fw-semibold px-3 py-2"
                 style="border-radius: 20px;border: 1px solid rgba(0, 0, 0, 0.12);color: rgba(49, 33, 177, 1);"><i
@@ -1312,6 +1312,46 @@ p {
   border-radius: 12px;
   padding: 12px;
   max-width: 220px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .project_name {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .testing-type {
+    width: 100%;
+  }
+
+  .testing-type .form-select {
+    max-width: 100%;
+  }
 }
 
 .upload-box {

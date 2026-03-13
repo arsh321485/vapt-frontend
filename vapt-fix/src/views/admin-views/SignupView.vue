@@ -122,7 +122,7 @@ export default {
           console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
           console.log("✅ User:", localStorage.getItem("user"));
           console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
-          this.$router.replace("/location");
+          this.$router.replace("/communication");
           
         } else {
           console.error("Signup failed details:", result.details);
@@ -172,7 +172,7 @@ async handleGoogleResponse(response) {
     } catch (error) {
       console.error("❌ checkAndRedirect error:", error);
       // Fallback to location page if error
-      this.$router.push("/location");
+      this.$router.push("/communication");
     }
   }
   console.log("Google login response:", res);
@@ -184,8 +184,8 @@ async handleGoogleResponse(response) {
 
       if (!reportId) {
         // No report uploaded yet
-        console.log("➡️ No reportId, redirecting to /location");
-        this.$router.push("/location");
+        console.log("➡️ No reportId, redirecting to /communication");
+        this.$router.push("/communication");
         return;
       }
 
@@ -201,13 +201,13 @@ async handleGoogleResponse(response) {
         this.$router.push("/admindashboardonboarding");
       } else if (res.isNotFound) {
         // 404 - Report doesn't exist, go to location (expected for new users)
-        console.log("➡️ No report found (404), redirecting to /location");
-        this.$router.push("/location");
+        console.log("➡️ No report found (404), redirecting to /communication");
+        this.$router.push("/communication");
       } else {
         // Real error occurred, show error but still redirect to location
         console.error("❌ Error checking report:", res.message);
         Swal.fire("Error", res.message || "Failed to verify report status", "error");
-        this.$router.push("/location");
+        this.$router.push("/communication");
       }
     }
   },

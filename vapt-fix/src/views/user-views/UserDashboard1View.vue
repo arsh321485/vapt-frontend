@@ -388,7 +388,7 @@
                 {{ supportReqs.pending ?? '—' }} Support requests ongoing
                 <i class="bi bi-arrow-right ms-1 fs-5"></i> -->
 
-                 <router-link to="/supportrequests" class="btn pending-approval-btn rounded-pill text-decoration-none">{{ supportReqs.pending ?? '—'  }} Support requests ongoing
+                 <router-link to="/userexception" class="btn pending-approval-btn rounded-pill text-decoration-none">{{ supportReqs.pending ?? '—'  }} Support requests ongoing
                 <i class="bi bi-arrow-right ms-1 fs-5"></i></router-link>
               <!-- </button> -->
               </div>
@@ -626,7 +626,7 @@ export default {
       }
       const year = this.currentDate.getFullYear();
       const month = this.currentDate.getMonth() + 1;
-      const result = await this.authStore.fetchRiskCriteriaCalendar(year, month);
+      const result = await this.authStore.fetchUserRiskCriteriaCalendar(year, month);
       if (result.status && result.data?.calendar?.days) {
         const map = {};
         result.data.calendar.days.forEach(day => {
@@ -828,7 +828,7 @@ export default {
       const hasExisting = !!(localStorage.getItem('riskCriteriaId') || localStorage.getItem('riskId'));
       let result;
       if (hasExisting) {
-        result = await store.updateRiskCriteria(updated);
+        result = await store.updateUserRiskCriteria(updated);
         if (result.status && result.data?.risk_criteria?._id) {
           localStorage.setItem('riskCriteriaId', result.data.risk_criteria._id);
           localStorage.setItem('riskId', result.data.risk_criteria._id);
@@ -849,6 +849,23 @@ export default {
       }
     },
     async loadRiskCriteria() {
+      // Try user-side list API first
+      const userResult = await this.authStore.fetchUserRiskCriteria();
+      if (userResult.status && userResult.data) {
+        const d = userResult.data;
+        if (d._id) { localStorage.setItem('riskId', d._id); localStorage.setItem('riskCriteriaId', d._id); }
+        this.riskCriteria = { critical: d.critical ?? null, high: d.high ?? null, medium: d.medium ?? null, low: d.low ?? null };
+        return;
+      }
+      // Try user-side get-by-id API
+      const userByIdResult = await this.authStore.getUserRiskCriteriaById();
+      if (userByIdResult.status && userByIdResult.data) {
+        const d = userByIdResult.data?.risk_criteria || userByIdResult.data;
+        if (d._id) { localStorage.setItem('riskId', d._id); localStorage.setItem('riskCriteriaId', d._id); }
+        this.riskCriteria = { critical: d.critical ?? null, high: d.high ?? null, medium: d.medium ?? null, low: d.low ?? null };
+        return;
+      }
+      // Fallback: admin endpoints
       let result = await this.authStore.getRiskCriteriaById();
       if (!result.status) {
         result = await this.authStore.getRiskCriteriaByAdmin();

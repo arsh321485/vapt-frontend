@@ -168,7 +168,7 @@ export default {
   //     if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
   //     if (user) localStorage.setItem("user", JSON.stringify(user));
       
-  //     this.$router.push("/location");
+  //     this.$router.push("/communication");
   //   } else {
   //     Swal.fire("Error", result.message || "Google login failed ❌", "error");
   //   }
@@ -217,8 +217,8 @@ export default {
 
       if (!reportId) {
         // No report uploaded yet
-        console.log("➡️ No reportId, redirecting to /location");
-        this.$router.push("/location");
+        console.log("➡️ No reportId, redirecting to /communication");
+        this.$router.push("/communication");
         return;
       }
 
@@ -234,13 +234,13 @@ export default {
         this.$router.push("/admindashboardonboarding");
       } else if (res.isNotFound) {
         // 404 - Report doesn't exist, go to location (expected for new users)
-        console.log("➡️ No report found (404), redirecting to /location");
-        this.$router.push("/location");
+        console.log("➡️ No report found (404), redirecting to /communication");
+        this.$router.push("/communication");
       } else {
         // Real error occurred, show error but still redirect to location
         console.error("❌ Error checking report:", res.message);
         Swal.fire("Error", res.message || "Failed to verify report status", "error");
-        this.$router.push("/location");
+        this.$router.push("/communication");
       }
     }
   },

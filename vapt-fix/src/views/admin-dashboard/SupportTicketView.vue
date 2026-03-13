@@ -108,7 +108,14 @@
     <td>{{ ticket.category }}</td>
 
     <!-- Status -->
-    <td class="text-capitalize">{{ ticket.status }}</td>
+    <td>
+      <span
+        class="status-badge"
+        :class="ticket.status?.toLowerCase() === 'open' ? 'status-open' : 'status-closed'"
+      >
+        {{ ticket.status }}
+      </span>
+    </td>
 
     <!-- Date -->
     <td>
@@ -639,5 +646,24 @@ computed: {
 .raised-tbody tr td{
     color: rgba(0, 0, 0, 1);
     font-weight: 500;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-open {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.status-closed {
+    background-color: #dcfce7;
+    color: #16a34a;
 }
 </style>

@@ -3,8 +3,8 @@
    
     <div
       class="step"
-      :class="{ active: isActive('/location') }"
-      @click="go('/location')"
+      :class="{ active: isActive('/communication') }"
+      @click="go('/communication')"
     >
       <div class="step-circle">1</div>
       <div class="step-label">
@@ -52,11 +52,11 @@
     <div
       class="step"
       :class="{
-        active: isActive('/location'),
+        active: isActive('/communication'),
         completed: isCompleted(1),
         disabled: !canNavigate(1)
       }"
-      @click="handleStepClick('/location', 1)"
+      @click="handleStepClick('/communication', 1)"
     >
       <div class="step-circle">1</div>
       <div class="step-label">Add<br />users</div>
@@ -111,7 +111,7 @@ export default {
   computed: {
     currentStep() {
       const map = {
-        "/location": 1,
+        "/communication": 1,
         "/riskcriteria": 2,
         "/uploadtarget": 3,
       };

@@ -395,7 +395,7 @@ export default {
     this.$router.push("/admindashboardonboarding");
   } else {
     // ❌ No targets uploaded
-    this.$router.push("/location");
+    this.$router.push("/communication");
   }
 },
 hasUploadedTargets(email) {
@@ -872,7 +872,7 @@ hasUploadedTargets(email) {
 
       if (result.status) {
         console.log('✅ Signup successful');
-        this.$router.replace('/location');
+        this.$router.replace('/communication');
       } else {
         // Extract error message from nested structure
         let errorMessage = result.message || 'Signup failed';
@@ -956,7 +956,7 @@ async handleSignin(recaptchaResponse) {
       this.$router.push("/admindashboardonboarding");
     } else {
       // ❌ No project exists
-      this.$router.push("/location");
+      this.$router.push("/communication");
     }
 
   } catch (error) {
@@ -971,7 +971,7 @@ async handleSignin(recaptchaResponse) {
       const reportId = localStorage.getItem('reportId');
 
       if (!reportId) {
-        this.$router.push('/location');
+        this.$router.push('/communication');
         return;
       }
 
@@ -981,10 +981,10 @@ async handleSignin(recaptchaResponse) {
         if (res.status && res.data?.upload_report) {
           this.$router.push('/admindashboardonboarding');
         } else {
-          this.$router.push('/location');
+          this.$router.push('/communication');
         }
       } catch (error) {
-        this.$router.push('/location');
+        this.$router.push('/communication');
       }
     },
     loadRecaptchaScript() {

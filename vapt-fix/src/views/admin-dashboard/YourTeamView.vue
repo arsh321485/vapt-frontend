@@ -236,6 +236,11 @@
         <p>✖ Uncheck a role to remove it</p>
       </div>
     </div>
+
+    <!-- REMOVE USER BUTTON -->
+    <button class="btn btn-sm remove-user-btn ms-2" @click="removeUser(user)" title="Remove user">
+      <i class="bi bi-trash"></i> Remove
+    </button>
   </div>
 </td>
 
@@ -289,19 +294,26 @@
                               <td class="email-cell">{{ user.email }}</td>
 
                               <td>
-                                <div class="multi-select-dropdown">
-                                  <div class="dropdown-input" @click="toggleDropdown(user._id)">
-                                    <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
-                                    <i class="bi bi-chevron-down"></i>
+                                <div class="role-dropdown-wrapper">
+                                  <div class="multi-select-dropdown">
+                                    <div class="dropdown-input" @click="toggleDropdown(user._id)">
+                                      <span>{{ selectedRoleText[user._id] || 'Select Role' }}</span>
+                                      <i class="bi bi-chevron-down"></i>
+                                    </div>
+
+                                    <div class="dropdown-list" v-show="isOpen[user._id]">
+                                      <label v-for="option in roleOptions" :key="option.short">
+                                        <input type="checkbox" :value="option.short" v-model="selectedRoles[user._id]"
+                                          @change="handleRoleChange($event, user, option)" />
+                                        {{ option.full }}
+                                      </label>
+                                    </div>
                                   </div>
 
-                                  <div class="dropdown-list" v-show="isOpen[user._id]">
-                                    <label v-for="option in roleOptions" :key="option.short">
-                                      <input type="checkbox" :value="option.short" v-model="selectedRoles[user._id]"
-                                        @change="handleRoleChange($event, user, option)" />
-                                      {{ option.full }}
-                                    </label>
-                                  </div>
+                                  <!-- REMOVE USER BUTTON -->
+                                  <button class="btn btn-sm remove-user-btn ms-2" @click="removeUser(user)" title="Remove user">
+                                    <i class="bi bi-trash"></i> Remove
+                                  </button>
                                 </div>
                               </td>
 
@@ -796,6 +808,36 @@ async deleteRoleFromUser(user, roleToRemove) {
 },
 
 
+    async removeUser(user) {
+      const confirm = await Swal.fire({
+        title: "Remove User",
+        text: `Are you sure you want to delete ${user.first_name} ${user.last_name}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc2626",
+        confirmButtonText: "Yes, remove",
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      const res = await this.authStore.deleteUserDetail(user._id);
+
+      if (!res.status) {
+        Swal.fire("Error", res.message, "error");
+        return;
+      }
+
+      this.users = this.users.filter(u => u._id !== user._id);
+
+      Swal.fire({
+        icon: "success",
+        title: "Removed",
+        text: res.message,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    },
+
     async updateSelectedRoleText(userId) {
       this.selectedRoleText[userId] = this.selectedRoles[userId].join(", ");
       const fullRoles = this.selectedRoles[userId].map(short =>
@@ -1252,6 +1294,27 @@ async deleteRoleFromUser(user, roleToRemove) {
 .email-cell {
   word-break: break-word;
   max-width: 200px;
+}
+
+/* ===== Remove User Button ===== */
+.remove-user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  padding: 4px 10px;
+  background: transparent;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.remove-user-btn:hover {
+  background: #dc2626;
+  color: #fff;
 }
 
 /* ===== Remove Button ===== */

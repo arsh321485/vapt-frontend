@@ -90,8 +90,8 @@ const router = createRouter({
       component: VulnerabilityExplorerView,
     },
     {
-      path: '/location',
-      name: 'location',
+      path: '/communication',
+      name: 'communication',
       component: LocationView,
     },
     {

@@ -490,6 +490,22 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // Delete User Entirely
+  async deleteUserDetail(userId: string): Promise<any> {
+    try {
+      const res = await endpoint.delete(
+        `/api/admin/users_details/user-detail/${userId}/delete/`,
+        { data: { confirm: true } }
+      );
+      return { status: true, message: res.data.message };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  },
+
   // Update Member Role
   async updateUserRoles(userId: string, newRoles: string[]): Promise<any> {
     try {
@@ -536,6 +552,61 @@ export const useAuthStore = defineStore("auth", {
     } catch (error: any) {
       console.error("❌ Error adding Risk Criteria:", error);
       return { status: false, message: error?.response?.data?.message || error.message || "Failed to add Risk Criteria" };
+    }
+  },
+
+  // ✅ GET Risk Criteria (User side)
+  async fetchUserRiskCriteria() {
+    try {
+      const res = await endpoint.get(`/api/user/risk_criteria/risks/`);
+      const list = res.data?.risk_criteria;
+      if (Array.isArray(list) && list.length > 0) {
+        return { status: true, data: list[0] };
+      }
+      return { status: false, message: "No risk criteria found" };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error?.response?.data?.message || "Failed to fetch risk criteria",
+      };
+    }
+  },
+
+  // ✅ UPDATE Risk Criteria (User side)
+  async updateUserRiskCriteria(payload: Record<string, string>) {
+    try {
+      const riskId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
+      if (!riskId) return { status: false, message: "Risk criteria ID not found." };
+
+      const res = await endpoint.patch(
+        `/api/user/risk_criteria/risks/${riskId}/update/`,
+        payload
+      );
+
+      return { status: true, message: res.data.message, data: res.data };
+    } catch (err: any) {
+      return { status: false, message: err?.response?.data?.message || "Failed to update risk criteria" };
+    }
+  },
+
+  // ✅ GET Risk Criteria by ID (User side)
+  async getUserRiskCriteriaById() {
+    try {
+      const riskCriteriaId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
+
+      if (!riskCriteriaId) {
+        return { status: false, message: "Risk Criteria ID not found", isNotFound: true };
+      }
+
+      const res = await endpoint.get(`/api/user/risk_criteria/risks/${riskCriteriaId}/`);
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      const is404 = error?.response?.status === 404;
+      return {
+        status: false,
+        message: error?.response?.data?.message || "Failed to fetch risk criteria",
+        isNotFound: is404,
+      };
     }
   },
 
@@ -617,7 +688,7 @@ export const useAuthStore = defineStore("auth", {
   }
   },
 
-  // ✅ GET Risk Criteria Calendar
+  // ✅ GET Risk Criteria Calendar (Admin)
   async fetchRiskCriteriaCalendar(year: number, month: number) {
     try {
       const riskCriteriaId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
@@ -625,6 +696,22 @@ export const useAuthStore = defineStore("auth", {
       const monthStr = `${year}-${String(month).padStart(2, '0')}`;
       const res = await endpoint.get(
         `/api/admin/risk_criteria/risks/${riskCriteriaId}/calendar/`,
+        { params: { month: monthStr } }
+      );
+      return { status: true, data: res.data };
+    } catch (error: any) {
+      return { status: false, message: error?.response?.data?.message || "Failed to fetch calendar" };
+    }
+  },
+
+  // ✅ GET Risk Criteria Calendar (User side)
+  async fetchUserRiskCriteriaCalendar(year: number, month: number) {
+    try {
+      const riskCriteriaId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
+      if (!riskCriteriaId) return { status: false, message: "Risk criteria ID not found" };
+      const monthStr = `${year}-${String(month).padStart(2, '0')}`;
+      const res = await endpoint.get(
+        `/api/user/risk_criteria/risks/${riskCriteriaId}/calendar/`,
         { params: { month: monthStr } }
       );
       return { status: true, data: res.data };
