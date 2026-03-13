@@ -1160,6 +1160,12 @@ async handleSignin(recaptchaResponse) {
     this.$nextTick(() => {
       this.startSlider();
     });
+
+    // Auto-select user tab if ?tab=user is in the URL (e.g. from welcome email link)
+    if (this.$route.query.tab === 'user') {
+      this.switchRole('user');
+    }
+
     if (this.currentRole === "admin" && this.currentMode === "signin") {
       this.fetchPreviousTestingTypes();
     }
