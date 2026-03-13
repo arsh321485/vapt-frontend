@@ -880,6 +880,18 @@ export default {
 
     async loadRiskCriteria() {
       const store = useAuthStore();
+      // Try list API first (GET /api/admin/risk_criteria/risks/)
+      const listResult = await store.fetchAdminRiskCriteria();
+      if (listResult.status && listResult.data) {
+        const d = listResult.data;
+        this.riskCriteria = {
+          critical: d.critical ?? null,
+          high: d.high ?? null,
+          medium: d.medium ?? null,
+          low: d.low ?? null,
+        };
+        return;
+      }
       let result = await store.getRiskCriteriaById();
       // Fallback: if no stored ID, fetch by admin (also stores the ID)
       if (!result.status) {

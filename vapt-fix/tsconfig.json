@@ -1,26 +1,7 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleDetection": "force",
-    "jsx": "preserve",
-    "jsxImportSource": "vue",
-    "noImplicitThis": true,
-    "strict": true,
-    "verbatimModuleSyntax": true,
-    "useDefineForClassFields": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "noEmit": true,
-
-    // 🟡 Optional extras if using aliases/import.meta
-    "baseUrl": ".",
-    "paths": {
-      "@/": ["src/"]
-    },
-    "types": ["vite/client"]
-  },
-  "include": ["src", "vite.config.ts", "eslint.config.ts"]
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.app.json" }
+  ]
 }

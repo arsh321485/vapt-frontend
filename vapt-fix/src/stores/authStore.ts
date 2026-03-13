@@ -627,6 +627,29 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // ✅ LIST Risk Criteria (Admin side) — GET /api/admin/risk_criteria/risks/
+  async fetchAdminRiskCriteria() {
+    try {
+      const res = await endpoint.get(`/api/admin/risk_criteria/risks/`);
+      const list = res.data?.risk_criteria;
+      if (Array.isArray(list) && list.length > 0) {
+        const data = list[0];
+        if (data?._id) {
+          localStorage.setItem("riskCriteriaId", data._id);
+          localStorage.setItem("riskId", data._id);
+        }
+        if (data?.admin_id) localStorage.setItem("adminId", data.admin_id);
+        return { status: true, data };
+      }
+      return { status: false, message: "No risk criteria found" };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error?.response?.data?.message || "Failed to fetch risk criteria",
+      };
+    }
+  },
+
   // ✅ GET Risk Criteria (from localStorage)
   async getRiskCriteriaById() {
     try {
