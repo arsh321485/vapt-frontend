@@ -96,12 +96,14 @@
 
     <!-- Description -->
     <td
-  style="cursor:pointer; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+  class="text-truncate"
+  style="cursor:pointer; max-width:220px;"
+  :title="ticket.description"
   data-bs-toggle="modal"
   data-bs-target="#viewRequestsModal"
   @click="openTicketModal(ticket)"
 >
-  {{ getShortDescription(ticket.description) }}
+  {{ ticket.description }}
 </td>
 
     <!-- Category -->
@@ -362,6 +364,9 @@ computed: {
   } else {
     this.tickets = [];
   }
+  this.$nextTick(() => {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+  });
 },
   openTicketModal(ticket) {
     this.selectedDescription = ticket.description || "";
@@ -658,12 +663,12 @@ computed: {
 }
 
 .status-open {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: #dc2626;
+    color: #fff;
 }
 
 .status-closed {
-    background-color: #dcfce7;
-    color: #16a34a;
+    background-color: #198754;
+    color: #fff;
 }
 </style>

@@ -928,7 +928,7 @@ export default {
 
     async loadMitigationData() {
       const store = useAuthStore();
-      this.loading = true;
+      if (!store.cachedMitigationByTeam) this.loading = true;
       const result = await store.fetchMitigationByTeam();
       if (result.status) {
         this.mitigationData = result.data;

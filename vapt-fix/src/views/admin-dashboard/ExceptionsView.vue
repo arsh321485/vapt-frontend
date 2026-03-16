@@ -77,12 +77,14 @@
                       <td>{{ req.host_name }}</td>
 
                       <!-- Description / Status -->
-                      <td style="cursor: pointer;"
+                      <td
+    class="text-truncate"
+    style="cursor:pointer; max-width:220px;"
+    :title="req.description"
     data-bs-toggle="modal"
     data-bs-target="#viewRequestsModal"
     @click="openViewRequestModal(req)">
-    
-  {{ getShortDescription(req.description) }}
+  {{ req.description }}
 </td>
 
                       <!-- Requested By -->
@@ -374,7 +376,7 @@ export default {
     }
 
     try {
-      this.loadingRequests = true;
+      if (!this.authStore.cachedSupportRequests[reportId]) this.loadingRequests = true;
 
       const res = await this.authStore.getSupportRequestsByReport(reportId);
 
@@ -385,6 +387,9 @@ export default {
       } else {
         this.supportRequests = [];
       }
+      this.$nextTick(() => {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+      });
 
     } catch (err) {
       console.error("❌ Fetch support requests failed:", err);

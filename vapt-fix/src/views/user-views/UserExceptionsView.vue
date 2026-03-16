@@ -167,7 +167,7 @@ export default {
             }
             const reportId = this.authStore.userLatestReportId;
             if (!reportId) return;
-            this.loading = true;
+            if (!this.authStore.cachedUserSupportRequests[reportId]) this.loading = true;
             const res = await this.authStore.fetchUserSupportRequestsByReport(reportId);
             this.loading = false;
             if (res.status) {

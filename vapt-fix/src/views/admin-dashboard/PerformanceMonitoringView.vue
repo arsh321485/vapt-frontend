@@ -105,8 +105,8 @@ export default {
     },
   },
   async mounted() {
-    this.loading = true;
     const store = useAuthStore();
+    if (!store.cachedDistributionByTeam) this.loading = true;
     const result = await store.fetchDistributionByTeamDetail();
     if (result.status && result.data?.teams) {
       this.teamDetail = result.data.teams;

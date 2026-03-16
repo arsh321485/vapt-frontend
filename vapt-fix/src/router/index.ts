@@ -53,6 +53,8 @@ import ScopeView from '../views/admin-dashboard/ScopeView.vue'
 import MicrosoftCallbackView from '../views/admin-views/MicrosoftCallbackView.vue'
 import PerformanceMonitoringView from '../views/admin-dashboard/PerformanceMonitoringView.vue'
 import ViewReportPage from '../views/admin-dashboard/ViewReportPage.vue'
+import ScopingFormView from '../views/admin-dashboard/ScopingFormView.vue'
+import ScopingFormView2 from '../views/admin-dashboard/ScopingFormView2.vue'
 
 
 const router = createRouter({
@@ -235,6 +237,16 @@ const router = createRouter({
       path: '/viewreport',
       name: 'viewreport',
       component: ViewReportPage,
+    },
+    {
+      path: '/scoping-form',
+      name: 'scoping-form',
+      component: ScopingFormView,
+    },
+    {
+      path: '/scoping-form-2',
+      name: 'scoping-form-2',
+      component: ScopingFormView2,
     },
     {
       path: '/yourteam',

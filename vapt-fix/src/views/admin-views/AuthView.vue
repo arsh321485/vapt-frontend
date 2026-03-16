@@ -593,6 +593,11 @@ hasUploadedTargets(email) {
 
       // Password validation (Signup)
       if (this.isSignup) {
+        if (this.formData.password !== this.formData.password.trim()) {
+          Swal.fire('Error', 'password must not contain leading or trailing spaces', 'error');
+          return false;
+        }
+
         if (this.formData.password.length < 8) {
           Swal.fire('Error', 'Password must be at least 8 characters', 'error');
           return false;
@@ -606,6 +611,11 @@ hasUploadedTargets(email) {
         // Sign In validation
         if (!this.formData.password || this.formData.password.trim() === '') {
           Swal.fire('Error', 'Please enter your password', 'error');
+          return false;
+        }
+
+        if (this.formData.password !== this.formData.password.trim()) {
+          Swal.fire('Error', 'password must not contain leading or trailing spaces', 'error');
           return false;
         }
       }

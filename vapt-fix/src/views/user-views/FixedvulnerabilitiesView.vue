@@ -164,8 +164,8 @@ export default {
       return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB');
     },
     async loadData() {
-      this.loading = true;
       const store = useAuthStore();
+      if (!store.cachedUserClosedVulns) this.loading = true;
       const result = await store.fetchUserClosedVulns();
       if (result.status) {
         this.allRows = result.data.closed_vulnerabilities || [];

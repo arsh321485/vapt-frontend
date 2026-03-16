@@ -83,6 +83,34 @@ export const useAuthStore = defineStore("auth", {
     channels: [],
     selectedTeam: null,
     lastMessageMeta: null,
+
+    // ── Cache layer ──────────────────────────────────────────
+    // Prevents re-fetching when navigating back to a page.
+    // Each key stores previously fetched data. Pass force:true to bypass.
+    cachedUserAssets: [] as any[],
+    cachedUserAssetTotal: 0,
+    cachedUserHeldAssets: [] as any[],
+    userHeldAssetsFetched: false,
+    cachedMeanTime: {} as Record<string, any>,
+    cachedMitigationTimeline: {} as Record<string, any>,
+    cachedUserVulnerabilities: {} as Record<string, any>,
+    cachedUserVulnerabilitiesFixed: {} as Record<string, any>,
+    cachedSupportRequests: {} as Record<string, any>,
+    cachedOpenTickets: {} as Record<string, any>,
+    cachedMitigationByTeam: null as any,
+    cachedUserMitigationByTeam: null as any,
+    cachedTicketsByReport: {} as Record<string, any>,
+    cachedUsersByAdmin: [] as any[],
+    usersByAdminFetched: false,
+    cachedDistributionByTeam: null as any,
+    cachedUserVulnRegister: [] as any[],
+    userVulnRegisterFetched: false,
+    cachedUserSupportRequests: {} as Record<string, any>,
+    cachedUserOpenTickets: {} as Record<string, any>,
+    cachedUserClosedVulns: null as any,
+    cachedUserTotalAssets: {} as Record<string, any>,
+    cachedUserAllTickets: {} as Record<string, any>,
+    // ─────────────────────────────────────────────────────────
     }),
 
 
@@ -430,7 +458,10 @@ export const useAuthStore = defineStore("auth", {
   // },
 
   // ✅ Fetch  UsersByAdminid
-  async fetchUsersByAdmin() {
+  async fetchUsersByAdmin(force = false) {
+    if (!force && this.usersByAdminFetched && this.cachedUsersByAdmin.length > 0) {
+      return { status: true, message: "Users fetched successfully", data: this.cachedUsersByAdmin, count: this.cachedUsersByAdmin.length };
+    }
     try {
       const adminId = this.user?._id || this.user?.id;
 
@@ -443,11 +474,13 @@ export const useAuthStore = defineStore("auth", {
       );
 
       const data = res.data;
+      this.cachedUsersByAdmin = Array.isArray(data.results) ? data.results : [];
+      this.usersByAdminFetched = true;
 
       return {
         status: true,
         message: "Users fetched successfully",
-        data: Array.isArray(data.results) ? data.results : [],
+        data: this.cachedUsersByAdmin,
         count: data.count || 0,
       };
     } catch (error: any) {
@@ -1683,10 +1716,15 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER MEAN TIME TO REMEDIATE
-    async fetchUserMeanTimeRemediate(team?: string) {
+    async fetchUserMeanTimeRemediate(team?: string, force = false) {
+      const key = team || '__all__';
+      if (!force && this.cachedMeanTime[key]) {
+        return { status: true, data: this.cachedMeanTime[key] };
+      }
       try {
         const params = team ? { team } : {};
         const res = await endpoint.get("/api/user/dashboard/mean-time-remediate/", { params });
+        this.cachedMeanTime[key] = res.data;
         return { status: true, data: res.data };
       } catch (error: any) {
         return {
@@ -1698,10 +1736,15 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER MITIGATION TIMELINE
-    async fetchUserMitigationTimeline(team?: string) {
+    async fetchUserMitigationTimeline(team?: string, force = false) {
+      const key = team || '__all__';
+      if (!force && this.cachedMitigationTimeline[key]) {
+        return { status: true, data: this.cachedMitigationTimeline[key] };
+      }
       try {
         const params = team ? { team } : {};
         const res = await endpoint.get("/api/user/dashboard/mitigation-timeline/", { params });
+        this.cachedMitigationTimeline[key] = res.data;
         return { status: true, data: res.data };
       } catch (error: any) {
         return {
@@ -1728,10 +1771,15 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER VULNERABILITIES FIXED
-    async fetchUserVulnerabilitiesFixed(team?: string) {
+    async fetchUserVulnerabilitiesFixed(team?: string, force = false) {
+      const key = team || '__all__';
+      if (!force && this.cachedUserVulnerabilitiesFixed[key]) {
+        return { status: true, data: this.cachedUserVulnerabilitiesFixed[key] };
+      }
       try {
         const params = team ? { team } : {};
         const res = await endpoint.get("/api/user/dashboard/vulnerabilities-fixed/", { params });
+        this.cachedUserVulnerabilitiesFixed[key] = res.data;
         return { status: true, data: res.data };
       } catch (error: any) {
         return {
@@ -1743,10 +1791,15 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER VULNERABILITIES
-    async fetchUserVulnerabilities(team?: string) {
+    async fetchUserVulnerabilities(team?: string, force = false) {
+      const key = team || '__all__';
+      if (!force && this.cachedUserVulnerabilities[key]) {
+        return { status: true, data: this.cachedUserVulnerabilities[key] };
+      }
       try {
         const params = team ? { team } : {};
         const res = await endpoint.get("/api/user/dashboard/vulnerabilities/", { params });
+        this.cachedUserVulnerabilities[key] = res.data;
         return { status: true, data: res.data };
       } catch (error: any) {
         return {
@@ -1758,11 +1811,16 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER TOTAL ASSETS BY TEAM
-    async fetchUserTotalAssets(team: string) {
+    async fetchUserTotalAssets(team: string, force = false) {
+      const key = team || '__all__';
+      if (!force && this.cachedUserTotalAssets[key]) {
+        return { status: true, data: this.cachedUserTotalAssets[key] };
+      }
       try {
         const res = await endpoint.get("/api/user/dashboard/total-assets/", {
           params: { team },
         });
+        this.cachedUserTotalAssets[key] = res.data;
         return { status: true, data: res.data };
       } catch (error: any) {
         return {
@@ -1844,19 +1902,27 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER HELD ASSETS LIST
-    async fetchUserHeldAssets() {
+    async fetchUserHeldAssets(force = false) {
+      if (!force && this.userHeldAssetsFetched) {
+        return { status: true, assets: this.cachedUserHeldAssets, count: this.cachedUserHeldAssets.length };
+      }
       try {
         const reportId = this.userLatestReportId;
         if (!reportId) return { status: false, assets: [], count: 0, message: "Report ID not found" };
         const res = await endpoint.get(`/api/user/asset/report/${reportId}/assets/hold-list/`);
-        return { status: true, assets: res.data.assets || [], count: res.data.count || 0, data: res.data };
+        this.cachedUserHeldAssets = res.data.assets || [];
+        this.userHeldAssetsFetched = true;
+        return { status: true, assets: this.cachedUserHeldAssets, count: res.data.count || 0, data: res.data };
       } catch (error: any) {
         return { status: false, assets: [], count: 0, message: error.response?.data?.detail || "Failed to fetch held assets" };
       }
     },
 
     // 🔹 USER ASSETS
-    async fetchUserAssets() {
+    async fetchUserAssets(force = false) {
+      if (!force && this.cachedUserAssets.length > 0) {
+        return { status: true, data: this.cachedUserAssets, total: this.cachedUserAssetTotal };
+      }
       try {
         const res = await endpoint.get("/api/user/asset/assets/");
         const rows = res.data.assets || [];
@@ -1869,7 +1935,10 @@ export const useAuthStore = defineStore("auth", {
           severity_counts: a.severity_counts || { critical: 0, high: 0, medium: 0, low: 0 },
         }));
         if (res.data.report_id) this.userLatestReportId = res.data.report_id;
-        return { status: true, data: normalized, total: res.data.total_assets ?? normalized.length };
+        const total = res.data.total_assets ?? normalized.length;
+        this.cachedUserAssets = normalized;
+        this.cachedUserAssetTotal = total;
+        return { status: true, data: normalized, total };
       } catch (error: any) {
         return { status: false, message: "Failed to fetch assets", details: error.response?.data || null };
       }
@@ -1898,11 +1967,15 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 DISTRIBUTION BY TEAM DETAIL
-    async fetchDistributionByTeamDetail() {
+    async fetchDistributionByTeamDetail(force = false) {
+      if (!force && this.cachedDistributionByTeam) {
+        return { status: true, data: this.cachedDistributionByTeam };
+      }
       try {
         const res = await endpoint.get(
           "/api/admin/admindashboard/dashboard/distribution-by-team/detail/"
         );
+        this.cachedDistributionByTeam = res.data;
         return { status: true, data: res.data };
       } catch (error: any) {
         return {
@@ -1991,12 +2064,17 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // fetch user vulnerability register data
-  async fetchUserVulnerabilityRegister() {
+  async fetchUserVulnerabilityRegister(force = false) {
+    if (!force && this.userVulnRegisterFetched && this.cachedUserVulnRegister.length > 0) {
+      return { status: true, data: this.cachedUserVulnRegister };
+    }
     try {
       const res = await endpoint.get(`/api/user/register/register/latest/vulns/`);
       const rows = res.data?.rows ?? [];
       this.userLatestReportId = res.data?.report_id || null;
-      return { status: true, data: Array.isArray(rows) ? rows : [] };
+      this.cachedUserVulnRegister = Array.isArray(rows) ? rows : [];
+      this.userVulnRegisterFetched = true;
+      return { status: true, data: this.cachedUserVulnRegister };
     } catch (error: any) {
       return {
         status: false,
@@ -2029,7 +2107,10 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // fetch all vul register data
-  async fetchVulnerabilityRegister() {
+  async fetchVulnerabilityRegister(force = false) {
+  if (!force && this.vulnerabilityRows.length > 0 && this.latestReportId) {
+    return { status: true, data: this.vulnerabilityRows };
+  }
   try {
     console.log("Fetching Latest Vulnerabilities...");
 
@@ -2467,12 +2548,16 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // User: Get all support requests by report ID
-  async fetchUserSupportRequestsByReport(reportId: string) {
+  async fetchUserSupportRequestsByReport(reportId: string, force = false) {
+    if (!force && this.cachedUserSupportRequests[reportId]) {
+      return { status: true, data: this.cachedUserSupportRequests[reportId], count: this.cachedUserSupportRequests[reportId].length };
+    }
     try {
       const res = await endpoint.get(
         `/api/user/register/support-requests/report/${reportId}/`
       );
-      return { status: true, data: res.data.results || [], count: res.data.count };
+      this.cachedUserSupportRequests[reportId] = res.data.results || [];
+      return { status: true, data: this.cachedUserSupportRequests[reportId], count: res.data.count };
     } catch (error) {
       const err = error as AxiosError<any>;
       return { status: false, data: [], message: err.response?.data?.message || "Failed to fetch support requests" };
@@ -2480,12 +2565,16 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // User: Get all tickets by report ID
-  async fetchUserAllTickets(reportId: string) {
+  async fetchUserAllTickets(reportId: string, force = false) {
+    if (!force && this.cachedUserAllTickets[reportId]) {
+      return { status: true, data: this.cachedUserAllTickets[reportId], count: this.cachedUserAllTickets[reportId].length };
+    }
     try {
       const res = await endpoint.get(
         `/api/user/register/tickets/report/${reportId}/`
       );
-      return { status: true, data: res.data.results || [], count: res.data.count };
+      this.cachedUserAllTickets[reportId] = res.data.results || [];
+      return { status: true, data: this.cachedUserAllTickets[reportId], count: res.data.count };
     } catch (error) {
       const err = error as AxiosError<any>;
       return { status: false, data: [], message: err.response?.data?.message || "Failed to fetch tickets" };
@@ -2493,12 +2582,16 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // User: Get all open tickets by report ID
-  async fetchUserOpenTickets(reportId: string) {
+  async fetchUserOpenTickets(reportId: string, force = false) {
+    if (!force && this.cachedUserOpenTickets[reportId]) {
+      return { status: true, data: this.cachedUserOpenTickets[reportId], count: this.cachedUserOpenTickets[reportId].length };
+    }
     try {
       const res = await endpoint.get(
         `/api/user/register/reports/${reportId}/tickets/open/`
       );
-      return { status: true, data: res.data.results || [], count: res.data.count };
+      this.cachedUserOpenTickets[reportId] = res.data.results || [];
+      return { status: true, data: this.cachedUserOpenTickets[reportId], count: res.data.count };
     } catch (error) {
       const err = error as AxiosError<any>;
       return { status: false, data: [], message: err.response?.data?.message || "Failed to fetch open tickets" };
@@ -2648,15 +2741,20 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // GET all open tickets by reportId
-  async getOpenTickets(reportId: string) {
+  async getOpenTickets(reportId: string, force = false) {
+    if (!force && this.cachedOpenTickets[reportId]) {
+      return { status: true, data: this.cachedOpenTickets[reportId], count: this.cachedOpenTickets[reportId].length };
+    }
     try {
       const res = await endpoint.get(
         `/api/admin/adminregister/reports/${reportId}/tickets/open/`
       );
 
+      const results = res.data.results || [];
+      this.cachedOpenTickets[reportId] = results;
       return {
         status: true,
-        data: res.data.results || [],
+        data: results,
         count: res.data.count || 0,
         message: res.data.message
       };
@@ -2673,7 +2771,10 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // Get all support requests by report id
-  async getSupportRequestsByReport(reportId: string) {
+  async getSupportRequestsByReport(reportId: string, force = false) {
+    if (!force && this.cachedSupportRequests[reportId]) {
+      return { status: true, data: this.cachedSupportRequests[reportId], count: this.cachedSupportRequests[reportId].length };
+    }
     try {
       console.log("📡 Store API called with:", reportId);
 
@@ -2681,9 +2782,11 @@ export const useAuthStore = defineStore("auth", {
         `/api/admin/adminregister/support-requests/report/${reportId}/`
       );
 
+      const results = res?.data?.results || [];
+      this.cachedSupportRequests[reportId] = results;
       return {
         status: true,
-        data: res?.data?.results || [],
+        data: results,
         count: res?.data?.count || 0
       };
 
@@ -2698,7 +2801,10 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // Get all tickets by report id
-  async getTicketsByReport(reportId: string) {
+  async getTicketsByReport(reportId: string, force = false) {
+    if (!force && this.cachedTicketsByReport[reportId]) {
+      return { status: true, data: this.cachedTicketsByReport[reportId], count: this.cachedTicketsByReport[reportId].length };
+    }
     try {
       console.log("Fetching tickets for report:", reportId);
 
@@ -2711,6 +2817,7 @@ export const useAuthStore = defineStore("auth", {
         || (Array.isArray(res?.data) ? res.data : []);
 
       console.log("Tickets fetched:", tickets.length);
+      this.cachedTicketsByReport[reportId] = tickets;
 
       return {
         status: true,
@@ -2729,7 +2836,10 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // GET ALL ASSETS (NEW API)
-  async fetchAssets() {
+  async fetchAssets(force = false) {
+    if (!force && this.assetRows.length > 0) {
+      return { status: true, data: { assets: this.assetRows, total_assets: this.assetCount, member_type: this.memberType } };
+    }
     console.log("🚀 fetchAssets called");
     try {
       const res = await endpoint.get(
@@ -3025,6 +3135,40 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
+  // ✅ Clear all cached data (called on logout or manual refresh)
+  clearCache() {
+    this.assetRows = [];
+    this.assetCount = 0;
+    this.vulnerabilityRows = [];
+    this.vulnerabilityCount = 0;
+    this.latestReportId = null;
+    this.userLatestReportId = null;
+    this.cachedUserAssets = [];
+    this.cachedUserAssetTotal = 0;
+    this.cachedUserHeldAssets = [];
+    this.userHeldAssetsFetched = false;
+    this.cachedMeanTime = {};
+    this.cachedMitigationTimeline = {};
+    this.cachedUserVulnerabilities = {};
+    this.cachedUserVulnerabilitiesFixed = {};
+    this.cachedSupportRequests = {};
+    this.cachedOpenTickets = {};
+    this.cachedMitigationByTeam = null;
+    this.cachedUserMitigationByTeam = null;
+    this.cachedTicketsByReport = {};
+    this.cachedUsersByAdmin = [];
+    this.usersByAdminFetched = false;
+    this.cachedDistributionByTeam = null;
+    this.cachedUserVulnRegister = [];
+    this.userVulnRegisterFetched = false;
+    this.cachedUserSupportRequests = {};
+    this.cachedUserOpenTickets = {};
+    this.cachedUserClosedVulns = null;
+    this.cachedUserTotalAssets = {};
+    this.cachedUserAllTickets = {};
+    this.projectNames = [];
+  },
+
   // ✅ Logout user
   async logout() {
     try {
@@ -3048,13 +3192,7 @@ export const useAuthStore = defineStore("auth", {
       this.accessToken = null;
       this.refreshToken = null;
       this.completedSteps = [];
-      // ✅ Reset report status on logout
-      // this.reportStatus = {
-      //   hasReport: false,
-      //   reportId: null,
-      //   message: "",
-      //   checked: false,
-      // };
+      this.clearCache();
       console.log("🚪 User logged out, localStorage cleared");
 
       return { status: true, data: res.data };
@@ -3254,9 +3392,13 @@ export const useAuthStore = defineStore("auth", {
   //   }
   // },
 
-  async fetchMitigationByTeam() {
+  async fetchMitigationByTeam(force = false) {
+    if (!force && this.cachedMitigationByTeam) {
+      return { status: true, data: this.cachedMitigationByTeam };
+    }
     try {
       const res = await endpoint.get(`/api/admin/adminmitigationstrategy/by-team/`);
+      this.cachedMitigationByTeam = res.data;
       return { status: true, data: res.data };
     } catch (error: any) {
       return {
@@ -3267,9 +3409,13 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ User: Mitigation by team
-  async fetchUserMitigationByTeam() {
+  async fetchUserMitigationByTeam(force = false) {
+    if (!force && this.cachedUserMitigationByTeam) {
+      return { status: true, data: this.cachedUserMitigationByTeam };
+    }
     try {
       const res = await endpoint.get(`/api/user/mitigation/by-team/`);
+      this.cachedUserMitigationByTeam = res.data;
       return { status: true, data: res.data };
     } catch (error: any) {
       return {
@@ -3293,9 +3439,13 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ User: Closed vulnerabilities
-  async fetchUserClosedVulns() {
+  async fetchUserClosedVulns(force = false) {
+    if (!force && this.cachedUserClosedVulns) {
+      return { status: true, data: this.cachedUserClosedVulns };
+    }
     try {
       const res = await endpoint.get(`/api/user/register/closed-vulns/`);
+      this.cachedUserClosedVulns = res.data;
       return { status: true, data: res.data };
     } catch (error: any) {
       return {

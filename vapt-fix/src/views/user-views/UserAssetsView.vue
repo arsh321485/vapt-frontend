@@ -716,7 +716,7 @@ export default {
       this.activeSeverity = sev;
     },
     async loadAssets() {
-      this.loading = true;
+      if (!this.authStore.cachedUserAssets.length) this.loading = true;
       const result = await this.authStore.fetchUserAssets();
       if (result.status) {
         this.assets = result.data;
