@@ -1,307 +1,292 @@
 <template>
-  <main>
-    <div class="container d-flex align-items-center justify-content-center min-vh-100">
-    <div class="row overflow-hidden w-100">
-      <div class="col-lg-6 col-md-12 px-5 pt-4 pb-4 form-section">
-        <img src="@/assets/images/logo-capital.png" alt="" class="mb-4" style="height: 40px;">
-        <h1 class="form-heading mb-3">Welcome back!</h1>
-        <p class="form-subheading mb-4">Login into your account to start fixing.</p>
+  <div class="signin-page">
+    <div class="signin-card">
 
-        
-         <div id="googleButton">
-        <button class="btn btn-outline-dark rounded-pill mb-2 mb-md-0 mb-lg-0 w-100"><img src="@/assets/images/google-icon.png" style="height: 23px;width: 23px;margin-top: -1px;"/> Login with Google</button>
+      <!-- Logo -->
+      <div class="text-center mb-4">
+        <img src="@/assets/images/logo-capital.png" alt="VaptFix" class="signin-logo" />
       </div>
 
-                    <div class="d-flex align-items-center mt-3">
-                      <hr class="flex-grow-1">
-                      <span class="mx-2 text-muted">or</span>
-                      <hr class="flex-grow-1">
-                    </div>
+      <h2 class="signin-title">Welcome back</h2>
+      <p class="signin-sub mb-4">Sign in to your VaptFix account</p>
 
-        <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleLogin" autocomplete="off">
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label">Email address</label>
+          <input
+            type="email"
+            class="form-control signin-input"
+            v-model="form.email"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
 
-    <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input type="email" id="email" class="form-control" v-model="form.email" placeholder="Enter your email">
-    </div>
+        <!-- Password -->
+        <div class="mb-2 position-relative">
+          <label class="form-label">Password</label>
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            class="form-control signin-input"
+            v-model="form.password"
+            placeholder="Enter your password"
+            required
+          />
+          <i
+            class="bi password-eye"
+            :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+            @click="showPassword = !showPassword"
+          ></i>
+        </div>
 
-    <div class="mb-4 mt-4 position-relative">
-      <label class="form-label">Your password</label>
-      <input :type="showPassword ? 'text' : 'password'" class="form-control" v-model="form.password" placeholder="Enter your password" />
-      <i class="bi" :class="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'" 
-         @click="togglePassword" style="position:absolute; top:42px; right:20px; cursor:pointer;"></i>
+        <div class="text-end mb-3">
+          <router-link to="/forgotpassword" class="forgot-link">Forgot password?</router-link>
+        </div>
 
-      <div class="text-end mt-1">
-        <router-link to="/forgotpassword" class="text-primary" style="font-size: 14px; text-decoration: none;">
-          Forgot Password?
-        </router-link>
-      </div>
-    </div>
+        <!-- reCAPTCHA -->
+        <div id="recaptcha-container" class="mb-4 d-flex justify-content-center"></div>
 
-    <!-- ✅ Google reCAPTCHA -->
-    <div id="recaptcha-container" class="mb-3"></div>
+        <button
+          type="submit"
+          class="btn signin-btn w-100"
+          :disabled="loading"
+        >
+          <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Sign In
+        </button>
+      </form>
 
-    <button type="submit" class="btn btn-vaptfix w-100 py-2 mt-4">
-      Login into vaptfix <i class="bi bi-arrow-right-circle-fill"></i>
-    </button>
-  </form>
+      <p class="text-center mt-3 small">
+        Don't have an account?
+        <router-link to="/signup" class="signup-link">Sign Up</router-link>
+      </p>
 
-        <p class="mt-4 text-center">Don’t have an account? <span>
-          <router-link to="/signup" class="text-decoration-none" tag="button" style="color: #422CE9;">Signup</router-link>
-        </span></p>
-      </div>
-
-      <!-- Right Image Section -->
-      <div class="col-lg-6 d-none d-lg-block image-section pt-5">
-        <img src="@/assets/images/signin.jpg" alt="" class="img-fluid" style="height: 500px;border-radius: 15px;">
-      </div>
     </div>
   </div>
-
-
-    </main>
 </template>
 
 <script>
-import Vue3Select from "vue3-select";
-import "vue3-select/dist/vue3-select.css";
-import { useAuthStore } from "../../stores/authStore";
-import Swal from "sweetalert2";
+import { useAuthStore } from '@/stores/authStore'
+import Swal from 'sweetalert2'
 
 export default {
-  name: "SigninView",
-  components: { Vue3Select },
+  name: 'SignInView',
   data() {
     return {
-      form: { email: "", password: "",testing_type: [], },
+      form: { email: '', password: '', testing_type: [] },
       showPassword: false,
       loading: false,
-      authStore: useAuthStore(),
-    };
+      recaptchaWidgetId: null
+    }
   },
   methods: {
-    togglePassword() {
-      this.showPassword = !this.showPassword;
-    },
-    isValidEmail(email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
-    },
-    isPasswordFilled(password) {
-      return password && password.trim() !== "";
-    },
     async handleLogin() {
-      if (!this.isValidEmail(this.form.email)) {
-        Swal.fire("Error", "Please enter a valid email", "error");
-        return;
-      }
-      if (!this.isPasswordFilled(this.form.password)) {
-        Swal.fire("Error", "Please enter your password", "error");
-        return;
-      }
-
-      const recaptchaResponse = grecaptcha.getResponse();
+      const recaptchaResponse = window.grecaptcha?.getResponse(this.recaptchaWidgetId)
       if (!recaptchaResponse) {
-        Swal.fire("Error", "Please verify you are not a robot", "error");
-        return;
+        Swal.fire('Error', 'Please verify you are not a robot', 'warning')
+        return
       }
 
-      this.loading = true;
+      this.loading = true
       try {
-        const authStore = useAuthStore();
+        const authStore = useAuthStore()
         const result = await authStore.login({
           email: this.form.email,
           password: this.form.password,
           recaptcha: recaptchaResponse,
-        });
+        })
 
         if (result.status) {
-
-          console.log("✅ Access Token:", localStorage.getItem("authorization"));
-          console.log("✅ Refresh Token:", localStorage.getItem("refreshToken"));
-          console.log("✅ User:", localStorage.getItem("user"));
-          console.log("✅ Authenticated:", localStorage.getItem("authenticated"));
-
-          // Check if user has uploaded report and redirect accordingly
-          await this.checkAndRedirect();
-
+          await this.checkAndRedirect()
         } else {
-          Swal.fire("Error", result.message || "Login failed ❌", "error");
-          grecaptcha.reset();
+          Swal.fire('Error', result.message || 'Login failed', 'error')
+          window.grecaptcha?.reset(this.recaptchaWidgetId)
         }
       } catch (err) {
-        console.error("Login API error:", err);
-        Swal.fire("Error", "Login request failed. Please try again.", "error");
-        grecaptcha.reset();
+        Swal.fire('Error', 'Login request failed. Please try again.', 'error')
+        window.grecaptcha?.reset(this.recaptchaWidgetId)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
-    //  Google login 
-    initializeGoogleLogin() {
-      google.accounts.id.initialize({
-        client_id:
-          "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
-        callback: this.handleGoogleResponse,
-      });
 
-      // ✅ Optional: render Google Sign-In button
-      google.accounts.id.renderButton(
-        document.getElementById("googleButton"), 
-        { theme: "outline", size: "large", text: "signin_with" }
-      );
+    async handleGoogleResponse(response) {
+      try {
+        const authStore = useAuthStore()
+        const result = await authStore.googleLogin(response.credential)
+        if (!result.status) {
+          Swal.fire('Error', result.message || 'Google login failed', 'error')
+          return
+        }
+        await this.checkAndRedirect()
+      } catch (error) {
+        Swal.fire('Error', 'Something went wrong during Google login', 'error')
+      }
     },
-  //   async handleGoogleResponse(response) {
-  // try {
-  //   const id_token = response.credential;
-  //   console.log("🧠 Received Google ID Token:", id_token);
 
-  //   localStorage.setItem("google_id_token", id_token);
-
-  //   const authStore = useAuthStore();
-  //   const result = await authStore.googleLogin(id_token);
-
-  //   console.log("📦 Google login result:", result);
-  //   if (result.status) {
-  //     const { user, tokens } = result;
-  //     if (tokens?.access) localStorage.setItem("accessToken", tokens.access);
-  //     if (tokens?.refresh) localStorage.setItem("refreshToken", tokens.refresh);
-  //     if (user) localStorage.setItem("user", JSON.stringify(user));
-      
-  //     this.$router.push("/communication");
-  //   } else {
-  //     Swal.fire("Error", result.message || "Google login failed ❌", "error");
-  //   }
-  // } catch (error) {
-  //   console.error("Google login API error:", error);
-  //   Swal.fire("Error", "Something went wrong during Google login ❌", "error");
-  // }
-  //   },
-  async handleGoogleResponse(response) {
-  try {
-    const id_token = response.credential;
-    console.log("🧠 Google ID Token received");
-
-    const authStore = useAuthStore();
-    const result = await authStore.googleLogin(id_token);
-
-    if (!result.status) {
-      Swal.fire(
-        "Error",
-        result.message || "Google login failed ❌",
-        "error"
-      );
-      return;
-    }
-
-    // ✅ Auth is already set in store
-    // ✅ authenticated = true
-    // ✅ user saved
-    // ✅ tokens saved
-
-    // 🔁 Check if user has uploaded report and redirect accordingly
-    await this.checkAndRedirect();
-
-  } catch (error) {
-    console.error("Google login error:", error);
-    Swal.fire(
-      "Error",
-      "Something went wrong during Google login ❌",
-      "error"
-    );
-  }
-},
     async checkAndRedirect() {
-      const reportId = localStorage.getItem("reportId");
-      console.log("📍 reportId:", reportId);
-
+      const reportId = localStorage.getItem('reportId')
       if (!reportId) {
-        // No report uploaded yet
-        console.log("➡️ No reportId, redirecting to /communication");
-        this.$router.push("/communication");
-        return;
+        this.$router.push('/communication')
+        return
       }
-
-      // Check if report exists
-      const authStore = useAuthStore();
-      console.log("🔍 Checking if report exists...");
-      const res = await authStore.getUploadReportById(reportId);
-      console.log("📊 API response:", res);
-
+      const authStore = useAuthStore()
+      const res = await authStore.getUploadReportById(reportId)
       if (res.status && res.data?.upload_report) {
-        // Report exists, go to dashboard
-        console.log("✅ Report exists, redirecting to /admindashboardonboarding");
-        this.$router.push("/admindashboardonboarding");
-      } else if (res.isNotFound) {
-        // 404 - Report doesn't exist, go to location (expected for new users)
-        console.log("➡️ No report found (404), redirecting to /communication");
-        this.$router.push("/communication");
+        this.$router.push('/admindashboardonboarding')
       } else {
-        // Real error occurred, show error but still redirect to location
-        console.error("❌ Error checking report:", res.message);
-        Swal.fire("Error", res.message || "Failed to verify report status", "error");
-        this.$router.push("/communication");
+        this.$router.push('/communication')
       }
     }
   },
+
+  mounted() {
+    const googleScript = document.createElement('script')
+    googleScript.src = 'https://accounts.google.com/gsi/client'
+    googleScript.async = true
+    googleScript.defer = true
+    googleScript.onload = () => {
+      google.accounts.id.initialize({
+        client_id: '727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com',
+        callback: this.handleGoogleResponse,
+      })
+    }
+    document.head.appendChild(googleScript)
+
+    const recaptchaScript = document.createElement('script')
+    recaptchaScript.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
+    recaptchaScript.async = true
+    recaptchaScript.defer = true
+    recaptchaScript.onload = () => {
+      window.grecaptcha.ready(() => {
+        const el = document.getElementById('recaptcha-container')
+        if (!el) return
+        this.recaptchaWidgetId = window.grecaptcha.render(el, {
+          sitekey: '6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny',
+        })
+      })
+    }
+    document.head.appendChild(recaptchaScript)
+  },
+
   beforeUnmount() {
-  if (window.grecaptcha) {
     try {
-      window.grecaptcha.reset();
+      if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+        window.grecaptcha.reset(this.recaptchaWidgetId)
+      }
     } catch (e) {}
   }
-},
-mounted() {
-  const googleScript = document.createElement("script");
-  googleScript.src = "https://accounts.google.com/gsi/client";
-  googleScript.async = true;
-  googleScript.defer = true;
-
-  googleScript.onload = () => {
-    google.accounts.id.initialize({
-      client_id: "727499952932-0v6984jl4eg37ak60d4851vkbkf0itb7.apps.googleusercontent.com",
-      callback: this.handleGoogleResponse,
-    });
-
-    const btn = document.getElementById("googleButton");
-    if (btn) {
-      google.accounts.id.renderButton(btn, {
-        theme: "outline",
-        size: "large",
-        text: "signin_with",
-        shape: "rectangular",
-      });
-    }
-
-  };
-
-  document.head.appendChild(googleScript);
-
-  const recaptchaScript = document.createElement("script");
-  recaptchaScript.src = "https://www.google.com/recaptcha/api.js?render=explicit";
-  recaptchaScript.async = true;
-  recaptchaScript.defer = true;
-
-  recaptchaScript.onload = () => {
-  if (this.$route.name !== "signin") return;
-
-  const el = document.getElementById("recaptcha-container");
-  if (!el) return;
-
-  window.grecaptcha.render(el, {
-    sitekey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
-  });
-};
-
-  document.head.appendChild(recaptchaScript);
 }
-
-};
 </script>
 
-
 <style scoped>
-.position-relative input + i {
-  font-size: 1.2rem;
+.signin-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1a1040 50%, #0f2d47 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.signin-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.signin-logo {
+  height: 36px;
+}
+
+.signin-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.signin-sub {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.signin-input {
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+}
+
+.signin-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.password-eye {
+  position: absolute;
+  right: 14px;
+  top: 38px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.35);
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.password-eye:hover {
+  color: #4f46e5;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.signin-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.signin-btn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.signin-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.signup-link {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
 }
 </style>

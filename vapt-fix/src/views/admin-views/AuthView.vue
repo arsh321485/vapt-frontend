@@ -1176,6 +1176,15 @@ async handleSignin(recaptchaResponse) {
       this.switchRole('user');
     }
 
+    // Auto-select admin signin tab if ?mode=signin is in the URL (e.g. after scoping form)
+    if (this.$route.query.mode === 'signin') {
+      this.currentRole = 'admin';
+      this.currentMode = 'signin';
+      this.$nextTick(() => {
+        this.reinitializeRecaptcha();
+      });
+    }
+
     if (this.currentRole === "admin" && this.currentMode === "signin") {
       this.fetchPreviousTestingTypes();
     }

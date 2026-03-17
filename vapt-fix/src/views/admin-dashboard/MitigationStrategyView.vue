@@ -217,7 +217,10 @@
                   <h5 class="mb-3">Update Days — {{ riskModalSeverityLabel }}</h5>
                   <div class="mb-3">
                     <label class="form-label">Days</label>
-                    <input type="text" class="form-control" style="border-radius: 10px;" v-model="riskModalDays" placeholder="e.g. day 1, 3 days, 1 week">
+                    <select class="form-select" style="border-radius: 10px;" v-model="riskModalDays">
+                      <option value="" disabled>Select timeline</option>
+                      <option v-for="opt in timeOptions" :key="opt" :value="opt">{{ opt }}</option>
+                    </select>
                   </div>
                   <div class="mb-3">
                     <label class="form-label">Reason</label>
@@ -788,6 +791,10 @@ export default {
       riskModalSeverity: null,
       riskModalDays: null,
       riskModalReason: "",
+      timeOptions: [
+        "1 Day", "2 Days", "3 Days", "4 Days", "5 Days",
+        "6 Days", "1 Week", "2 Weeks", "3 Weeks", "4 Weeks", "5 Weeks",
+      ],
       tabs: [
         { key: "Patch Management", label: "Patch management", icon: "bi bi-shield-lock" },
         { key: "Configuration Management", label: "Configuration management", icon: "bi bi-wrench" },

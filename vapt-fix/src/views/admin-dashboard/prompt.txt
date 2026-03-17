@@ -1,1 +1,2 @@
-in user panel the if we first time land on any poage it take time to load and than if again copme to that page its gpoes to loading again b ut i domnt want that if first time ;load that not get loading again and again if logout and again comes only that time it will be loadin g again so again check complete admin and user dahsboard there view all pages and make iut proper 
+same like header you add signin add same like on /homer get started currently you gave 
+Already have an account?

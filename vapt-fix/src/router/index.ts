@@ -159,11 +159,13 @@ const router = createRouter({
     },
     {
       path: '/signup',
-      redirect: '/auth'
+      name: 'signup',
+      component: SignupView,
     },
     {
       path: '/signin',
-      redirect: '/auth'
+      name: 'signin',
+      component: SignInView,
     },
     {
       path: '/forgotpassword',

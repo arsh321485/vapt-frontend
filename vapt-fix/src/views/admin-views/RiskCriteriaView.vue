@@ -329,17 +329,21 @@ export default {
           return;
         }
 
-        if (res.status && res.data?.risk_criteria) {
-          const d = res.data.risk_criteria;
+        if (res.status) {
+          const d = res.data?.risk_criteria || res.data;
+
+          if (!d || (!d.critical && !d.high && !d.medium && !d.low)) return;
 
           this.form.critical = d.critical;
           this.form.high = d.high;
           this.form.medium = d.medium;
           this.form.low = d.low;
 
-          localStorage.setItem("riskId", d._id);
-          localStorage.setItem("riskCriteriaId", d._id);
-          localStorage.setItem("adminId", d.admin_id);
+          if (d._id) {
+            localStorage.setItem("riskId", d._id);
+            localStorage.setItem("riskCriteriaId", d._id);
+          }
+          if (d.admin_id) localStorage.setItem("adminId", d.admin_id);
 
           this.isLocked = !this.isEditMode;
         }

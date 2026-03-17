@@ -21,19 +21,29 @@
           </div> -->
           <!-- Replace your existing hero button block with this -->
 <div class="hero-div-btn">
-  <button type="button" class="btn hero-btn" @click="handleFixNow">
-    Get Started
-    <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
-  </button>
-  <!-- <button
-  type="button"
-  class="btn hero-btn"
-  @click.prevent.stop="handleFixNow"
->
-  Fix your vulnerabilities now
-  <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
-</button> -->
+  <div class="hero-cta-row d-flex align-items-center gap-3 flex-wrap">
+    <button type="button" class="btn hero-btn" @click="handleFixNow">
+      Get Started
+      <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
+    </button>
 
+    <!-- Sign In hover tooltip (same as header) -->
+    <div class="hero-signin-hover-wrap">
+      <button class="hero-signin-trigger">
+        <i class="bi bi-person me-1"></i> Sign In
+        <i class="bi bi-chevron-down ms-1 hero-signin-chevron"></i>
+      </button>
+      <div class="hero-signin-tooltip">
+        <div class="hero-signin-tooltip-arrow"></div>
+        <p class="hero-signin-tooltip-label">Already have an account?</p>
+        <p class="hero-signin-tooltip-sub">Sign in to your VaptFix dashboard and continue where you left off.</p>
+        <router-link to="/auth?mode=signin" class="hero-signin-tooltip-btn">
+          Sign In to Dashboard
+          <i class="bi bi-arrow-right ms-2"></i>
+        </router-link>
+      </div>
+    </div>
+  </div>
 </div>
 
         </div>
@@ -394,10 +404,122 @@ methods: {
   //   }
   // }
   handleFixNow() {
-    this.$router.push("/auth");
+    this.$router.push("/signup");
   }
 }
 
 };
 </script>
 
+<style scoped>
+.hero-cta-row {
+  margin-top: 8px;
+}
+
+/* ── Hero Sign In hover wrap ── */
+.hero-signin-hover-wrap {
+  position: relative;
+}
+
+.hero-signin-trigger {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.hero-signin-trigger:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+}
+
+.hero-signin-chevron {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.hero-signin-hover-wrap:hover .hero-signin-chevron {
+  transform: rotate(180deg);
+}
+
+/* Tooltip card */
+.hero-signin-tooltip {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  width: 260px;
+  background: #1e1b4b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 2000;
+}
+
+.hero-signin-tooltip-arrow {
+  position: absolute;
+  top: -7px;
+  left: 22px;
+  width: 13px;
+  height: 13px;
+  background: #1e1b4b;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+.hero-signin-hover-wrap:hover .hero-signin-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.hero-signin-tooltip-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.hero-signin-tooltip-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.hero-signin-tooltip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, #5A44FF, #7c3aed);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 14px rgba(90, 68, 255, 0.4);
+}
+
+.hero-signin-tooltip-btn:hover {
+  opacity: 0.88;
+  color: #ffffff;
+}
+</style>
