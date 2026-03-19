@@ -402,7 +402,7 @@
                 </div>
                 <div class="mt-3">
                   <label class="sf-field-label">Additional Notes</label>
-                  <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. Include thick client application testing, IoT firmware analysis..."></textarea>
+                  <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. Include thick client application testing, IoT firmware analysis..." v-model="assessmentNotes"></textarea>
                 </div>
               </div>
 
@@ -450,7 +450,7 @@
                 </div>
                 <div class="mt-3">
                   <label class="sf-field-label">Additional Standards / Notes</label>
-                  <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. CIS Benchmarks v8, RBI Cybersecurity Framework..."></textarea>
+                  <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. CIS Benchmarks v8, RBI Cybersecurity Framework..." v-model="complianceNotes"></textarea>
                 </div>
               </div>
 
@@ -495,11 +495,25 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import Swal from 'sweetalert2'
 
+const router = useRouter()
+
+function getUserCacheKey(base: string): string {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    const id = user?.id || user?.email || ''
+    return id ? `${base}_${id}` : base
+  } catch {
+    return base
+  }
+}
+
 const activeSection = ref(0)
 const submitted = ref(false)
+const pollIntervalRef = ref<ReturnType<typeof setInterval> | null>(null)
 
 const submitLoading = ref(false)
 
@@ -557,6 +571,23 @@ async function handleSubmit() {
       return
     }
   }
+
+  // Cache methodology state locally — fallback if GET endpoint returns 404 on return visit
+  try {
+    localStorage.setItem(getUserCacheKey('scopingMethodology'), JSON.stringify({
+      multipleTestingEnabled: multipleTestingEnabled.value,
+      selectedKnowledge: selectedKnowledge.value,
+      selectedKnowledgeMultiple: selectedKnowledgeMultiple.value,
+      klSettings: klSettings.value,
+      selectedCats: selectedCats.value,
+      selectedPerspective: selectedPerspective.value,
+      selectedEnv: selectedEnv.value,
+      selectedStds: selectedStds.value,
+      assessmentNotes: assessmentNotes.value,
+      complianceNotes: complianceNotes.value,
+    }))
+  } catch (_) {}
+
   const submitResult = await authStore.submitScopingForm()
   submitLoading.value = false
 
@@ -568,11 +599,26 @@ async function handleSubmit() {
   submitted.value = true
 
   // Poll upload status every 5s; redirect when file is uploaded
-  const pollInterval = setInterval(async () => {
-    const res = await authStore.getScopingUploadStatus()
-    if (res.file_uploaded) {
-      clearInterval(pollInterval)
-      window.location.href = 'https://vapt-frontend-liart.vercel.app/auth?mode=signin'
+  let pollCount = 0
+  const maxPolls = 120 // 10 minutes max
+  pollIntervalRef.value = setInterval(async () => {
+    pollCount++
+    if (pollCount > maxPolls) {
+      clearInterval(pollIntervalRef.value)
+      pollIntervalRef.value = null
+      Swal.fire('Error', 'Upload timed out. Please try again.', 'error')
+      submitted.value = false
+      return
+    }
+    try {
+      const res = await authStore.getScopingUploadStatus()
+      if (res.file_uploaded) {
+        clearInterval(pollIntervalRef.value)
+        pollIntervalRef.value = null
+        router.push('/signin')
+      }
+    } catch {
+      // ignore transient network errors during polling
     }
   }, 5000)
 }
@@ -795,8 +841,8 @@ async function handleSectionContinue() {
       Swal.fire('Error', result.message || 'Failed to save project details.', 'error')
       return
     }
-    // Cache locally so refresh pre-fills even if GET endpoint is unavailable
-    localStorage.setItem('projectDetails', JSON.stringify(projectDetails.value))
+    // Cache locally so refresh pre-fills even if GET endpoint is unavailable (user-specific)
+    localStorage.setItem(getUserCacheKey('projectDetails'), JSON.stringify(projectDetails.value))
     projectDetailsSaved.value = true
   }
   activeSection.value++
@@ -812,6 +858,13 @@ function parseListString(val: string | string[] | undefined): string[] {
     return []
   }
 }
+
+onBeforeUnmount(() => {
+  if (pollIntervalRef.value) {
+    clearInterval(pollIntervalRef.value)
+    pollIntervalRef.value = null
+  }
+})
 
 onMounted(async () => {
   const authStore = useAuthStore()
@@ -838,13 +891,13 @@ onMounted(async () => {
     }
     projectDetailsSaved.value = true
   } else {
-    const cached = localStorage.getItem('projectDetails')
-    if (cached) {
-      try {
+    try {
+      const cached = localStorage.getItem(getUserCacheKey('projectDetails'))
+      if (cached) {
         projectDetails.value = JSON.parse(cached)
         projectDetailsSaved.value = true
-      } catch (_) {}
-    }
+      }
+    } catch (_) {}
   }
 
   // GET returns an array of records (one per testing_type)
@@ -891,6 +944,24 @@ onMounted(async () => {
     const first = records[0]
     assessmentNotes.value = first.assessment_notes || ''
     complianceNotes.value = first.compliance_notes || ''
+  } else {
+    // GET returned 404 or no data — restore from localStorage cache (user-specific)
+    try {
+      const cached = localStorage.getItem(getUserCacheKey('scopingMethodology'))
+      if (cached) {
+        const m = JSON.parse(cached)
+        multipleTestingEnabled.value = m.multipleTestingEnabled ?? false
+        selectedKnowledge.value = m.selectedKnowledge ?? 'grey'
+        selectedKnowledgeMultiple.value = m.selectedKnowledgeMultiple ?? []
+        if (m.klSettings) klSettings.value = m.klSettings
+        selectedCats.value = m.selectedCats ?? []
+        selectedPerspective.value = m.selectedPerspective ?? 'External'
+        selectedEnv.value = m.selectedEnv ?? 'Staging'
+        selectedStds.value = m.selectedStds ?? []
+        assessmentNotes.value = m.assessmentNotes ?? ''
+        complianceNotes.value = m.complianceNotes ?? ''
+      }
+    } catch (_) {}
   }
 })
 </script>

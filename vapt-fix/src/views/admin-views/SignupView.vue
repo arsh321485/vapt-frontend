@@ -216,12 +216,15 @@ export default {
         })
 
         if (result.status) {
+          this.form = { email: '', password: '', confirm_password: '' }
           this.$router.push('/scoping-form-2')
         } else {
           Swal.fire('Error', result.message || 'Invalid OTP. Please try again.', 'error')
+          this.resetRecaptcha()
         }
       } catch (error) {
         Swal.fire('Error', error.message || 'Something went wrong', 'error')
+        this.resetRecaptcha()
       } finally {
         this.loading = false
       }
@@ -284,6 +287,8 @@ export default {
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('authenticated')
     localStorage.removeItem('user')
+    localStorage.removeItem('projectDetails')
+    localStorage.removeItem('scopingMethodology')
 
     const script = document.createElement('script')
     script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
@@ -303,6 +308,9 @@ export default {
           }
         })
       })
+    }
+    script.onerror = () => {
+      console.error('Failed to load reCAPTCHA script')
     }
     document.head.appendChild(script)
   },

@@ -74,7 +74,7 @@ export default {
   name: 'SignInView',
   data() {
     return {
-      form: { email: '', password: '', testing_type: [] },
+      form: { email: '', password: '' },
       showPassword: false,
       loading: false,
       recaptchaWidgetId: null
@@ -101,10 +101,12 @@ export default {
           await this.checkAndRedirect()
         } else {
           Swal.fire('Error', result.message || 'Login failed', 'error')
+          this.form.password = ''
           window.grecaptcha?.reset(this.recaptchaWidgetId)
         }
       } catch (err) {
         Swal.fire('Error', 'Login request failed. Please try again.', 'error')
+        this.form.password = ''
         window.grecaptcha?.reset(this.recaptchaWidgetId)
       } finally {
         this.loading = false
@@ -141,6 +143,9 @@ export default {
         callback: this.handleGoogleResponse,
       })
     }
+    googleScript.onerror = () => {
+      console.error('Failed to load Google Sign-In script')
+    }
     document.head.appendChild(googleScript)
 
     const recaptchaScript = document.createElement('script')
@@ -155,6 +160,9 @@ export default {
           sitekey: '6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny',
         })
       })
+    }
+    recaptchaScript.onerror = () => {
+      console.error('Failed to load reCAPTCHA script')
     }
     document.head.appendChild(recaptchaScript)
   },

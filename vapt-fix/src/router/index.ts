@@ -55,6 +55,7 @@ import PerformanceMonitoringView from '../views/admin-dashboard/PerformanceMonit
 import ViewReportPage from '../views/admin-dashboard/ViewReportPage.vue'
 import ScopingFormView from '../views/admin-dashboard/ScopingFormView.vue'
 import ScopingFormView2 from '../views/admin-dashboard/ScopingFormView2.vue'
+import UserSetPasswordView from '../views/user-views/UserSetPasswordView.vue'
 
 
 const router = createRouter({
@@ -269,6 +270,11 @@ const router = createRouter({
       path: '/set-password/:uidb64/:token',
       name: 'set-password',
       component: ResetPasswordView
+    },
+    {
+      path: '/user-set-password/:uidb64/:token',
+      name: 'user-set-password',
+      component: UserSetPasswordView,
     },
     {
       path: '/reset-password/:uidb64/:token',

@@ -1,0 +1,1 @@
+once chek the api of auth?mode=set-password , /auth?mode=signin , forgot-password check all these is the integration corre3ctv or not 

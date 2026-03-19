@@ -378,25 +378,29 @@ export const useAuthStore = defineStore("auth", {
 
   // ✅ Google login
   async googleLogin(id_token: string) {
-  const res = await endpoint.post("/api/admin/users/google-oauth/", { id_token });
-  const data = res.data;
+    try {
+      const res = await endpoint.post("/api/admin/users/google-oauth/", { id_token });
+      const data = res.data;
 
-  if (!data?.tokens?.access || !data?.user) {
-    return { status: false, message: "Google login failed" };
-  }
+      if (!data?.tokens?.access || !data?.user) {
+        return { status: false, message: "Google login failed" };
+      }
 
-  this.setAuth(data.tokens.access, data.user);
-  localStorage.setItem("refreshToken", data.tokens.refresh);
+      this.setAuth(data.tokens.access, data.user);
+      localStorage.setItem("refreshToken", data.tokens.refresh);
 
-  // ✅ TRUST BACKEND (THIS IS THE FIX)
-  localStorage.setItem(
-    "isNewUser",
-    data.is_new_user === true ? "true" : "false"
-  );
+      localStorage.setItem(
+        "isNewUser",
+        data.is_new_user === true ? "true" : "false"
+      );
 
-  console.log("Google login → isNewUser =", localStorage.getItem("isNewUser"));
-
-  return { status: true, user: data.user, tokens: data.tokens };
+      return { status: true, user: data.user, tokens: data.tokens };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.message || error.message || "Google login failed",
+      };
+    }
   },
 
   // ✅ Forgot Password
@@ -411,6 +415,20 @@ export const useAuthStore = defineStore("auth", {
           details: error.response?.data || null,
         };
       }
+  },
+
+  // 🔹 USER FORGOT PASSWORD
+  async userForgotPassword(payload: { email: string }) {
+    try {
+      const res = await endpoint.post("/api/admin/users/user-forgot-password/", payload);
+      return { status: true, data: res.data, message: res.data?.msg || res.data?.message };
+    } catch (error: any) {
+      return {
+        status: false,
+        message: error.response?.data?.msg || error.response?.data?.message || error.message || "Request failed",
+        details: error.response?.data || null,
+      };
+    }
   },
 
   // ✅ Reset Password
@@ -2057,7 +2075,7 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER LOGIN
-    async userLogin(payload: { email: string; recaptcha: string }) {
+    async userLogin(payload: { email: string; password: string; recaptcha: string }) {
       try {
         localStorage.removeItem("authorization");
         const res = await endpoint.post("/api/admin/users/user-login/", payload);
@@ -2074,6 +2092,39 @@ export const useAuthStore = defineStore("auth", {
           error.response?.data?.message ||
           error.response?.data?.detail ||
           "Login failed";
+        return { status: false, message: msg, details: error.response?.data || null };
+      }
+    },
+
+    // 🔹 USER SET PASSWORD (no token)
+    async userSetPassword(payload: { password: string; confirm_password: string }) {
+      try {
+        const res = await endpoint.post("/api/admin/users/user-set-password/", payload);
+        return { status: true, data: res.data, message: res.data?.message };
+      } catch (error: any) {
+        const msg =
+          error.response?.data?.message ||
+          error.response?.data?.detail ||
+          "Failed to set password";
+        return { status: false, message: msg, details: error.response?.data || null };
+      }
+    },
+
+    // 🔹 USER SET PASSWORD WITH TOKEN (from email link)
+    async userSetPasswordWithToken(payload: { uidb64: string; token: string; password: string; confirm_password: string }) {
+      try {
+        const { uidb64, token, password, confirm_password } = payload;
+        const res = await endpoint.post(`/api/admin/users/user-set-password/${uidb64}/${token}/`, {
+          password,
+          confirm_password,
+        });
+        return { status: true, data: res.data, message: res.data?.message || res.data?.msg };
+      } catch (error: any) {
+        const msg =
+          error.response?.data?.message ||
+          error.response?.data?.msg ||
+          error.response?.data?.detail ||
+          "Failed to set password";
         return { status: false, message: msg, details: error.response?.data || null };
       }
     },
