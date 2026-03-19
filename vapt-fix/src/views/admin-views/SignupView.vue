@@ -19,13 +19,15 @@
             v-for="(digit, index) in 6"
             :key="index"
             type="text"
+            inputmode="numeric"
             class="form-control otp-box text-center"
             maxlength="1"
-            v-model="otpDigits[index]"
+            :value="otpDigits[index]"
             @input="handleOtpInput($event, index)"
             @keydown="handleOtpKeydown($event, index)"
+            @paste="handleOtpPaste($event, index)"
             :ref="el => otpRefs[index] = el"
-            autocomplete="off"
+            autocomplete="one-time-code"
           />
         </div>
 
@@ -55,10 +57,15 @@
           <div class="mb-3">
             <label class="form-label">Email address</label>
             <input
-              type="email"
+              type="text"
+              inputmode="email"
+              name="new-signup-email-x7k"
               class="form-control signup-input"
               v-model="form.email"
               placeholder="Enter your email"
+              autocomplete="new-password"
+              readonly
+              @focus="$event.target.removeAttribute('readonly')"
               required
             />
           </div>
@@ -71,6 +78,9 @@
               class="form-control signup-input"
               v-model="form.password"
               placeholder="Create a password"
+              autocomplete="new-password"
+              readonly
+              @focus="$event.target.removeAttribute('readonly')"
               required
             />
             <i
@@ -88,6 +98,9 @@
               class="form-control signup-input"
               v-model="form.confirm_password"
               placeholder="Re-enter your password"
+              autocomplete="new-password"
+              readonly
+              @focus="$event.target.removeAttribute('readonly')"
               required
             />
             <i
@@ -106,9 +119,14 @@
             :disabled="loading || !recaptchaToken"
           >
             <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-            Sign Up
+            Send OTP
           </button>
         </form>
+
+        <p class="text-center mt-3 small">
+          Already have an account?
+          <router-link to="/signin" class="signin-link">Sign In</router-link>
+        </p>
 
       </div>
 
@@ -133,11 +151,15 @@ export default {
       showCPwd: false,
       loading: false,
       otpSent: false,
-      otp: '',
       otpDigits: ['', '', '', '', '', ''],
       otpRefs: [],
       recaptchaToken: '',
       recaptchaWidgetId: null
+    }
+  },
+  computed: {
+    otp() {
+      return this.otpDigits.join('')
     }
   },
   methods: {
@@ -163,7 +185,6 @@ export default {
 
         if (result.status) {
           this.otpSent = true
-          this.otp = ''
           this.otpDigits = ['', '', '', '', '', '']
           this.$nextTick(() => {
             if (this.otpRefs[0]) this.otpRefs[0].focus()
@@ -208,8 +229,7 @@ export default {
 
     handleOtpInput(event, index) {
       const value = event.target.value.replace(/\D/g, '')
-      this.otpDigits[index] = value ? value[0] : ''
-      this.otp = this.otpDigits.join('')
+      this.otpDigits.splice(index, 1, value ? value[0] : '')
 
       if (value && index < 5) {
         this.$nextTick(() => {
@@ -221,13 +241,32 @@ export default {
     handleOtpKeydown(event, index) {
       if (event.key === 'Backspace') {
         if (!this.otpDigits[index] && index > 0) {
-          this.otpDigits[index - 1] = ''
-          this.otp = this.otpDigits.join('')
+          this.otpDigits.splice(index - 1, 1, '')
           this.$nextTick(() => {
             if (this.otpRefs[index - 1]) this.otpRefs[index - 1].focus()
           })
         }
       }
+    },
+
+    handleOtpPaste(event, index) {
+      event.preventDefault()
+      const pasted = (event.clipboardData || window.clipboardData)
+        .getData('text')
+        .replace(/\D/g, '')
+        .slice(0, 6)
+      if (!pasted) return
+
+      const newDigits = [...this.otpDigits]
+      for (let i = 0; i < pasted.length; i++) {
+        if (index + i < 6) newDigits[index + i] = pasted[i]
+      }
+      this.otpDigits.splice(0, 6, ...newDigits)
+
+      const nextFocus = Math.min(index + pasted.length, 5)
+      this.$nextTick(() => {
+        if (this.otpRefs[nextFocus]) this.otpRefs[nextFocus].focus()
+      })
     },
 
     resetRecaptcha() {
@@ -239,6 +278,13 @@ export default {
   },
 
   mounted() {
+    // Clear any stale auth token so it doesn't get sent with signup/OTP requests
+    // A leftover expired token would cause the interceptor to catch a 401 and redirect to /signin
+    localStorage.removeItem('authorization')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('authenticated')
+    localStorage.removeItem('user')
+
     const script = document.createElement('script')
     script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
     script.async = true

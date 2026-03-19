@@ -186,6 +186,117 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+  // ✅ Get Project Details
+  async getProjectDetails() {
+    try {
+      const res = await endpoint.get("/api/admin/scoping/project-details/");
+      return { status: true, data: res.data.data };
+    } catch (error: any) {
+      // 404 = no project details saved yet (new user) — not an error
+      if (error.response?.status === 404) {
+        return { status: false, data: null };
+      }
+      const errorData = error.response?.data;
+      return { status: false, data: null, message: errorData?.message || errorData?.detail || "Failed to fetch project details" };
+    }
+  },
+
+  // ✅ Get Testing Methodology
+  async getTestingMethodology() {
+    try {
+      const res = await endpoint.get("/api/admin/scoping/testing-methodology/");
+      return { status: true, data: res.data.data };
+    } catch (error: any) {
+      if (error.response?.status === 404) return { status: false, data: null };
+      const errorData = error.response?.data;
+      return { status: false, data: null, message: errorData?.message || "Failed to fetch testing methodology" };
+    }
+  },
+
+  // ✅ Check scoping upload status
+  async getScopingUploadStatus() {
+    try {
+      const res = await endpoint.get("/api/scoping/upload-status/");
+      return { status: true, file_uploaded: res.data.file_uploaded ?? false };
+    } catch (error: any) {
+      return { status: false, file_uploaded: false };
+    }
+  },
+
+  // ✅ Submit Scoping Form
+  async submitScopingForm() {
+    try {
+      const res = await endpoint.post("/api/admin/scoping/submit/");
+      return { status: true, message: res.data.message, already_submitted: res.data.already_submitted };
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      return { status: false, message: errorData?.message || errorData?.detail || "Failed to submit scoping form" };
+    }
+  },
+
+  // ✅ Get Single Testing Methodology by type
+  async getTestingMethodologyByType(testing_type: string) {
+    try {
+      const res = await endpoint.get("/api/admin/scoping/testing-methodology/", { params: { testing_type } });
+      return { status: true, data: res.data.data };
+    } catch (error: any) {
+      if (error.response?.status === 404) return { status: false, data: null };
+      const errorData = error.response?.data;
+      return { status: false, data: null, message: errorData?.message || "Failed to fetch testing methodology" };
+    }
+  },
+
+  // ✅ Save Testing Methodology (Scoping Form Step 2) — one call per testing_type
+  async saveTestingMethodology(payload: {
+    testing_type: string;
+    assessment_categories: string[];
+    assessment_notes?: string;
+    network_perspective: string;
+    environment: string;
+    compliance_standards: string[];
+    compliance_notes?: string;
+  }) {
+    try {
+      const res = await endpoint.post("/api/admin/scoping/testing-methodology/", payload);
+      return { status: true, data: res.data.data, message: res.data.message };
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "Failed to save testing methodology";
+      return { status: false, message: errorMessage };
+    }
+  },
+
+  // ✅ Save Project Details (Scoping Form Step 1)
+  async saveProjectDetails(payload: {
+    organization_name: string;
+    industry: string;
+    country: string;
+    full_name: string;
+    email_address: string;
+    phone_number?: string;
+  }) {
+    try {
+      const res = await endpoint.post("/api/admin/scoping/project-details/", payload);
+      return { status: true, data: res.data.data, message: res.data.message };
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "Failed to save project details";
+      return { status: false, message: errorMessage };
+    }
+  },
+
+  // ✅ Fetch Countries
+  async fetchCountries() {
+    try {
+      const res = await endpoint.get("/api/admin/location/countries/");
+      this.countries = res.data.countries || [];
+      return { status: true, data: this.countries };
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      return { status: false, message: errorData?.message || "Failed to fetch countries" };
+    }
+  },
+
   // ✅ Signup Step 2: Verify OTP
   async signupVerifyOtp(payload: { email: string; otp: string }) {
       try {
@@ -254,6 +365,7 @@ export const useAuthStore = defineStore("auth", {
         errorData?.message ||
         errorData?.error ||
         errorData?.detail ||
+        (Array.isArray(errorData?.non_field_errors) ? errorData.non_field_errors[0] : null) ||
         "Login failed";
 
       return {

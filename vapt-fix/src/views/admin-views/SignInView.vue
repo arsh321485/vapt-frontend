@@ -125,19 +125,8 @@ export default {
       }
     },
 
-    async checkAndRedirect() {
-      const reportId = localStorage.getItem('reportId')
-      if (!reportId) {
-        this.$router.push('/communication')
-        return
-      }
-      const authStore = useAuthStore()
-      const res = await authStore.getUploadReportById(reportId)
-      if (res.status && res.data?.upload_report) {
-        this.$router.push('/admindashboardonboarding')
-      } else {
-        this.$router.push('/communication')
-      }
+    checkAndRedirect() {
+      this.$router.push('/scoping-form-2')
     }
   },
 

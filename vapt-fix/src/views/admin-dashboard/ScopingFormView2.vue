@@ -17,8 +17,8 @@
           A confirmation has been sent to your email address
         </div>
         <p class="redirect-note mt-4 mb-0">
-          <i class="bi bi-arrow-right-circle me-1"></i>
-          Redirecting to Sign In in <strong>{{ countdown }}</strong> second{{ countdown !== 1 ? 's' : '' }}...
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Please wait, your account is being set up...
         </p>
       </div>
     </div>
@@ -65,11 +65,12 @@
                 v-for="(sec, i) in sections"
                 :key="i"
                 class="sf-step"
-                :class="{ active: activeSection === i, done: i < activeSection }"
-                @click="activeSection = i"
+                :class="{ active: activeSection === i, done: i < activeSection, locked: i > 0 && !projectDetailsSaved }"
+                @click="handleStepClick(i)"
               >
                 <div class="sf-step-circle">
                   <i v-if="i < activeSection" class="bi bi-check2"></i>
+                  <i v-else-if="i > 0 && !projectDetailsSaved" class="bi bi-lock-fill" style="font-size:11px;"></i>
                   <span v-else>{{ i + 1 }}</span>
                 </div>
                 <div class="sf-step-info">
@@ -116,25 +117,28 @@
               <div class="row g-3 mt-1">
                 <div class="col-md-6">
                   <label class="sf-field-label">Client / Organization <span class="text-danger">*</span></label>
-                  <input type="text" class="sf-input" placeholder="Organization full name" />
+                  <input type="text" class="sf-input" placeholder="Organization full name" v-model="projectDetails.organization_name" />
                 </div>
                 <div class="col-md-3">
                   <label class="sf-field-label">Industry <span class="text-danger">*</span></label>
-                  <select class="sf-input">
+                  <select class="sf-input" v-model="projectDetails.industry">
                     <option value="" disabled selected>Select industry</option>
-                    <option>Banking & Finance</option>
-                    <option>Healthcare</option>
-                    <option>E-Commerce</option>
-                    <option>Government</option>
-                    <option>Telecom</option>
-                    <option>Manufacturing</option>
-                    <option>Education</option>
-                    <option>Other</option>
+                    <option value="banking_finance">Banking & Finance</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="ecommerce">E-Commerce</option>
+                    <option value="government">Government</option>
+                    <option value="telecom">Telecom</option>
+                    <option value="manufacturing">Manufacturing</option>
+                    <option value="education">Education</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
                 <div class="col-md-3">
                   <label class="sf-field-label">Country</label>
-                  <input type="text" class="sf-input" placeholder="e.g. India" />
+                  <select class="sf-input" v-model="projectDetails.country">
+                    <option value="" disabled>Select a country</option>
+                    <option v-for="country in countries" :key="country" :value="country">{{ country }}</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -147,15 +151,15 @@
               <div class="row g-3 mt-1">
                 <div class="col-md-4">
                   <label class="sf-field-label">Full Name <span class="text-danger">*</span></label>
-                  <input type="text" class="sf-input" placeholder="Contact's full name" />
+                  <input type="text" class="sf-input" placeholder="Contact's full name" v-model="projectDetails.full_name" />
                 </div>
                 <div class="col-md-4">
                   <label class="sf-field-label">Email Address <span class="text-danger">*</span></label>
-                  <input type="email" class="sf-input" placeholder="email@company.com" />
+                  <input type="email" class="sf-input" placeholder="email@company.com" v-model="projectDetails.email_address" />
                 </div>
                 <div class="col-md-4">
                   <label class="sf-field-label">Phone Number <span class="sf-optional">(optional)</span></label>
-                  <input type="tel" class="sf-input" placeholder="+91 98765 43210" />
+                  <input type="tel" class="sf-input" placeholder="+91 98765 43210" v-model="projectDetails.phone_number" />
                 </div>
               </div>
             </div>
@@ -312,7 +316,7 @@
                   </div>
                   <div class="mt-3">
                     <label class="sf-field-label">Additional Notes</label>
-                    <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. Include thick client application testing, IoT firmware analysis..."></textarea>
+                    <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. Include thick client application testing, IoT firmware analysis..." v-model="assessmentNotes"></textarea>
                   </div>
                 </div>
 
@@ -363,7 +367,7 @@
                   </div>
                   <div class="mt-3">
                     <label class="sf-field-label">Additional Standards / Notes</label>
-                    <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. CIS Benchmarks v8, RBI Cybersecurity Framework..."></textarea>
+                    <textarea class="sf-textarea mt-1" rows="2" placeholder="e.g. CIS Benchmarks v8, RBI Cybersecurity Framework..." v-model="complianceNotes"></textarea>
                   </div>
                 </div>
 
@@ -466,16 +470,20 @@
             <button
               v-if="activeSection < sections.length - 1"
               class="btn sf-btn-next"
-              @click="activeSection++"
+              :disabled="sectionLoading"
+              @click="handleSectionContinue"
             >
+              <span v-if="sectionLoading" class="spinner-border spinner-border-sm me-2"></span>
               Continue <i class="bi bi-arrow-right ms-2"></i>
             </button>
             <button
               v-if="activeSection === sections.length - 1"
               class="btn sf-btn-next"
+              :disabled="submitLoading"
               @click="handleSubmit"
             >
-              <i class="bi bi-send-check me-2"></i> Submit Scoping Form
+              <span v-if="submitLoading" class="spinner-border spinner-border-sm me-2"></span>
+              Submit Form
             </button>
           </div>
 
@@ -487,21 +495,86 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+import Swal from 'sweetalert2'
 
 const activeSection = ref(0)
 const submitted = ref(false)
-const countdown = ref(5)
 
-function handleSubmit() {
-  submitted.value = true
-  countdown.value = 5
-  const interval = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      clearInterval(interval)
-      window.location.href = '/auth?mode=signin'
+const submitLoading = ref(false)
+
+// Value maps: UI → backend
+const knowledgeMap: Record<string, string> = { black: 'black_box', grey: 'grey_box', white: 'white_box' }
+const catMap: Record<string, string> = {
+  network: 'network', web: 'web_app', mobile: 'mobile_app', api: 'api',
+  cloud: 'cloud', social: 'social_eng', wireless: 'wireless', iot: 'iot_ot'
+}
+const stdMap: Record<string, string> = {
+  'OWASP': 'owasp', 'NIST': 'nist', 'ISO 27001': 'iso_27001',
+  'PCI-DSS': 'pci_dss', 'HIPAA': 'hipaa', 'SOC 2': 'soc2', 'GDPR': 'gdpr'
+}
+const perspMap: Record<string, string> = { 'Internal': 'internal', 'External': 'external', 'Both': 'both' }
+const envMap: Record<string, string>  = { 'Production': 'production', 'Staging': 'staging', 'Dev': 'dev' }
+
+async function handleSubmit() {
+  const authStore = useAuthStore()
+
+  // Build list of payloads — one per testing_type (API accepts one at a time)
+  const payloads: Array<Parameters<typeof authStore.saveTestingMethodology>[0]> = []
+
+  if (multipleTestingEnabled.value === true && selectedKnowledgeMultiple.value.length > 0) {
+    selectedKnowledgeMultiple.value.forEach(klv => {
+      const s = klSettings.value[klv]
+      if (!s) return
+      payloads.push({
+        testing_type: knowledgeMap[klv] ?? klv,
+        assessment_categories: s.selectedCats.map(c => catMap[c] ?? c),
+        assessment_notes: assessmentNotes.value || undefined,
+        network_perspective: perspMap[s.selectedPerspective] ?? 'external',
+        environment: envMap[s.selectedEnv] ?? 'staging',
+        compliance_standards: s.selectedStds.map(st => stdMap[st] ?? st),
+        compliance_notes: complianceNotes.value || undefined
+      })
+    })
+  } else {
+    payloads.push({
+      testing_type: knowledgeMap[selectedKnowledge.value] ?? selectedKnowledge.value,
+      assessment_categories: selectedCats.value.map(c => catMap[c] ?? c),
+      assessment_notes: assessmentNotes.value || undefined,
+      network_perspective: perspMap[selectedPerspective.value] ?? 'external',
+      environment: envMap[selectedEnv.value] ?? 'staging',
+      compliance_standards: selectedStds.value.map(s => stdMap[s] ?? s),
+      compliance_notes: complianceNotes.value || undefined
+    })
+  }
+
+  submitLoading.value = true
+  for (const payload of payloads) {
+    const result = await authStore.saveTestingMethodology(payload)
+    if (!result.status) {
+      submitLoading.value = false
+      Swal.fire('Error', result.message || 'Failed to save testing methodology.', 'error')
+      return
     }
-  }, 1000)
+  }
+  const submitResult = await authStore.submitScopingForm()
+  submitLoading.value = false
+
+  if (!submitResult.status) {
+    Swal.fire('Error', submitResult.message || 'Failed to submit scoping form.', 'error')
+    return
+  }
+
+  submitted.value = true
+
+  // Poll upload status every 5s; redirect when file is uploaded
+  const pollInterval = setInterval(async () => {
+    const res = await authStore.getScopingUploadStatus()
+    if (res.file_uploaded) {
+      clearInterval(pollInterval)
+      window.location.href = 'https://vapt-frontend-liart.vercel.app/auth?mode=signin'
+    }
+  }, 5000)
 }
 
 const sections = [
@@ -541,12 +614,36 @@ function initKlSettings(v: string) {
   }
 }
 
-function toggleMultiKnowledge(v: string) {
+async function toggleMultiKnowledge(v: string) {
   const i = selectedKnowledgeMultiple.value.indexOf(v)
   if (i === -1) {
     selectedKnowledgeMultiple.value.push(v)
     initKlSettings(v)
     activeKlTab.value = v
+
+    // Fetch saved data for this testing type and pre-fill the tab
+    const backendType = knowledgeMap[v] ?? v
+    const authStore = useAuthStore()
+    const res = await authStore.getTestingMethodologyByType(backendType)
+    if (res.status && res.data) {
+      const r = res.data
+      const revCat: Record<string, string> = {
+        network: 'network', web_app: 'web', mobile_app: 'mobile', api: 'api',
+        cloud: 'cloud', social_eng: 'social', wireless: 'wireless', iot_ot: 'iot'
+      }
+      const revStd: Record<string, string> = {
+        owasp: 'OWASP', nist: 'NIST', iso_27001: 'ISO 27001',
+        pci_dss: 'PCI-DSS', hipaa: 'HIPAA', soc2: 'SOC 2', gdpr: 'GDPR'
+      }
+      const revPersp: Record<string, string> = { internal: 'Internal', external: 'External', both: 'Both' }
+      const revEnv: Record<string, string>   = { production: 'Production', staging: 'Staging', dev: 'Dev' }
+      klSettings.value[v].selectedCats = parseListString(r.assessment_categories).map((c: string) => revCat[c] ?? c)
+      klSettings.value[v].selectedPerspective = revPersp[r.network_perspective] ?? 'External'
+      klSettings.value[v].selectedEnv = revEnv[r.environment] ?? 'Staging'
+      klSettings.value[v].selectedStds = parseListString(r.compliance_standards).map((s: string) => revStd[s] ?? s)
+      if (!assessmentNotes.value) assessmentNotes.value = r.assessment_notes || ''
+      if (!complianceNotes.value) complianceNotes.value = r.compliance_notes || ''
+    }
   } else {
     selectedKnowledgeMultiple.value.splice(i, 1)
     if (activeKlTab.value === v) {
@@ -612,6 +709,8 @@ const selectedPerspective = ref('External')
 const selectedEnv = ref('Staging')
 const standards = ['OWASP', 'NIST', 'ISO 27001', 'PCI-DSS', 'HIPAA', 'SOC 2', 'GDPR']
 const selectedStds = ref<string[]>(['OWASP', 'PCI-DSS'])
+const assessmentNotes = ref('')
+const complianceNotes = ref('')
 
 const scopeTabs = ['Network', 'Web & API', 'Mobile', 'Cloud']
 const activeScopeTab = ref('Web & API')
@@ -647,6 +746,153 @@ function toggleCloud(v: string) {
   const i = selectedCloud.value.indexOf(v)
   i === -1 ? selectedCloud.value.push(v) : selectedCloud.value.splice(i, 1)
 }
+
+const countries = ref<string[]>([])
+const sectionLoading = ref(false)
+const projectDetailsSaved = ref(false)
+
+function handleStepClick(i: number) {
+  if (i > 0 && !projectDetailsSaved.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Complete Project Details First',
+      text: 'Please fill and save the Project Details before proceeding.',
+      confirmButtonColor: '#4f46e5'
+    })
+    return
+  }
+  activeSection.value = i
+}
+
+const projectDetails = ref({
+  organization_name: '',
+  industry: '',
+  country: '',
+  full_name: '',
+  email_address: '',
+  phone_number: ''
+})
+
+async function handleSectionContinue() {
+  if (activeSection.value === 0) {
+    const { organization_name, industry, country, full_name, email_address } = projectDetails.value
+    if (!organization_name || !industry || !full_name || !email_address) {
+      Swal.fire('Missing Fields', 'Please fill all required fields before continuing.', 'warning')
+      return
+    }
+    sectionLoading.value = true
+    const authStore = useAuthStore()
+    const result = await authStore.saveProjectDetails({
+      organization_name,
+      industry,
+      country,
+      full_name,
+      email_address,
+      phone_number: projectDetails.value.phone_number || undefined
+    })
+    sectionLoading.value = false
+    if (!result.status) {
+      Swal.fire('Error', result.message || 'Failed to save project details.', 'error')
+      return
+    }
+    // Cache locally so refresh pre-fills even if GET endpoint is unavailable
+    localStorage.setItem('projectDetails', JSON.stringify(projectDetails.value))
+    projectDetailsSaved.value = true
+  }
+  activeSection.value++
+}
+
+// Parse Python-style list strings e.g. "['black_box', 'grey_box']" → ['black_box', 'grey_box']
+function parseListString(val: string | string[] | undefined): string[] {
+  if (!val) return []
+  if (Array.isArray(val)) return val
+  try {
+    return JSON.parse(val.replace(/'/g, '"'))
+  } catch {
+    return []
+  }
+}
+
+onMounted(async () => {
+  const authStore = useAuthStore()
+
+  const [countriesResult, detailsResult, methodologyResult] = await Promise.all([
+    authStore.fetchCountries(),
+    authStore.getProjectDetails(),
+    authStore.getTestingMethodology()
+  ])
+
+  if (countriesResult.status) {
+    countries.value = authStore.countries
+  }
+
+  if (detailsResult.status && detailsResult.data) {
+    const d = detailsResult.data
+    projectDetails.value = {
+      organization_name: d.organization_name || '',
+      industry: d.industry || '',
+      country: d.country || '',
+      full_name: d.full_name || '',
+      email_address: d.email_address || '',
+      phone_number: d.phone_number || ''
+    }
+    projectDetailsSaved.value = true
+  } else {
+    const cached = localStorage.getItem('projectDetails')
+    if (cached) {
+      try {
+        projectDetails.value = JSON.parse(cached)
+        projectDetailsSaved.value = true
+      } catch (_) {}
+    }
+  }
+
+  // GET returns an array of records (one per testing_type)
+  const records: any[] = Array.isArray(methodologyResult.data) ? methodologyResult.data : []
+  if (methodologyResult.status && records.length > 0) {
+    // Reverse maps: backend → UI
+    const revKnowledge: Record<string, string> = { black_box: 'black', grey_box: 'grey', white_box: 'white' }
+    const revCat: Record<string, string> = {
+      network: 'network', web_app: 'web', mobile_app: 'mobile', api: 'api',
+      cloud: 'cloud', social_eng: 'social', wireless: 'wireless', iot_ot: 'iot'
+    }
+    const revStd: Record<string, string> = {
+      owasp: 'OWASP', nist: 'NIST', iso_27001: 'ISO 27001',
+      pci_dss: 'PCI-DSS', hipaa: 'HIPAA', soc2: 'SOC 2', gdpr: 'GDPR'
+    }
+    const revPersp: Record<string, string> = { internal: 'Internal', external: 'External', both: 'Both' }
+    const revEnv: Record<string, string>   = { production: 'Production', staging: 'Staging', dev: 'Dev' }
+
+    // Each record has testing_type (singular); map all records to UI keys
+    const types = records.map(r => revKnowledge[r.testing_type] ?? r.testing_type).filter(Boolean)
+
+    if (types.length > 1) {
+      multipleTestingEnabled.value = true
+      selectedKnowledgeMultiple.value = types
+      records.forEach(r => {
+        const t = revKnowledge[r.testing_type] ?? r.testing_type
+        initKlSettings(t)
+        klSettings.value[t].selectedCats = parseListString(r.assessment_categories).map((v: string) => revCat[v] ?? v)
+        klSettings.value[t].selectedPerspective = revPersp[r.network_perspective] ?? 'External'
+        klSettings.value[t].selectedEnv = revEnv[r.environment] ?? 'Staging'
+        klSettings.value[t].selectedStds = parseListString(r.compliance_standards).map((v: string) => revStd[v] ?? v)
+      })
+      activeKlTab.value = types[0]
+    } else {
+      const r = records[0]
+      multipleTestingEnabled.value = false
+      selectedKnowledge.value = types[0] ?? 'grey'
+      selectedCats.value = parseListString(r.assessment_categories).map((v: string) => revCat[v] ?? v)
+      selectedPerspective.value = revPersp[r.network_perspective] ?? 'External'
+      selectedEnv.value = revEnv[r.environment] ?? 'Staging'
+      selectedStds.value = parseListString(r.compliance_standards).map((v: string) => revStd[v] ?? v)
+    }
+
+    const first = records[0]
+    assessmentNotes.value = first.assessment_notes || ''
+    complianceNotes.value = first.compliance_notes || ''
+  }
+})
 </script>
 
 <style scoped>
@@ -878,6 +1124,8 @@ function toggleCloud(v: string) {
 }
 .sf-step.active .sf-step-label { color: #4f46e5; }
 .sf-step.done .sf-step-label { color: #059669; }
+.sf-step.locked { opacity: 0.45; cursor: not-allowed; }
+.sf-step.locked .sf-step-circle { background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; }
 .sf-step-sub {
   font-size: 11px;
   color: #94a3b8;
