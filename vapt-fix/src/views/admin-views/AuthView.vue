@@ -255,7 +255,11 @@ export default {
         return false;
       }
 
-      if (window.grecaptcha && this.recaptchaWidgetId !== null) {
+      if (this.currentMode === 'signin') {
+        if (!window.grecaptcha || this.recaptchaWidgetId === null) {
+          Swal.fire('Error', 'Security check not loaded. Please wait a moment and try again.', 'error');
+          return false;
+        }
         const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
         if (!recaptchaResponse) {
           Swal.fire('Error', 'Please verify you are not a robot', 'error');
@@ -268,13 +272,10 @@ export default {
     async handleSubmit() {
       if (!this.validateForm()) return;
 
-      const recaptchaResponse = window.grecaptcha
-        ? window.grecaptcha.getResponse(this.recaptchaWidgetId)
-        : "";
-
       if (this.currentMode === 'set-password') {
         await this.handleSetPassword();
       } else {
+        const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
         await this.handleSignin(recaptchaResponse);
       }
     },
@@ -294,6 +295,7 @@ export default {
         });
 
         if (result.status) {
+          const emailFromResponse = result.data?.email || result.data?.user?.email || "";
           await Swal.fire({
             icon: 'success',
             title: 'Password Set!',
@@ -302,6 +304,11 @@ export default {
             showConfirmButton: false
           });
           this.switchMode('signin');
+          if (emailFromResponse) {
+            this.$nextTick(() => {
+              this.formData.email = emailFromResponse;
+            });
+          }
         } else {
           Swal.fire('Error', result.message || 'Failed to set password.', 'error');
         }
@@ -383,19 +390,21 @@ export default {
       document.head.appendChild(script);
     },
     initializeRecaptcha() {
-      if (!window.grecaptcha || !window.grecaptcha.render) return;
-      this.$nextTick(() => {
-        const container = document.getElementById(this.recaptchaContainerId);
-        if (!container) return;
-        container.innerHTML = '';
-        try {
-          this.recaptchaWidgetId = window.grecaptcha.render(container, {
-            sitekey: this.recaptchaSiteKey,
-            theme: "dark"
-          });
-        } catch (error) {
-          console.error('reCAPTCHA render error:', error);
-        }
+      if (!window.grecaptcha) return;
+      window.grecaptcha.ready(() => {
+        this.$nextTick(() => {
+          const container = document.getElementById(this.recaptchaContainerId);
+          if (!container) return;
+          container.innerHTML = '';
+          try {
+            this.recaptchaWidgetId = window.grecaptcha.render(container, {
+              sitekey: this.recaptchaSiteKey,
+              theme: "dark"
+            });
+          } catch (error) {
+            console.error('reCAPTCHA render error:', error);
+          }
+        });
       });
     },
     reinitializeRecaptcha() {

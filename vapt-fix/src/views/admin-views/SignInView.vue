@@ -127,7 +127,34 @@ export default {
       }
     },
 
-    checkAndRedirect() {
+    async checkAndRedirect() {
+      // Case 1: file was already uploaded in a previous session → go to /communication
+      if (localStorage.getItem('scoping_completed') === 'true') {
+        localStorage.removeItem('scoping_completed')
+        this.$router.push('/communication')
+        return
+      }
+
+      // Case 2: scoping form was submitted but user logged out before file was uploaded
+      if (localStorage.getItem('scoping_submitted') === 'true') {
+        try {
+          const authStore = useAuthStore()
+          const res = await authStore.getScopingUploadStatus()
+          if (!!res.file_uploaded) {
+            // File got uploaded while user was away → go directly to /communication
+            localStorage.removeItem('scoping_submitted')
+            this.$router.push('/communication')
+          } else {
+            // File not yet uploaded → go to scoping form waiting screen to resume polling
+            this.$router.push('/scoping-form-2')
+          }
+        } catch {
+          this.$router.push('/scoping-form-2')
+        }
+        return
+      }
+
+      // Default: new user → go to scoping form
       this.$router.push('/scoping-form-2')
     }
   },

@@ -3,7 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../components/admin-component/Login.vue'
 import HomeView from '../views/admin-views/HomeView.vue'
 import LocationView from '../views/admin-views/LocationView.vue'
-import UploadReportView from '../views/admin-views/UploadReportView.vue'
 import Dashboard1View from '../views/admin-dashboard/Dashboard1View.vue'
 import SignupView from '../views/admin-views/SignupView.vue'
 import SignInView from '../views/admin-views/SignInView.vue'
@@ -106,11 +105,6 @@ const router = createRouter({
       path: '/riskcriteria',
       name: 'riskcriteria',
       component: RiskCriteriaView,
-    },
-    {
-      path: '/uploadtarget',
-      name: 'uploadtarget',
-      component: UploadReportView,
     },
     // {
     //   path: '/uploadreport',

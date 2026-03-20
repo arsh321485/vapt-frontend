@@ -162,7 +162,7 @@
 
         <div class="cta">
           <button class="btn btn-primary" :disabled="loading" @click="submitRiskCriteria">
-            {{ loading ? "Saving..." : (isEditMode ? "Back to Previous Page →" : "Continue to Upload Target →") }}
+            {{ loading ? "Saving..." : (isEditMode ? "Back to Previous Page →" : "Continue to Dashboard →") }}
           </button>
         </div>
 
@@ -252,7 +252,7 @@ export default {
       // normal locked flow
       if (this.isLocked && !this.isEditMode) {
         auth.markStepCompleted(2);
-        this.$router.push("/uploadtarget");
+        this.$router.push("/admindashboardonboarding");
         return;
       }
 
@@ -296,7 +296,7 @@ export default {
             showConfirmButton: false,
           });
 
-          this.$router.push("/uploadtarget");
+          this.$router.push("/admindashboardonboarding");
         }
 
       } catch (err) {

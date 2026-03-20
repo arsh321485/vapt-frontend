@@ -26,10 +26,20 @@ endpoint.interceptors.request.use(
 );
 
 // ✅ Handle session expiry
+const AUTH_ENDPOINTS = [
+  "/api/admin/users/user-login/",
+  "/api/admin/users/user-set-password/",
+  "/api/admin/users/forgot-password/",
+  "/api/admin/users/reset-password/",
+];
+
 endpoint.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url || "";
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((ep) => requestUrl.includes(ep));
+
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       // Clear localStorage directly
       localStorage.removeItem("authorization");
       localStorage.removeItem("user");

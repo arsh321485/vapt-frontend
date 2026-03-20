@@ -597,10 +597,21 @@ async function handleSubmit() {
   }
 
   submitted.value = true
+  localStorage.setItem('scoping_submitted', 'true')
+  startPolling()
+}
 
-  // Poll upload status every 5s; redirect when file is uploaded
+function startPolling() {
+  // Stop any existing interval before starting a new one
+  if (pollIntervalRef.value) {
+    clearInterval(pollIntervalRef.value)
+    pollIntervalRef.value = null
+  }
+
+  const authStore = useAuthStore()
   let pollCount = 0
   const maxPolls = 120 // 10 minutes max
+
   pollIntervalRef.value = setInterval(async () => {
     pollCount++
     if (pollCount > maxPolls) {
@@ -610,15 +621,13 @@ async function handleSubmit() {
       submitted.value = false
       return
     }
-    try {
-      const res = await authStore.getScopingUploadStatus()
-      if (res.file_uploaded) {
-        clearInterval(pollIntervalRef.value ?? undefined)
-        pollIntervalRef.value = null
-        router.push('/signin')
-      }
-    } catch {
-      // ignore transient network errors during polling
+    const res = await authStore.getScopingUploadStatus()
+    if (!!res.file_uploaded) {
+      clearInterval(pollIntervalRef.value ?? undefined)
+      pollIntervalRef.value = null
+      localStorage.removeItem('scoping_submitted')
+      localStorage.setItem('scoping_completed', 'true')
+      router.push('/signin')
     }
   }, 5000)
 }
@@ -635,7 +644,7 @@ const scopeTabIcons: Record<string, string> = {
   'Cloud': 'bi bi-cloud',
 }
 
-const selectedKnowledge = ref('grey')
+const selectedKnowledge = ref('')
 const multipleTestingEnabled = ref<boolean | null>(null)
 const selectedKnowledgeMultiple = ref<string[]>([])
 const multiDropdownOpen = ref(false)
@@ -652,10 +661,10 @@ const klSettings = ref<Record<string, KlSettings>>({})
 function initKlSettings(v: string) {
   if (!klSettings.value[v]) {
     klSettings.value[v] = {
-      selectedCats: ['web', 'api'],
-      selectedPerspective: 'External',
-      selectedEnv: 'Staging',
-      selectedStds: ['OWASP', 'PCI-DSS']
+      selectedCats: [],
+      selectedPerspective: '',
+      selectedEnv: '',
+      selectedStds: []
     }
   }
 }
@@ -739,7 +748,7 @@ const knowledgeLevels = [
   }
 ]
 
-const selectedCats = ref<string[]>(['web', 'api'])
+const selectedCats = ref<string[]>([])
 const categories = [
   { value: 'network', label: 'Network', icon: 'bi bi-hdd-network', color: '#0284c7' },
   { value: 'web', label: 'Web App', icon: 'bi bi-globe', color: '#4f46e5' },
@@ -751,10 +760,10 @@ const categories = [
   { value: 'iot', label: 'IoT / OT', icon: 'bi bi-cpu', color: '#dc2626' }
 ]
 
-const selectedPerspective = ref('External')
-const selectedEnv = ref('Staging')
+const selectedPerspective = ref('')
+const selectedEnv = ref('')
 const standards = ['OWASP', 'NIST', 'ISO 27001', 'PCI-DSS', 'HIPAA', 'SOC 2', 'GDPR']
-const selectedStds = ref<string[]>(['OWASP', 'PCI-DSS'])
+const selectedStds = ref<string[]>([])
 const assessmentNotes = ref('')
 const complianceNotes = ref('')
 
@@ -926,18 +935,18 @@ onMounted(async () => {
         const t = revKnowledge[r.testing_type] ?? r.testing_type
         initKlSettings(t)
         klSettings.value[t].selectedCats = parseListString(r.assessment_categories).map((v: string) => revCat[v] ?? v)
-        klSettings.value[t].selectedPerspective = revPersp[r.network_perspective] ?? 'External'
-        klSettings.value[t].selectedEnv = revEnv[r.environment] ?? 'Staging'
+        klSettings.value[t].selectedPerspective = revPersp[r.network_perspective] ?? ''
+        klSettings.value[t].selectedEnv = revEnv[r.environment] ?? ''
         klSettings.value[t].selectedStds = parseListString(r.compliance_standards).map((v: string) => revStd[v] ?? v)
       })
       activeKlTab.value = types[0]
     } else {
       const r = records[0]
       multipleTestingEnabled.value = false
-      selectedKnowledge.value = types[0] ?? 'grey'
+      selectedKnowledge.value = types[0] ?? ''
       selectedCats.value = parseListString(r.assessment_categories).map((v: string) => revCat[v] ?? v)
-      selectedPerspective.value = revPersp[r.network_perspective] ?? 'External'
-      selectedEnv.value = revEnv[r.environment] ?? 'Staging'
+      selectedPerspective.value = revPersp[r.network_perspective] ?? ''
+      selectedEnv.value = revEnv[r.environment] ?? ''
       selectedStds.value = parseListString(r.compliance_standards).map((v: string) => revStd[v] ?? v)
     }
 
@@ -951,17 +960,23 @@ onMounted(async () => {
       if (cached) {
         const m = JSON.parse(cached)
         multipleTestingEnabled.value = m.multipleTestingEnabled ?? false
-        selectedKnowledge.value = m.selectedKnowledge ?? 'grey'
+        selectedKnowledge.value = m.selectedKnowledge ?? ''
         selectedKnowledgeMultiple.value = m.selectedKnowledgeMultiple ?? []
         if (m.klSettings) klSettings.value = m.klSettings
         selectedCats.value = m.selectedCats ?? []
-        selectedPerspective.value = m.selectedPerspective ?? 'External'
-        selectedEnv.value = m.selectedEnv ?? 'Staging'
+        selectedPerspective.value = m.selectedPerspective ?? ''
+        selectedEnv.value = m.selectedEnv ?? ''
         selectedStds.value = m.selectedStds ?? []
         assessmentNotes.value = m.assessmentNotes ?? ''
         complianceNotes.value = m.complianceNotes ?? ''
       }
     } catch (_) {}
+  }
+
+  // Resume waiting screen if user had submitted scoping form but closed/logged out before file was uploaded
+  if (localStorage.getItem('scoping_submitted') === 'true') {
+    submitted.value = true
+    startPolling()
   }
 })
 </script>

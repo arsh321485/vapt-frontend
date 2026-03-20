@@ -14,12 +14,12 @@
          </div>
 
          <!-- SCOPE - Always allowed -->
-         <div>
+         <!-- <div>
           <router-link to="/scope">
           <button class="btn border-0" :class="{ activeBtn: isActive('/scope') }"><i class="bi bi-bullseye nav-menu"></i>
           <p class="menu-heading">Scope</p></button>
           </router-link>
-         </div>
+         </div> -->
 
          <!-- TEAMS - Always allowed -->
          <div>

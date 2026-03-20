@@ -75,21 +75,6 @@
     >
       <div class="step-circle">2</div>
       <div class="step-label">Risk<br />Criteria</div>
-      <div class="step-line" :class="{ active: isLineActive(3), completed: isLineCompleted(2) }"></div>
-    </div>
-
-    <!-- STEP 3 -->
-    <div
-      class="step"
-      :class="{
-        active: isActive('/uploadtarget'),
-        completed: isCompleted(3),
-        disabled: !canNavigate(3)
-      }"
-      @click="handleStepClick('/uploadtarget', 3)"
-    >
-      <div class="step-circle">3</div>
-      <div class="step-label">Upload<br />Targets</div>
     </div>
 
   </div>
@@ -113,7 +98,6 @@ export default {
       const map = {
         "/communication": 1,
         "/riskcriteria": 2,
-        "/uploadtarget": 3,
       };
       return map[this.$route.path] || 1;
     }

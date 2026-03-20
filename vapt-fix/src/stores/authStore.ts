@@ -216,9 +216,11 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Check scoping upload status
   async getScopingUploadStatus() {
     try {
-      const res = await endpoint.get("/api/scoping/upload-status/");
-      return { status: true, file_uploaded: res.data.file_uploaded ?? false };
+      const res = await endpoint.get("/api/admin/scoping/upload-status/");
+      console.log("[upload-status] raw response:", JSON.stringify(res.data));
+      return { status: true, file_uploaded: !!res.data.file_uploaded };
     } catch (error: any) {
+      console.error("[upload-status] error:", error?.response?.status, error?.response?.data);
       return { status: false, file_uploaded: false };
     }
   },
@@ -1530,44 +1532,6 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // CREATE SCOPE (TEXT OR FILE)
-  async createScope(formData: FormData, testingType: string) {
-  try {
-    if (!testingType) {
-      throw new Error("Testing type is required");
-    }
-
-    // 🔥 add testing_type in body
-    formData.append("testing_type", testingType);
-
-    const res = await endpoint.post(
-      `/api/admin/scope/create/`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    return {
-      status: true,
-      data: res.data,
-    };
-
-  } catch (err) {
-    const error = err as AxiosError<any>;
-
-    return {
-      status: false,
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Create scope failed",
-      details: error.response?.data || null,
-    };
-  }
-  },
 
   // GET FULL SCOPE DATA BY PROJECT NAME
   async getFullScopeData(
