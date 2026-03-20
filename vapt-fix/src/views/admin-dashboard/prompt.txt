@@ -1,1 +1,2 @@
-once chek the api of auth?mode=set-password , /auth?mode=signin , forgot-password check all these is the integration corre3ctv or not 
+Quick check: Open https://vapt-frontend-liart.vercel.app/auth?mode=set-password&uid=test&token=test directly in your        browser. If it loads AuthView.vue correctly → the frontend is fine and the issue is 100% on the backend email template
+  side.        this link lands mw trp the old version so is the code is updated or not or what is the issue now
