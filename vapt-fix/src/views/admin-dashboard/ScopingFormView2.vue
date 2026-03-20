@@ -609,18 +609,8 @@ function startPolling() {
   }
 
   const authStore = useAuthStore()
-  let pollCount = 0
-  const maxPolls = 120 // 10 minutes max
 
   pollIntervalRef.value = setInterval(async () => {
-    pollCount++
-    if (pollCount > maxPolls) {
-      clearInterval(pollIntervalRef.value ?? undefined)
-      pollIntervalRef.value = null
-      Swal.fire('Error', 'Upload timed out. Please try again.', 'error')
-      submitted.value = false
-      return
-    }
     const res = await authStore.getScopingUploadStatus()
     if (!!res.file_uploaded) {
       clearInterval(pollIntervalRef.value ?? undefined)

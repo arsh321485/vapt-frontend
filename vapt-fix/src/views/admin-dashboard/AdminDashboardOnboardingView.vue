@@ -1018,6 +1018,41 @@ export default {
     // REPORT STATUS CHECK METHODS
     // ==========================================
 
+    loadDashboardData() {
+      this.loadMitigationByTeam();
+      this.loadVulnAssetCount();
+      this.loadRiskCriteria();
+      Promise.all([
+        this.authStore.fetchDashboardTotalAssets(),
+        this.authStore.fetchDashboardAvgScore(),
+        this.authStore.fetchDashboardVulnerabilities(),
+        this.authStore.fetchDashboardMitigationTimeline(),
+        this.authStore.fetchDashboardMeanTimeToRemediate(),
+        this.authStore.getDashboardVulnerabilitiesFixed().then(res => {
+          if (res.status) {
+            this.vulFixedTotal = res.data.total_fixed || 0;
+            this.vulFixedCritical = res.data.critical_fixed || 0;
+            this.vulFixedHigh = res.data.high_fixed || 0;
+            this.vulFixedMedium = res.data.medium_fixed || 0;
+            this.vulFixedLow = res.data.low_fixed || 0;
+          }
+        }),
+        this.authStore.getDashboardSupportRequests().then(res => {
+          if (res.status) {
+            this.supportTotal = res.data.total || 0;
+            this.supportPending = res.data.pending || 0;
+            this.supportClosed = res.data.closed || 0;
+          }
+        }),
+      ])
+        .then(() => {
+          console.log("✅ All dashboard APIs loaded");
+        })
+        .catch(err => {
+          console.error("❌ Dashboard API error", err);
+        });
+    },
+
     async checkReportStatus() {
       console.log("🔍 Checking report status...");
       const res = await this.authStore.getReportStatus();
@@ -1039,6 +1074,9 @@ export default {
           this.removeReportStatusOverlay();
           this.showReportAvailableAlert();
           this.reportStatusChecking = false;
+
+          // Load all dashboard data without requiring a page refresh
+          this.loadDashboardData();
 
         } else {
           // Report not uploaded yet - keep showing overlay
@@ -1212,38 +1250,7 @@ mounted() {
   // }
 
   // ✅ DASHBOARD APIs
-  this.loadMitigationByTeam();
-  this.loadVulnAssetCount();
-  this.loadRiskCriteria();
-  Promise.all([
-    this.authStore.fetchDashboardTotalAssets(),
-    this.authStore.fetchDashboardAvgScore(),
-    this.authStore.fetchDashboardVulnerabilities(),
-    this.authStore.fetchDashboardMitigationTimeline(),
-    this.authStore.fetchDashboardMeanTimeToRemediate(),
-    this.authStore.getDashboardVulnerabilitiesFixed().then(res => {
-      if (res.status) {
-        this.vulFixedTotal = res.data.total_fixed || 0;
-        this.vulFixedCritical = res.data.critical_fixed || 0;
-        this.vulFixedHigh = res.data.high_fixed || 0;
-        this.vulFixedMedium = res.data.medium_fixed || 0;
-        this.vulFixedLow = res.data.low_fixed || 0;
-      }
-    }),
-    this.authStore.getDashboardSupportRequests().then(res => {
-      if (res.status) {
-        this.supportTotal = res.data.total || 0;
-        this.supportPending = res.data.pending || 0;
-        this.supportClosed = res.data.closed || 0;
-      }
-    }),
-  ])
-    .then(() => {
-      console.log("✅ All dashboard APIs loaded");
-    })
-    .catch(err => {
-      console.error("❌ Dashboard API error", err);
-    });
+  this.loadDashboardData();
 },
 
 
