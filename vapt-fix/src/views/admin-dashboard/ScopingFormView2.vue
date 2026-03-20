@@ -513,7 +513,7 @@ function getUserCacheKey(base: string): string {
 
 const activeSection = ref(0)
 const submitted = ref(false)
-const pollIntervalRef = ref<ReturnType<typeof setInterval> | undefined>(undefined)
+const pollIntervalRef = ref<ReturnType<typeof setInterval> | null>(null)
 
 const submitLoading = ref(false)
 
@@ -604,8 +604,8 @@ async function handleSubmit() {
   pollIntervalRef.value = setInterval(async () => {
     pollCount++
     if (pollCount > maxPolls) {
-      clearInterval(pollIntervalRef.value)
-      pollIntervalRef.value = undefined
+      clearInterval(pollIntervalRef.value ?? undefined)
+      pollIntervalRef.value = null
       Swal.fire('Error', 'Upload timed out. Please try again.', 'error')
       submitted.value = false
       return
@@ -613,8 +613,8 @@ async function handleSubmit() {
     try {
       const res = await authStore.getScopingUploadStatus()
       if (res.file_uploaded) {
-        clearInterval(pollIntervalRef.value)
-        pollIntervalRef.value = undefined
+        clearInterval(pollIntervalRef.value ?? undefined)
+        pollIntervalRef.value = null
         router.push('/signin')
       }
     } catch {
@@ -862,7 +862,7 @@ function parseListString(val: string | string[] | undefined): string[] {
 onBeforeUnmount(() => {
   if (pollIntervalRef.value) {
     clearInterval(pollIntervalRef.value)
-    pollIntervalRef.value = undefined
+    pollIntervalRef.value = null
   }
 })
 

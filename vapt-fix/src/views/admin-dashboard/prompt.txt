@@ -1,16 +1,70 @@
-when i created dist file to check if any error bacuase code is not pushed properly so i see below error in dist file so solve this error 
-
-src/views/admin-dashboard/ScopingFormView2.vue:607:21 - error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number | undefined'.
-  Type 'null' is not assignable to type 'number | undefined'.
-
-607       clearInterval(pollIntervalRef.value)
-                        ~~~~~~~~~~~~~~~~~~~~~
-
-src/views/admin-dashboard/ScopingFormView2.vue:616:23 - error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number | undefined'.
-  Type 'null' is not assignable to type 'number | undefined'.
-
-616         clearInterval(pollIntervalRef.value)
-                          ~~~~~~~~~~~~~~~~~~~~~
+Simple Answer
+Backend mein kuch nahi badlna — email link already sahi hai:
 
 
-Found 2 errors.
+/auth?mode=set-password&uid={uid}&token={token}
+Sirf Frontend (Vue) mein fix karni hai.
+
+Frontend Developer ko yeh batao
+Problem: Jab URL mein uid aur token hote hain (email link), Vue component tabs hide kar deta hai aur sirf form dikhata hai.
+
+Fix — Auth.vue mein yeh 2 cheezein karni hain:
+
+1. Tabs hamesha show karo
+
+<!-- GALAT: tabs tab hide ho jate hain jab mode=set-password ho -->
+<div v-if="!isSetPasswordMode" class="tabs">...</div>
+
+<!-- SAHI: tabs hamesha dikhao -->
+<div class="tabs">
+  <button :class="{ active: activeTab === 'set-password' }">Set Password</button>
+  <button :class="{ active: activeTab === 'signin' }">Sign In</button>
+</div>
+2. URL params se tab select karo
+
+// mounted() ya onMounted() mein
+const params = new URLSearchParams(window.location.search);
+const mode = params.get('mode');      // 'set-password'
+const uid = params.get('uid');         // user id
+const token = params.get('token');     // reset token
+
+if (mode === 'set-password') {
+  this.activeTab = 'set-password';    // Set Password tab active
+  this.uid = uid;
+  this.token = token;
+}
+Summary Table
+Backend	Frontend (Vue)
+Problem	❌ Koi nahi	✅ Tabs hide ho rahi hain
+Fix needed	Kuch nahi	Auth.vue mein tabs hamesha show karo
+File	—	Auth.vue ya AuthPage.vue
+Frontend developer ko simply batao: "Jab mode=set-password URL mein ho, tabs hide mat karo — dono tabs dikhao aur Set Password wala auto-select karo."
+
+
+see this is my backedn friedn ask to claude on her code so as i m a frontedn engineer so updARTE C ODE OF MINE ACCORDIGNLY  
+
+
+
+Also cherck the set-password api is this integrate proper or not if not than intyrgrate it proper 
+
+USER SET PASSWORD
+(user-set-password/<uid>/<token>/)
+
+METHOD: PAST
+URL: http://127.0.0.1:8000/api/admin/users/user-set-password/MWE5ODk5M2QtZDFhYi00YTBjLThjMDYtYTczZDg0YzU5MWVl/d5otif-1a0069dd4fc666cdef4ab9955a60c4e7/
+
+
+BODY: 
+
+  {
+    "password": "Sona123@",
+    "confirm_password": "Sona123@"
+  }
+
+RESPONSE:
+
+{
+    "msg": "Your password has been set successfully. You can now log in."
+}
+
+

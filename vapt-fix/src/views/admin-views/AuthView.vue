@@ -12,8 +12,8 @@
           <div class="form-area text-white">
             <div class="form-wrapper w-75 pt-4">
 
-              <!-- SUB TABS (hidden when opened via email set-password link) -->
-              <div class="sub-tabs" v-if="!isSetPasswordLink">
+              <!-- SUB TABS -->
+              <div class="sub-tabs">
                 <div class="sub-tab" :class="{ active: currentMode === 'set-password' }" @click="switchMode('set-password')">
                   Set Password
                 </div>
