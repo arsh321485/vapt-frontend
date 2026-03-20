@@ -1,2 +1,16 @@
-Quick check: Open https://vapt-frontend-liart.vercel.app/auth?mode=set-password&uid=test&token=test directly in your        browser. If it loads AuthView.vue correctly → the frontend is fine and the issue is 100% on the backend email template
-  side.        this link lands mw trp the old version so is the code is updated or not or what is the issue now
+when i created dist file to check if any error bacuase code is not pushed properly so i see below error in dist file so solve this error 
+
+src/views/admin-dashboard/ScopingFormView2.vue:607:21 - error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+
+607       clearInterval(pollIntervalRef.value)
+                        ~~~~~~~~~~~~~~~~~~~~~
+
+src/views/admin-dashboard/ScopingFormView2.vue:616:23 - error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+
+616         clearInterval(pollIntervalRef.value)
+                          ~~~~~~~~~~~~~~~~~~~~~
+
+
+Found 2 errors.
