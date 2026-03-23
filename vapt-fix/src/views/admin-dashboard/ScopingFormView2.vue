@@ -566,9 +566,13 @@ async function handleSubmit() {
   for (const payload of payloads) {
     const result = await authStore.saveTestingMethodology(payload)
     if (!result.status) {
-      submitLoading.value = false
-      Swal.fire('Error', result.message || 'Failed to save testing methodology.', 'error')
-      return
+      const msg = result.message || ''
+      // If already submitted, treat as success and continue
+      if (!msg.toLowerCase().includes('already submitted')) {
+        submitLoading.value = false
+        Swal.fire('Error', msg || 'Failed to save testing methodology.', 'error')
+        return
+      }
     }
   }
 
@@ -837,12 +841,19 @@ async function handleSectionContinue() {
     })
     sectionLoading.value = false
     if (!result.status) {
-      Swal.fire('Error', result.message || 'Failed to save project details.', 'error')
-      return
+      const msg = result.message || ''
+      // If already submitted, treat as success and continue
+      if (msg.toLowerCase().includes('already submitted')) {
+        projectDetailsSaved.value = true
+      } else {
+        Swal.fire('Error', msg || 'Failed to save project details.', 'error')
+        return
+      }
+    } else {
+      // Cache locally so refresh pre-fills even if GET endpoint is unavailable (user-specific)
+      localStorage.setItem(getUserCacheKey('projectDetails'), JSON.stringify(projectDetails.value))
+      projectDetailsSaved.value = true
     }
-    // Cache locally so refresh pre-fills even if GET endpoint is unavailable (user-specific)
-    localStorage.setItem(getUserCacheKey('projectDetails'), JSON.stringify(projectDetails.value))
-    projectDetailsSaved.value = true
   }
   activeSection.value++
 }

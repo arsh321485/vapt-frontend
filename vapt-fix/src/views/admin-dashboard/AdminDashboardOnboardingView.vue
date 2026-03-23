@@ -1191,6 +1191,17 @@ export default {
         return;
       }
 
+      // ✅ STEP 1b: Check localStorage as fallback (reportId persisted from upload flow)
+      const cachedReportId = localStorage.getItem("reportId");
+      if (cachedReportId) {
+        console.log("✅ Report already confirmed from localStorage:", cachedReportId);
+        this.hasReport = true;
+        this.currentReportId = cachedReportId;
+        this.reportStatusChecking = false;
+        this.removeReportStatusOverlay();
+        return;
+      }
+
       // ✅ STEP 2: Show overlay IMMEDIATELY while checking
       this.reportStatusChecking = true;
       this.reportStatusMessage = "Checking report status...";
@@ -1208,17 +1219,12 @@ export default {
         this.removeReportStatusOverlay();
         // Don't show toast here - report was already available, not a new upload
       } else {
-        // No report yet - update overlay message and start polling
-        console.log("⏳ No report yet, starting polling...");
+        // API returned no report - remove overlay and load dashboard directly
+        console.log("⚠️ Report status API returned no report, proceeding to load dashboard.");
         this.hasReport = false;
-        this.reportStatusMessage = res.message || "No report uploaded yet. Please wait for Super Admin to upload a report.";
-        this.reportStatusChecking = true;
-
-        // Update overlay message (overlay already created above)
-        this.updateReportStatusMessage(this.reportStatusMessage);
-
-        // Start polling
-        this.startReportStatusPolling();
+        this.reportStatusChecking = false;
+        this.removeReportStatusOverlay();
+        this.loadDashboardData();
       }
     },
   },
