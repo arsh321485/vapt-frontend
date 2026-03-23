@@ -26,54 +26,54 @@
                         <div class="row mt-5">
                             <div v-if="loading" class="py-4 text-center text-muted">Loading...</div>
                             <template v-else>
-                            <h6 class="fw-semibold mb-3">
-                              <i class="bi bi-microsoft me-1"></i>
-                              Windows ({{ activeVulns.length }} assets)
-                            </h6>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
+                              <div v-if="groupedVulns.length === 0" class="py-4 text-center text-muted">
+                                No vulnerabilities found.
+                              </div>
+                              <div v-for="group in groupedVulns" :key="group.name" class="mb-5">
+                                <h6 class="fw-semibold mb-3">
+                                  {{ group.name }}
+                                  <span class="text-muted fw-normal ms-2" style="font-size:13px;">
+                                    ({{ group.rows.length }} {{ group.rows.length === 1 ? 'asset' : 'assets' }})
+                                  </span>
+                                </h6>
+                                <div class="table-responsive">
+                                  <table class="table table-hover align-middle">
                                     <thead class="table-light">
-                                        <tr>
-                                            <th scope="col">Vul. name</th>
-                                            <th scope="col">Asset</th>
-                                            <th scope="col">OS</th>
-                                            <th scope="col">Criticality</th>
-                                            <th scope="col">Status</th>
-                                            <th></th>
-                                        </tr>
+                                      <tr>
+                                        <th scope="col">Asset</th>
+                                        <th scope="col">OS</th>
+                                        <th scope="col">Criticality</th>
+                                        <th scope="col">Status</th>
+                                        <th></th>
+                                      </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
-                                        <tr v-if="activeVulns.length === 0">
-                                            <td colspan="6" class="text-center text-muted py-4">No vulnerabilities found.</td>
-                                        </tr>
-                                        <tr v-for="vuln in activeVulns" :key="vuln.id">
-                                            <td class="text-truncate" style="max-width: 200px;" :title="vuln.plugin_name">
-                                              {{ vuln.plugin_name }}
-                                            </td>
-                                            <td>{{ vuln.host_name }}</td>
-                                            <td :title="vuln.os" class="text-truncate" style="max-width: 150px;">{{ vuln.os || '-' }}</td>
-                                            <td :style="{ color: getSeverityColor(vuln.risk_factor), fontWeight: 600 }">{{ vuln.risk_factor }}</td>
-                                            <td>
-                                              <span :style="getStatusStyle(vuln.status)" class="badge rounded-pill px-3 py-2 fw-semibold text-white">
-                                                {{ vuln.status }}
-                                              </span>
-                                            </td>
-                                            <td>
-                                                <router-link :to="{
-                                                  name: 'VulFix',
-                                                  params: { reportId: reportId, asset: vuln.host_name },
-                                                  query: { id: vuln.id, plugin_name: vuln.plugin_name, risk_factor: vuln.risk_factor }
-                                                }">
-                                                  <button class="btn fixes-btn border-0">
-                                                    View
-                                                    <i class="bi bi-arrow-right-circle-fill"></i>
-                                                  </button>
-                                                </router-link>
-                                            </td>
-                                        </tr>
+                                      <tr v-for="vuln in group.rows" :key="vuln.id">
+                                        <td>{{ vuln.host_name }}</td>
+                                        <td :title="vuln.os" class="text-truncate" style="max-width: 150px;">{{ vuln.os || '-' }}</td>
+                                        <td :style="{ color: getSeverityColor(vuln.risk_factor), fontWeight: 600 }">{{ vuln.risk_factor }}</td>
+                                        <td>
+                                          <span :style="getStatusStyle(vuln.status)" class="badge rounded-pill px-3 py-2 fw-semibold text-white">
+                                            {{ vuln.status }}
+                                          </span>
+                                        </td>
+                                        <td>
+                                          <router-link :to="{
+                                            name: 'VulFix',
+                                            params: { reportId: reportId, asset: vuln.host_name },
+                                            query: { id: vuln.id, plugin_name: vuln.plugin_name, risk_factor: vuln.risk_factor }
+                                          }">
+                                            <button class="btn fixes-btn border-0">
+                                              View
+                                              <i class="bi bi-arrow-right-circle-fill"></i>
+                                            </button>
+                                          </router-link>
+                                        </td>
+                                      </tr>
                                     </tbody>
-                                </table>
-                            </div>
+                                  </table>
+                                </div>
+                              </div>
                             </template>
                         </div>
             </div>
@@ -142,6 +142,17 @@ export default {
       if (!this.mitigationData?.teams) return [];
       return this.mitigationData.teams[this.activeTeamKey]?.vulnerabilities || [];
     },
+    groupedVulns() {
+      const map = new Map();
+      for (const vuln of this.activeVulns) {
+        const key = (vuln.plugin_name || '').trim();
+        if (!map.has(key)) {
+          map.set(key, []);
+        }
+        map.get(key).push(vuln);
+      }
+      return Array.from(map.entries()).map(([name, rows]) => ({ name, rows }));
+    },
   },
   methods: {
     getSeverityColor(sev) {
@@ -158,8 +169,8 @@ export default {
     },
     async loadData() {
       const store = useAuthStore();
-      if (!store.cachedMitigationByTeam) this.loading = true;
-      const result = await store.fetchMitigationByTeam();
+      this.loading = true;
+      const result = await store.fetchMitigationByTeam(true);
       if (result.status) {
         this.mitigationData = result.data;
         this.reportId = result.data.report_id;

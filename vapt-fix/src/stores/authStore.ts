@@ -336,12 +336,15 @@ export const useAuthStore = defineStore("auth", {
   async login(payload: {
     email: string;
     password: string;
-    testing_type: string[];
     recaptcha: string;
+    testing_type?: string[];
   }) {
     try {
-      // Clear any stale token so it doesn't get attached to the login request
+      // Clear any stale token and cached report so it doesn't get attached to the login request
       localStorage.removeItem("authorization");
+      localStorage.removeItem("reportId");
+      this.reportStatus.reportId = null;
+      this.reportStatus.checked = false;
 
       const res = await endpoint.post(
         "/api/admin/users/login/",
@@ -390,6 +393,9 @@ export const useAuthStore = defineStore("auth", {
 
       this.setAuth(data.tokens.access, data.user);
       localStorage.setItem("refreshToken", data.tokens.refresh);
+      localStorage.removeItem("reportId");
+      this.reportStatus.reportId = null;
+      this.reportStatus.checked = false;
 
       localStorage.setItem(
         "isNewUser",
@@ -3015,7 +3021,7 @@ export const useAuthStore = defineStore("auth", {
   // DELETE Asset from report (UPDATED)
   async deleteAsset(assetIp: string) {
     try {
-      const reportId = localStorage.getItem("reportId");
+      const reportId = await this.resolveReportId();
 
       if (!reportId) {
         return {
@@ -3056,7 +3062,7 @@ export const useAuthStore = defineStore("auth", {
   // HOLD asset (UPDATED API)
   async holdAsset(assetIp: string) {
     try {
-      const reportId = localStorage.getItem("reportId");
+      const reportId = await this.resolveReportId();
 
       if (!reportId) {
         return {
@@ -3091,7 +3097,7 @@ export const useAuthStore = defineStore("auth", {
   // FETCH HELD ASSETS LIST (UPDATED)
   async fetchHeldAssets() {
     try {
-      const reportId = localStorage.getItem("reportId");
+      const reportId = await this.resolveReportId();
 
       if (!reportId) {
         return {
@@ -3126,7 +3132,7 @@ export const useAuthStore = defineStore("auth", {
   // UNHOLD asset (UPDATED – matches new API)
   async unholdAsset(assetIp: string) {
     try {
-      const reportId = localStorage.getItem("reportId");
+      const reportId = await this.resolveReportId();
 
       if (!reportId) {
         return {
@@ -3227,7 +3233,7 @@ export const useAuthStore = defineStore("auth", {
   // FETCH vulnerabilities for single asset (UPDATED)
   async fetchSingleAssetVulnerabilities(asset: string) {
     try {
-      const reportId = localStorage.getItem("reportId");
+      const reportId = await this.resolveReportId();
 
       if (!reportId) {
         return { status: false };
@@ -3378,6 +3384,17 @@ export const useAuthStore = defineStore("auth", {
     this.completedSteps = [];
     localStorage.removeItem('completedSteps');
     console.log('🔄 Completed steps reset');
+  },
+
+  // ✅ Resolve reportId — reads localStorage, falls back to store state,
+  // and auto-fetches from the API if still missing.
+  async resolveReportId(): Promise<string | null> {
+    let reportId: string | null = localStorage.getItem("reportId") || this.reportStatus.reportId;
+    if (!reportId) {
+      await this.getReportStatus();
+      reportId = localStorage.getItem("reportId") || this.reportStatus.reportId;
+    }
+    return reportId;
   },
 
   // ✅ GET Report Status (for dashboard - Super Admin upload check)

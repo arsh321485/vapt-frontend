@@ -1178,10 +1178,7 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
   async setActive(asset) {
       if (!asset?.asset) return;
       this.activeIndex = asset.asset;
-      this.authStore.fetchSingleAssetVulnerabilities(
-        
-        asset.asset
-      );
+      await this.authStore.fetchSingleAssetVulnerabilities(asset.asset);
       // 🔥 NEW: fetch support requests for this asset
   this.loadingSupportRequests = true;
   const res = await this.authStore.getSupportRequestsByHost(asset.asset);
@@ -1494,7 +1491,7 @@ if (res.status) {
   });
 },
   },
-  mounted() {
+  async mounted() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
 
@@ -1526,6 +1523,15 @@ if (res.status) {
     }
 
     console.log("🔥 AssetsView mounted");
+
+    // Ensure reportId is in localStorage before assets load and trigger setActive.
+    // Without this, navigating directly to /assets skips getReportStatus() (normally
+    // called from AdminDashboardOnboardingView) and fetchSingleAssetVulnerabilities
+    // returns early with { status: false } because reportId is missing.
+    if (!localStorage.getItem("reportId")) {
+      await this.authStore.getReportStatus();
+    }
+
     this.authStore.fetchAssets();
 
     // Ensure latestReportId and vulnerabilityRows are available

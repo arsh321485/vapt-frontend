@@ -494,7 +494,7 @@ methods: {
   //   }
   // }
   handleFixNow() {
-    this.$router.push("/auth");
+    this.$router.push("/signup");
   }
 }
 

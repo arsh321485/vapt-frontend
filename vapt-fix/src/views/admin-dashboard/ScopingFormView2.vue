@@ -121,7 +121,7 @@
                 </div>
                 <div class="col-md-3">
                   <label class="sf-field-label">Industry <span class="text-danger">*</span></label>
-                  <select class="sf-input" v-model="projectDetails.industry">
+                  <select v-if="projectDetails.industry !== 'other'" class="sf-input" v-model="projectDetails.industry">
                     <option value="" disabled selected>Select industry</option>
                     <option value="banking_finance">Banking & Finance</option>
                     <option value="healthcare">Healthcare</option>
@@ -132,6 +132,19 @@
                     <option value="education">Education</option>
                     <option value="other">Other</option>
                   </select>
+                  <div v-else>
+                    <input
+                      type="text"
+                      class="sf-input"
+                      placeholder="Please specify your industry"
+                      v-model="customIndustry"
+                      autofocus
+                    />
+                    <span
+                      class="sf-industry-back"
+                      @click="projectDetails.industry = ''; customIndustry = ''"
+                    >&#8592; Back to list</span>
+                  </div>
                 </div>
                 <div class="col-md-3">
                   <label class="sf-field-label">Country</label>
@@ -159,7 +172,7 @@
                 </div>
                 <div class="col-md-4">
                   <label class="sf-field-label">Phone Number <span class="sf-optional">(optional)</span></label>
-                  <input type="tel" class="sf-input" placeholder="+91 98765 43210" v-model="projectDetails.phone_number" />
+                  <input type="tel" class="sf-input" :placeholder="countryPhonePlaceholder" v-model="projectDetails.phone_number" />
                 </div>
               </div>
             </div>
@@ -494,7 +507,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import Swal from 'sweetalert2'
@@ -521,7 +534,7 @@ const submitLoading = ref(false)
 const knowledgeMap: Record<string, string> = { black: 'black_box', grey: 'grey_box', white: 'white_box' }
 const catMap: Record<string, string> = {
   network: 'network', web: 'web_app', mobile: 'mobile_app', api: 'api',
-  cloud: 'cloud', social: 'social_eng', wireless: 'wireless', iot: 'iot_ot'
+  cloud: 'cloud', social: 'social_eng', iot: 'iot_ot'
 }
 const stdMap: Record<string, string> = {
   'OWASP': 'owasp', 'NIST': 'nist', 'ISO 27001': 'iso_27001',
@@ -678,7 +691,7 @@ async function toggleMultiKnowledge(v: string) {
       const r = res.data
       const revCat: Record<string, string> = {
         network: 'network', web_app: 'web', mobile_app: 'mobile', api: 'api',
-        cloud: 'cloud', social_eng: 'social', wireless: 'wireless', iot_ot: 'iot'
+        cloud: 'cloud', social_eng: 'social', iot_ot: 'iot'
       }
       const revStd: Record<string, string> = {
         owasp: 'OWASP', nist: 'NIST', iso_27001: 'ISO 27001',
@@ -750,7 +763,6 @@ const categories = [
   { value: 'api', label: 'API', icon: 'bi bi-braces', color: '#059669' },
   { value: 'cloud', label: 'Cloud', icon: 'bi bi-cloud', color: '#0284c7' },
   { value: 'social', label: 'Social Eng.', icon: 'bi bi-people', color: '#db2777' },
-  { value: 'wireless', label: 'Wireless', icon: 'bi bi-wifi', color: '#d97706' },
   { value: 'iot', label: 'IoT / OT', icon: 'bi bi-cpu', color: '#dc2626' }
 ]
 
@@ -798,6 +810,33 @@ function toggleCloud(v: string) {
 
 const countries = ref<string[]>([])
 const sectionLoading = ref(false)
+
+const countryDialCodes: Record<string, string> = {
+  'Afghanistan': '+93', 'Albania': '+355', 'Algeria': '+213', 'Argentina': '+54',
+  'Australia': '+61', 'Austria': '+43', 'Bahrain': '+973', 'Bangladesh': '+880',
+  'Belgium': '+32', 'Brazil': '+55', 'Canada': '+1', 'Chile': '+56',
+  'China': '+86', 'Colombia': '+57', 'Croatia': '+385', 'Czech Republic': '+420',
+  'Denmark': '+45', 'Egypt': '+20', 'Ethiopia': '+251', 'Finland': '+358',
+  'France': '+33', 'Germany': '+49', 'Ghana': '+233', 'Greece': '+30',
+  'Hungary': '+36', 'India': '+91', 'Indonesia': '+62', 'Iran': '+98',
+  'Iraq': '+964', 'Ireland': '+353', 'Israel': '+972', 'Italy': '+39',
+  'Japan': '+81', 'Jordan': '+962', 'Kenya': '+254', 'Kuwait': '+965',
+  'Malaysia': '+60', 'Mexico': '+52', 'Morocco': '+212', 'Netherlands': '+31',
+  'New Zealand': '+64', 'Nigeria': '+234', 'Norway': '+47', 'Oman': '+968',
+  'Pakistan': '+92', 'Philippines': '+63', 'Poland': '+48', 'Portugal': '+351',
+  'Qatar': '+974', 'Romania': '+40', 'Russia': '+7', 'Saudi Arabia': '+966',
+  'Singapore': '+65', 'South Africa': '+27', 'South Korea': '+82', 'Spain': '+34',
+  'Sri Lanka': '+94', 'Sweden': '+46', 'Switzerland': '+41', 'Taiwan': '+886',
+  'Thailand': '+66', 'Turkey': '+90', 'UAE': '+971', 'Ukraine': '+380',
+  'United Arab Emirates': '+971', 'United Kingdom': '+44', 'United States': '+1',
+  'USA': '+1', 'UK': '+44', 'Venezuela': '+58', 'Vietnam': '+84',
+}
+
+const countryPhonePlaceholder = computed(() => {
+  const country = projectDetails.value.country
+  const code = countryDialCodes[country]
+  return code ? `${code} XXXXXXXXXX` : '+__ XXXXXXXXXX'
+})
 const projectDetailsSaved = ref(false)
 
 function handleStepClick(i: number) {
@@ -821,24 +860,32 @@ const projectDetails = ref({
   email_address: '',
   phone_number: ''
 })
+const customIndustry = ref('')
 
 async function handleSectionContinue() {
   if (activeSection.value === 0) {
     const { organization_name, industry, country, full_name, email_address } = projectDetails.value
+    const industryOther = customIndustry.value.trim()
     if (!organization_name || !industry || !full_name || !email_address) {
       Swal.fire('Missing Fields', 'Please fill all required fields before continuing.', 'warning')
       return
     }
+    if (industry === 'other' && !industryOther) {
+      Swal.fire('Missing Fields', 'Please specify your industry.', 'warning')
+      return
+    }
     sectionLoading.value = true
     const authStore = useAuthStore()
-    const result = await authStore.saveProjectDetails({
+    const payload: Record<string, unknown> = {
       organization_name,
       industry,
       country,
       full_name,
       email_address,
       phone_number: projectDetails.value.phone_number || undefined
-    })
+    }
+    if (industry === 'other') payload.industry_other = industryOther
+    const result = await authStore.saveProjectDetails(payload as any)
     sectionLoading.value = false
     if (!result.status) {
       const msg = result.message || ''
@@ -1753,4 +1800,15 @@ onMounted(async () => {
 .sf-content::-webkit-scrollbar { display: none; }
 .sf-sidebar,
 .sf-content { -ms-overflow-style: none; scrollbar-width: none; }
+.sf-industry-back {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6366f1;
+  cursor: pointer;
+  user-select: none;
+}
+.sf-industry-back:hover {
+  text-decoration: underline;
+}
 </style>
