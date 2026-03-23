@@ -1,4 +1,3 @@
-
 <template>
   <main>
     <Header />
@@ -9,7 +8,7 @@
       <div class="row">
         <div class="col-lg-6 col-md-12 col-sm-12">
           <p><i class="bi bi-shield-fill-check"></i> Vetted, tested security. Trusted by experts</p>
-          <h1>Secure your assets with proven fixes and clear steps.</h1>
+          <h1>Welcome to the Vulnerability Management Program as a service platform</h1>
           <p class="hero-text">Security isn’t just about finding flaws—it’s about fixing them fast. We close the gaps that reports leave behind, giving you lasting protection.</p>
           <!-- <div class="hero-div-btn">
              <router-link to="/location">
@@ -21,29 +20,19 @@
           </div> -->
           <!-- Replace your existing hero button block with this -->
 <div class="hero-div-btn">
-  <div class="hero-cta-row d-flex align-items-center gap-3 flex-wrap">
-    <button type="button" class="btn hero-btn" @click="handleFixNow">
-      Get Started
-      <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
-    </button>
+  <button type="button" class="btn hero-btn" @click="handleFixNow">
+    Get Started
+    <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
+  </button>
+  <!-- <button
+  type="button"
+  class="btn hero-btn"
+  @click.prevent.stop="handleFixNow"
+>
+  Fix your vulnerabilities now
+  <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
+</button> -->
 
-    <!-- Sign In hover tooltip (same as header) -->
-    <div class="hero-signin-hover-wrap">
-      <button class="hero-signin-trigger">
-        <i class="bi bi-person me-1"></i> Sign In
-        <i class="bi bi-chevron-down ms-1 hero-signin-chevron"></i>
-      </button>
-      <div class="hero-signin-tooltip">
-        <div class="hero-signin-tooltip-arrow"></div>
-        <p class="hero-signin-tooltip-label">Already have an account?</p>
-        <p class="hero-signin-tooltip-sub">Sign in to your VaptFix dashboard and continue where you left off.</p>
-        <router-link to="/auth?mode=signin" class="hero-signin-tooltip-btn">
-          Sign In to Dashboard
-          <i class="bi bi-arrow-right ms-2"></i>
-        </router-link>
-      </div>
-    </div>
-  </div>
 </div>
 
         </div>
@@ -56,17 +45,119 @@
           </div>
         </div>
       </div>
-      
+
      </div>
     </section>
-     
+
     <!-- Why post VAPT Remidiation is broken -->
     <section class="remidiation-section fluid-padding">
       <div class="container-fluid gx-0">
-        <div class="row mb-5">
+
+        <!-- Scrolling Cards Banner -->
+        <div class="row mb-4">
+          <div class="cards-scroll-wrapper">
+            <div class="cards-scroll-track">
+
+              <!-- Card 1 -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <h6 class="info-card-title">"Stop Tracking Paper SLAs. Start Tracking Real-Time Resilience."</h6>
+                <p class="info-card-desc">Close the gap between theoretical policy and actual mitigation speed.</p>
+              </div>
+
+              <!-- Card 2 -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-map"></i></div>
+                <h6 class="info-card-title">"Is Your Policy a Promise or a Reality? Map Your Mitigation Timeline Today."</h6>
+                <p class="info-card-desc">Highlight the risk criteria mapping against operational data.</p>
+              </div>
+
+              <!-- Card 3 -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-eye"></i></div>
+                <h6 class="info-card-title">"Visibility Without Action is Just Noise. Bridge the Gap Between Detection and Fix."</h6>
+                <p class="info-card-desc">Transition from "seeing" to "solving."</p>
+              </div>
+
+              <!-- Card 4 -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-shield-check"></i></div>
+                <h6 class="info-card-title">"Your Security is Only as Strong as Your Weakest Vendor. Hold Them Accountable."</h6>
+                <p class="info-card-desc">Track third-party mitigation.</p>
+              </div>
+
+              <!-- Card 5 -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-display"></i></div>
+                <h6 class="info-card-title">"One View. Zero Roadblocks. Total Command Over Your Entire Attack Surface."</h6>
+                <p class="info-card-desc">A comprehensive view of assets and ownership.</p>
+              </div>
+
+              <!-- Card 6 -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-people"></i></div>
+                <h6 class="info-card-title">"Don't Just Find Vulnerabilities — Fix Them. Collaborate Across Every Team."</h6>
+                <p class="info-card-desc">Assign, track, and close vulnerabilities across internal and external teams.</p>
+              </div>
+
+              <!-- Card 7 -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-bar-chart-line"></i></div>
+                <h6 class="info-card-title">"Turn Audit Anxiety Into Audit Confidence. Every Fix. Every Proof. Always Ready."</h6>
+                <p class="info-card-desc">Audit-ready evidence for every remediation action.</p>
+              </div>
+
+              <!-- Duplicate Cards for seamless loop -->
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <h6 class="info-card-title">"Stop Tracking Paper SLAs. Start Tracking Real-Time Resilience."</h6>
+                <p class="info-card-desc">Close the gap between theoretical policy and actual mitigation speed.</p>
+              </div>
+
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-map"></i></div>
+                <h6 class="info-card-title">"Is Your Policy a Promise or a Reality? Map Your Mitigation Timeline Today."</h6>
+                <p class="info-card-desc">Highlight the risk criteria mapping against operational data.</p>
+              </div>
+
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-eye"></i></div>
+                <h6 class="info-card-title">"Visibility Without Action is Just Noise. Bridge the Gap Between Detection and Fix."</h6>
+                <p class="info-card-desc">Transition from "seeing" to "solving."</p>
+              </div>
+
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-shield-check"></i></div>
+                <h6 class="info-card-title">"Your Security is Only as Strong as Your Weakest Vendor. Hold Them Accountable."</h6>
+                <p class="info-card-desc">Track third-party mitigation.</p>
+              </div>
+
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-display"></i></div>
+                <h6 class="info-card-title">"One View. Zero Roadblocks. Total Command Over Your Entire Attack Surface."</h6>
+                <p class="info-card-desc">A comprehensive view of assets and ownership.</p>
+              </div>
+
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-people"></i></div>
+                <h6 class="info-card-title">"Don't Just Find Vulnerabilities — Fix Them. Collaborate Across Every Team."</h6>
+                <p class="info-card-desc">Assign, track, and close vulnerabilities across internal and external teams.</p>
+              </div>
+
+              <div class="info-card">
+                <div class="info-card-icon"><i class="bi bi-bar-chart-line"></i></div>
+                <h6 class="info-card-title">"Turn Audit Anxiety Into Audit Confidence. Every Fix. Every Proof. Always Ready."</h6>
+                <p class="info-card-desc">Audit-ready evidence for every remediation action.</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="row mb-5">
         <div class="scroll-banner">
         <div class="scroll-track">
-          <!-- Original images -->
+          Original images
           <img src="@/assets/images/clients/client-1.png" alt="">
           <img src="@/assets/images/clients/client-2.png" alt="">
           <img src="@/assets/images/clients/client-3.png" alt="">
@@ -75,13 +166,11 @@
           <img src="@/assets/images/clients/client-6.png" alt="">
           <img src="@/assets/images/clients/client-7.png" alt="">
           <img src="@/assets/images/clients/client-8.png" alt="">
-          <!-- <img src="@/assets/images/clients/client-9.png" alt="">
-          <img src="@/assets/images/clients/client-10.png" alt=""> -->
           <img src="@/assets/images/clients/client-11.png" alt="">
           <img src="@/assets/images/clients/client-12.png" alt="">
           <img src="@/assets/images/clients/client-13.png" alt="">
 
-          <!-- Duplicate images for seamless loop -->
+          Duplicate images for seamless loop
           <img src="@/assets/images/clients/client-1.png" alt="">
           <img src="@/assets/images/clients/client-2.png" alt="">
           <img src="@/assets/images/clients/client-3.png" alt="">
@@ -90,14 +179,12 @@
           <img src="@/assets/images/clients/client-6.png" alt="">
           <img src="@/assets/images/clients/client-7.png" alt="">
           <img src="@/assets/images/clients/client-8.png" alt="">
-          <!-- <img src="@/assets/images/clients/client-9.png" alt="">
-          <img src="@/assets/images/clients/client-10.png" alt=""> -->
           <img src="@/assets/images/clients/client-11.png" alt="">
           <img src="@/assets/images/clients/client-12.png" alt="">
           <img src="@/assets/images/clients/client-13.png" alt="">
         </div>
         </div>
-      </div>
+      </div> -->
         <div class="row">
           <div class="col-lg-6">
             <p class="warning"><i class="bi bi-exclamation-triangle-fill"></i> The problem</p>
@@ -166,7 +253,10 @@
       <div class="container-fluid our-approach-box py-3 gx-0">
         <div class="text-center">
               <p><i class="bi bi-puzzle-fill"></i> Our solution</p>
-              <h1>Our Approach to Quick<br> Remediation</h1>
+              <h1>   Foundations of a Mature<br>
+            Vulnerability Management Program<br>
+              Remediation
+</h1>
         </div>
         <div class="container my-5">
         <div class="card-wrapper">
@@ -175,35 +265,32 @@
             <div class="card-top-bg">
               <img src="" alt="">
             </div>
-            <h4 class="text-white mt-4">some head here</h4>
-            <p>some para here.
-            </p>
+            <h4 class="text-white mt-4">Continuous Multi-Modal Discovery</h4>
+            <p>See everything, everywhere. Continuously discover vulnerabilities across hybrid cloud, on-premises infrastructure, and remote endpoints.</p>
           </div>
           <!-- Card 2 -->
           <div class="card-fixed">
             <div class="card-top-bg">
               <img src="" alt="">
             </div>
-            <h4 class="text-white mt-4">Step-by-step guidance</h4>
-            <p>Each fix comes with detailed, step-by-step instructions tailored to your system—no guesswork, no confusion.
-            </p>
+            <h4 class="text-white mt-4">Intelligent Mitigation Guidance</h4>
+            <p>Stop searching for the fix. Get the blueprints. Every vulnerability is paired with clear, actionable, human-readable steps tailored to your specific technology stack. We provide the technical instructions your teams need to resolve issues without the manual research overhead.</p>
           </div>
           <!-- Card 3 -->
           <div class="card-fixed">
             <div class="card-top-bg">
               <img src="" alt="">
             </div>
-            <h4 class="text-white mt-4">Workflow automation</h4>
-            <p>Automate repetitive tasks like detection, patch deployment, and follow-up checks—so your team can focus on critical decisions.
-            </p>
+            <h4 class="text-white mt-4">Internal & 3rd Party Task Orchestration</h4>
+            <p>Hold every stakeholder accountable. Track and manage mitigation tasks across your internal teams and external vendors through a single pane of glass. Collaborative portals allow third-party partners to view their specific exposures and report progress directly to you.</p>
           </div>
           <!-- Card 4 -->
           <div class="card-fixed">
             <div class="card-top-bg">
               <img src="" alt="">
             </div>
-            <h4 class="text-white mt-4">Evidence based validation</h4>
-            <p>Every fix we recommend is backed by proof-of-success data. You’ll get clear, verifiable evidence that each vulnerability has been resolve.</p>
+            <h4 class="text-white mt-4">Operational Reality Mapping</h4>
+            <p>Ascertain exactly how your operational timeline stacks up against the risk criteria set in your management policy. We map the time it actually takes to mitigate against your "paper" recommendations, surfacing the real-world exposure windows that static SLAs hide.</p>
           </div>
         </div>
         </div>
@@ -306,16 +393,17 @@
        <div class="purple-glow"></div>
         <div class="row text-center mb-5 pb-lg-5">
           <p class="vetting-icon"><i class="bi bi-puzzle-fill"></i> Our solution</p>
-          <h1 class="vetting-head">Our vetting process</h1>
+          <h1 class="vetting-head">Flexible Assessment Scheduling</h1>
         </div>
 
-        <div class="row text-center process-step-wrapper pt-4">
+        <div class="row text-center process-step-wrapper pt-4 align-items-start">
         <!-- Step 1 -->
         <div class="col-md-3 col-12 mb-4 position-relative step">
           <div class="step-number">1</div>
-          <h5 class="step-title">Initial discovery and intake</h5>
+          <h5 class="step-title">Security on your timeline</h5>
           <p class="step-desc">
-            We collect system information (infrastructure, platforms, tools) and review past incidents.
+           Security on your timeline. Provision for assessment of frequencies that match your risk appetite—from daily continuous scans for critical production assets to comprehensive annual deep-dives for compliance.
+
           </p>
           <!-- Right dashed line -->
           <div class="dashed-line d-none d-md-block"></div>
@@ -324,9 +412,9 @@
         <!-- Step 2 -->
         <div class="col-md-3 col-12 mb-4 position-relative step">
           <div class="step-number">2</div>
-          <h5 class="step-title">Vulnerability Identification</h5>
+          <h5 class="step-title">Expert Mitigation Support</h5>
           <p class="step-desc">
-            We perform vulnerability scans using automated tools. Conduct manual testing to find edge-case or logic-based flaws.
+           Expertise on demand. Gain access to expert mitigation support to help your team navigate complex remediations. Our specialists provide manual validation to remove false positives and guidance for vulnerabilities that lack standard vendor patches.
           </p>
           <!-- Right dashed line -->
           <div class="dashed-line d-none d-md-block"></div>
@@ -335,9 +423,10 @@
         <!-- Step 3 -->
         <div class="col-md-3 col-12 mb-4 position-relative step">
           <div class="step-number">3</div>
-          <h5 class="step-title">Verification and Validation</h5>
+          <h5 class="step-title">Native Slack & Teams Integration</h5>
           <p class="step-desc">
-            We confirm vulnerabilities are real (not false positives) and reproduce and document the issue.
+            Manage communication where your team works. Keep everyone aligned with real-time notifications and task management directly within Slack and Microsoft Teams. Reduce friction between security and IT by moving discussions out of email and into your primary collaboration channels.
+
           </p>
           <!-- Right dashed line -->
           <div class="dashed-line d-none d-md-block"></div>
@@ -346,16 +435,17 @@
         <!-- Step 4 -->
         <div class="col-md-3 col-12 mb-4 position-relative step">
           <div class="step-number">4</div>
-          <h5 class="step-title">Fix Recommendation Design</h5>
+          <h5 class="step-title">Comprehensive Asset Command Center</h5>
           <p class="step-desc">
-            We suggest step-by-step remediation tailored to the environment.
+           Total visibility across your entire game. Get a comprehensive view of your vulnerabilities across all assets. Track trends, monitor your global risk score, and ensure you stay on top of the game with audit-ready evidence for every remediation action.
+
           </p>
         </div>
         </div>
         <!-- Bottom glow shadow -->
         <div class="bottom-glow"></div>
 
-        <div class="row justify-content-center"> 
+        <div class="row justify-content-center">
           <div class="col-lg-10 fix-card py-lg-5 px-lg-5 py-md-4 px-md-4 py-3 px-3 position-relative">
             <!-- Bottom Shadow Glow -->
           <div class="start-fixing-glow"></div>
@@ -404,7 +494,7 @@ methods: {
   //   }
   // }
   handleFixNow() {
-    this.$router.push("/signup");
+    this.$router.push("/auth");
   }
 }
 
@@ -412,114 +502,80 @@ methods: {
 </script>
 
 <style scoped>
-.hero-cta-row {
-  margin-top: 8px;
-}
-
-/* ── Hero Sign In hover wrap ── */
-.hero-signin-hover-wrap {
+/* ===== Scrolling Cards Banner Section ===== */
+.cards-scroll-wrapper {
+  overflow: hidden;
+  width: 100%;
   position: relative;
 }
 
-.hero-signin-trigger {
-  background: transparent;
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 5px 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
+.cards-scroll-wrapper:hover .cards-scroll-track {
+  animation-play-state: paused;
 }
 
-.hero-signin-trigger:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.55);
-  color: #ffffff;
+.cards-scroll-track {
+  display: flex;
+  width: max-content;
+  gap: 20px;
+  animation: cards-scroll-left 30s linear infinite;
+  align-items: stretch;
+  padding: 10px 0;
 }
 
-.hero-signin-chevron {
-  font-size: 10px;
-  transition: transform 0.2s;
+.info-card {
+  background: #ffffff;
+  border: 1px solid rgba(90, 68, 255, 0.2);
+  border-radius: 16px;
+  padding: 24px 20px;
+  width: 280px;
+  min-width: 280px;
+  box-shadow: 0 2px 12px rgba(90, 68, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  cursor: default;
 }
 
-.hero-signin-hover-wrap:hover .hero-signin-chevron {
-  transform: rotate(180deg);
+.info-card:hover {
+  box-shadow: 0 6px 24px rgba(90, 68, 255, 0.15);
+  transform: translateY(-4px);
 }
 
-/* Tooltip card */
-.hero-signin-tooltip {
-  position: absolute;
-  top: calc(100% + 12px);
-  left: 0;
-  width: 260px;
-  background: #1e1b4b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: 18px 20px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(6px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 2000;
-}
-
-.hero-signin-tooltip-arrow {
-  position: absolute;
-  top: -7px;
-  left: 22px;
-  width: 13px;
-  height: 13px;
-  background: #1e1b4b;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  transform: rotate(45deg);
-  border-radius: 2px;
-}
-
-.hero-signin-hover-wrap:hover .hero-signin-tooltip {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.hero-signin-tooltip-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 6px;
-}
-
-.hero-signin-tooltip-sub {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.6;
-  margin-bottom: 14px;
-}
-
-.hero-signin-tooltip-btn {
+.info-card-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(90, 68, 255, 0.08);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 9px 16px;
-  background: linear-gradient(135deg, #5A44FF, #7c3aed);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: opacity 0.2s;
-  box-shadow: 0 4px 14px rgba(90, 68, 255, 0.4);
+  font-size: 20px;
+  color: rgba(90, 68, 255, 1);
+  flex-shrink: 0;
 }
 
-.hero-signin-tooltip-btn:hover {
-  opacity: 0.88;
-  color: #ffffff;
+.info-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(9, 9, 35, 0.88);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.info-card-desc {
+  font-size: 13px;
+  color: rgba(9, 9, 35, 0.5);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@keyframes cards-scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 </style>

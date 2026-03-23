@@ -1,1 +1,36 @@
-jese hi admindaSHBAORDONBOARDING PAR REPORT UPLOAD HO JATI HAI TO REfresh krne ke bad sare api hit hote hai but esa nhi hona chiye direct hit hone chiye api refesh ki jarurat nhi npadni chgiye
+USER SET PASSWORD
+(user-set-password/<uid>/<token>/)
+
+METHOD: PAST
+URL: http://127.0.0.1:8000/api/admin/users/user-set-password/MWE5ODk5M2QtZDFhYi00YTBjLThjMDYtYTczZDg0YzU5MWVl/d5otif-1a0069dd4fc666cdef4ab9955a60c4e7/
+
+
+BODY: 
+
+  {
+    "password": "Sona123@",
+    "confirm_password": "Sona123@"
+  }
+
+RESPONSE:
+
+{
+    "msg": "Your password has been set successfully. You can now log in."
+}
+see this api imntegration of set password 
+{
+    "detail": "Given token not valid for any token type",
+    "code": "token_not_valid",
+    "messages": [
+        {
+            "token_class": "AccessToken",
+            "token_type": "access",
+            "message": "Token is invalid or expired"
+        }
+    ]
+}
+in network it gices this RESPONSE
+Error
+Given token not valid for any token type
+OK
+WITH THIUS ALERT SOLVE THIS WHY THIS COMES EXPLAIN

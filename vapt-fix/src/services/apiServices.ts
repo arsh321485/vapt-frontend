@@ -12,11 +12,18 @@ const endpoint = axios.create({
 });
 
 // ✅ Add token to requests (if exists)
+const PUBLIC_URL_PATTERNS = [
+  "/api/admin/users/user-set-password/",
+  "/api/admin/users/reset-password/",
+  "/api/admin/users/forgot-password/",
+];
+
 endpoint.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authorization");
+    const isPublic = PUBLIC_URL_PATTERNS.some((p) => config.url?.includes(p));
 
-    if (token && token !== "null" && token !== "undefined") {
+    if (token && token !== "null" && token !== "undefined" && !isPublic) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
 
