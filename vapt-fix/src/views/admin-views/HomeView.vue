@@ -7,7 +7,7 @@
       <div class="container-fluid">
       <div class="row">
         <div class="col-lg-6 col-md-12 col-sm-12">
-          <p><i class="bi bi-shield-fill-check"></i> Vetted, tested security. Trusted by experts</p>
+         <!--  <p><i class="bi bi-shield-fill-check"></i> Vetted, tested security. Trusted by experts</p> -->
           <h1>Welcome to the Vulnerability Management Program as a service platform</h1>
           <p class="hero-text">Security isn’t just about finding flaws—it’s about fixing them fast. We close the gaps that reports leave behind, giving you lasting protection.</p>
           <!-- <div class="hero-div-btn">
