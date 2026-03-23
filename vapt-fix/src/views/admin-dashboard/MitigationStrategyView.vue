@@ -241,7 +241,7 @@
                 <div class="col-11">
                     <div class="d-flex justify-content-between">
                       <p style="color: rgba(0, 0, 0, 0.6);font-weight: 600;font-size: 15px;">
-                        Vulnerabilities ({{ activeTeamData.count }})
+                        Vulnerabilities ({{ uniqueVulns.length }})
                       </p>
                     </div>
 
@@ -249,20 +249,22 @@
                     <div v-if="loading" class="py-4 text-center text-muted">Loading...</div>
 
                     <!-- No data state -->
-                    <div v-else-if="activeTeamData.vulnerabilities.length === 0" class="py-4 text-muted">
+                    <div v-else-if="uniqueVulns.length === 0" class="py-4 text-muted">
                       No vulnerabilities assigned to this team.
                     </div>
 
                     <!-- Vulnerability cards (first card UI, up to 4) -->
                     <div v-else class="row align-items-stretch">
                         <div
-                          v-for="vuln in activeTeamData.vulnerabilities.slice(0, 4)"
-                          :key="vuln.id"
+                          v-for="vuln in uniqueVulns.slice(0, 4)"
+                          :key="vuln.plugin_name"
                           class="col-3 d-flex"
                         >
                           <div class="card py-4 px-3 w-100 d-flex flex-column" style="border-radius: 12px;">
                             <div class="d-flex justify-content-between">
-                              <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">{{ vuln.host_name }}</p>
+                              <p style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">
+                                {{ vuln.assets.length > 1 ? vuln.assets.length + ' assets' : vuln.assets[0] }}
+                              </p>
                               <span
                                 :style="{ color: riskColor(vuln.risk_factor), fontSize: '12px', fontWeight: '600' }"
                               >{{ vuln.risk_factor }}</span>
@@ -812,6 +814,18 @@ export default {
     activeTeamData() {
       if (!this.mitigationData?.teams) return { count: 0, vulnerabilities: [] };
       return this.mitigationData.teams[this.activeTab] || { count: 0, vulnerabilities: [] };
+    },
+    uniqueVulns() {
+      const seen = new Map();
+      for (const vuln of this.activeTeamData.vulnerabilities) {
+        const key = (vuln.plugin_name || '').trim().toLowerCase();
+        if (!seen.has(key)) {
+          seen.set(key, { ...vuln, assets: [vuln.host_name] });
+        } else {
+          seen.get(key).assets.push(vuln.host_name);
+        }
+      }
+      return Array.from(seen.values());
     },
   },
 
