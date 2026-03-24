@@ -128,34 +128,41 @@ export default {
     },
 
     async checkAndRedirect() {
-      // Case 1: file was already uploaded in a previous session → go to /communication
-      if (localStorage.getItem('scoping_completed') === 'true') {
-        localStorage.removeItem('scoping_completed')
-        this.$router.push('/communication')
-        return
-      }
+      const authStore = useAuthStore()
 
-      // Case 2: scoping form was submitted but user logged out before file was uploaded
-      if (localStorage.getItem('scoping_submitted') === 'true') {
-        try {
-          const authStore = useAuthStore()
-          const res = await authStore.getScopingUploadStatus()
-          if (!!res.file_uploaded) {
-            // File got uploaded while user was away → go directly to /communication
-            localStorage.removeItem('scoping_submitted')
+      try {
+        const res = await authStore.getScopingUploadStatus()
+
+        if (res.file_uploaded) {
+          // File is uploaded — check onboarding step completion
+          const user = authStore.user || JSON.parse(localStorage.getItem('user') || '{}')
+          const uid = user?.id || user?.email || ''
+          const submittedKey = uid ? `scoping_submitted_${uid}` : 'scoping_submitted'
+          localStorage.removeItem(submittedKey)
+          localStorage.removeItem('scoping_completed')
+
+          const completedSteps = JSON.parse(localStorage.getItem('completedSteps') || '[]')
+          const communicationDone = completedSteps.includes(1)
+          const riskCriteriaDone = completedSteps.includes(2)
+
+          if (communicationDone && riskCriteriaDone) {
+            // All onboarding steps done → go to dashboard
+            this.$router.push('/admindashboardonboarding')
+          } else if (!communicationDone) {
+            // Communication not done yet
             this.$router.push('/communication')
           } else {
-            // File not yet uploaded → go to scoping form waiting screen to resume polling
-            this.$router.push('/scoping-form-2')
+            // Communication done but risk criteria not done
+            this.$router.push('/riskcriteria')
           }
-        } catch {
+        } else {
+          // File not yet uploaded → show scoping form waiting/alert screen
           this.$router.push('/scoping-form-2')
         }
-        return
+      } catch {
+        // On error, fall back to scoping form
+        this.$router.push('/scoping-form-2')
       }
-
-      // Default: new user → go to scoping form
-      this.$router.push('/scoping-form-2')
     }
   },
 

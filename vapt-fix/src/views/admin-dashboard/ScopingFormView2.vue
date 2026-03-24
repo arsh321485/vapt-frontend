@@ -527,6 +527,9 @@ function getUserCacheKey(base: string): string {
 const activeSection = ref(0)
 const submitted = ref(false)
 const pollIntervalRef = ref<ReturnType<typeof setInterval> | null>(null)
+const pollingStartTime = ref<number | null>(null)
+const MAX_POLL_DURATION = 30 * 60 * 1000 // 30 minutes
+const POLL_EVERY = 5000 // 5 seconds
 
 const submitLoading = ref(false)
 
@@ -614,29 +617,42 @@ async function handleSubmit() {
   }
 
   submitted.value = true
-  localStorage.setItem('scoping_submitted', 'true')
+  localStorage.setItem(getUserCacheKey('scoping_submitted'), Date.now().toString())
   startPolling()
 }
 
-function startPolling() {
-  // Stop any existing interval before starting a new one
+function stopPolling() {
   if (pollIntervalRef.value) {
     clearInterval(pollIntervalRef.value)
     pollIntervalRef.value = null
   }
+}
+
+function startPolling() {
+  stopPolling()
+  pollingStartTime.value = Date.now()
 
   const authStore = useAuthStore()
 
   pollIntervalRef.value = setInterval(async () => {
-    const res = await authStore.getScopingUploadStatus()
-    if (!!res.file_uploaded) {
-      clearInterval(pollIntervalRef.value ?? undefined)
-      pollIntervalRef.value = null
-      localStorage.removeItem('scoping_submitted')
-      localStorage.setItem('scoping_completed', 'true')
-      router.push('/signin')
+    // 30 minutes ho gaye? Polling band karo
+    if (Date.now() - (pollingStartTime.value ?? 0) > MAX_POLL_DURATION) {
+      stopPolling()
+      return
     }
-  }, 5000)
+
+    try {
+      const res = await authStore.getScopingUploadStatus()
+      if (res.file_uploaded === true) {
+        stopPolling()
+        localStorage.removeItem(getUserCacheKey('scoping_submitted'))
+        router.push('/signin')
+      }
+      // file_uploaded false hai → silently continue polling
+    } catch {
+      // Network error → silently retry, polling band mat karo
+    }
+  }, POLL_EVERY)
 }
 
 const sections = [
@@ -1022,7 +1038,7 @@ onMounted(async () => {
   }
 
   // Resume waiting screen if user had submitted scoping form but closed/logged out before file was uploaded
-  if (localStorage.getItem('scoping_submitted') === 'true') {
+  if (localStorage.getItem(getUserCacheKey('scoping_submitted'))) {
     submitted.value = true
     startPolling()
   }

@@ -37,7 +37,42 @@
               <img v-if="tool.icon" :src="tool.icon" />
               {{ tool.label }}
             </div>
+          </div>
 
+          <!-- Jira Connected User -->
+          <div v-if="jiraConnected && jiraUser" class="jira-user-card mt-3">
+            <img :src="jiraUser.picture" class="jira-user-avatar" />
+            <div class="jira-user-info">
+              <div class="jira-user-name">{{ jiraUser.name }}</div>
+              <div class="jira-user-email">{{ jiraUser.email }}</div>
+            </div>
+            <span class="jira-user-badge">
+              <i class="bi bi-check-circle-fill me-1"></i>Connected
+            </span>
+          </div>
+
+          <!-- Jira Cloud Resources -->
+          <div v-if="jiraConnected && jiraResources.length" class="jira-resources mt-3">
+            <div class="jira-resources-title">
+              <i class="bi bi-check-circle-fill text-success me-1"></i>
+              Jira Connected — Select your workspace:
+            </div>
+            <div class="jira-resource-list mt-2">
+              <div
+                v-for="resource in jiraResources"
+                :key="resource.id"
+                class="jira-resource-item"
+                :class="{ active: selectedJiraCloudId === resource.id }"
+                @click="selectedJiraCloudId = resource.id"
+              >
+                <img :src="resource.avatarUrl" class="jira-resource-avatar" />
+                <div class="jira-resource-info">
+                  <div class="jira-resource-name">{{ resource.name }}</div>
+                  <div class="jira-resource-url">{{ resource.url }}</div>
+                </div>
+                <i v-if="selectedJiraCloudId === resource.id" class="bi bi-check-circle-fill text-success ms-auto"></i>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -170,7 +205,18 @@ export default {
       backendBase: "https://vaptbackend.secureitlab.com",
       jiraResources: [],
       jiraConnected: false,
+      jiraUser: null,
+      selectedJiraCloudId: localStorage.getItem("jira_cloud_id") || null,
     };
+  },
+  watch: {
+    selectedJiraCloudId(val) {
+      if (val) {
+        localStorage.setItem("jira_cloud_id", val);
+      } else {
+        localStorage.removeItem("jira_cloud_id");
+      }
+    },
   },
   computed: {
     returnTo() {
@@ -844,6 +890,7 @@ export default {
       if (event.data?.type === "JIRA_CONNECTED") {
         this.jiraConnected = true;
         this.fetchJiraResources();
+        this.fetchJiraUser();
         Swal.fire({
           icon: "success",
           title: "Jira Connected",
@@ -853,13 +900,60 @@ export default {
         });
       }
     },
+    // ✅ Validate Jira Token (with auto-refresh on expiry)
+    async checkJiraConnection() {
+      const jiraToken = localStorage.getItem("jira_access_token");
+      if (!jiraToken) return;
+
+      const res = await this.authStore.validateJiraToken(jiraToken);
+      if (res.valid) {
+        this.jiraConnected = true;
+        this.selectedProject = "jira";
+        this.fetchJiraResources();
+        this.fetchJiraUser();
+        return;
+      }
+
+      // Token invalid — try refreshing
+      const refreshToken = localStorage.getItem("jira_refresh_token");
+      if (refreshToken) {
+        const refreshRes = await this.authStore.refreshJiraToken(refreshToken);
+        if (refreshRes.status) {
+          // Refresh succeeded — validate new token
+          this.jiraConnected = true;
+          this.selectedProject = "jira";
+          this.fetchJiraResources();
+          this.fetchJiraUser();
+          return;
+        }
+      }
+
+      // Refresh also failed — clear and ask to reconnect
+      localStorage.removeItem("jira_access_token");
+      localStorage.removeItem("jira_refresh_token");
+      localStorage.removeItem("jira_oauth_state");
+      this.jiraConnected = false;
+      this.selectedProject = null;
+      Swal.fire({
+        icon: "warning",
+        title: "Jira Session Expired",
+        text: "Please reconnect Jira to continue.",
+        confirmButtonColor: "#5a44ff",
+      });
+    },
     // ✅ Fetch Jira Resources (Cloud IDs)
     async fetchJiraResources() {
       const res = await this.authStore.getJiraResources();
       if (res.status) {
         this.jiraResources = res.data;
         this.jiraConnected = true;
-        console.log("Jira Resources:", this.jiraResources);
+      }
+    },
+    // ✅ Fetch Jira Connected User Info
+    async fetchJiraUser() {
+      const res = await this.authStore.getJiraUser();
+      if (res.status) {
+        this.jiraUser = res.user;
       }
     },
   },
@@ -898,9 +992,7 @@ export default {
     // Check if Jira already connected
     const jiraToken = localStorage.getItem("jira_access_token");
     if (jiraToken) {
-      this.jiraConnected = true;
-      this.selectedProject = "jira";
-      this.fetchJiraResources();
+      this.checkJiraConnection();
     }
 
     document.addEventListener("click", this.closeOnOutside);
@@ -1203,4 +1295,93 @@ export default {
   }
 }
 
+
+/* ── Jira Connected User ── */
+.jira-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #d1fae5;
+  border-radius: 12px;
+  background: #f0fdf4;
+}
+
+.jira-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.jira-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.jira-user-email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.jira-user-badge {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+/* ── Jira Cloud Resources ── */
+.jira-resources-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.jira-resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jira-resource-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #e6e9f2;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: #fff;
+}
+
+.jira-resource-item:hover {
+  border-color: #5a44ff;
+  background: #f5f4ff;
+}
+
+.jira-resource-item.active {
+  border-color: #5a44ff;
+  background: #f0eeff;
+}
+
+.jira-resource-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.jira-resource-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.jira-resource-url {
+  font-size: 12px;
+  color: #6b7280;
+}
 </style>

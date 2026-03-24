@@ -215,14 +215,8 @@ export const useAuthStore = defineStore("auth", {
 
   // ✅ Check scoping upload status
   async getScopingUploadStatus() {
-    try {
-      const res = await endpoint.get("/api/admin/scoping/upload-status/");
-      console.log("[upload-status] raw response:", JSON.stringify(res.data));
-      return { status: true, file_uploaded: !!res.data.file_uploaded };
-    } catch (error: any) {
-      console.error("[upload-status] error:", error?.response?.status, error?.response?.data);
-      return { status: false, file_uploaded: false };
-    }
+    const res = await endpoint.get("/api/admin/scoping/upload-status/");
+    return { file_uploaded: res.data.file_uploaded === true };
   },
 
   // ✅ Submit Scoping Form
@@ -1460,15 +1454,19 @@ export const useAuthStore = defineStore("auth", {
   // 🧠 Jira OAuth - Handle Callback (exchange code for token)
   async handleJiraCallback(code: string, state: string) {
     try {
-      const res = await endpoint.get("/api/admin/users/jira/callback/", {
-        params: { code, state }
-      });
+      const res = await endpoint.post("/api/admin/users/jira/oauth/", { code });
       const data = res.data;
 
-      if (data?.access_token) {
-        localStorage.setItem("jira_access_token", data.access_token);
-        if (data.refresh_token) {
-          localStorage.setItem("jira_refresh_token", data.refresh_token);
+      if (data?.jira_tokens?.access_token) {
+        localStorage.setItem("jira_access_token", data.jira_tokens.access_token);
+        if (data.jira_tokens.refresh_token) {
+          localStorage.setItem("jira_refresh_token", data.jira_tokens.refresh_token);
+        }
+        if (data.jwt_tokens?.access) {
+          localStorage.setItem("authorization", data.jwt_tokens.access);
+        }
+        if (data.jwt_tokens?.refresh) {
+          localStorage.setItem("refresh_token", data.jwt_tokens.refresh);
         }
         return { status: true, data };
       }
@@ -1504,6 +1502,68 @@ export const useAuthStore = defineStore("auth", {
         status: false,
         message: error.response?.data?.message || "Failed to fetch Jira resources",
         details: error.response?.data || null,
+      };
+    }
+  },
+
+  // 🧠 Jira - Get Connected User Info
+  async getJiraUser() {
+    try {
+      const jiraToken = localStorage.getItem("jira_access_token");
+      if (!jiraToken) {
+        return { status: false, message: "No Jira access token found" };
+      }
+      const res = await endpoint.get("/api/admin/users/jira/user/", {
+        headers: { "Jira-Access-Token": jiraToken }
+      });
+      return { status: true, user: res.data.user };
+    } catch (error: any) {
+      console.error("❌ Jira user fetch error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Failed to fetch Jira user",
+      };
+    }
+  },
+
+  // 🧠 Jira - Validate Access Token
+  async validateJiraToken(accessToken: string) {
+    try {
+      const res = await endpoint.post("/api/admin/users/jira/validate-token/", {
+        access_token: accessToken,
+      });
+      const data = res.data;
+      return { status: true, valid: data.valid, user: data.user };
+    } catch (error: any) {
+      console.error("❌ Jira token validation error:", error);
+      return {
+        status: false,
+        valid: false,
+        message: error.response?.data?.message || "Jira token validation failed",
+      };
+    }
+  },
+
+  // 🧠 Jira - Refresh Access Token
+  async refreshJiraToken(refreshToken: string) {
+    try {
+      const res = await endpoint.post("/api/admin/users/jira/token/refresh/", {
+        refresh_token: refreshToken,
+      });
+      const data = res.data;
+      if (data?.access_token) {
+        localStorage.setItem("jira_access_token", data.access_token);
+        if (data.refresh_token) {
+          localStorage.setItem("jira_refresh_token", data.refresh_token);
+        }
+        return { status: true, access_token: data.access_token };
+      }
+      return { status: false, message: "No access token in refresh response" };
+    } catch (error: any) {
+      console.error("❌ Jira token refresh error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Jira token refresh failed",
       };
     }
   },
@@ -3319,12 +3379,11 @@ export const useAuthStore = defineStore("auth", {
       // localStorage.removeItem("locations");
       localStorage.removeItem("google_id_token");
       localStorage.removeItem("isNewUser");
-      localStorage.removeItem("completedSteps");
+      // completedSteps is kept intentionally — onboarding milestones persist across logout
       // localStorage.removeItem("reportId");
       this.user = null;
       this.accessToken = null;
       this.refreshToken = null;
-      this.completedSteps = [];
       this.clearCache();
       console.log("🚪 User logged out, localStorage cleared");
 
