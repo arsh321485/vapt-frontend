@@ -350,7 +350,10 @@ computed: {
   return words.length > 4 ? words.slice(0, 4).join(" ") + "..." : desc;
 },  
     async loadAllTickets() {
-  const reportId = localStorage.getItem("reportId");
+  if (!this.authStore.latestReportId) {
+    await this.authStore.fetchVulnerabilityRegister();
+  }
+  const reportId = this.authStore.latestReportId || localStorage.getItem("reportId");
 
   if (!reportId) {
     console.warn("⚠️ No reportId found");

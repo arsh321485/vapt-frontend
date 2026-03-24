@@ -989,10 +989,21 @@ export default {
     // ✅ Jira event listener
     window.addEventListener("message", this.onJiraConnected);
 
-    // Check if Jira already connected
+    // Check if Jira already connected (or just returned from OAuth callback)
     const jiraToken = localStorage.getItem("jira_access_token");
     if (jiraToken) {
       this.checkJiraConnection();
+    } else if (this.$route.query.jira_connected === "true") {
+      // Returned from backend redirect after server-side token exchange
+      const storedToken = localStorage.getItem("jira_access_token");
+      if (storedToken) {
+        this.jiraConnected = true;
+        this.selectedProject = "jira";
+        this.fetchJiraResources();
+        this.fetchJiraUser();
+      }
+      // Clean query param from URL
+      this.$router.replace({ query: {} });
     }
 
     document.addEventListener("click", this.closeOnOutside);

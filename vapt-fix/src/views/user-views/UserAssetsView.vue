@@ -425,12 +425,12 @@
                   </div>
                   <div class="d-flex flex-column">
                     <router-link
-                      v-if="authStore.userLatestReportId"
+                      v-if="authStore.userLatestReportId && activeIndex"
                       :to="{
                         name: 'UserVulFix',
                         params: {
                           reportId: authStore.userLatestReportId,
-                          asset: vuln.asset,
+                          asset: activeIndex,
                         },
                         query: {
                           plugin_name: vuln.vul_name,
@@ -766,7 +766,7 @@ export default {
       if (!reportId) return;
       this.$router.push({
         name: 'UserVulFix',
-        params: { reportId, asset: item.host_name },
+        params: { reportId, asset: item.host_name || this.activeIndex },
         query: {
           id: item.fix_vulnerability_id,
           plugin_name: item.plugin_name,
