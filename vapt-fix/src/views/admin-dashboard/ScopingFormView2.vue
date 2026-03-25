@@ -16,7 +16,11 @@
           <i class="bi bi-envelope-check me-2"></i>
           A confirmation has been sent to your email address
         </div>
-        <p class="redirect-note mt-4 mb-0">
+        <p v-if="cardsGenerating" class="redirect-note mt-4 mb-0">
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Report upload ho gayi, agents generate ho rahe hain...
+        </p>
+        <p v-else class="redirect-note mt-4 mb-0">
           <span class="spinner-border spinner-border-sm me-2"></span>
           Please wait, your account is being set up...
         </p>
@@ -493,6 +497,7 @@ const activeSection = ref(0)
 const submitted = ref(false)
 const pollIntervalRef = ref<ReturnType<typeof setInterval> | null>(null)
 const pollingStartTime = ref<number | null>(null)
+const cardsGenerating = ref(false)
 const MAX_POLL_DURATION = 30 * 60 * 1000 // 30 minutes
 const POLL_EVERY = 5000 // 5 seconds
 
@@ -612,8 +617,13 @@ function startPolling() {
         stopPolling()
         localStorage.removeItem(getUserCacheKey('scoping_submitted'))
         router.push('/signin')
+      } else if (res.cards_generating === true) {
+        cardsGenerating.value = true
+        // agents generate ho rahe hain — polling jari rakho
+      } else {
+        cardsGenerating.value = false
+        // abhi upload nahi hui — polling jari rakho
       }
-      // file_uploaded false hai → silently continue polling
     } catch {
       // Network error → silently retry, polling band mat karo
     }

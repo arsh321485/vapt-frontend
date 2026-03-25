@@ -1128,7 +1128,51 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // Slack 
+  // ✅ Add user to a Microsoft Teams channel
+  async addUserToTeamsChannel({
+    teamId,
+    channelId,
+    userEmail,
+    userRole = "member",
+  }: {
+    teamId: string;
+    channelId: string;
+    userEmail: string;
+    userRole?: string;
+  }) {
+    try {
+      const graphToken = localStorage.getItem("microsoft_graph_token");
+      if (!graphToken) {
+        return { status: false, message: "Graph token missing" };
+      }
+      console.log("Calling Add User to Teams Channel API...");
+      const res = await endpoint.post(
+        "/api/admin/users/teams/channels/add-user/",
+        {
+          access_token: graphToken,
+          team_id: teamId,
+          channel_id: channelId,
+          user_email: userEmail,
+          user_role: userRole,
+        }
+      );
+      console.log("Teams add user response:", res.data);
+      if (res.data?.success) {
+        return { status: true, data: res.data.data };
+      }
+      return { status: false, message: res.data?.message };
+    } catch (error: any) {
+      console.error("Add user to Teams channel error:", error);
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to add user to Teams channel",
+      };
+    }
+  },
+
+  // Slack
   async getSlackOAuthUrl(baseUrl: string) {
       console.log("Calling POST /api/admin/users/slack/oauth-url/ with baseUrl:", baseUrl);
       const res = await endpoint.post(
@@ -1320,17 +1364,22 @@ export const useAuthStore = defineStore("auth", {
   async addUserToSlackChannel(
     accessToken: string,
     channel: string,
-    userId: string
+    userId: string,
+    userEmail?: string,
+    userName?: string
   ) {
     try {
       console.log("Calling Add User to Slack Channel API...");
+      const body: Record<string, string> = {
+        access_token: accessToken,
+        channel: channel,
+        user_id: userId,
+      };
+      if (userEmail) body.user_email = userEmail;
+      if (userName) body.user_name = userName;
       const res = await endpoint.post(
         "/api/admin/users/slack/channel/add-user/",
-        {
-          access_token: accessToken,
-          channel: channel,
-          user_id: userId,
-        }
+        body
       );
       console.log("Add user response:", res.data);
       if (res.data?.success) {

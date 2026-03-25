@@ -31,11 +31,11 @@
             <li class="nav-item">
             <a class="nav-link text-white" style="font-size: 1rem;" href="#">Partners</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <router-link to="/vulnerabilityexplorer" style="font-size: 1rem;" class="nav-link text-white text-decoration-none">
                 Vulnerability Explorer
               </router-link>
-            </li>
+            </li> -->
             <!-- <li class="nav-item">
               <router-link to="/usersignup" class="nav-link text-white text-decoration-none">
                 Dashboard screen

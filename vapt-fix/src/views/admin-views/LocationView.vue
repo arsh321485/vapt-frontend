@@ -812,7 +812,7 @@ export default {
     console.error("Slack users error:", err);
   }
     },
-    async addUserToProjectSlack(channelId, slackUserId) {
+    async addUserToProjectSlack(channelId, slackUserId, userEmail, userName) {
   try {
     const botToken = localStorage.getItem("slack_bot_token");
 
@@ -824,13 +824,37 @@ export default {
     const res = await this.authStore.addUserToSlackChannel(
       botToken,
       channelId,
-      slackUserId
+      slackUserId,
+      userEmail,
+      userName
     );
 
     console.log("Slack add user result:", res);
 
   } catch (err) {
     console.error("Slack add user error:", err);
+  }
+    },
+
+    async addUserToProjectTeams(teamId, channelId, userEmail) {
+  try {
+    const graphToken = localStorage.getItem("microsoft_graph_token");
+
+    if (!graphToken) {
+      console.warn("Microsoft Teams not connected");
+      return;
+    }
+
+    const res = await this.authStore.addUserToTeamsChannel({
+      teamId,
+      channelId,
+      userEmail,
+    });
+
+    console.log("Teams add user result:", res);
+
+  } catch (err) {
+    console.error("Teams add user error:", err);
   }
     },
     async inviteProjectTeam(channelId, slackUserIds) {

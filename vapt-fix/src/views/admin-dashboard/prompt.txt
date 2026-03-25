@@ -1,1 +1,1 @@
-on missingsecurityupdated page of both admin and user side in table change 	Criticality to sevirity
+on /home we have a menu in which we have vulnerability explorer comment this vulnerability explorer
