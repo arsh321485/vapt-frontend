@@ -6,11 +6,11 @@
 
           <!-- LOGO -->
           <div class="logo-wrapper">
-            <img src="@/assets/images/vaptfix_white.png" height="28">
+            <img src="@/assets/images/vaptfix_white.png" height="38">
           </div>
 
           <div class="form-area text-white">
-            <div class="form-wrapper w-75 pt-4">
+            <div class="form-wrapper w-75">
 
               <!-- SUB TABS -->
               <div class="sub-tabs">
@@ -501,7 +501,7 @@ export default {
 
 .logo-wrapper {
   position: absolute;
-  top: 28px;
+  top: 44px;
   left: 20%;
   transform: translateX(-50%);
   z-index: 10;
@@ -510,9 +510,8 @@ export default {
 .form-area {
   height: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-top: 40px;
   width: 100%;
 }
 
@@ -520,7 +519,6 @@ export default {
   background: transparent;
   max-height: 100vh;
   position: relative;
-  padding-top: 140px;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -690,22 +688,9 @@ export default {
 .form-wrapper {
   width: 100%;
   max-width: 420px;
-  padding-top: 60px;
-  padding-bottom: 40px;
-}
-
-@media (min-width: 1600px) {
-  .form-wrapper {
-    padding-top: 80px;
-    padding-bottom: 60px;
-  }
-}
-
-@media screen and (min-width: 1920px) {
-  .form-wrapper {
-    padding-top: 50px;
-    padding-bottom: 40px;
-  }
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 60px;
 }
 
 /* ===== FORGOT PASSWORD LINK ===== */
