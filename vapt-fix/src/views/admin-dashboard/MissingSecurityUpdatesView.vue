@@ -40,15 +40,17 @@
                                   <table class="table table-hover align-middle">
                                     <thead class="table-light">
                                       <tr>
+                                        <th scope="col">Vul. name</th>
                                         <th scope="col">Asset</th>
                                         <th scope="col">OS</th>
-                                        <th scope="col">Criticality</th>
+                                        <th scope="col">Severity</th>
                                         <th scope="col">Status</th>
                                         <th></th>
                                       </tr>
                                     </thead>
                                     <tbody class="raised-tbody">
                                       <tr v-for="vuln in group.rows" :key="vuln.id">
+                                        <td class="text-truncate" style="max-width: 200px;" :title="vuln.plugin_name">{{ vuln.plugin_name }}</td>
                                         <td>{{ vuln.host_name }}</td>
                                         <td :title="vuln.os" class="text-truncate" style="max-width: 150px;">{{ vuln.os || '-' }}</td>
                                         <td :style="{ color: getSeverityColor(vuln.risk_factor), fontWeight: 600 }">{{ vuln.risk_factor }}</td>
@@ -89,7 +91,7 @@
                                             <th scope="col">Vul. name</th>
                                             <th scope="col">Asset</th>
                                             <th scope="col">OS</th>
-                                            <th scope="col">Criticality</th>
+                                            <th scope="col">Severity</th>
                                             <th scope="col">Status</th>
                                             <th></th>
                                         </tr>

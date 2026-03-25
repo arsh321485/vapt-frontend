@@ -133,34 +133,41 @@ export default {
       try {
         const res = await authStore.getScopingUploadStatus()
 
-        if (res.file_uploaded) {
-          // File is uploaded — check onboarding step completion
-          const user = authStore.user || JSON.parse(localStorage.getItem('user') || '{}')
-          const uid = user?.id || user?.email || ''
-          const submittedKey = uid ? `scoping_submitted_${uid}` : 'scoping_submitted'
-          localStorage.removeItem(submittedKey)
-          localStorage.removeItem('scoping_completed')
-
-          const completedSteps = JSON.parse(localStorage.getItem('completedSteps') || '[]')
-          const communicationDone = completedSteps.includes(1)
-          const riskCriteriaDone = completedSteps.includes(2)
-
-          if (communicationDone && riskCriteriaDone) {
-            // All onboarding steps done → go to dashboard
-            this.$router.push('/admindashboardonboarding')
-          } else if (!communicationDone) {
-            // Communication not done yet
-            this.$router.push('/communication')
-          } else {
-            // Communication done but risk criteria not done
-            this.$router.push('/riskcriteria')
-          }
-        } else {
-          // File not yet uploaded → show scoping form waiting/alert screen
+        if (!res.file_uploaded) {
           this.$router.push('/scoping-form-2')
+          return
+        }
+
+        // File uploaded — clear scoping keys
+        const user = authStore.user || JSON.parse(localStorage.getItem('user') || '{}')
+        const uid = user?.id || user?.email || ''
+        const submittedKey = uid ? `scoping_submitted_${uid}` : 'scoping_submitted'
+        localStorage.removeItem(submittedKey)
+        localStorage.removeItem('scoping_completed')
+
+        // Check risk criteria from backend (source of truth for step 2)
+        const riskRes = await authStore.fetchAdminRiskCriteria()
+        const riskCriteriaDone = riskRes.status === true
+
+        if (riskCriteriaDone) {
+          // Risk criteria already set → all onboarding done → sync store and go to dashboard
+          authStore.markStepCompleted(1)
+          authStore.markStepCompleted(2)
+          this.$router.push('/admindashboardonboarding')
+          return
+        }
+
+        // Risk criteria not set — check communication step via user-scoped localStorage
+        const stepsKey = uid ? `completedSteps_${uid}` : 'completedSteps'
+        const completedSteps = JSON.parse(localStorage.getItem(stepsKey) || '[]')
+        const communicationDone = completedSteps.includes(1)
+
+        if (communicationDone) {
+          this.$router.push('/riskcriteria')
+        } else {
+          this.$router.push('/communication')
         }
       } catch {
-        // On error, fall back to scoping form
         this.$router.push('/scoping-form-2')
       }
     }

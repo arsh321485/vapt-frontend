@@ -43,7 +43,7 @@
                             <th scope="col">Vul. name</th>
                             <th scope="col">Asset</th>
                             <th scope="col">OS</th>
-                            <th scope="col">Criticality</th>
+                            <th scope="col">Severity</th>
                             <th scope="col">Status</th>
                             <th></th>
                           </tr>

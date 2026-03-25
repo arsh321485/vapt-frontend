@@ -1,2 +1,1 @@
-see tomorrow i can said you that my assests data and its hold mitigation and unhold will not work on my admin dahdsbaord also the vul card on same assets page data not get so not the admin side issue resolve but the user side issue not resolve so do there also
-first give me plan what you understand
+on missingsecurityupdated page of both admin and user side in table change 	Criticality to sevirity

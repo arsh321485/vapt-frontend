@@ -209,41 +209,6 @@
                     @click="multipleTestingEnabled = false; selectedKnowledgeMultiple = []; multiDropdownOpen = false">No</button>
                 </div>
 
-                <!-- Custom multi-select dropdown (only when Yes) -->
-                <div v-if="multipleTestingEnabled === true" class="sf-custom-dropdown" v-click-outside="() => multiDropdownOpen = false">
-                  <button type="button" class="sf-dropdown-trigger" @click="multiDropdownOpen = !multiDropdownOpen">
-                    <span v-if="selectedKnowledgeMultiple.length === 0" class="sf-dropdown-placeholder">
-                      <i class="bi bi-chevron-down me-2"></i>Select testing types…
-                    </span>
-                    <span v-else class="d-flex align-items-center gap-2">
-                      <span
-                        v-for="v in selectedKnowledgeMultiple" :key="v"
-                        class="sf-dropdown-tag"
-                        :style="{ background: knowledgeLevels.find(k=>k.value===v)?.tagBg, color: knowledgeLevels.find(k=>k.value===v)?.color }"
-                      >{{ knowledgeLevels.find(k=>k.value===v)?.label }}</span>
-                      <i class="bi bi-chevron-down ms-1" style="color:#94a3b8; font-size:11px;"></i>
-                    </span>
-                  </button>
-                  <div v-if="multiDropdownOpen" class="sf-dropdown-menu">
-                    <div
-                      v-for="kl in knowledgeLevels" :key="kl.value"
-                      class="sf-dropdown-option"
-                      :class="{ selected: selectedKnowledgeMultiple.includes(kl.value) }"
-                      @click="toggleMultiKnowledge(kl.value)"
-                    >
-                      <div class="sf-dropdown-check">
-                        <i v-if="selectedKnowledgeMultiple.includes(kl.value)" class="bi bi-check2" style="font-size:12px; color:#fff;"></i>
-                      </div>
-                      <div class="sf-kb-icon-sm" :style="{ background: kl.iconBg }">
-                        <i :class="kl.icon" :style="{ color: kl.color, fontSize: '14px' }"></i>
-                      </div>
-                      <div>
-                        <p class="sf-dropdown-opt-title mb-0">{{ kl.label }}</p>
-                        <p class="sf-dropdown-opt-sub mb-0">{{ kl.tag }}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               <!-- Cards: always visible; in multi-mode clicking toggles selection -->
@@ -507,7 +472,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import Swal from 'sweetalert2'
@@ -788,6 +753,16 @@ const standards = ['OWASP', 'NIST', 'ISO 27001', 'PCI-DSS', 'HIPAA', 'SOC 2', 'G
 const selectedStds = ref<string[]>([])
 const assessmentNotes = ref('')
 const complianceNotes = ref('')
+
+// Clear notes when switching testing type tab (multi-mode) or card (single-mode)
+watch(activeKlTab, () => {
+  assessmentNotes.value = ''
+  complianceNotes.value = ''
+})
+watch(selectedKnowledge, () => {
+  assessmentNotes.value = ''
+  complianceNotes.value = ''
+})
 
 const scopeTabs = ['Network', 'Web & API', 'Mobile', 'Cloud']
 const activeScopeTab = ref('Web & API')

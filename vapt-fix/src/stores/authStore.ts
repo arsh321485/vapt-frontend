@@ -257,8 +257,13 @@ export const useAuthStore = defineStore("auth", {
       return { status: true, data: res.data.data, message: res.data.message };
     } catch (error: any) {
       const errorData = error.response?.data;
-      const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "Failed to save testing methodology";
-      return { status: false, message: errorMessage };
+      let errorMessage = errorData?.message || errorData?.error || errorData?.detail || '';
+      if (!errorMessage && errorData && typeof errorData === 'object') {
+        // DRF field-level validation errors: { field: ["msg", ...], ... }
+        const messages = (Object.values(errorData) as any[]).flat().filter((v: any) => typeof v === 'string');
+        if (messages.length > 0) errorMessage = messages.join(' ');
+      }
+      return { status: false, message: errorMessage || "Failed to save testing methodology" };
     }
   },
 
@@ -3420,18 +3425,25 @@ export const useAuthStore = defineStore("auth", {
     return this.token;
   },
 
+  // ✅ Returns a user-scoped localStorage key for completedSteps
+  _stepsKey(): string {
+    const user = this.user || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null);
+    const uid = user?.id || user?.email || '';
+    return uid ? `completedSteps_${uid}` : 'completedSteps';
+  },
+
   // ✅ Mark onboarding step as completed
   markStepCompleted(stepNumber: number) {
     if (!this.completedSteps.includes(stepNumber)) {
       this.completedSteps.push(stepNumber);
-      localStorage.setItem('completedSteps', JSON.stringify(this.completedSteps));
+      localStorage.setItem(this._stepsKey(), JSON.stringify(this.completedSteps));
       console.log(`✅ Step ${stepNumber} marked as completed`);
     }
   },
 
   // ✅ Initialize completed steps from localStorage
   initCompletedSteps() {
-    const saved = localStorage.getItem('completedSteps');
+    const saved = localStorage.getItem(this._stepsKey());
     if (saved) {
       this.completedSteps = JSON.parse(saved);
       console.log('♻️ Restored completed steps:', this.completedSteps);
@@ -3441,7 +3453,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Reset completed steps (useful for testing or new onboarding)
   resetCompletedSteps() {
     this.completedSteps = [];
-    localStorage.removeItem('completedSteps');
+    localStorage.removeItem(this._stepsKey());
     console.log('🔄 Completed steps reset');
   },
 
