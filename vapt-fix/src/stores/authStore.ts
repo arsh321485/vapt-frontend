@@ -216,7 +216,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Check scoping upload status
   async getScopingUploadStatus() {
     const res = await endpoint.get("/api/admin/scoping/upload-status/");
-    return { file_uploaded: res.data.file_uploaded === true };
+    return { file_uploaded: res.data.file_uploaded === true, cards_generating: res.data.cards_generating === true };
   },
 
   // ✅ Submit Scoping Form
