@@ -385,7 +385,7 @@
                     <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center">
                       <p style="font-weight: 600;" class="mb-0">
-                        Vulnerabilities ({{ mitigationActiveTeamData.count }})
+                        Vulnerabilities ({{ uniqueMitigationVulns.length }})
                       </p>
                       <router-link :to="{ path: '/missingsecurityupdates', query: { team: mitigationActiveTab } }">
                         <button class="btn border-0" style="color: rgba(49, 33, 177, 1); font-weight: 600;">More details <i class="bi bi-arrow-right"></i></button>
@@ -393,13 +393,13 @@
                     </div>
 
                     <div v-if="mitigationLoading" class="py-3 text-center text-muted">Loading...</div>
-                    <div v-else-if="mitigationActiveTeamData.vulnerabilities.length === 0" class="py-3 text-muted">
+                    <div v-else-if="uniqueMitigationVulns.length === 0" class="py-3 text-muted">
                       No vulnerabilities assigned to this team.
                     </div>
                     <div v-else class="row align-items-stretch">
                         <div
-                          v-for="vuln in mitigationActiveTeamData.vulnerabilities.slice(0, 4)"
-                          :key="vuln.id"
+                          v-for="vuln in uniqueMitigationVulns.slice(0, 4)"
+                          :key="vuln.plugin_name"
                           class="col-3 d-flex"
                         >
                           <div class="card py-4 px-3 w-100 d-flex flex-column" style="border-radius: 12px;">
@@ -415,9 +415,9 @@
                               {{ vuln.plugin_name }}
                             </h4>
                             <div class="d-flex justify-content-start mt-2">
-                              <i class="bi bi-microsoft me-2"></i>
-                              <h6 :title="vuln.os || 'Unknown OS'" style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px" class="truncated-text">
-                                {{ vuln.os || 'Unknown OS' }}
+                              <i class="bi bi-hdd-network me-2"></i>
+                              <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 14px;margin-top: 2px">
+                                {{ vulnAssetCountMap[vuln.plugin_name] ?? 1 }} affected asset{{ (vulnAssetCountMap[vuln.plugin_name] ?? 1) !== 1 ? 's' : '' }}
                               </h6>
                             </div>
                           </div>
@@ -543,16 +543,31 @@ export default {
       return useAuthStore();
     },
     mitigationActiveTeamData() {
-      if (!this.mitigationByTeamData?.teams) return { count: 0, vulnerabilities: [] };
-      return this.mitigationByTeamData.teams[this.mitigationActiveTab] || { count: 0, vulnerabilities: [] };
+      if (!this.mitigationByTeamData) return { count: 0, vulnerabilities: [] };
+      const teams = this.mitigationByTeamData.teams || this.mitigationByTeamData;
+      if (!teams || typeof teams !== 'object') return { count: 0, vulnerabilities: [] };
+      if (teams[this.mitigationActiveTab]) return teams[this.mitigationActiveTab];
+      const normalize = (s) => String(s).toLowerCase().replace(/\s+/g, ' ').trim();
+      const matchedKey = Object.keys(teams).find(k => normalize(k) === normalize(this.mitigationActiveTab));
+      return matchedKey ? teams[matchedKey] : { count: 0, vulnerabilities: [] };
     },
     vulnAssetCountMap() {
-      if (!this.vulnAssetCountData?.vulnerabilities) return {};
+      if (!this.vulnAssetCountData?.teams) return {};
       const map = {};
-      for (const v of this.vulnAssetCountData.vulnerabilities) {
-        map[v.plugin_name] = v.asset_count;
+      for (const teamData of Object.values(this.vulnAssetCountData.teams)) {
+        for (const v of (teamData.vulnerabilities || [])) {
+          map[v.plugin_name] = v.asset_count;
+        }
       }
       return map;
+    },
+    uniqueMitigationVulns() {
+      const seen = new Map();
+      for (const vuln of this.mitigationActiveTeamData.vulnerabilities) {
+        const key = (vuln.plugin_name || '').trim().toLowerCase();
+        if (!seen.has(key)) seen.set(key, vuln);
+      }
+      return Array.from(seen.values());
     },
     modalSeverityLabel() {
       const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };

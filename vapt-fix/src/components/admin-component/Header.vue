@@ -1,28 +1,28 @@
 <template>
-    <main>
+  <main>
     <nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container-fluid">
-        
-    <router-link to="/home"><img src="@/assets/images/vaptfix_white.png" alt="logo" class="me-5"></router-link>
-     <!-- <div class="browser-bar" style="height: 40px;">
+      <div class="container-fluid">
+
+        <router-link to="/home"><img src="@/assets/images/vaptfix_white.png" alt="logo" class="me-5"></router-link>
+        <!-- <div class="browser-bar" style="height: 40px;">
         <img src="@/assets/images/logo-capital.png" alt="">
       </div>  -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
         </button>
-    
+
         <div class="collapse navbar-collapse" id="navbarNav">
-          
-        <!-- Left nav links -->
-        <ul class="navbar-nav me-auto gap-4">
+          <!-- Left nav links -->
+          <ul class="navbar-nav me-auto gap-4">
             <li class="nav-item">
-              <router-link to="/home" class="nav-link active text-white text-decoration-none" style="font-size: 1rem;" aria-current="page" >
+              <router-link to="/home" class="nav-link active text-white text-decoration-none" style="font-size: 1rem;"
+                aria-current="page">
                 Home
               </router-link>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-white" style="font-size: 1rem;" href="#">Features</a>
+              <a class="nav-link text-white" style="font-size: 1rem;" href="#">Features</a>
             </li>
             <li class="nav-item">
               <router-link to="/pricingplan" style="font-size: 1rem;" class="nav-link text-white text-decoration-none">
@@ -30,25 +30,26 @@
               </router-link>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-white" style="font-size: 1rem;" href="#">Partners</a>
+              <a class="nav-link text-white" style="font-size: 1rem;" href="#">Partners</a>
             </li>
             <!-- <li class="nav-item">
               <router-link to="/vulnerabilityexplorer" style="font-size: 1rem;" class="nav-link text-white text-decoration-none">
                 Vulnerability Explorer
               </router-link>
-            </li> --> 
+            </li> -->
             <!-- <li class="nav-item">
               <router-link to="/usersignup" class="nav-link text-white text-decoration-none">
                 Dashboard screen
               </router-link>
-            </li>
-            -->
+            </li> -->
+
           </ul>
 
-       
+
           <div class="header-cta d-flex align-items-center gap-3">
             <!-- Sign In with hover tooltip -->
             <div class="signin-hover-wrap">
+
               <button class="signin-trigger">
                 <i class="bi bi-person me-1"></i> Sign In
                 <i class="bi bi-chevron-down ms-1 signin-chevron"></i>
@@ -70,17 +71,17 @@
               <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
             </button>
           </div>
-        
 
-        <!-- <div class="d-flex justify-content-start gap-2">
+
+          <!-- <div class="d-flex justify-content-start gap-2">
           
   <template v-if="!user">
     <router-link to="/signup" class="text-white text-decoration-none" tag="button">Signup /</router-link>
     <router-link to="/signin" class="text-white text-decoration-none" tag="button">Signin</router-link>
   </template>
 
-         
-  <template v-else>
+
+<template v-else>
     <router-link to="/profile" class="text-center text-decoration-none d-flex flex-column align-items-center">
       <img 
         src="https://cdn-icons-png.flaticon.com/512/147/147144.png" 
@@ -94,28 +95,28 @@
 </p>
     </router-link>
   </template>
-        </div> -->
+</div> -->
 
         </div>
-    </div>
+      </div>
     </nav>
-    </main>
+  </main>
 </template>
 
 <script>
 export default {
   name: 'Header',
   data() {
-  return {
-    user: null, 
-  };
-},
-methods: {
-   handleFixNow() {
-    this.$router.push("/signup");
-  }
-},
-mounted() {
+    return {
+      user: null,
+    };
+  },
+  methods: {
+    handleFixNow() {
+      this.$router.push("/signup");
+    }
+  },
+  mounted() {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
       this.user = JSON.parse(savedUser);

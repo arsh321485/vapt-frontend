@@ -97,14 +97,12 @@ export default {
     },
     methods: {
         async loadTickets() {
-            // Ensure reportId is available — fetch it if missing
-            if (!this.authStore.userLatestReportId) {
-                await this.authStore.fetchUserVulnerabilityRegister();
-            }
+            // Always fetch fresh on every page visit
+            await this.authStore.fetchUserVulnerabilityRegister();
             const reportId = this.authStore.userLatestReportId;
             if (!reportId) return;
-            if (!this.authStore.cachedUserOpenTickets[reportId]) this.loading = true;
-            const res = await this.authStore.fetchUserOpenTickets(reportId);
+            this.loading = true;
+            const res = await this.authStore.fetchUserOpenTickets(reportId, true);
             this.loading = false;
             if (res.status) {
                 this.tickets = res.data;

@@ -273,13 +273,9 @@
                               {{ vuln.plugin_name }}
                             </h4>
                             <div class="d-flex justify-content-start mt-2">
-                              <i class="bi bi-microsoft me-2"></i>
-                              <h6
-                                :title="vuln.os || 'Unknown OS'"
-                                style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px"
-                                class="truncated-text"
-                              >
-                                {{ vuln.os || 'Unknown OS' }}
+                              <i class="bi bi-hdd-network me-2"></i>
+                              <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 14px;margin-top: 2px">
+                                {{ vuln.assets.length }} affected asset{{ vuln.assets.length !== 1 ? 's' : '' }}
                               </h6>
                             </div>
                             <div class="text-end">
@@ -785,6 +781,7 @@ export default {
       showPopup: false,
       loading: false,
       mitigationData: null,
+      teamsData: null,
       activeTab: "Patch Management",
       activeTabIndex: 0,
       riskCriteria: { critical: null, high: null, medium: null, low: null },
@@ -812,17 +809,22 @@ export default {
       return this.riskModalSeverity ? map[this.riskModalSeverity] : '';
     },
     activeTeamData() {
-      if (!this.mitigationData?.teams) return { count: 0, vulnerabilities: [] };
-      return this.mitigationData.teams[this.activeTab] || { count: 0, vulnerabilities: [] };
+      if (!this.teamsData) return { vulnerabilities: [] };
+      const teamObj = this.teamsData[this.activeTab];
+      if (teamObj && Array.isArray(teamObj.vulnerabilities)) return teamObj;
+      return { vulnerabilities: [] };
     },
     uniqueVulns() {
       const seen = new Map();
       for (const vuln of this.activeTeamData.vulnerabilities) {
         const key = (vuln.plugin_name || '').trim().toLowerCase();
         if (!seen.has(key)) {
-          seen.set(key, { ...vuln, assets: [vuln.host_name] });
+          // vuln-asset-count returns assets array; by-team returns host_name per row
+          const assets = Array.isArray(vuln.assets) ? vuln.assets
+            : vuln.host_name ? [vuln.host_name] : [];
+          seen.set(key, { ...vuln, assets });
         } else {
-          seen.get(key).assets.push(vuln.host_name);
+          if (vuln.host_name) seen.get(key).assets.push(vuln.host_name);
         }
       }
       return Array.from(seen.values());
@@ -949,10 +951,25 @@ export default {
 
     async loadMitigationData() {
       const store = useAuthStore();
-      if (!store.cachedMitigationByTeam) this.loading = true;
-      const result = await store.fetchMitigationByTeam();
-      if (result.status) {
-        this.mitigationData = result.data;
+      this.loading = true;
+
+      // Try vuln-asset-count API first (returns { report_id, teams: {...} })
+      let result = await store.fetchAdminMitigationVulnAssetCount();
+      if (result.status && result.data) {
+        const data = result.data;
+        // vuln-asset-count wraps teams under a "teams" key
+        this.teamsData = data.teams || data;
+        this.mitigationData = data;
+        this.loading = false;
+        return;
+      }
+
+      // Fallback: by-team API (returns { "Team Name": {...} } directly)
+      result = await store.fetchMitigationByTeam();
+      if (result.status && result.data) {
+        const data = result.data;
+        this.teamsData = data.teams || data;
+        this.mitigationData = data;
       }
       this.loading = false;
     },

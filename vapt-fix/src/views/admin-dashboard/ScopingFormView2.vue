@@ -18,7 +18,7 @@
         </div>
         <p v-if="cardsGenerating" class="redirect-note mt-4 mb-0">
           <span class="spinner-border spinner-border-sm me-2"></span>
-          Report upload ho gayi, agents generate ho rahe hain...
+          Report has been uploaded. Vulnerability cards are being generated, please wait...
         </p>
         <p v-else class="redirect-note mt-4 mb-0">
           <span class="spinner-border spinner-border-sm me-2"></span>
@@ -88,10 +88,10 @@
             <div class="sf-progress-box mt-4">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="sf-progress-label">Progress</span>
-                <span class="sf-progress-pct">{{ Math.round(((activeSection + 1) / sections.length) * 100) }}%</span>
+                <span class="sf-progress-pct">{{ formProgress }}%</span>
               </div>
               <div class="sf-progress-track">
-                <div class="sf-progress-fill" :style="{ width: Math.round(((activeSection + 1) / sections.length) * 100) + '%' }"></div>
+                <div class="sf-progress-fill" :style="{ width: formProgress + '%' }"></div>
               </div>
               <p class="sf-progress-note mt-2 mb-0">{{ activeSection + 1 }} of {{ sections.length }} sections</p>
             </div>
@@ -519,6 +519,18 @@ const envMap: Record<string, string>  = { 'Production': 'production', 'Staging':
 async function handleSubmit() {
   const authStore = useAuthStore()
 
+  // Validate each selected testing type has required fields filled
+  if (multipleTestingEnabled.value === true && selectedKnowledgeMultiple.value.length > 0) {
+    for (const klv of selectedKnowledgeMultiple.value) {
+      const s = klSettings.value[klv]
+      const label = knowledgeLevels.find(k => k.value === klv)?.label ?? klv
+      if (!s || s.selectedCats.length === 0 || !s.selectedPerspective || !s.selectedEnv) {
+        Swal.fire('Incomplete Details', `Please fill the required details for "${label}" testing type before submitting.`, 'warning')
+        return
+      }
+    }
+  }
+
   // Build list of payloads — one per testing_type (API accepts one at a time)
   const payloads: Array<Parameters<typeof authStore.saveTestingMethodology>[0]> = []
 
@@ -634,6 +646,51 @@ const sections = [
   { label: 'Project Details', sub: 'Client & info' },
   { label: 'Methodology', sub: 'Type & approach' },
 ]
+
+const formProgress = computed(() => {
+  if (submitted.value) return 100
+
+  // Section 0: 4 required fields → 0% to 50%
+  const d = projectDetails.value
+  const industryFilled = d.industry && (d.industry !== 'other' || customIndustry.value.trim())
+  const section0Filled = [
+    d.organization_name.trim(),
+    industryFilled,
+    d.full_name.trim(),
+    d.email_address.trim()
+  ].filter(Boolean).length
+  const section0Progress = Math.round((section0Filled / 4) * 50)
+
+  if (activeSection.value === 0) return section0Progress
+
+  // Section 1: 5 steps → 50% to 100%
+  let steps = 0
+  const totalSteps = 5
+
+  if (multipleTestingEnabled.value !== null) steps++
+
+  const hasKnowledge = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.length > 0
+    : !!selectedKnowledge.value
+  if (hasKnowledge) steps++
+
+  const hasCats = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.some(k => klSettings.value[k]?.selectedCats.length > 0)
+    : selectedCats.value.length > 0
+  if (hasCats) steps++
+
+  const hasPerspective = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.some(k => !!klSettings.value[k]?.selectedPerspective)
+    : !!selectedPerspective.value
+  if (hasPerspective) steps++
+
+  const hasEnv = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.some(k => !!klSettings.value[k]?.selectedEnv)
+    : !!selectedEnv.value
+  if (hasEnv) steps++
+
+  return 50 + Math.round((steps / totalSteps) * 50)
+})
 
 const scopeTabIcons: Record<string, string> = {
   'Network': 'bi bi-hdd-network',

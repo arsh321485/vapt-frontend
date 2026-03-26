@@ -452,8 +452,10 @@
                             </div>
                             <h4 class="truncated-text" :title="vuln.plugin_name">{{ vuln.plugin_name }}</h4>
                             <div class="d-flex justify-content-start mt-2">
-                              <i class="bi bi-microsoft me-2"></i>
-                              <h6 class="truncated-text" :title="vuln.os || 'Unknown OS'" style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">{{ vuln.os || 'Unknown OS' }}</h6>
+                              <i class="bi bi-hdd-network me-2"></i>
+                              <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 14px;margin-top: 2px">
+                                {{ vuln.assets.length }} affected asset{{ vuln.assets.length !== 1 ? 's' : '' }}
+                              </h6>
                             </div>
                             <div class="text-end">
                               <!-- <router-link :to="{ path: '/usermissingsecurityupdates', query: { team: selectedTeam } }" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
@@ -550,8 +552,13 @@ export default {
       return useAuthStore();
     },
     mitigationActiveTeamData() {
-      if (!this.mitigationByTeamData?.teams) return { count: 0, vulnerabilities: [] };
-      return this.mitigationByTeamData.teams[this.selectedTeam] || { count: 0, vulnerabilities: [] };
+      if (!this.mitigationByTeamData) return { count: 0, vulnerabilities: [] };
+      const teams = this.mitigationByTeamData.teams || this.mitigationByTeamData;
+      if (!teams || typeof teams !== 'object') return { count: 0, vulnerabilities: [] };
+      if (teams[this.selectedTeam]) return teams[this.selectedTeam];
+      const normalize = (s) => String(s).toLowerCase().replace(/\s+/g, ' ').trim();
+      const matchedKey = Object.keys(teams).find(k => normalize(k) === normalize(this.selectedTeam));
+      return matchedKey ? teams[matchedKey] : { count: 0, vulnerabilities: [] };
     },
     modalSeverityLabel() {
       const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };

@@ -265,21 +265,32 @@ export default {
   },
   methods: {
     initChipSelection() {
-      document
-        .querySelectorAll(".chip-group.selectable")
-        .forEach(group => {
-          group.querySelectorAll(".chip").forEach(chip => {
-            chip.addEventListener("click", () => {
-              group.querySelectorAll(".chip").forEach(c =>
-                c.classList.remove("active")
-              );
-              chip.classList.add("active");
-            });
-          });
-        });
+      // Active state is handled by Vue :class binding — no manual DOM manipulation needed
     },
     async addUser() {
-      // 1️⃣ Get admin id
+      // 1️⃣ Validate required fields before API call
+      if (!this.form.first_name?.trim()) {
+        Swal.fire("Missing Field", "Please enter the First Name.", "warning");
+        return;
+      }
+      if (!this.form.last_name?.trim()) {
+        Swal.fire("Missing Field", "Please enter the Last Name.", "warning");
+        return;
+      }
+      if (!this.form.email?.trim()) {
+        Swal.fire("Missing Field", "Please enter the Email Address.", "warning");
+        return;
+      }
+      if (!this.form.user_type) {
+        Swal.fire("Missing Field", "Please select a User Type.", "warning");
+        return;
+      }
+      if (!this.selectedRoles || this.selectedRoles.length === 0) {
+        Swal.fire("Missing Field", "Please select at least one Role.", "warning");
+        return;
+      }
+
+      // 2️⃣ Get admin id
       const adminId =
         this.authStore.user?._id ||
         this.authStore.user?.id;
@@ -289,7 +300,7 @@ export default {
         return;
       }
 
-      // 2️⃣ Build payload (❌ location removed)
+      // 3️⃣ Build payload (❌ location removed)
       const payload = {
         admin_id: adminId,                 // ✅ required
         first_name: this.form.first_name,
@@ -481,7 +492,6 @@ export default {
 
       if (res.isConfirmed) {
         this.selectedCommunication = this.pendingCommunication;
-
         // ✅ VERY IMPORTANT
         if (this.pendingCommunication === "slack") {
           await this.startSlackLogin();
@@ -1009,6 +1019,7 @@ export default {
       this.fetchSlackChannels();
       this.fetchSlackUsers();
     }
+
 
     // ✅ Jira event listener
     window.addEventListener("message", this.onJiraConnected);

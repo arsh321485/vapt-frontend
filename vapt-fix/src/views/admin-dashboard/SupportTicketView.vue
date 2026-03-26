@@ -15,16 +15,6 @@
                             <div>
                                 <h2 class="ticket-head mt-3">Support Tickets</h2>
                             </div>
-                            <div class="d-flex flex-row mt-4">
-                                <div>
-                                  <routerlink to="/pricingplan" class="btn pending-approval-btn rounded-pill">Go Premium
-                                <i class="bi bi-arrow-right ms-1 fs-5"></i></routerlink>
-                                <!-- <button type="button" class="btn pending-approval-btn rounded-pill">
-                                Go Premium
-                                <i class="bi bi-arrow-right ms-1 fs-5"></i>
-                                </button> -->
-                            </div>
-                            </div>
                         </div>
                         <div class="row">
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
