@@ -13,6 +13,7 @@
         </button>
     
         <div class="collapse navbar-collapse" id="navbarNav">
+          
         <!-- Left nav links -->
         <ul class="navbar-nav me-auto gap-4">
             <li class="nav-item">
@@ -35,14 +36,14 @@
               <router-link to="/vulnerabilityexplorer" style="font-size: 1rem;" class="nav-link text-white text-decoration-none">
                 Vulnerability Explorer
               </router-link>
-            </li> -->
+            </li> --> 
             <!-- <li class="nav-item">
               <router-link to="/usersignup" class="nav-link text-white text-decoration-none">
                 Dashboard screen
               </router-link>
-            </li> -->
-            
-        </ul>
+            </li>
+            -->
+          </ul>
 
        
           <div class="header-cta d-flex align-items-center gap-3">
