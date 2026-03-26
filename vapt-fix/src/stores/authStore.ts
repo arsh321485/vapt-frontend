@@ -438,20 +438,6 @@ export const useAuthStore = defineStore("auth", {
       }
   },
 
-  // 🔹 USER FORGOT PASSWORD
-  async userForgotPassword(payload: { email: string }) {
-    try {
-      const res = await endpoint.post("/api/admin/users/user-forgot-password/", payload);
-      return { status: true, data: res.data, message: res.data?.msg || res.data?.message };
-    } catch (error: any) {
-      return {
-        status: false,
-        message: error.response?.data?.msg || error.response?.data?.message || error.message || "Request failed",
-        details: error.response?.data || null,
-      };
-    }
-  },
-
   // ✅ Reset Password
   async resetPassword(payload: { uidb64: string; token: string; password: string; confirm_password: string }) {
       try {
