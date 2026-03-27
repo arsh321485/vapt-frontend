@@ -162,12 +162,10 @@ export default {
     },
     methods: {
         async loadSupportRequests() {
-            if (!this.authStore.userLatestReportId) {
-                await this.authStore.fetchUserVulnerabilityRegister();
-            }
+            await this.authStore.fetchUserVulnerabilityRegister();
             const reportId = this.authStore.userLatestReportId;
             if (!reportId) return;
-            if (!this.authStore.cachedUserSupportRequests[reportId]) this.loading = true;
+            this.loading = true;
             const res = await this.authStore.fetchUserSupportRequestsByReport(reportId);
             this.loading = false;
             if (res.status) {

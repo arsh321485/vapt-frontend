@@ -97,12 +97,11 @@ export default {
     },
     methods: {
         async loadTickets() {
-            // Always fetch fresh on every page visit
             await this.authStore.fetchUserVulnerabilityRegister();
             const reportId = this.authStore.userLatestReportId;
             if (!reportId) return;
             this.loading = true;
-            const res = await this.authStore.fetchUserOpenTickets(reportId, true);
+            const res = await this.authStore.fetchUserOpenTickets(reportId);
             this.loading = false;
             if (res.status) {
                 this.tickets = res.data;

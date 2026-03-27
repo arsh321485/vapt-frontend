@@ -14,15 +14,9 @@
 
             <!-- Page Header -->
             <div class="report-sticky-header d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-back" @click="$router.back()">
-                  <i class="bi bi-arrow-left me-1"></i> Back
-                </button>
-                <div>
-                  <h2 class="page-title mb-0">Vulnerability Management Report</h2>
-                
-                </div>
-              </div>
+              <button class="btn btn-back" @click="$router.back()">
+                <i class="bi bi-arrow-left me-1"></i> Back
+              </button>
               <button class="btn btn-download" @click="downloadReport">
                 <i class="bi bi-download me-2"></i>Download Report
               </button>
@@ -30,8 +24,13 @@
 
             <div class="report-page-wrap" ref="reportWrap">
 
+              <!-- Report Heading -->
+              <div class="report-main-heading mb-4">
+                <h2 class="report-heading-title">Vulnerability Management Report</h2>
+              </div>
+
               <!-- Summary Stat Cards -->
-              <div class="stat-cards-row mb-4 mt-5">
+              <div class="stat-cards-row mb-4">
                 <div class="stat-card">
                   <div class="stat-label">Total Vulnerabilities</div>
                   <div class="stat-value">{{ statsLoading ? '—' : totalVulnerabilities }}</div>
@@ -479,6 +478,8 @@ export default {
 
       // Clone DOM so we can modify without affecting the live page
       const clone = reportContent.cloneNode(true);
+      // Remove fixed-header offset padding — not needed in the downloaded file
+      clone.style.paddingTop = '0';
 
       // Convert canvas elements → <img> with base64 data URLs so charts are preserved
       const liveCanvases = reportContent.querySelectorAll('canvas');
@@ -513,11 +514,12 @@ export default {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <style>
-    body { font-family: 'Inter', sans-serif; background: #f1f5f9; padding: 32px; margin: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; padding: 0; margin: 0; }
+    .report-download-wrapper { max-width: 1200px; margin: 0 auto; padding: 48px 60px; }
     ${cssText}
   </style>
 </head>
-<body>${clone.outerHTML}</body>
+<body><div class="report-download-wrapper">${clone.outerHTML}</div></body>
 </html>`;
 
       const blob = new Blob([html], { type: 'text/html' });
@@ -577,6 +579,17 @@ export default {
 /* ── Report content offset below fixed header ── */
 .report-page-wrap {
   padding-top: 72px;
+}
+
+/* ── Report main heading (inside reportWrap, appears in downloaded file) ── */
+.report-main-heading {
+  padding-top: 8px;
+}
+.report-heading-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0;
 }
 
 /* ── Stat Cards ── */

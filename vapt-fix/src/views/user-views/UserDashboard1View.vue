@@ -701,8 +701,7 @@ export default {
     },
     async fetchAssets(team) {
       const store = useAuthStore();
-      const cacheKey = (team === 'both' ? undefined : team) || '__all__';
-      if (!store.cachedUserTotalAssets[cacheKey]) this.assetsLoading = true;
+      this.assetsLoading = true;
       const result = await store.fetchUserTotalAssets(team === 'both' ? undefined : team);
       if (result.status) {
         this.totalAssets = result.data?.total_assets ?? null;
