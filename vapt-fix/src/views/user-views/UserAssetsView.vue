@@ -710,7 +710,7 @@ export default {
   },
   computed: {
     filteredVulnerabilities() {
-      const vulns = this.authStore.selectedAssetVulnerabilities;
+      const vulns = this.authStore.selectedAssetVulnerabilities.filter(v => v.status === 'open');
       if (this.activeSeverity === 'All') return vulns;
       return vulns.filter(v => v.severity === this.activeSeverity);
     },
