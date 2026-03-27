@@ -746,6 +746,7 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ UPDATE Risk Criteria (User side)
+// ✅ UPDATE Risk Criteria (User side)
   async updateUserRiskCriteria(payload: Record<string, string>) {
     try {
       const riskId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
@@ -755,6 +756,9 @@ export const useAuthStore = defineStore("auth", {
         `/api/user/risk_criteria/risks/${riskId}/update/`,
         payload
       );
+
+      // Clear mitigation timeline cache so dashboard reflects the new criteria immediately
+      this.cachedMitigationTimeline = {};
 
       return { status: true, message: res.data.message, data: res.data };
     } catch (err: any) {

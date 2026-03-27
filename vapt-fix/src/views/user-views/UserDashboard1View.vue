@@ -851,6 +851,8 @@ export default {
       if (result.status) {
         this.riskCriteria = { ...updated };
         this.closeModal();
+        // Re-fetch mitigation timeline immediately with fresh data
+        await this.fetchMitigation(this.selectedTeam || undefined);
       } else {
         alert(result.message || 'Failed to save risk criteria');
       }
