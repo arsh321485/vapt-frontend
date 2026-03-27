@@ -710,7 +710,10 @@ export default {
   },
   computed: {
     filteredVulnerabilities() {
-      const vulns = this.authStore.selectedAssetVulnerabilities.filter(v => v.status === 'open');
+      const closedNames = new Set(this.closedFixVulnerabilities.map(v => v.plugin_name));
+      const vulns = this.authStore.selectedAssetVulnerabilities.filter(v =>
+        v.status === 'open' && !closedNames.has(v.vul_name)
+      );
       if (this.activeSeverity === 'All') return vulns;
       return vulns.filter(v => v.severity === this.activeSeverity);
     },
