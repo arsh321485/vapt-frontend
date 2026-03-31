@@ -352,11 +352,11 @@
                   <div class="row mt-3">
                     <div class="">
                       <div class="d-flex justify-content-between mb-2">
-                        <p style="color:rgba(0,0,0,0.6);font-weight:600;font-size:15px;">
-                          Assets ({{ teamAssets.length }})
+                        <p style="color:rgba(0,0,0,0.87);font-weight:700;font-size:16px;">
+                          Assets <span style="color:rgba(49,33,177,1);font-size:18px;font-weight:800;">({{ teamAssets.length }})</span>
                         </p>
                         <router-link to="/assets" style="color:rgba(49,33,177,1);font-weight:600;font-size:15px;text-decoration:none;">
-                          More details <i class="bi bi-arrow-right"></i>
+                         Go to assets <i class="bi bi-arrow-right"></i>
                         </router-link>
                       </div>
                       <div v-if="!allAssets.length" class="py-3 text-muted">Loading assets...</div>

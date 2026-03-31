@@ -193,7 +193,7 @@ export default {
       projectNoneSelected: false,
       projectPlatforms: [
         { value: "jira", label: "Jira", icon: jiraIcon },
-        { value: "asana", label: "Asana", icon: asanaIcon },
+        // { value: "asana", label: "Asana", icon: asanaIcon },
         // { value: "none", label: "None" }
       ],
       slackPopup: null,

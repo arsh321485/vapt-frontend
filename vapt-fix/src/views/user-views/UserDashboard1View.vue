@@ -10,7 +10,7 @@
             <DashboardMenu />
           </div>
 
-          <div class="col-11 pt-5 pb-3 pe-5 mt-2">
+          <div class="col-11 pt-5 pb-3 pe-5 mt-2" style="position: relative; z-index: 10;">
             <div class="d-flex justify-content-between py-3">
               <div class="d-flex flex-row gap-2">
                 <div>
@@ -394,7 +394,7 @@
                       type="button"
                       class="btn btn-pill fw-semibold"
                       :class="selectedTeam === team ? 'btn-primary active-tab' : 'btn-outline-secondary other-btn'"
-                      @click.stop="selectMitigationTeam(team)"
+                      @click="selectMitigationTeam(team)"
                     >
                       {{ team }}
                     </button>
@@ -406,11 +406,11 @@
               <div class="row mt-3">
                 <div class="">
                   <div class="d-flex justify-content-between mb-2">
-                    <p style="color:rgba(0,0,0,0.6);font-weight:600;font-size:15px;">
-                      Assets ({{ teamAssets.length }})
+                    <p style="color:rgba(0,0,0,0.87);font-weight:700;font-size:16px;">
+                      Assets <span style="color:rgba(49,33,177,1);font-size:18px;font-weight:800;">({{ teamAssets.length }})</span>
                     </p>
                     <router-link to="/userassets">
-                      <button class="btn border-0" style="color:rgba(49,33,177,1);font-weight:600;">More details <i class="bi bi-arrow-right"></i></button>
+                      <button class="btn border-0" style="color:rgba(49,33,177,1);font-weight:600;">Go to assets <i class="bi bi-arrow-right"></i></button>
                     </router-link>
                   </div>
                   <div v-if="!allUserAssets.length" class="py-3 text-muted">Loading assets...</div>
@@ -614,10 +614,24 @@ export default {
     teamAssets() {
       if (!this.selectedTeam || !this.allUserAssets.length) return [];
       const norm = (s) => String(s).toLowerCase().trim();
-      return this.allUserAssets.filter(a =>
+
+      // Primary: filter by assigned_teams on assets
+      const byTeam = this.allUserAssets.filter(a =>
         Array.isArray(a.assigned_teams) &&
         a.assigned_teams.some(t => norm(t) === norm(this.selectedTeam))
       );
+      if (byTeam.length > 0) return byTeam;
+
+      // Fallback: derive hostnames from mitigation data for this team
+      const teams = this.mitigationByTeamData?.teams || this.mitigationByTeamData || {};
+      const teamVulns = teams[this.selectedTeam]?.vulnerabilities || [];
+      const teamHostnames = new Set();
+      for (const vuln of teamVulns) {
+        if (Array.isArray(vuln.assets)) vuln.assets.forEach(h => teamHostnames.add(norm(h)));
+        else if (vuln.host_name) teamHostnames.add(norm(vuln.host_name));
+      }
+      if (teamHostnames.size === 0) return [];
+      return this.allUserAssets.filter(a => teamHostnames.has(norm(a.asset)));
     },
     vulnAssetCountMap() {
       if (!this.vulnAssetCountData?.vulnerabilities) return {};
@@ -768,9 +782,8 @@ export default {
     },
     async fetchAssets(team) {
       const store = useAuthStore();
-      const cacheKey = (team === 'both' ? undefined : team) || '__all__';
-      if (!store.cachedUserTotalAssets[cacheKey]) this.assetsLoading = true;
-      const result = await store.fetchUserTotalAssets(team === 'both' ? undefined : team);
+      this.assetsLoading = true;
+      const result = await store.fetchUserTotalAssets(team === 'both' ? undefined : team, true);
       if (result.status) {
         this.totalAssets = result.data?.total_assets ?? null;
       } else {

@@ -40,13 +40,18 @@ const AUTH_ENDPOINTS = [
   "/api/admin/users/reset-password/",
 ];
 
+// Flag to prevent multiple simultaneous 401 redirects
+let isHandling401 = false;
+
 endpoint.interceptors.response.use(
   (response) => response,
   async (error) => {
     const requestUrl = error.config?.url || "";
     const isAuthEndpoint = AUTH_ENDPOINTS.some((ep) => requestUrl.includes(ep));
 
-    if (error.response?.status === 401 && !isAuthEndpoint) {
+    if (error.response?.status === 401 && !isAuthEndpoint && !isHandling401) {
+      isHandling401 = true;
+
       // Clear localStorage directly
       localStorage.removeItem("authorization");
       localStorage.removeItem("user");
@@ -54,12 +59,14 @@ endpoint.interceptors.response.use(
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("locations");
 
-      router.push("/signin");
+      router.push("/auth?mode=signin");
 
       Swal.fire({
         icon: "error",
         title: "Session Expired",
         text: "Please log in again.",
+      }).finally(() => {
+        isHandling401 = false;
       });
     }
     return Promise.reject(error);

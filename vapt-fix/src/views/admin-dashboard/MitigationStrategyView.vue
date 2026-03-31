@@ -192,8 +192,8 @@
             <div class="row mt-3 mb-2">
               <div class="col-11">
                 <div class="d-flex justify-content-between mb-2">
-                  <p style="color:rgba(0,0,0,0.6);font-weight:600;font-size:15px;">
-                    Assets ({{ teamAssets.length }})
+                  <p style="color:rgba(0,0,0,0.87);font-weight:700;font-size:16px;">
+                    Assets <span style="color:rgba(49,33,177,1);font-size:18px;font-weight:800;">({{ teamAssets.length }})</span>
                   </p>
                   <router-link to="/assets" style="color:rgba(49,33,177,1);font-weight:600;font-size:15px;text-decoration:none;">
                     More details <i class="bi bi-arrow-right"></i>
@@ -866,8 +866,46 @@ export default {
       return this.riskModalSeverity ? map[this.riskModalSeverity] : '';
     },
     activeTeamData() {
-      if (!this.mitigationData?.teams) return { count: 0, vulnerabilities: [] };
-      return this.mitigationData.teams[this.activeTab] || { count: 0, vulnerabilities: [] };
+      if (!this.teamsData) return { vulnerabilities: [] };
+      const teamObj = this.teamsData[this.activeTab];
+      if (teamObj && Array.isArray(teamObj.vulnerabilities)) return teamObj;
+      return { vulnerabilities: [] };
+    },
+    teamAssets() {
+      if (!this.activeTab || !this.allAssets.length) return [];
+      const norm = (s) => String(s).toLowerCase().trim();
+
+      // Primary: use assigned_teams if available on assets
+      const byTeam = this.allAssets.filter(a =>
+        Array.isArray(a.assigned_teams) &&
+        a.assigned_teams.some(t => norm(t) === norm(this.activeTab))
+      );
+      if (byTeam.length > 0) return byTeam;
+
+      // Fallback: derive asset hostnames for the active team from teamsData
+      const teamVulns = this.teamsData?.[this.activeTab]?.vulnerabilities || [];
+      const teamHostnames = new Set();
+      for (const vuln of teamVulns) {
+        if (Array.isArray(vuln.assets)) vuln.assets.forEach(h => teamHostnames.add(norm(h)));
+        else if (vuln.host_name) teamHostnames.add(norm(vuln.host_name));
+      }
+      if (teamHostnames.size === 0) return [];
+      return this.allAssets.filter(a => teamHostnames.has(norm(a.asset)));
+    },
+    uniqueVulns() {
+      const seen = new Map();
+      for (const vuln of this.activeTeamData.vulnerabilities) {
+        const key = (vuln.plugin_name || '').trim().toLowerCase();
+        if (!seen.has(key)) {
+          // vuln-asset-count returns assets array; by-team returns host_name per row
+          const assets = Array.isArray(vuln.assets) ? vuln.assets
+            : vuln.host_name ? [vuln.host_name] : [];
+          seen.set(key, { ...vuln, assets });
+        } else {
+          if (vuln.host_name) seen.get(key).assets.push(vuln.host_name);
+        }
+      }
+      return Array.from(seen.values());
     },
   },
 

@@ -28,17 +28,17 @@
                 </div>
 
                 <!-- Team filter pills -->
-                <div v-if="userTeams.length > 0" class="d-flex gap-2 flex-wrap ms-3 mb-3">
+                <div v-if="mitigationTeams.length > 0" class="d-flex gap-2 flex-wrap ms-3 mb-3">
                   <button type="button" class="btn btn-pill fw-semibold text-dark"
-                    :class="selectedTeam === 'both' ? 'active-tab' : 'btn-outline-secondary'"
-                    @click="selectTeam('both')">All Teams</button>
+                    :class="selectedMitigationTeam === 'all' ? 'active-tab' : 'btn-outline-secondary'"
+                    @click="selectMitigationTeam('all')">All</button>
                   <button
-                    v-for="team in userTeams"
+                    v-for="team in mitigationTeams"
                     :key="team"
                     type="button"
                     class="btn btn-pill fw-semibold"
-                    :class="selectedTeam === team ? 'active-tab' : 'btn-outline-secondary'"
-                    @click="selectTeam(team)">{{ team }}</button>
+                    :class="selectedMitigationTeam === team ? 'active-tab' : 'btn-outline-secondary'"
+                    @click="selectMitigationTeam(team)">{{ team }}</button>
                 </div>
 
                 <!-- Asset List -->
@@ -701,6 +701,9 @@ export default {
       authStore: useAuthStore(),
       userTeams: [],
       selectedTeam: 'both',
+      mitigationTeams: [],
+      selectedMitigationTeam: 'all',
+      mitigationTeamHostMap: {},
       selectedSeverity: "",
       activeSeverity: "All",
       searchQuery: "",
@@ -727,9 +730,12 @@ export default {
   computed: {
     filteredVulnerabilities() {
       const closedNames = new Set(this.closedFixVulnerabilities.map(v => v.plugin_name));
-      const vulns = this.authStore.selectedAssetVulnerabilities.filter(v =>
+      let vulns = this.authStore.selectedAssetVulnerabilities.filter(v =>
         v.status === 'open' && !closedNames.has(v.vul_name)
       );
+      if (this.selectedMitigationTeam !== 'all') {
+        vulns = vulns.filter(v => v.assigned_team === this.selectedMitigationTeam);
+      }
       if (this.activeSeverity === 'All') return vulns;
       return vulns.filter(v => v.severity === this.activeSeverity);
     },
@@ -737,6 +743,10 @@ export default {
       let list = this.assets;
       if (this.selectedTeam !== 'both') {
         list = list.filter(a => Array.isArray(a.assigned_teams) && a.assigned_teams.includes(this.selectedTeam));
+      }
+      if (this.selectedMitigationTeam !== 'all') {
+        const hosts = this.mitigationTeamHostMap[this.selectedMitigationTeam] || new Set();
+        list = list.filter(a => hosts.has(String(a.asset).toLowerCase().trim()));
       }
       if (!this.searchQuery) return list;
       const q = this.searchQuery.toLowerCase();
@@ -766,6 +776,10 @@ export default {
   methods: {
     selectTeam(team) {
       this.selectedTeam = team;
+      this.currentPage = 1;
+    },
+    selectMitigationTeam(team) {
+      this.selectedMitigationTeam = team;
       this.currentPage = 1;
     },
     setSeverity(sev) {
@@ -1020,6 +1034,27 @@ export default {
     await this.loadAssets();
     await this.loadHeldAssets();
     await this.loadSupportRequests();
+
+    // Load mitigation team data for team-based filtering
+    const mitResult = await this.authStore.fetchUserMitigationByTeam();
+    if (mitResult.status && mitResult.data) {
+      const data = mitResult.data.teams || mitResult.data;
+      if (data && typeof data === 'object') {
+        this.mitigationTeams = Object.keys(data).filter(k => k !== 'member_teams');
+        const hostMap = {};
+        for (const [team, teamData] of Object.entries(data)) {
+          if (team === 'member_teams') continue;
+          const hosts = new Set();
+          const vulns = (teamData && teamData.vulnerabilities) || [];
+          for (const v of vulns) {
+            if (Array.isArray(v.assets)) v.assets.forEach(h => hosts.add(String(h).toLowerCase().trim()));
+            else if (v.host_name) hosts.add(String(v.host_name).toLowerCase().trim());
+          }
+          hostMap[team] = hosts;
+        }
+        this.mitigationTeamHostMap = hostMap;
+      }
+    }
   },
 };
 </script>

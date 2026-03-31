@@ -81,6 +81,20 @@
                     style="right:12px; top:50%; transform:translateY(-50%); cursor:pointer;" @click="clearSearch"></i>
                 </div>
 
+                <!-- Team filter pills -->
+                <div v-if="adminTeams.length > 0" class="d-flex gap-2 flex-wrap mt-3">
+                  <button type="button" class="btn btn-pill fw-semibold text-dark"
+                    :class="selectedTeam === 'all' ? 'active-tab' : 'btn-outline-secondary'"
+                    @click="selectTeam('all')">All Teams</button>
+                  <button
+                    v-for="team in adminTeams"
+                    :key="team"
+                    type="button"
+                    class="btn btn-pill fw-semibold"
+                    :class="selectedTeam === team ? 'active-tab' : 'btn-outline-secondary'"
+                    @click="selectTeam(team)">{{ team }}</button>
+                </div>
+
                 <!-- Asset List -->
                 <div class="asset-list-wrapper">
                   <div class="d-flex flex-column mt-3">
@@ -925,6 +939,9 @@ export default {
       pageSize: 5,
       query: "",
       isSearching: false,
+      selectedTeam: "all",
+      adminTeams: [],
+      mitigationTeamData: null,
       // reportId: localStorage.getItem("reportId"),
       selectedAsset: "",
       activeSeverity: 'All',
@@ -958,6 +975,26 @@ export default {
         );
       }
 
+      // 🔥 STEP 1.2: filter by team
+      if (this.selectedTeam && this.selectedTeam !== 'all') {
+        const norm = (s) => String(s).toLowerCase().trim();
+        const byAssigned = list.filter(a =>
+          Array.isArray(a.assigned_teams) && a.assigned_teams.some(t => norm(t) === norm(this.selectedTeam))
+        );
+        if (byAssigned.length > 0) {
+          list = byAssigned;
+        } else if (this.mitigationTeamData) {
+          // Fallback: derive hostnames for this team from mitigation data
+          const teamVulns = this.mitigationTeamData[this.selectedTeam]?.vulnerabilities || [];
+          const teamHosts = new Set();
+          for (const v of teamVulns) {
+            if (Array.isArray(v.assets)) v.assets.forEach(h => teamHosts.add(norm(h)));
+            else if (v.host_name) teamHosts.add(norm(v.host_name));
+          }
+          list = teamHosts.size > 0 ? list.filter(a => teamHosts.has(norm(a.asset))) : [];
+        }
+      }
+
       // 🔥 STEP 1.5: filter by severity (FIXED)
 if (this.selectedSeverity && this.selectedSeverity !== "all") {
   list = list.filter(a => {
@@ -987,6 +1024,25 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
     list = list.filter(a =>
       a.asset.toLowerCase().includes(q)
     );
+  }
+
+  // team filter
+  if (this.selectedTeam && this.selectedTeam !== 'all') {
+    const norm = (s) => String(s).toLowerCase().trim();
+    const byAssigned = list.filter(a =>
+      Array.isArray(a.assigned_teams) && a.assigned_teams.some(t => norm(t) === norm(this.selectedTeam))
+    );
+    if (byAssigned.length > 0) {
+      list = byAssigned;
+    } else if (this.mitigationTeamData) {
+      const teamVulns = this.mitigationTeamData[this.selectedTeam]?.vulnerabilities || [];
+      const teamHosts = new Set();
+      for (const v of teamVulns) {
+        if (Array.isArray(v.assets)) v.assets.forEach(h => teamHosts.add(norm(h)));
+        else if (v.host_name) teamHosts.add(norm(v.host_name));
+      }
+      list = teamHosts.size > 0 ? list.filter(a => teamHosts.has(norm(a.asset))) : [];
+    }
   }
 
   // 🔥 severity filter (ADDED)
@@ -1137,6 +1193,10 @@ if (this.selectedSeverity && this.selectedSeverity !== "all") {
       let formatted = digits.match(/.{1,3}/g)?.join(".") || "";
       let parts = formatted.split(".").slice(0, 4);
       this.ipAddress = parts.join(".");
+    },
+    selectTeam(team) {
+      this.selectedTeam = team;
+      this.currentPage = 1;
     },
     handleDeleteClick() {
       if (this.activeAction === "hold") {
@@ -1532,7 +1592,17 @@ if (res.status) {
       await this.authStore.getReportStatus();
     }
 
-    this.authStore.fetchAssets();
+    await this.authStore.fetchAssets();
+
+    // Load team names for filter pills from mitigation API
+    const mitigationResult = await this.authStore.fetchMitigationByTeam();
+    if (mitigationResult.status && mitigationResult.data) {
+      const data = mitigationResult.data.teams || mitigationResult.data;
+      if (data && typeof data === 'object') {
+        this.adminTeams = Object.keys(data).filter(t => t.toLowerCase() !== 'unassigned');
+        this.mitigationTeamData = data;
+      }
+    }
 
     // Ensure latestReportId and vulnerabilityRows are available
     if (!this.authStore.latestReportId || !this.authStore.vulnerabilityRows.length) {
