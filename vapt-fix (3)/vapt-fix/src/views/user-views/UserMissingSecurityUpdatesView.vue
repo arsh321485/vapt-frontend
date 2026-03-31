@@ -171,4 +171,4 @@ export default {
   color: rgba(49, 33, 177, 1);
   font-weight: 600;
 }
-</style>gut
+</style>

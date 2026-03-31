@@ -1,6 +1,0 @@
-{
-    "detail": "User is not linked to any team. Ask your admin to assign you a team."
-}
-
-
-https://vaptbackend.secureitlab.com/api/user/asset/assets/
