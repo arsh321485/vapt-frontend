@@ -37,7 +37,42 @@
               <img v-if="tool.icon" :src="tool.icon" />
               {{ tool.label }}
             </div>
+          </div>
 
+          <!-- Jira Connected User -->
+          <div v-if="jiraConnected && jiraUser" class="jira-user-card mt-3">
+            <img :src="jiraUser.picture" class="jira-user-avatar" />
+            <div class="jira-user-info">
+              <div class="jira-user-name">{{ jiraUser.name }}</div>
+              <div class="jira-user-email">{{ jiraUser.email }}</div>
+            </div>
+            <span class="jira-user-badge">
+              <i class="bi bi-check-circle-fill me-1"></i>Connected
+            </span>
+          </div>
+
+          <!-- Jira Cloud Resources -->
+          <div v-if="jiraConnected && jiraResources.length" class="jira-resources mt-3">
+            <div class="jira-resources-title">
+              <i class="bi bi-check-circle-fill text-success me-1"></i>
+              Jira Connected — Select your workspace:
+            </div>
+            <div class="jira-resource-list mt-2">
+              <div
+                v-for="resource in jiraResources"
+                :key="resource.id"
+                class="jira-resource-item"
+                :class="{ active: selectedJiraCloudId === resource.id }"
+                @click="selectedJiraCloudId = resource.id"
+              >
+                <img :src="resource.avatarUrl" class="jira-resource-avatar" />
+                <div class="jira-resource-info">
+                  <div class="jira-resource-name">{{ resource.name }}</div>
+                  <div class="jira-resource-url">{{ resource.url }}</div>
+                </div>
+                <i v-if="selectedJiraCloudId === resource.id" class="bi bi-check-circle-fill text-success ms-auto"></i>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -170,7 +205,18 @@ export default {
       backendBase: "https://vaptbackend.secureitlab.com",
       jiraResources: [],
       jiraConnected: false,
+      jiraUser: null,
+      selectedJiraCloudId: localStorage.getItem("jira_cloud_id") || null,
     };
+  },
+  watch: {
+    selectedJiraCloudId(val) {
+      if (val) {
+        localStorage.setItem("jira_cloud_id", val);
+      } else {
+        localStorage.removeItem("jira_cloud_id");
+      }
+    },
   },
   computed: {
     returnTo() {
@@ -219,58 +265,88 @@ export default {
   },
   methods: {
     initChipSelection() {
-      document
-        .querySelectorAll(".chip-group.selectable")
-        .forEach(group => {
-          group.querySelectorAll(".chip").forEach(chip => {
-            chip.addEventListener("click", () => {
-              group.querySelectorAll(".chip").forEach(c =>
-                c.classList.remove("active")
-              );
-              chip.classList.add("active");
-            });
-          });
-        });
+      // Active state is handled by Vue :class binding — no manual DOM manipulation needed
     },
     async addUser() {
-      // 1️⃣ Get admin id
-      const adminId =
-        this.authStore.user?._id ||
-        this.authStore.user?.id;
+      // Validate required fields
+      if (!this.form.first_name?.trim()) {
+        Swal.fire("Missing Field", "Please enter the First Name.", "warning");
+        return;
+      }
+      if (!this.form.last_name?.trim()) {
+        Swal.fire("Missing Field", "Please enter the Last Name.", "warning");
+        return;
+      }
+      if (!this.form.email?.trim()) {
+        Swal.fire("Missing Field", "Please enter the Email Address.", "warning");
+        return;
+      }
+      if (!this.form.user_type) {
+        Swal.fire("Missing Field", "Please select a User Type.", "warning");
+        return;
+      }
+      if (!this.selectedRoles || this.selectedRoles.length === 0) {
+        Swal.fire("Missing Field", "Please select at least one Role.", "warning");
+        return;
+      }
 
+      const adminId = this.authStore.user?._id || this.authStore.user?.id;
       if (!adminId) {
         Swal.fire("Error", "Please login again", "error");
         return;
       }
 
-      // 2️⃣ Build payload (❌ location removed)
+      // Base payload
       const payload = {
-        admin_id: adminId,                 // ✅ required
+        admin_id: adminId,
         first_name: this.form.first_name,
         last_name: this.form.last_name,
         email: this.form.email,
         user_type: this.form.user_type,
         Member_role: this.selectedRoles.map(
           r => this.roleOptions.find(o => o.short === r)?.full
-        )                                  // ✅ full role names
+        )
       };
 
-      // 🧪 Debug
+      // MS Teams: add access_token + team_id if Teams is selected
+      if (this.selectedCommunication === "teams") {
+        const graphToken = localStorage.getItem("microsoft_graph_token");
+        const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
+        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+        if (graphToken && teamId) {
+          payload.access_token = graphToken;
+          payload.team_id = teamId;
+        }
+      }
+
+      // Slack: add slack_bot_token if Slack is selected
+      if (this.selectedCommunication === "slack") {
+        const botToken = localStorage.getItem("slack_bot_token");
+        if (botToken) {
+          payload.slack_bot_token = botToken;
+        }
+      }
+
       console.log("FINAL PAYLOAD 👉", payload);
 
-      // 3️⃣ API call
       const res = await this.authStore.createUserDetail(payload);
 
       if (res.status) {
+        const syncMsg = this.selectedCommunication === "teams"
+          ? " and added to Microsoft Teams"
+          : this.selectedCommunication === "slack"
+            ? " and invited to Slack channels"
+            : "";
+
         Swal.fire({
           icon: "success",
-          title: "User added successfully",
-          timer: 1800,
+          title: `User added successfully${syncMsg}`,
+          timer: 2000,
           showConfirmButton: false,
           allowOutsideClick: false
         });
 
-        // 🔄 reset form
+        // Reset form
         this.form.first_name = "";
         this.form.last_name = "";
         this.form.email = "";
@@ -280,18 +356,9 @@ export default {
 
       } else {
         let errorMessage = "User detail with this email already exists";
-
-        if (
-          res.details &&
-          res.details.detail &&
-          res.details.detail.email &&
-          Array.isArray(res.details.detail.email)
-        ) {
-          errorMessage = "User detail with this email already exists";
-        } else if (res.message && !res.message.includes("500")) {
+        if (res.message && !res.message.includes("500")) {
           errorMessage = res.message;
         }
-
         Swal.fire({
           icon: "warning",
           title: "User already exists",
@@ -435,7 +502,6 @@ export default {
 
       if (res.isConfirmed) {
         this.selectedCommunication = this.pendingCommunication;
-
         // ✅ VERY IMPORTANT
         if (this.pendingCommunication === "slack") {
           await this.startSlackLogin();
@@ -546,7 +612,7 @@ export default {
     Swal.fire("Error", "Microsoft login failed", "error");
   }
     },
-    onTeamsConnected(event) {
+    async onTeamsConnected(event) {
       if (event.data?.type === "TEAMS_CONNECTED") {
         Swal.fire({
           icon: "success",
@@ -555,7 +621,14 @@ export default {
           timer: 2000,
           showConfirmButton: false
         });
-        this.fetchTeams();
+        await this.fetchTeams();
+
+        // Subscribe to Teams webhook (one-time after connect)
+        const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
+        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+        if (teamId) {
+          await this.authStore.subscribeTeamsWebhook(teamId);
+        }
       }
     },
     async fetchTeams() {
@@ -766,7 +839,7 @@ export default {
     console.error("Slack users error:", err);
   }
     },
-    async addUserToProjectSlack(channelId, slackUserId) {
+    async addUserToProjectSlack(channelId, slackUserId, userEmail, userName) {
   try {
     const botToken = localStorage.getItem("slack_bot_token");
 
@@ -778,13 +851,37 @@ export default {
     const res = await this.authStore.addUserToSlackChannel(
       botToken,
       channelId,
-      slackUserId
+      slackUserId,
+      userEmail,
+      userName
     );
 
     console.log("Slack add user result:", res);
 
   } catch (err) {
     console.error("Slack add user error:", err);
+  }
+    },
+
+    async addUserToProjectTeams(teamId, channelId, userEmail) {
+  try {
+    const graphToken = localStorage.getItem("microsoft_graph_token");
+
+    if (!graphToken) {
+      console.warn("Microsoft Teams not connected");
+      return;
+    }
+
+    const res = await this.authStore.addUserToTeamsChannel({
+      teamId,
+      channelId,
+      userEmail,
+    });
+
+    console.log("Teams add user result:", res);
+
+  } catch (err) {
+    console.error("Teams add user error:", err);
   }
     },
     async inviteProjectTeam(channelId, slackUserIds) {
@@ -844,6 +941,7 @@ export default {
       if (event.data?.type === "JIRA_CONNECTED") {
         this.jiraConnected = true;
         this.fetchJiraResources();
+        this.fetchJiraUser();
         Swal.fire({
           icon: "success",
           title: "Jira Connected",
@@ -853,13 +951,60 @@ export default {
         });
       }
     },
+    // ✅ Validate Jira Token (with auto-refresh on expiry)
+    async checkJiraConnection() {
+      const jiraToken = localStorage.getItem("jira_access_token");
+      if (!jiraToken) return;
+
+      const res = await this.authStore.validateJiraToken(jiraToken);
+      if (res.valid) {
+        this.jiraConnected = true;
+        this.selectedProject = "jira";
+        this.fetchJiraResources();
+        this.fetchJiraUser();
+        return;
+      }
+
+      // Token invalid — try refreshing
+      const refreshToken = localStorage.getItem("jira_refresh_token");
+      if (refreshToken) {
+        const refreshRes = await this.authStore.refreshJiraToken(refreshToken);
+        if (refreshRes.status) {
+          // Refresh succeeded — validate new token
+          this.jiraConnected = true;
+          this.selectedProject = "jira";
+          this.fetchJiraResources();
+          this.fetchJiraUser();
+          return;
+        }
+      }
+
+      // Refresh also failed — clear and ask to reconnect
+      localStorage.removeItem("jira_access_token");
+      localStorage.removeItem("jira_refresh_token");
+      localStorage.removeItem("jira_oauth_state");
+      this.jiraConnected = false;
+      this.selectedProject = null;
+      Swal.fire({
+        icon: "warning",
+        title: "Jira Session Expired",
+        text: "Please reconnect Jira to continue.",
+        confirmButtonColor: "#5a44ff",
+      });
+    },
     // ✅ Fetch Jira Resources (Cloud IDs)
     async fetchJiraResources() {
       const res = await this.authStore.getJiraResources();
       if (res.status) {
         this.jiraResources = res.data;
         this.jiraConnected = true;
-        console.log("Jira Resources:", this.jiraResources);
+      }
+    },
+    // ✅ Fetch Jira Connected User Info
+    async fetchJiraUser() {
+      const res = await this.authStore.getJiraUser();
+      if (res.status) {
+        this.jiraUser = res.user;
       }
     },
   },
@@ -892,15 +1037,25 @@ export default {
       this.fetchSlackUsers();
     }
 
+
     // ✅ Jira event listener
     window.addEventListener("message", this.onJiraConnected);
 
-    // Check if Jira already connected
+    // Check if Jira already connected (or just returned from OAuth callback)
     const jiraToken = localStorage.getItem("jira_access_token");
     if (jiraToken) {
-      this.jiraConnected = true;
-      this.selectedProject = "jira";
-      this.fetchJiraResources();
+      this.checkJiraConnection();
+    } else if (this.$route.query.jira_connected === "true") {
+      // Returned from backend redirect after server-side token exchange
+      const storedToken = localStorage.getItem("jira_access_token");
+      if (storedToken) {
+        this.jiraConnected = true;
+        this.selectedProject = "jira";
+        this.fetchJiraResources();
+        this.fetchJiraUser();
+      }
+      // Clean query param from URL
+      this.$router.replace({ query: {} });
     }
 
     document.addEventListener("click", this.closeOnOutside);
@@ -1203,4 +1358,93 @@ export default {
   }
 }
 
+
+/* ── Jira Connected User ── */
+.jira-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #d1fae5;
+  border-radius: 12px;
+  background: #f0fdf4;
+}
+
+.jira-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.jira-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.jira-user-email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.jira-user-badge {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+/* ── Jira Cloud Resources ── */
+.jira-resources-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.jira-resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jira-resource-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #e6e9f2;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: #fff;
+}
+
+.jira-resource-item:hover {
+  border-color: #5a44ff;
+  background: #f5f4ff;
+}
+
+.jira-resource-item.active {
+  border-color: #5a44ff;
+  background: #f0eeff;
+}
+
+.jira-resource-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.jira-resource-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.jira-resource-url {
+  font-size: 12px;
+  color: #6b7280;
+}
 </style>

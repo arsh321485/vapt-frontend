@@ -21,10 +21,24 @@
                     </div>
                   </div>
 
-                <div class="mb-4 pe-3 ms-3 mt-3">
+                <div class="mb-2 pe-3 ms-3 mt-3">
                   <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" v-model="searchQuery" style="padding-top: 6px;padding-bottom: 6px;">
                   </form>
+                </div>
+
+                <!-- Team filter pills -->
+                <div v-if="userTeams.length > 0" class="d-flex gap-2 flex-wrap ms-3 mb-3">
+                  <button type="button" class="btn btn-pill fw-semibold text-dark"
+                    :class="selectedTeam === 'both' ? 'active-tab' : 'btn-outline-secondary'"
+                    @click="selectTeam('both')">All Teams</button>
+                  <button
+                    v-for="team in userTeams"
+                    :key="team"
+                    type="button"
+                    class="btn btn-pill fw-semibold"
+                    :class="selectedTeam === team ? 'active-tab' : 'btn-outline-secondary'"
+                    @click="selectTeam(team)">{{ team }}</button>
                 </div>
 
                 <!-- Asset List -->
@@ -315,13 +329,16 @@
         </button>
       </li>
       <li class="nav-item">
-        <button 
-          class="nav-link" 
-          :class="{ active: activeTab === 'exceptions' }" 
+        <button
+          class="nav-link"
+          :class="{ active: activeTab === 'exceptions' }"
           @click="activeTab = 'exceptions'">
-          Support Requests <span class="badge rounded-circle bg-danger ms-1" style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">
-    2
-  </span>
+          Support Requests
+          <span
+            v-if="assetSupportRequests.length > 0"
+            class="badge rounded-circle bg-danger ms-1"
+            style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;"
+          >{{ assetSupportRequests.length }}</span>
         </button>
       </li>
       <li class="nav-item">
@@ -381,7 +398,7 @@
               >
                 <div class="d-flex justify-content-start align-items-center gap-3">
                   <p class="mb-0" style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;flex-shrink:0;">{{ idx + 1 }}</p>
-                  <p class="mb-0" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.vul_name }}</p>
+                  <p class="mb-0" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;max-width: 300px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;" :title="vuln.vul_name">{{ vuln.vul_name }}</p>
                   <span class="d-flex align-items-center badge-critical" style="margin-top: 0;" :style="{ color: getSeverityColor(vuln.severity) }">
                     <span class="rounded-circle me-1" :style="{ width: '6px', height: '6px', backgroundColor: getSeverityColor(vuln.severity) }"></span>
                     <span>{{ vuln.severity }}</span>
@@ -425,12 +442,12 @@
                   </div>
                   <div class="d-flex flex-column">
                     <router-link
-                      v-if="authStore.userLatestReportId"
+                      v-if="authStore.userLatestReportId && activeIndex"
                       :to="{
                         name: 'UserVulFix',
                         params: {
                           reportId: authStore.userLatestReportId,
-                          asset: vuln.asset,
+                          asset: activeIndex,
                         },
                         query: {
                           plugin_name: vuln.vul_name,
@@ -484,66 +501,85 @@
         </div>
       </div>
 
-      <!-- Exception Requests -->
+      <!-- Support Requests Tab -->
       <div v-if="activeTab === 'exceptions'">
-        <div class="d-flex justify-content-between align-items-center gap-3">
-          <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-          <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-          <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-          <span>High</span>
-          </span>
-          <button class="btn btn-sm fixes-btn" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
-                              View raised requests
-                            </button>   
-        </div> 
+        <div v-if="loadingSupportRequests" class="text-center py-4">
+          <span class="spinner-border spinner-border-sm text-primary"></span>
+        </div>
+        <div v-else-if="assetSupportRequests.length === 0" class="text-center text-muted py-4">
+          No support requests for this asset.
+        </div>
+        <div v-else>
+          <div
+            v-for="(req, idx) in assetSupportRequests"
+            :key="req._id"
+            class="d-flex justify-content-between align-items-center gap-3 py-2 border-bottom"
+          >
+            <p class="mb-0 flex-shrink-0" style="background-color: black; height: 30px; width: 30px; color: white; border-radius: 50%; display: grid; place-items: center;">{{ idx + 1 }}</p>
+            <p class="mb-0 flex-grow-1 text-truncate" style="color: rgba(0,0,0,0.87); font-weight: 500; font-size: 15px;" :title="req.vul_name">{{ req.vul_name }}</p>
+            <span
+              class="badge rounded-pill px-3 py-2 flex-shrink-0"
+              :class="req.status === 'open' ? 'bg-danger' : 'bg-success'"
+              style="font-size: 12px; text-transform: capitalize;"
+            >{{ req.status }}</span>
+            <button
+              class="btn btn-sm fixes-btn flex-shrink-0"
+              data-bs-toggle="modal"
+              data-bs-target="#userSupportRequestModal"
+              @click="selectedSupportRequest = req"
+            >View raised requests</button>
+          </div>
+        </div>
 
-        <!-- view Requests Modal -->
-                      <div class="modal fade" id="viewRequestsModal" tabindex="-1" aria-labelledby="viewRequestsModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                            
-                            <!-- Modal Header -->
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="viewRequestsModalLabel">Issues Raised for Support</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            
-                            <!-- Modal Body -->
-                            <div class="modal-body">
-                              <div class="row g-2">
-                                <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 2: Code review</span>
-                                </div>
-                                <div class="col-4">
-                                  <span class="badge rounded-pill w-100 py-2 text-center bg-primary" style="cursor: pointer; font-size: 12px;">Step 4:Code review</span>    
-                                </div>
-                              </div>
+        <!-- Support Request Detail Modal -->
+        <div class="modal fade" id="userSupportRequestModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Issues Raised for Support</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body" v-if="selectedSupportRequest">
+                <p class="mb-1 text-muted" style="font-size: 13px;">Vulnerability</p>
+                <p class="fw-semibold mb-3" style="font-size: 15px;">{{ selectedSupportRequest.vul_name }}</p>
 
-                              <h6 class="mt-3 fw-semibold">Description</h6>
-                              <textarea class="form-control rounded-0" rows="4" >The issue has been reviewed, but the current explanation is not sufficient. Please provide additional justification to proceed further.
-                              </textarea>
-                            </div>
-                            
-                            <!-- Modal Footer -->
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
+                <p class="mb-1 fw-semibold">Steps Requested</p>
+                <div class="row g-2 mb-3">
+                  <template v-if="selectedSupportRequest.step_requested === 'all'">
+                    <div class="col-auto">
+                      <span class="badge rounded-pill bg-primary py-2 px-3" style="font-size: 12px;">All Steps</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div
+                      v-for="step in selectedSupportRequest.step_requested.split(',')"
+                      :key="step"
+                      class="col-auto"
+                    >
+                      <span class="badge rounded-pill bg-primary py-2 px-3" style="font-size: 12px;">Step {{ step.trim() }}</span>
+                    </div>
+                  </template>
+                </div>
 
-                          </div>
-                        </div>
-                      </div>
-        
-        <div class="d-flex justify-content-between align-items-center gap-3">
-          <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">5</p>
-          <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-          <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-          <span>High</span>
-          </span>
-          <button class="btn btn-sm fixes-btn" data-bs-toggle="modal" data-bs-target="#viewRequestsModal">
-                              View raised requests
-                            </button>    
+                <p class="mb-1 fw-semibold">Description</p>
+                <textarea class="form-control rounded-0 mb-3" rows="4" readonly>{{ selectedSupportRequest.description }}</textarea>
+
+                <div class="d-flex gap-4">
+                  <div>
+                    <p class="mb-0 text-muted" style="font-size: 12px;">Requested by</p>
+                    <p class="mb-0 fw-semibold" style="font-size: 14px;">{{ selectedSupportRequest.requested_by }}</p>
+                  </div>
+                  <div>
+                    <p class="mb-0 text-muted" style="font-size: 12px;">Date</p>
+                    <p class="mb-0 fw-semibold" style="font-size: 14px;">{{ formatRequestDate(selectedSupportRequest.requested_at) }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -663,6 +699,8 @@ export default {
   data() {
     return {
       authStore: useAuthStore(),
+      userTeams: [],
+      selectedTeam: 'both',
       selectedSeverity: "",
       activeSeverity: "All",
       searchQuery: "",
@@ -681,18 +719,28 @@ export default {
       pageSize: 5,
       closedFixVulnerabilities: [],
       loadingClosedFix: false,
+      supportRequests: [],
+      loadingSupportRequests: false,
+      selectedSupportRequest: null,
     };
   },
   computed: {
     filteredVulnerabilities() {
-      const vulns = this.authStore.selectedAssetVulnerabilities;
+      const closedNames = new Set(this.closedFixVulnerabilities.map(v => v.plugin_name));
+      const vulns = this.authStore.selectedAssetVulnerabilities.filter(v =>
+        v.status === 'open' && !closedNames.has(v.vul_name)
+      );
       if (this.activeSeverity === 'All') return vulns;
       return vulns.filter(v => v.severity === this.activeSeverity);
     },
     filteredAssets() {
-      if (!this.searchQuery) return this.assets;
+      let list = this.assets;
+      if (this.selectedTeam !== 'both') {
+        list = list.filter(a => Array.isArray(a.assigned_teams) && a.assigned_teams.includes(this.selectedTeam));
+      }
+      if (!this.searchQuery) return list;
       const q = this.searchQuery.toLowerCase();
-      return this.assets.filter(a => a.asset?.toLowerCase().includes(q));
+      return list.filter(a => a.asset?.toLowerCase().includes(q));
     },
     pagedAssets() {
       const start = (this.currentPage - 1) * this.pageSize;
@@ -710,13 +758,39 @@ export default {
       if (!this.activeIndex) return null;
       return this.assets.find(a => a.asset === this.activeIndex) || null;
     },
+    assetSupportRequests() {
+      if (!this.activeIndex) return [];
+      return this.supportRequests.filter(r => r.host_name === this.activeIndex);
+    },
   },
   methods: {
+    selectTeam(team) {
+      this.selectedTeam = team;
+      this.currentPage = 1;
+    },
     setSeverity(sev) {
       this.activeSeverity = sev;
     },
+    async loadSupportRequests() {
+      let reportId = this.authStore.userLatestReportId;
+      if (!reportId) {
+        await this.authStore.fetchUserVulnerabilityRegister();
+        reportId = this.authStore.userLatestReportId;
+      }
+      if (!reportId) return;
+      this.loadingSupportRequests = true;
+      const res = await this.authStore.fetchUserSupportRequestsByReport(reportId);
+      this.loadingSupportRequests = false;
+      if (res.status && Array.isArray(res.data)) {
+        this.supportRequests = res.data;
+      }
+    },
+    formatRequestDate(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    },
     async loadAssets() {
-      if (!this.authStore.cachedUserAssets.length) this.loading = true;
+      this.loading = true;
       const result = await this.authStore.fetchUserAssets();
       if (result.status) {
         this.assets = result.data;
@@ -766,7 +840,7 @@ export default {
       if (!reportId) return;
       this.$router.push({
         name: 'UserVulFix',
-        params: { reportId, asset: item.host_name },
+        params: { reportId, asset: item.host_name || this.activeIndex },
         query: {
           id: item.fix_vulnerability_id,
           plugin_name: item.plugin_name,
@@ -937,16 +1011,39 @@ export default {
     },
   },
   async mounted() {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      this.userTeams = Array.isArray(user.Member_role) ? user.Member_role : [];
+    } catch { this.userTeams = []; }
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
     await this.loadAssets();
     await this.loadHeldAssets();
+    await this.loadSupportRequests();
   },
 };
 </script>
 
 
 <style scoped>
+.btn-pill {
+  border-radius: 50px;
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  height: 32px;
+}
+
+.active-tab {
+  background-color: #EAE8FF;
+  color: #3121B1;
+  border: none;
+  font-size: 13px;
+}
+
   .hold-asset {
     padding: 7px 10px;
     position: relative;

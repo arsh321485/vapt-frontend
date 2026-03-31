@@ -98,7 +98,7 @@ export default {
         cancelButtonText: "No, stay"
       }).then((result) => {
         if (result.isConfirmed) {
-          this.$router.push("/home"); 
+          this.$router.push("/auth?mode=signin");
         }
       });
     }

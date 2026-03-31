@@ -15,12 +15,6 @@
               <div>
                 <h2 class="ticket-head mt-4">Support Requests</h2>
               </div>
-              <div class="d-flex flex-row gap-3 mt-4">
-                <router-link to="/pricingplan" class="btn pending-approval-btn rounded-pill text-decoration-none">Go
-                  Premium
-                  <i class="bi bi-arrow-right"></i></router-link>
-              
-              </div>
             </div>
 
             <div class="row mt-3">

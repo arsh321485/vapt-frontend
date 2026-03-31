@@ -1,151 +1,173 @@
 <template>
-  <main>
-    <div class="container-fluid min-vh-100">
-      <div class="row min-vh-100">
-        <div class="col-xl-5 col-lg-12 col-md-12 col-12 form-section">
+  <div class="auth-page">
+    <div class="auth-card">
 
-          <!-- LOGO -->
-          <div class="logo-wrapper">
-            <img src="@/assets/images/vaptfix_white.png" height="28">
+      <!-- Logo -->
+      <div class="text-center mb-4">
+        <img src="@/assets/images/logo-capital.png" alt="VaptFix" class="auth-logo" />
+      </div>
+
+      <!-- SET PASSWORD MODE -->
+      <template v-if="currentMode === 'set-password'">
+        <h2 class="auth-title">Set Your Password</h2>
+        <p class="auth-sub mb-4">Create a secure password for your VaptFix account</p>
+
+        <form @submit.prevent="handleSubmit" autocomplete="off">
+          <input type="text" style="display:none" aria-hidden="true" />
+          <input type="password" style="display:none" aria-hidden="true" />
+
+          <!-- New Password -->
+          <div class="mb-3 position-relative">
+            <label class="form-label">New Password</label>
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              class="form-control auth-input"
+              placeholder="Enter new password"
+              v-model="formData.password"
+              @input="validatePassword"
+              autocomplete="off"
+              readonly
+              onfocus="this.removeAttribute('readonly');"
+              required
+            />
+            <i
+              class="bi password-eye"
+              :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+              @click="showPassword = !showPassword"
+            ></i>
           </div>
 
-          <div class="form-area text-white">
-            <div class="form-wrapper w-75 pt-4">
+          <!-- Password Rules -->
+          <ul v-if="showPasswordRules && !allRulesValid" class="password-rules mb-3">
+            <li :class="{ valid: rules.minLength }">At least 8 characters</li>
+            <li :class="{ valid: rules.uppercase }">At least 1 uppercase letter</li>
+            <li :class="{ valid: rules.special }">At least 1 special character</li>
+          </ul>
 
-              <!-- SUB TABS -->
-              <div class="sub-tabs">
-                <div class="sub-tab" :class="{ active: currentMode === 'set-password' }" @click="switchMode('set-password')">
-                  Set Password
-                </div>
-                <div class="sub-tab" :class="{ active: currentMode === 'signin' }" @click="switchMode('signin')">
-                  Sign In
-                </div>
-              </div>
-
-              <!-- FORM -->
-              <form :key="formKey" id="authForm" @submit.prevent="handleSubmit" autocomplete="off">
-                <!-- Hidden fields to trick browser autofill -->
-                <input type="text" style="display:none" aria-hidden="true">
-                <input type="password" style="display:none" aria-hidden="true">
-
-                <!-- EMAIL (Sign In only) -->
-                <div class="mb-2" v-if="currentMode === 'signin'">
-                  <label class="form-label">Email</label>
-                  <input type="email" class="form-control custom-input" placeholder="name@work.com"
-                    v-model="formData.email" autocomplete="off" autocorrect="off" autocapitalize="off"
-                    spellcheck="false" :name="'email_' + formKey" readonly onfocus="this.removeAttribute('readonly');"
-                    required />
-                </div>
-
-                <!-- PASSWORD -->
-                <div class="mb-2 password-field">
-                  <label class="form-label">{{ currentMode === 'set-password' ? 'New Password' : 'Password' }}</label>
-                  <div class="position-relative">
-                    <input :type="showPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Password" v-model="formData.password" @input="validatePassword" autocomplete="off"
-                      autocorrect="off" autocapitalize="off" spellcheck="false" :name="'password_' + formKey" readonly
-                      onfocus="this.removeAttribute('readonly');" required />
-                    <span class="password-toggle" @click="showPassword = !showPassword">
-                      <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
-                    </span>
-                  </div>
-                </div>
-
-                <!-- PASSWORD RULES (Set Password only) -->
-                <ul v-if="showPasswordRules && currentMode === 'set-password' && !allRulesValid"
-                  class="password-rules mt-2 mb-1">
-                  <li :class="{ valid: rules.minLength }">At least 8 characters</li>
-                  <li :class="{ valid: rules.uppercase }">At least 1 uppercase letter</li>
-                  <li :class="{ valid: rules.special }">At least 1 special character</li>
-                </ul>
-
-                <!-- CONFIRM PASSWORD (Set Password only) -->
-                <div class="mb-2 password-confirm" v-if="currentMode === 'set-password'">
-                  <label class="form-label">Confirm Password</label>
-                  <div class="position-relative">
-                    <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control custom-input"
-                      placeholder="Confirm Password" v-model="formData.confirm_password" autocomplete="off"
-                      :name="'confirm-password-' + formKey" readonly onfocus="this.removeAttribute('readonly');"
-                      required />
-                    <span class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
-                      <i :class="showConfirmPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
-                    </span>
-                  </div>
-                </div>
-
-                <!-- FORGOT PASSWORD (Sign In only) -->
-                <div class="text-end mb-2" v-if="currentMode === 'signin'">
-                  <a href="#" @click.prevent="openForgotPasswordModal" class="forgot-link">Forgot Password?</a>
-                </div>
-
-                <!-- reCAPTCHA (Sign In only) -->
-                <div class="mb-2 d-flex justify-content-center" v-if="currentMode === 'signin'">
-                  <div :id="recaptchaContainerId" :key="recaptchaKey"></div>
-                </div>
-
-                <!-- SUBMIT -->
-                <button type="submit" class="btn signup-btn w-100 mb-2" :disabled="loading">
-                  <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-                  {{ currentMode === 'set-password' ? 'Set Password' : 'Sign In' }}
-                </button>
-
-              </form>
-
-            </div>
+          <!-- Confirm Password -->
+          <div class="mb-4 position-relative">
+            <label class="form-label">Confirm Password</label>
+            <input
+              :type="showConfirmPassword ? 'text' : 'password'"
+              class="form-control auth-input"
+              placeholder="Confirm your password"
+              v-model="formData.confirm_password"
+              autocomplete="off"
+              readonly
+              onfocus="this.removeAttribute('readonly');"
+              required
+            />
+            <i
+              class="bi password-eye"
+              :class="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"
+              @click="showConfirmPassword = !showConfirmPassword"
+            ></i>
           </div>
 
-        </div>
+          <button type="submit" class="btn auth-btn w-100" :disabled="loading">
+            <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ loading ? 'Setting Password...' : 'Set Password' }}
+          </button>
+        </form>
 
-        <!-- RIGHT SECTION -->
-        <div
-          class="col-xl-7 col-lg-12 col-md-12 col-12 d-flex flex-column justify-content-center align-items-center info-section p-5">
+        <p class="text-center mt-3 small">
+          Already have an account?
+          <a href="#" @click.prevent="switchMode('signin')" class="auth-link">Sign In</a>
+        </p>
+      </template>
 
-          <h2 class="testimonial-headline text-center mb-2">
-            <span class="text-white">VAPTFIX — Scan Smart. Fix Fast. Stay Secure.</span>
-          </h2>
-          <!-- DASHBOARD ROTATOR -->
-          <div class="dashboard-slider">
-            <img src="@/assets/images/slider1.png" class="dashboard-slide active" />
-            <img src="@/assets/images/slider2.png" class="dashboard-slide" />
-            <img src="@/assets/images/slider3.png" class="dashboard-slide" />
+      <!-- SIGN IN MODE -->
+      <template v-else>
+        <h2 class="auth-title">Welcome back</h2>
+        <p class="auth-sub mb-4">Sign in to your VaptFix account</p>
+
+        <form :key="formKey" @submit.prevent="handleSubmit" autocomplete="off">
+          <input type="text" style="display:none" aria-hidden="true" />
+          <input type="password" style="display:none" aria-hidden="true" />
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label">Email address</label>
+            <input
+              type="email"
+              class="form-control auth-input"
+              placeholder="Enter your email"
+              v-model="formData.email"
+              autocomplete="off"
+              :name="'email_' + formKey"
+              readonly
+              onfocus="this.removeAttribute('readonly');"
+              required
+            />
           </div>
 
-          <p class="text-white fst-italic">VAPTFIX gives a clear and structured way to handle vulnerability assessments.
-            Instead of juggling multiple tools and reports, everything now lives in one place.
-            It's helped a team stay organised, focused, and confident in a security workflow.</p>
+          <!-- Password -->
+          <div class="mb-2 position-relative">
+            <label class="form-label">Password</label>
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              class="form-control auth-input"
+              placeholder="Enter your password"
+              v-model="formData.password"
+              autocomplete="off"
+              :name="'password_' + formKey"
+              readonly
+              onfocus="this.removeAttribute('readonly');"
+              required
+            />
+            <i
+              class="bi password-eye"
+              :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+              @click="showPassword = !showPassword"
+            ></i>
+          </div>
 
-          <p class="text-light fw-semibold">From risk to resolution, VAPTFIX keeps everything Intune.</p>
+          <div class="text-end mb-3">
+            <a href="#" @click.prevent="openForgotPasswordModal" class="forgot-link">Forgot password?</a>
+          </div>
 
-        </div>
+          <!-- reCAPTCHA -->
+          <div :id="recaptchaContainerId" :key="recaptchaKey" class="mb-4 d-flex justify-content-center"></div>
 
+          <button type="submit" class="btn auth-btn w-100" :disabled="loading">
+            <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ loading ? 'Signing in...' : 'Sign In' }}
+          </button>
+        </form>
+      </template>
+
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div v-if="showForgotPasswordModal" class="fp-backdrop" @click="closeForgotPasswordModal">
+    <div class="fp-modal" @click.stop>
+      <div class="fp-modal-header">
+        <h5 class="fp-modal-title">Reset Password</h5>
+        <button class="fp-close" @click="closeForgotPasswordModal">&times;</button>
+      </div>
+      <div class="fp-modal-body">
+        <p class="fp-desc">Enter your registered email address and we'll send you a reset link.</p>
+        <form @submit.prevent="handleForgotPassword">
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input
+              type="email"
+              class="form-control auth-input"
+              placeholder="name@work.com"
+              v-model="forgotEmail"
+              autocomplete="off"
+              required
+            />
+          </div>
+          <button type="submit" class="btn auth-btn w-100" :disabled="forgotLoading">
+            <span v-if="forgotLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ forgotLoading ? 'Sending...' : 'Send Reset Link' }}
+          </button>
+        </form>
       </div>
     </div>
-
-    <!-- FORGOT PASSWORD MODAL -->
-    <div v-if="showForgotPasswordModal" class="modal-backdrop" @click="closeForgotPasswordModal">
-      <div class="forgot-modal" @click.stop>
-        <div class="forgot-modal-header">
-          <h4>Reset Password</h4>
-          <button class="modal-close" @click="closeForgotPasswordModal">&times;</button>
-        </div>
-        <div class="forgot-modal-body">
-          <p class="text-light mb-3">Enter your registered email address and we'll send you a reset link.</p>
-          <form @submit.prevent="handleForgotPassword">
-            <div class="mb-3">
-              <label class="form-label text-light">Email</label>
-              <input type="email" class="form-control custom-input" placeholder="name@work.com" v-model="forgotEmail"
-                autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
-            </div>
-            <button type="submit" class="btn signup-btn w-100" :disabled="forgotLoading">
-              <span v-if="forgotLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ forgotLoading ? "Sending..." : "Send Reset Link" }}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-  </main>
+  </div>
 </template>
 
 <script>
@@ -157,70 +179,45 @@ export default {
   data() {
     return {
       currentMode: "set-password",
-      formData: {
-        email: "",
-        password: "",
-        confirm_password: ""
-      },
+      formData: { email: "", password: "", confirm_password: "" },
       showPassword: false,
       showConfirmPassword: false,
       loading: false,
-      recaptchaWidgetId: null,
-      recaptchaKey: 0,
-      recaptchaSiteKey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
-      authStore: null,
       formKey: Date.now(),
-      currentSlide: 0,
-      sliderInterval: null,
       showPasswordRules: false,
-      rules: {
-        minLength: false,
-        uppercase: false,
-        special: false
-      },
+      rules: { minLength: false, uppercase: false, special: false },
       showForgotPasswordModal: false,
       forgotEmail: "",
       forgotLoading: false,
       uidb64: "",
       token: "",
-      linkInvalid: false,
+      recaptchaWidgetId: null,
+      recaptchaKey: 0,
+      recaptchaSiteKey: "6LevYjAsAAAAAH5H0o33_0IvZAbvvOiZ82ZwA8ny",
+      authStore: null,
     };
   },
   computed: {
     recaptchaContainerId() {
-      return `recaptcha-user-${this.currentMode}`;
+      return `recaptcha-auth-${this.recaptchaKey}`;
     },
     allRulesValid() {
       return this.rules.minLength && this.rules.uppercase && this.rules.special;
     },
-    isSetPasswordLink() {
-      return !!(this.uidb64 && this.token);
-    }
   },
   methods: {
     switchMode(mode) {
       this.currentMode = mode;
-      this.resetForm();
-      this.formKey = Date.now();
-      this.$router.replace({ path: '/auth', query: { mode } });
-      this.$nextTick(() => {
-        this.clearAutofill();
-        this.reinitializeRecaptcha();
-      });
-    },
-    resetForm() {
       this.formData = { email: "", password: "", confirm_password: "" };
       this.showPassword = false;
       this.showConfirmPassword = false;
       this.showPasswordRules = false;
       this.rules = { minLength: false, uppercase: false, special: false };
-    },
-    clearAutofill() {
-      requestAnimationFrame(() => {
-        this.formData.email = "";
-        this.formData.password = "";
-        this.formData.confirm_password = "";
-      });
+      this.formKey = Date.now();
+      this.$router.replace({ path: '/auth', query: { mode } });
+      if (mode === 'signin') {
+        this.$nextTick(() => { this.reinitializeRecaptcha(); });
+      }
     },
     validatePassword() {
       const pwd = this.formData.password;
@@ -230,34 +227,28 @@ export default {
       this.rules.special = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
     },
     validateForm() {
+      if (!this.formData.password || this.formData.password.trim() === '') {
+        Swal.fire('Error', 'Please enter a password', 'error');
+        return false;
+      }
+      if (this.currentMode === 'set-password') {
+        if (!this.allRulesValid) {
+          Swal.fire('Error', 'Password must be at least 8 characters, include one uppercase letter and one special character.', 'error');
+          return false;
+        }
+        if (this.formData.password !== this.formData.confirm_password) {
+          Swal.fire('Error', 'Passwords do not match', 'error');
+          return false;
+        }
+      }
       if (this.currentMode === 'signin') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(this.formData.email)) {
           Swal.fire('Error', 'Please enter a valid email', 'error');
           return false;
         }
-      }
-
-      if (!this.formData.password || this.formData.password.trim() === '') {
-        Swal.fire('Error', 'Please enter a password', 'error');
-        return false;
-      }
-
-      if (this.currentMode === 'set-password') {
-        if (!this.allRulesValid) {
-          Swal.fire('Error', 'Password must be at least 8 characters, include one uppercase letter and one special character.', 'error');
-          return false;
-        }
-      }
-
-      if (this.currentMode === 'set-password' && this.formData.password !== this.formData.confirm_password) {
-        Swal.fire('Error', 'Passwords do not match', 'error');
-        return false;
-      }
-
-      if (this.currentMode === 'signin') {
         if (!window.grecaptcha || this.recaptchaWidgetId === null) {
-          Swal.fire('Error', 'Security check not loaded. Please wait a moment and try again.', 'error');
+          Swal.fire('Error', 'Security check not loaded. Please wait and try again.', 'error');
           return false;
         }
         const recaptchaResponse = window.grecaptcha.getResponse(this.recaptchaWidgetId);
@@ -266,12 +257,10 @@ export default {
           return false;
         }
       }
-
       return true;
     },
     async handleSubmit() {
       if (!this.validateForm()) return;
-
       if (this.currentMode === 'set-password') {
         await this.handleSetPassword();
       } else {
@@ -284,7 +273,6 @@ export default {
         Swal.fire('Error', 'Invalid or missing reset link. Please use the link sent to your email.', 'error');
         return;
       }
-
       this.loading = true;
       try {
         const result = await this.authStore.userSetPasswordWithToken({
@@ -293,7 +281,6 @@ export default {
           password: this.formData.password,
           confirm_password: this.formData.confirm_password,
         });
-
         if (result.status) {
           const emailFromResponse = result.data?.email || result.data?.user?.email || "";
           await Swal.fire({
@@ -305,9 +292,7 @@ export default {
           });
           this.switchMode('signin');
           if (emailFromResponse) {
-            this.$nextTick(() => {
-              this.formData.email = emailFromResponse;
-            });
+            this.$nextTick(() => { this.formData.email = emailFromResponse; });
           }
         } else {
           Swal.fire('Error', result.message || 'Failed to set password.', 'error');
@@ -326,7 +311,6 @@ export default {
           password: this.formData.password,
           recaptcha: recaptchaResponse,
         });
-
         if (result.status) {
           await Swal.fire({
             icon: 'success',
@@ -359,7 +343,7 @@ export default {
     async handleForgotPassword() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.forgotEmail)) {
-        Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address', confirmButtonColor: '#5a44ff' });
+        Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address', confirmButtonColor: '#4f46e5' });
         return;
       }
       this.forgotLoading = true;
@@ -369,10 +353,10 @@ export default {
           this.closeForgotPasswordModal();
           await Swal.fire({ icon: 'success', title: 'Reset Link Sent!', text: 'Check your email for the password reset link.', timer: 3000, showConfirmButton: false });
         } else {
-          Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Something went wrong!', confirmButtonColor: '#5a44ff' });
+          Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Something went wrong!', confirmButtonColor: '#4f46e5' });
         }
       } catch (error) {
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send reset link. Please try again.', confirmButtonColor: '#5a44ff' });
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send reset link. Please try again.', confirmButtonColor: '#4f46e5' });
       } finally {
         this.forgotLoading = false;
       }
@@ -399,7 +383,6 @@ export default {
           try {
             this.recaptchaWidgetId = window.grecaptcha.render(container, {
               sitekey: this.recaptchaSiteKey,
-              theme: "dark"
             });
           } catch (error) {
             console.error('reCAPTCHA render error:', error);
@@ -417,55 +400,23 @@ export default {
         try { window.grecaptcha.reset(this.recaptchaWidgetId); } catch (e) {}
       }
     },
-    startSlider() {
-      this.sliderInterval = setInterval(() => { this.nextSlide(); }, 4000);
-    },
-    nextSlide() {
-      const slides = document.querySelectorAll('.dashboard-slide');
-      if (!slides || slides.length === 0) return;
-      slides[this.currentSlide].classList.remove('active');
-      slides[this.currentSlide].classList.add('prev');
-      this.currentSlide = (this.currentSlide + 1) % slides.length;
-      slides[this.currentSlide].classList.add('active');
-      slides[this.currentSlide].classList.remove('prev');
-      setTimeout(() => {
-        slides.forEach((slide, index) => {
-          if (index !== this.currentSlide && index !== (this.currentSlide - 1 + slides.length) % slides.length) {
-            slide.classList.remove('prev');
-          }
-        });
-      }, 1000);
-    },
-    stopSlider() {
-      if (this.sliderInterval) {
-        clearInterval(this.sliderInterval);
-        this.sliderInterval = null;
-      }
-    },
   },
   mounted() {
     this.authStore = useAuthStore();
-
-    // Set tab from ?mode= query param; default to set-password
     const mode = this.$route.query.mode;
     if (mode === 'signin' || mode === 'set-password') {
       this.currentMode = mode;
     }
-
-    // Extract uid/token for set-password flow (user-side email link)
     this.uidb64 = this.$route.query.uid || this.$route.query.uidb64 || "";
     this.token = this.$route.query.token || "";
-
-    this.loadRecaptchaScript();
-    this.$nextTick(() => { this.startSlider(); });
-
-    // Ensure URL reflects the active tab on initial load
+    if (this.currentMode === 'signin') {
+      this.loadRecaptchaScript();
+    }
     if (!this.$route.query.mode) {
       this.$router.replace({ path: '/auth', query: { mode: this.currentMode } });
     }
   },
   beforeUnmount() {
-    this.stopSlider();
     if (window.grecaptcha && this.recaptchaWidgetId !== null) {
       try { window.grecaptcha.reset(this.recaptchaWidgetId); } catch (e) {}
     }
@@ -475,243 +426,79 @@ export default {
 </script>
 
 <style scoped>
-
-.alert-box {
-  background: rgba(220, 53, 69, 0.1);
-  border: 1px solid rgba(220, 53, 69, 0.3);
-  border-radius: 10px;
-  color: #f87171;
-  font-size: 13px;
-  padding: 12px 16px;
-}
-
-.password-rules {
-  list-style: none;
-  padding-left: 0;
-  font-size: 13px;
-}
-
-.password-rules li {
-  color: #dc3545;
-}
-
-.password-rules li.valid {
-  color: #28a745;
-}
-
-.logo-wrapper {
-  position: absolute;
-  top: 28px;
-  left: 20%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
-
-.form-area {
-  height: 100%;
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1a1040 50%, #0f2d47 100%);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-top: 40px;
+  padding: 24px;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 36px;
   width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-.form-wrapper {
-  background: transparent;
-  max-height: 100vh;
-  position: relative;
-  padding-top: 140px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.auth-logo {
+  height: 36px;
 }
 
-/* ===== SUB TABS ===== */
-.sub-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid #1f2937;
-  min-height: 46px;
-  height: 46px;
-  flex-shrink: 0;
+.auth-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
 }
 
-#authForm {
-  flex-grow: 1;
+.auth-sub {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
 }
 
-.password-confirm {
-  min-height: 78px;
-}
-
-.sub-tab {
-  padding: 10px 0;
-  cursor: pointer;
-  font-weight: 500;
-  opacity: 0.6;
-  position: relative;
-  min-width: 80px;
-  text-align: center;
-}
-
-.sub-tab.active {
-  opacity: 1;
-  color: rgb(90, 68, 255);
-}
-
-.sub-tab.active::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: rgb(90, 68, 255);
-}
-
-/* ===== INPUTS ===== */
 .form-label {
-  color: #9ca3af;
   font-size: 13px;
-  margin-bottom: 5px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
 }
 
-.custom-input {
-  background: #020617;
-  border: 1px solid #1f2937;
-  color: #fff;
-  height: 46px;
-  border-radius: 10px;
+.auth-input {
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  font-size: 14px;
+  padding: 10px 14px;
+  padding-right: 42px;
+  transition: border-color 0.2s;
 }
 
-.custom-input::placeholder {
-  color: #6b7280;
+.auth-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
 }
 
-.custom-input:focus {
-  background: #020617;
-  border-color: rgb(90, 68, 255);
-  box-shadow: none;
-  color: #fff;
-}
-
-.password-toggle {
+.password-eye {
   position: absolute;
   right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 38px;
   cursor: pointer;
-  opacity: 0.7;
-  color: #fff;
+  color: rgba(0, 0, 0, 0.35);
+  font-size: 16px;
+  transition: color 0.2s;
 }
 
-.custom-input:-webkit-autofill~.password-toggle,
-.custom-input:-webkit-autofill~.password-toggle i {
-  color: #020617 !important;
-  opacity: 1;
+.password-eye:hover {
+  color: #4f46e5;
 }
 
-/* ===== BUTTON ===== */
-.signup-btn {
-  height: 48px;
-  border-radius: 12px;
-  font-weight: 600;
-  background: rgb(90, 68, 255);
-  border: none;
-  color: white;
-}
-
-.info-section {
-  background-color: rgb(13, 13, 43);
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.testimonial-headline {
-  color: #8b949e;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-/* ===== DASHBOARD SLIDER ===== */
-.dashboard-slider {
-  position: relative;
-  width: 100%;
-  max-width: 800px;
-  height: 300px;
-  margin: 0 auto 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dashboard-slide {
-  position: absolute;
-  width: 100%;
-  max-height: 100%;
-  border-radius: 16px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  transform: scale(0.92) translateY(30px);
-  transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dashboard-slide.active {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  z-index: 3;
-}
-
-.dashboard-slide.prev {
-  opacity: 0;
-  transform: scale(0.9) translateY(-40px);
-  z-index: 1;
-}
-
-@media (max-width: 768px) {
-  .dashboard-slider {
-    height: 260px;
-  }
-}
-
-/* Left form column */
-.form-section {
-  background-color: rgb(9, 9, 35);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  padding: 0;
-}
-
-.form-wrapper {
-  width: 100%;
-  max-width: 420px;
-  padding-top: 60px;
-  padding-bottom: 40px;
-}
-
-@media (min-width: 1600px) {
-  .form-wrapper {
-    padding-top: 80px;
-    padding-bottom: 60px;
-  }
-}
-
-@media screen and (min-width: 1920px) {
-  .form-wrapper {
-    padding-top: 50px;
-    padding-bottom: 40px;
-  }
-}
-
-/* ===== FORGOT PASSWORD LINK ===== */
 .forgot-link {
   font-size: 13px;
-  color: rgb(90, 68, 255);
+  color: #4f46e5;
   text-decoration: none;
 }
 
@@ -719,57 +506,94 @@ export default {
   text-decoration: underline;
 }
 
-/* ===== FORGOT PASSWORD MODAL ===== */
-.modal-backdrop {
+.password-rules {
+  list-style: none;
+  padding-left: 0;
+  font-size: 13px;
+  margin-top: -8px;
+}
+
+.password-rules li { color: #dc3545; }
+.password-rules li.valid { color: #28a745; }
+
+.auth-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.auth-btn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.auth-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-link {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-link:hover { text-decoration: underline; }
+
+/* FORGOT PASSWORD MODAL */
+.fp-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 1050;
 }
 
-.forgot-modal {
-  background: #0d0d2b;
-  border: 1px solid #1f2937;
-  border-radius: 16px;
+.fp-modal {
+  background: #fff;
+  border-radius: 14px;
   width: 100%;
-  max-width: 420px;
-  padding: 0;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  max-width: 400px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
 }
 
-.forgot-modal-header {
+.fp-modal-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid #1f2937;
-  color: #fff;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-.forgot-modal-header h4 {
-  margin: 0;
+.fp-modal-title {
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
 }
 
-.modal-close {
+.fp-close {
   background: none;
   border: none;
-  color: #9ca3af;
   font-size: 22px;
-  line-height: 1;
+  color: rgba(0, 0, 0, 0.4);
   cursor: pointer;
-  padding: 0;
+  line-height: 1;
 }
 
-.modal-close:hover {
-  color: #fff;
-}
+.fp-close:hover { color: #0f172a; }
 
-.forgot-modal-body {
-  padding: 20px 24px 24px;
+.fp-desc {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 16px;
 }
 </style>

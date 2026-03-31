@@ -130,8 +130,16 @@ export default {
   },
   computed: {
     filteredRows() {
-      if (this.activeFilters.includes('All')) return this.allRows;
-      return this.allRows.filter(item => this.activeFilters.includes(item.risk_factor));
+      const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+      let rows = this.activeFilters.includes('All')
+        ? [...this.allRows]
+        : this.allRows.filter(item => this.activeFilters.includes(item.risk_factor));
+      rows.sort((a, b) => {
+        const ao = severityOrder[a.risk_factor?.toLowerCase()] ?? 99;
+        const bo = severityOrder[b.risk_factor?.toLowerCase()] ?? 99;
+        return ao - bo;
+      });
+      return rows;
     },
   },
   methods: {
@@ -165,7 +173,7 @@ export default {
     },
     async loadData() {
       const store = useAuthStore();
-      if (!store.cachedUserClosedVulns) this.loading = true;
+      this.loading = true;
       const result = await store.fetchUserClosedVulns();
       if (result.status) {
         this.allRows = result.data.closed_vulnerabilities || [];

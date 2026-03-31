@@ -16,7 +16,11 @@
           <i class="bi bi-envelope-check me-2"></i>
           A confirmation has been sent to your email address
         </div>
-        <p class="redirect-note mt-4 mb-0">
+        <p v-if="cardsGenerating" class="redirect-note mt-4 mb-0">
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Report has been uploaded. Vulnerability cards are being generated, please wait...
+        </p>
+        <p v-else class="redirect-note mt-4 mb-0">
           <span class="spinner-border spinner-border-sm me-2"></span>
           Please wait, your account is being set up...
         </p>
@@ -84,10 +88,10 @@
             <div class="sf-progress-box mt-4">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="sf-progress-label">Progress</span>
-                <span class="sf-progress-pct">{{ Math.round(((activeSection + 1) / sections.length) * 100) }}%</span>
+                <span class="sf-progress-pct">{{ formProgress }}%</span>
               </div>
               <div class="sf-progress-track">
-                <div class="sf-progress-fill" :style="{ width: Math.round(((activeSection + 1) / sections.length) * 100) + '%' }"></div>
+                <div class="sf-progress-fill" :style="{ width: formProgress + '%' }"></div>
               </div>
               <p class="sf-progress-note mt-2 mb-0">{{ activeSection + 1 }} of {{ sections.length }} sections</p>
             </div>
@@ -209,41 +213,6 @@
                     @click="multipleTestingEnabled = false; selectedKnowledgeMultiple = []; multiDropdownOpen = false">No</button>
                 </div>
 
-                <!-- Custom multi-select dropdown (only when Yes) -->
-                <div v-if="multipleTestingEnabled === true" class="sf-custom-dropdown" v-click-outside="() => multiDropdownOpen = false">
-                  <button type="button" class="sf-dropdown-trigger" @click="multiDropdownOpen = !multiDropdownOpen">
-                    <span v-if="selectedKnowledgeMultiple.length === 0" class="sf-dropdown-placeholder">
-                      <i class="bi bi-chevron-down me-2"></i>Select testing types…
-                    </span>
-                    <span v-else class="d-flex align-items-center gap-2">
-                      <span
-                        v-for="v in selectedKnowledgeMultiple" :key="v"
-                        class="sf-dropdown-tag"
-                        :style="{ background: knowledgeLevels.find(k=>k.value===v)?.tagBg, color: knowledgeLevels.find(k=>k.value===v)?.color }"
-                      >{{ knowledgeLevels.find(k=>k.value===v)?.label }}</span>
-                      <i class="bi bi-chevron-down ms-1" style="color:#94a3b8; font-size:11px;"></i>
-                    </span>
-                  </button>
-                  <div v-if="multiDropdownOpen" class="sf-dropdown-menu">
-                    <div
-                      v-for="kl in knowledgeLevels" :key="kl.value"
-                      class="sf-dropdown-option"
-                      :class="{ selected: selectedKnowledgeMultiple.includes(kl.value) }"
-                      @click="toggleMultiKnowledge(kl.value)"
-                    >
-                      <div class="sf-dropdown-check">
-                        <i v-if="selectedKnowledgeMultiple.includes(kl.value)" class="bi bi-check2" style="font-size:12px; color:#fff;"></i>
-                      </div>
-                      <div class="sf-kb-icon-sm" :style="{ background: kl.iconBg }">
-                        <i :class="kl.icon" :style="{ color: kl.color, fontSize: '14px' }"></i>
-                      </div>
-                      <div>
-                        <p class="sf-dropdown-opt-title mb-0">{{ kl.label }}</p>
-                        <p class="sf-dropdown-opt-sub mb-0">{{ kl.tag }}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               <!-- Cards: always visible; in multi-mode clicking toggles selection -->
@@ -507,7 +476,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import Swal from 'sweetalert2'
@@ -527,6 +496,10 @@ function getUserCacheKey(base: string): string {
 const activeSection = ref(0)
 const submitted = ref(false)
 const pollIntervalRef = ref<ReturnType<typeof setInterval> | null>(null)
+const pollingStartTime = ref<number | null>(null)
+const cardsGenerating = ref(false)
+const MAX_POLL_DURATION = 30 * 60 * 1000 // 30 minutes
+const POLL_EVERY = 5000 // 5 seconds
 
 const submitLoading = ref(false)
 
@@ -545,6 +518,18 @@ const envMap: Record<string, string>  = { 'Production': 'production', 'Staging':
 
 async function handleSubmit() {
   const authStore = useAuthStore()
+
+  // Validate each selected testing type has required fields filled
+  if (multipleTestingEnabled.value === true && selectedKnowledgeMultiple.value.length > 0) {
+    for (const klv of selectedKnowledgeMultiple.value) {
+      const s = klSettings.value[klv]
+      const label = knowledgeLevels.find(k => k.value === klv)?.label ?? klv
+      if (!s || s.selectedCats.length === 0 || !s.selectedPerspective || !s.selectedEnv) {
+        Swal.fire('Incomplete Details', `Please fill the required details for "${label}" testing type before submitting.`, 'warning')
+        return
+      }
+    }
+  }
 
   // Build list of payloads — one per testing_type (API accepts one at a time)
   const payloads: Array<Parameters<typeof authStore.saveTestingMethodology>[0]> = []
@@ -614,35 +599,98 @@ async function handleSubmit() {
   }
 
   submitted.value = true
-  localStorage.setItem('scoping_submitted', 'true')
+  localStorage.setItem(getUserCacheKey('scoping_submitted'), Date.now().toString())
   startPolling()
 }
 
-function startPolling() {
-  // Stop any existing interval before starting a new one
+function stopPolling() {
   if (pollIntervalRef.value) {
     clearInterval(pollIntervalRef.value)
     pollIntervalRef.value = null
   }
+}
+
+function startPolling() {
+  stopPolling()
+  pollingStartTime.value = Date.now()
 
   const authStore = useAuthStore()
 
   pollIntervalRef.value = setInterval(async () => {
-    const res = await authStore.getScopingUploadStatus()
-    if (!!res.file_uploaded) {
-      clearInterval(pollIntervalRef.value ?? undefined)
-      pollIntervalRef.value = null
-      localStorage.removeItem('scoping_submitted')
-      localStorage.setItem('scoping_completed', 'true')
-      router.push('/signin')
+    // 30 minutes ho gaye? Polling band karo
+    if (Date.now() - (pollingStartTime.value ?? 0) > MAX_POLL_DURATION) {
+      stopPolling()
+      return
     }
-  }, 5000)
+
+    try {
+      const res = await authStore.getScopingUploadStatus()
+      if (res.file_uploaded === true) {
+        stopPolling()
+        localStorage.removeItem(getUserCacheKey('scoping_submitted'))
+        router.push('/signin')
+      } else if (res.cards_generating === true) {
+        cardsGenerating.value = true
+        // agents generate ho rahe hain — polling jari rakho
+      } else {
+        cardsGenerating.value = false
+        // abhi upload nahi hui — polling jari rakho
+      }
+    } catch {
+      // Network error → silently retry, polling band mat karo
+    }
+  }, POLL_EVERY)
 }
 
 const sections = [
   { label: 'Project Details', sub: 'Client & info' },
   { label: 'Methodology', sub: 'Type & approach' },
 ]
+
+const formProgress = computed(() => {
+  if (submitted.value) return 100
+
+  // Section 0: 4 required fields → 0% to 50%
+  const d = projectDetails.value
+  const industryFilled = d.industry && (d.industry !== 'other' || customIndustry.value.trim())
+  const section0Filled = [
+    d.organization_name.trim(),
+    industryFilled,
+    d.full_name.trim(),
+    d.email_address.trim()
+  ].filter(Boolean).length
+  const section0Progress = Math.round((section0Filled / 4) * 50)
+
+  if (activeSection.value === 0) return section0Progress
+
+  // Section 1: 5 steps → 50% to 100%
+  let steps = 0
+  const totalSteps = 5
+
+  if (multipleTestingEnabled.value !== null) steps++
+
+  const hasKnowledge = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.length > 0
+    : !!selectedKnowledge.value
+  if (hasKnowledge) steps++
+
+  const hasCats = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.some(k => klSettings.value[k]?.selectedCats.length > 0)
+    : selectedCats.value.length > 0
+  if (hasCats) steps++
+
+  const hasPerspective = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.some(k => !!klSettings.value[k]?.selectedPerspective)
+    : !!selectedPerspective.value
+  if (hasPerspective) steps++
+
+  const hasEnv = multipleTestingEnabled.value === true
+    ? selectedKnowledgeMultiple.value.some(k => !!klSettings.value[k]?.selectedEnv)
+    : !!selectedEnv.value
+  if (hasEnv) steps++
+
+  return 50 + Math.round((steps / totalSteps) * 50)
+})
 
 const scopeTabIcons: Record<string, string> = {
   'Network': 'bi bi-hdd-network',
@@ -772,6 +820,16 @@ const standards = ['OWASP', 'NIST', 'ISO 27001', 'PCI-DSS', 'HIPAA', 'SOC 2', 'G
 const selectedStds = ref<string[]>([])
 const assessmentNotes = ref('')
 const complianceNotes = ref('')
+
+// Clear notes when switching testing type tab (multi-mode) or card (single-mode)
+watch(activeKlTab, () => {
+  assessmentNotes.value = ''
+  complianceNotes.value = ''
+})
+watch(selectedKnowledge, () => {
+  assessmentNotes.value = ''
+  complianceNotes.value = ''
+})
 
 const scopeTabs = ['Network', 'Web & API', 'Mobile', 'Cloud']
 const activeScopeTab = ref('Web & API')
@@ -1022,7 +1080,7 @@ onMounted(async () => {
   }
 
   // Resume waiting screen if user had submitted scoping form but closed/logged out before file was uploaded
-  if (localStorage.getItem('scoping_submitted') === 'true') {
+  if (localStorage.getItem(getUserCacheKey('scoping_submitted'))) {
     submitted.value = true
     startPolling()
   }

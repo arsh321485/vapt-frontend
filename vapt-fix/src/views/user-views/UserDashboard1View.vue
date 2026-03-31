@@ -15,7 +15,7 @@
               <div class="d-flex flex-row gap-2">
                 <div>
                   <h2>Vulnerability Management Program</h2>
-                  <p style="color: rgba(0, 0, 0, 0.6);font-size:16px;font-weight: 500;">{{ selectedTeam === 'both' ? 'All Teams' : selectedTeam }}</p>
+                  <p style="color: rgba(0, 0, 0, 0.6);font-size:16px;font-weight: 500;">All Teams</p>
                 </div>
                 <div>
                     <button class="btn border-0" @click="toggleCalendar">
@@ -211,16 +211,9 @@
                     </div>
                     </div>
 
-                <div class="dropdown" ref="teamDropdown">
-                  <div class="dropdown-btn" @click="toggleTeamDropdown"> {{ selectedTeam === 'both' ? 'All Teams' : selectedTeam }}</div>
-                  <div class="dropdown-content">
-                    <a href="#" @click.prevent="selectTeam('both')">All Teams</a>
-                    <a v-for="team in userTeams" :key="team" href="#" @click.prevent="selectTeam(team)">{{ team }}</a>
-                  </div>
-                </div>
               </div>
             </div>
-            
+
 
             <div class="row">
               <div class="col-3">
@@ -398,21 +391,78 @@
                     <button
                       v-for="team in userTeams"
                       :key="team"
+                      type="button"
                       class="btn btn-pill fw-semibold"
                       :class="selectedTeam === team ? 'btn-primary active-tab' : 'btn-outline-secondary other-btn'"
-                      @click="selectTeam(team)"
+                      @click.stop="selectMitigationTeam(team)"
                     >
                       {{ team }}
                     </button>
                   </div>
                 </div>
               </div>
+
+              <!-- Assets section for selected team -->
+              <div class="row mt-3">
+                <div class="">
+                  <div class="d-flex justify-content-between mb-2">
+                    <p style="color:rgba(0,0,0,0.6);font-weight:600;font-size:15px;">
+                      Assets ({{ teamAssets.length }})
+                    </p>
+                    <router-link to="/userassets">
+                      <button class="btn border-0" style="color:rgba(49,33,177,1);font-weight:600;">More details <i class="bi bi-arrow-right"></i></button>
+                    </router-link>
+                  </div>
+                  <div v-if="!allUserAssets.length" class="py-3 text-muted">Loading assets...</div>
+                  <div v-else-if="teamAssets.length === 0" class="py-3 text-muted">No assets assigned to this team.</div>
+                  <div v-else class="row">
+                    <div
+                      v-for="asset in teamAssets.slice(0, 4)"
+                      :key="asset.asset"
+                      class="col-3 d-flex mb-3"
+                    >
+                      <div class="card py-3 px-3 w-100" style="border-radius:12px;">
+                        <div class="d-flex justify-content-between align-items-start">
+                          <div class="fw-semibold" style="color:rgba(0,0,0,0.87);font-size:16px;">{{ asset.asset }}</div>
+                          <span v-if="getTopSeverity(asset.severity_counts)"
+                            :style="{ color: getSeverityColor(getTopSeverity(asset.severity_counts)), fontSize:'12px', fontWeight:'600' }">
+                            {{ getTopSeverity(asset.severity_counts) }}
+                          </span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1 mt-1 mb-2">
+                          <i class="bi bi-link-45deg" style="color:rgba(0,0,0,0.6);font-size:16px;"></i>
+                          <small style="color:rgba(0,0,0,0.6);">{{ asset.isInternal ? 'Internal' : 'External' }}</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                          <span class="d-flex align-items-center">
+                            <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#b31c1c"></span>
+                            <span class="text-danger fw-bold">{{ asset.severity_counts?.critical ?? 0 }}</span>
+                          </span>
+                          <span class="d-flex align-items-center">
+                            <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#f44336"></span>
+                            <span class="text-danger fw-bold">{{ asset.severity_counts?.high ?? 0 }}</span>
+                          </span>
+                          <span class="d-flex align-items-center">
+                            <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#f6b100"></span>
+                            <span class="text-warning fw-bold">{{ asset.severity_counts?.medium ?? 0 }}</span>
+                          </span>
+                          <span class="d-flex align-items-center">
+                            <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#4caf50"></span>
+                            <span class="text-success fw-bold">{{ asset.severity_counts?.low ?? 0 }}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="mt-2 d-flex align-items-center mb-2">
                 <span style="color: rgba(0, 0, 0, 0.87);">
                   Assigned to {{ selectedTeam === 'both' ? 'All Teams' : selectedTeam }} team
                 </span>
               </div>
-              <div class="d-flex gap-4 my-3">
+              <div v-if="mitigationActiveTeamData.vulnerabilities.length > 0" class="d-flex gap-4 my-3">
                       <div class="d-flex flex-column gap-2">
                           <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
                           <button type="button" class="btn patch-btn rounded-pill text-nowrap">{{ riskCriteria.critical ?? '—' }} <i class="bi bi-plus-circle text-danger ms-2" style="cursor:pointer;" @click.stop="openModal('critical')"></i></button>
@@ -452,8 +502,10 @@
                             </div>
                             <h4 class="truncated-text" :title="vuln.plugin_name">{{ vuln.plugin_name }}</h4>
                             <div class="d-flex justify-content-start mt-2">
-                              <i class="bi bi-microsoft me-2"></i>
-                              <h6 class="truncated-text" :title="vuln.os || 'Unknown OS'" style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px">{{ vuln.os || 'Unknown OS' }}</h6>
+                              <i class="bi bi-hdd-network me-2"></i>
+                              <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 14px;margin-top: 2px">
+                                {{ vuln.assets.length }} affected asset{{ vuln.assets.length !== 1 ? 's' : '' }}
+                              </h6>
                             </div>
                             <div class="text-end">
                               <!-- <router-link :to="{ path: '/usermissingsecurityupdates', query: { team: selectedTeam } }" style="color: rgba(49, 33, 177, 1);font-weight: 600;font-size: 15px;text-decoration: none;">
@@ -465,13 +517,9 @@
                     </div>
                 </div>
                 <div class="col-1">
-                 
                 </div>
               </div>
 
-            
-
-           
 
             </div>
 
@@ -537,6 +585,7 @@ export default {
       meanTimeRemediate: null,
       mitigationByTeamData: null,
       vulnAssetCountData: null,
+      allUserAssets: [],
       riskCriteria: { critical: null, high: null, medium: null, low: null },
       showModal: false,
       modalSeverity: null,
@@ -550,12 +599,25 @@ export default {
       return useAuthStore();
     },
     mitigationActiveTeamData() {
-      if (!this.mitigationByTeamData?.teams) return { count: 0, vulnerabilities: [] };
-      return this.mitigationByTeamData.teams[this.selectedTeam] || { count: 0, vulnerabilities: [] };
+      if (!this.mitigationByTeamData) return { count: 0, vulnerabilities: [] };
+      const teams = this.mitigationByTeamData.teams || this.mitigationByTeamData;
+      if (!teams || typeof teams !== 'object') return { count: 0, vulnerabilities: [] };
+      if (teams[this.selectedTeam]) return teams[this.selectedTeam];
+      const normalize = (s) => String(s).toLowerCase().replace(/\s+/g, ' ').trim();
+      const matchedKey = Object.keys(teams).find(k => normalize(k) === normalize(this.selectedTeam));
+      return matchedKey ? teams[matchedKey] : { count: 0, vulnerabilities: [] };
     },
     modalSeverityLabel() {
       const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
       return this.modalSeverity ? map[this.modalSeverity] : '';
+    },
+    teamAssets() {
+      if (!this.selectedTeam || !this.allUserAssets.length) return [];
+      const norm = (s) => String(s).toLowerCase().trim();
+      return this.allUserAssets.filter(a =>
+        Array.isArray(a.assigned_teams) &&
+        a.assigned_teams.some(t => norm(t) === norm(this.selectedTeam))
+      );
     },
     vulnAssetCountMap() {
       if (!this.vulnAssetCountData?.vulnerabilities) return {};
@@ -655,11 +717,26 @@ export default {
       this.showYearPicker = false;
       this.loadCalendarData();
     },
+    getTopSeverity(counts) {
+      if (!counts) return null;
+      if (counts.critical > 0) return 'Critical';
+      if (counts.high > 0) return 'High';
+      if (counts.medium > 0) return 'Medium';
+      if (counts.low > 0) return 'Low';
+      return null;
+    },
     getSeverityColor(sev) {
       if (sev === 'Critical') return 'maroon';
       if (sev === 'High') return 'red';
       if (sev === 'Medium') return 'orange';
       return 'green';
+    },
+    async loadUserAssetsData() {
+      const store = useAuthStore();
+      const result = await store.fetchUserAssets();
+      if (result.status) {
+        this.allUserAssets = result.data || [];
+      }
     },
     getSeverityClass(date) {
       const year = this.currentDate.getFullYear();
@@ -689,14 +766,10 @@ export default {
         this.$router.push("/userassets");
       }
     },
-    toggleTeamDropdown() {
-      this.$refs.teamDropdown.classList.toggle('show');
-    },
     async fetchAssets(team) {
       const store = useAuthStore();
-      const cacheKey = (team === 'both' ? undefined : team) || '__all__';
-      if (!store.cachedUserTotalAssets[cacheKey]) this.assetsLoading = true;
-      const result = await store.fetchUserTotalAssets(team === 'both' ? undefined : team);
+      this.assetsLoading = true;
+      const result = await store.fetchUserTotalAssets(team === 'both' ? undefined : team, true);
       if (result.status) {
         this.totalAssets = result.data?.total_assets ?? null;
       } else {
@@ -787,11 +860,16 @@ export default {
     },
     async fetchMitigationByTeam() {
       const store = useAuthStore();
-      const result = await store.fetchUserMitigationByTeam();
-      if (result.status) {
+      const result = await store.fetchUserMitigationByTeam(true);
+      if (result.status && result.data) {
         this.mitigationByTeamData = result.data;
         if (Array.isArray(result.data.member_teams) && result.data.member_teams.length) {
           this.userTeams = result.data.member_teams;
+          // always sync selectedTeam to a valid team from API data
+          const currentValid = this.userTeams.find(t => t === this.selectedTeam);
+          if (!currentValid) {
+            this.selectedTeam = this.userTeams[0];
+          }
         }
       }
     },
@@ -845,6 +923,8 @@ export default {
       if (result.status) {
         this.riskCriteria = { ...updated };
         this.closeModal();
+        // Re-fetch mitigation timeline immediately with fresh data
+        await this.fetchMitigation(this.selectedTeam || undefined);
       } else {
         alert(result.message || 'Failed to save risk criteria');
       }
@@ -883,49 +963,29 @@ export default {
         this.riskCriteria = { critical: d.critical ?? null, high: d.high ?? null, medium: d.medium ?? null, low: d.low ?? null };
       }
     },
-    async selectTeam(team) {
+    selectMitigationTeam(team) {
       this.selectedTeam = team;
-      const t = team === 'both' ? undefined : team;
-      await Promise.all([
-        this.fetchAssets(team),
-        this.fetchVulns(t),
-        this.fetchVulnsFixed(t),
-        this.fetchSupportReqs(t),
-        this.fetchMitigation(t),
-        this.fetchMeanTimeRemediate(t),
-      ]);
     },
   },
   async mounted() {
-    // Load user's assigned teams from localStorage
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       this.userTeams = Array.isArray(user.Member_role) ? user.Member_role : [];
-    } catch {
-      this.userTeams = [];
-    }
-
-    // Default to first team on load
+    } catch { this.userTeams = []; }
     this.selectedTeam = this.userTeams[0] || '';
+
     await Promise.all([
-      this.fetchAssets(this.selectedTeam),
-      this.fetchVulns(this.selectedTeam || undefined),
-      this.fetchVulnsFixed(this.selectedTeam || undefined),
-      this.fetchSupportReqs(this.selectedTeam || undefined),
-      this.fetchMitigation(this.selectedTeam || undefined),
+      this.fetchAssets('both'),
+      this.fetchVulns(undefined),
+      this.fetchVulnsFixed(undefined),
+      this.fetchSupportReqs(undefined),
+      this.fetchMitigation(undefined),
       this.fetchMeanTimeRemediate(undefined),
       this.fetchMitigationByTeam(),
       this.fetchVulnAssetCount(),
+      this.loadUserAssetsData(),
       this.loadRiskCriteria(),
     ]);
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      const dropdown = document.querySelector('.dropdown');
-      if (dropdown && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
   },
 };
 </script>

@@ -502,6 +502,31 @@ methods: {
 </script>
 
 <style scoped>
+/* ===== Get Started Button Animation ===== */
+.hero-btn {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  animation: btn-pulse 2.5s ease-in-out infinite;
+}
+
+.hero-btn:hover {
+  animation: none;
+  box-shadow: 0 0 18px rgba(90, 68, 255, 0.6);
+}
+
+.hero-btn i {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.hero-btn:hover i {
+  transform: translateX(5px);
+}
+
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(90, 68, 255, 0.45); }
+  50%       { box-shadow: 0 0 0 8px rgba(90, 68, 255, 0); }
+}
+
 /* ===== Scrolling Cards Banner Section ===== */
 .cards-scroll-wrapper {
   overflow: hidden;

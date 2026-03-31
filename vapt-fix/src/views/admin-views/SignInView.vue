@@ -41,7 +41,7 @@
         </div>
 
         <div class="text-end mb-3">
-          <router-link to="/forgotpassword" class="forgot-link">Forgot password?</router-link>
+          <a href="#" @click.prevent="showForgotModal = true" class="forgot-link">Forgot password?</a>
         </div>
 
         <!-- reCAPTCHA -->
@@ -64,6 +64,36 @@
 
     </div>
   </div>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div v-if="showForgotModal" class="fp-backdrop" @click="closeForgotModal">
+    <div class="fp-modal" @click.stop>
+      <div class="fp-modal-header">
+        <h5 class="fp-modal-title">Reset Password</h5>
+        <button class="fp-close" @click="closeForgotModal">&times;</button>
+      </div>
+      <div class="fp-modal-body">
+        <p class="fp-desc">Enter your registered email address and we'll send you a reset link.</p>
+        <form @submit.prevent="handleForgotPassword">
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input
+              type="email"
+              class="form-control signin-input"
+              placeholder="name@work.com"
+              v-model="forgotEmail"
+              autocomplete="off"
+              required
+            />
+          </div>
+          <button type="submit" class="btn signin-btn w-100" :disabled="forgotLoading">
+            <span v-if="forgotLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ forgotLoading ? 'Sending...' : 'Send Reset Link' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -77,7 +107,10 @@ export default {
       form: { email: '', password: '' },
       showPassword: false,
       loading: false,
-      recaptchaWidgetId: null
+      recaptchaWidgetId: null,
+      showForgotModal: false,
+      forgotEmail: '',
+      forgotLoading: false
     }
   },
   methods: {
@@ -127,35 +160,77 @@ export default {
       }
     },
 
-    async checkAndRedirect() {
-      // Case 1: file was already uploaded in a previous session → go to /communication
-      if (localStorage.getItem('scoping_completed') === 'true') {
-        localStorage.removeItem('scoping_completed')
-        this.$router.push('/communication')
-        return
+    closeForgotModal() {
+      this.showForgotModal = false;
+      this.forgotEmail = '';
+      this.forgotLoading = false;
+    },
+    async handleForgotPassword() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.forgotEmail)) {
+        Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.', confirmButtonColor: '#4f46e5' });
+        return;
       }
-
-      // Case 2: scoping form was submitted but user logged out before file was uploaded
-      if (localStorage.getItem('scoping_submitted') === 'true') {
-        try {
-          const authStore = useAuthStore()
-          const res = await authStore.getScopingUploadStatus()
-          if (!!res.file_uploaded) {
-            // File got uploaded while user was away → go directly to /communication
-            localStorage.removeItem('scoping_submitted')
-            this.$router.push('/communication')
-          } else {
-            // File not yet uploaded → go to scoping form waiting screen to resume polling
-            this.$router.push('/scoping-form-2')
-          }
-        } catch {
-          this.$router.push('/scoping-form-2')
+      this.forgotLoading = true;
+      try {
+        const authStore = useAuthStore();
+        const res = await authStore.userForgotPassword({ email: this.forgotEmail });
+        if (res.status) {
+          this.closeForgotModal();
+          Swal.fire({ icon: 'success', title: 'Reset Link Sent!', text: 'Please check your email for the password reset link.', timer: 3000, showConfirmButton: false });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'Something went wrong.', confirmButtonColor: '#4f46e5' });
         }
-        return
+      } catch {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send reset link. Please try again.', confirmButtonColor: '#4f46e5' });
+      } finally {
+        this.forgotLoading = false;
       }
+    },
 
-      // Default: new user → go to scoping form
-      this.$router.push('/scoping-form-2')
+    async checkAndRedirect() {
+      const authStore = useAuthStore()
+
+      try {
+        const res = await authStore.getScopingUploadStatus()
+
+        if (!res.file_uploaded) {
+          this.$router.push('/scoping-form-2')
+          return
+        }
+
+        // File uploaded — clear scoping keys
+        const user = authStore.user || JSON.parse(localStorage.getItem('user') || '{}')
+        const uid = user?.id || user?.email || ''
+        const submittedKey = uid ? `scoping_submitted_${uid}` : 'scoping_submitted'
+        localStorage.removeItem(submittedKey)
+        localStorage.removeItem('scoping_completed')
+
+        // Check risk criteria from backend (source of truth for step 2)
+        const riskRes = await authStore.fetchAdminRiskCriteria()
+        const riskCriteriaDone = riskRes.status === true
+
+        if (riskCriteriaDone) {
+          // Risk criteria already set → all onboarding done → sync store and go to dashboard
+          authStore.markStepCompleted(1)
+          authStore.markStepCompleted(2)
+          this.$router.push('/admindashboardonboarding')
+          return
+        }
+
+        // Risk criteria not set — check communication step via user-scoped localStorage
+        const stepsKey = uid ? `completedSteps_${uid}` : 'completedSteps'
+        const completedSteps = JSON.parse(localStorage.getItem(stepsKey) || '[]')
+        const communicationDone = completedSteps.includes(1)
+
+        if (communicationDone) {
+          this.$router.push('/riskcriteria')
+        } else {
+          this.$router.push('/communication')
+        }
+      } catch {
+        this.$router.push('/scoping-form-2')
+      }
     }
   },
 
@@ -312,5 +387,54 @@ export default {
 
 .signup-link:hover {
   text-decoration: underline;
+}
+
+/* ===== FORGOT PASSWORD MODAL ===== */
+.fp-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.fp-modal {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+.fp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.fp-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.fp-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #6b7280;
+  cursor: pointer;
+  line-height: 1;
+}
+.fp-close:hover { color: #111; }
+.fp-modal-body {
+  padding: 20px 24px 24px;
+}
+.fp-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 16px;
 }
 </style>

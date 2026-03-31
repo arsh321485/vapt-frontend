@@ -153,12 +153,10 @@ export default {
     },
     methods: {
         async loadTickets() {
-            if (!this.authStore.userLatestReportId) {
-                await this.authStore.fetchUserVulnerabilityRegister();
-            }
+            await this.authStore.fetchUserVulnerabilityRegister();
             const reportId = this.authStore.userLatestReportId;
             if (!reportId) return;
-            if (!this.authStore.cachedUserAllTickets[reportId]) this.loading = true;
+            this.loading = true;
             const res = await this.authStore.fetchUserAllTickets(reportId);
             this.loading = false;
             if (res.status) this.tickets = res.data;

@@ -348,6 +348,61 @@
                     </div>
                   </div>
 
+                  <!-- Assets for selected team -->
+                  <div class="row mt-3">
+                    <div class="">
+                      <div class="d-flex justify-content-between mb-2">
+                        <p style="color:rgba(0,0,0,0.6);font-weight:600;font-size:15px;">
+                          Assets ({{ teamAssets.length }})
+                        </p>
+                        <router-link to="/assets" style="color:rgba(49,33,177,1);font-weight:600;font-size:15px;text-decoration:none;">
+                          More details <i class="bi bi-arrow-right"></i>
+                        </router-link>
+                      </div>
+                      <div v-if="!allAssets.length" class="py-3 text-muted">Loading assets...</div>
+                      <div v-else-if="teamAssets.length === 0" class="py-3 text-muted">No assets assigned to this team.</div>
+                      <div v-else class="row">
+                        <div
+                          v-for="asset in teamAssets.slice(0, 4)"
+                          :key="asset.asset"
+                          class="col-3 d-flex mb-3"
+                        >
+                          <div class="card py-3 px-3 w-100" style="border-radius:12px;">
+                            <div class="d-flex justify-content-between align-items-start">
+                              <div class="fw-semibold" style="color:rgba(0,0,0,0.87);font-size:16px;">{{ asset.asset }}</div>
+                              <span v-if="getTopSeverity(asset.severity_counts)"
+                                :style="{ color: getMitigationRiskColor(getTopSeverity(asset.severity_counts)), fontSize:'12px', fontWeight:'600' }">
+                                {{ getTopSeverity(asset.severity_counts) }}
+                              </span>
+                            </div>
+                            <div class="d-flex align-items-center gap-1 mt-1 mb-2">
+                              <i class="bi bi-link-45deg" style="color:rgba(0,0,0,0.6);font-size:16px;"></i>
+                              <small style="color:rgba(0,0,0,0.6);">{{ asset.exposure === 'internal' ? 'Internal' : 'External' }}</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#b31c1c"></span>
+                                <span class="text-danger fw-bold">{{ asset.severity_counts?.critical ?? 0 }}</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#f44336"></span>
+                                <span class="text-danger fw-bold">{{ asset.severity_counts?.high ?? 0 }}</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#f6b100"></span>
+                                <span class="text-warning fw-bold">{{ asset.severity_counts?.medium ?? 0 }}</span>
+                              </span>
+                              <span class="d-flex align-items-center">
+                                <span class="rounded-circle me-1" style="width:6px;height:6px;background-color:#4caf50"></span>
+                                <span class="text-success fw-bold">{{ asset.severity_counts?.low ?? 0 }}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="row  my-4">
                     <div class="d-flex justify-content-between">
                         <div class="mt-2 d-flex align-items-center">
@@ -357,7 +412,7 @@
                         </div>
                     </div>
 
-                    <div class="d-flex gap-4 my-3">
+                    <div v-if="uniqueMitigationVulns.length > 0" class="d-flex gap-4 my-3">
                       
                       <div class="d-flex flex-column gap-2">
                         <button class="btn rounded-pill btn-outline-secondary d-flex align-items-center justify-content-center w-100" style="color: maroon;">Critical</button>
@@ -385,7 +440,7 @@
                     <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center">
                       <p style="font-weight: 600;" class="mb-0">
-                        Vulnerabilities ({{ mitigationActiveTeamData.count }})
+                        Vulnerabilities ({{ uniqueMitigationVulns.length }})
                       </p>
                       <router-link :to="{ path: '/missingsecurityupdates', query: { team: mitigationActiveTab } }">
                         <button class="btn border-0" style="color: rgba(49, 33, 177, 1); font-weight: 600;">More details <i class="bi bi-arrow-right"></i></button>
@@ -393,13 +448,13 @@
                     </div>
 
                     <div v-if="mitigationLoading" class="py-3 text-center text-muted">Loading...</div>
-                    <div v-else-if="mitigationActiveTeamData.vulnerabilities.length === 0" class="py-3 text-muted">
+                    <div v-else-if="uniqueMitigationVulns.length === 0" class="py-3 text-muted">
                       No vulnerabilities assigned to this team.
                     </div>
                     <div v-else class="row align-items-stretch">
                         <div
-                          v-for="vuln in mitigationActiveTeamData.vulnerabilities.slice(0, 4)"
-                          :key="vuln.id"
+                          v-for="vuln in uniqueMitigationVulns.slice(0, 4)"
+                          :key="vuln.plugin_name"
                           class="col-3 d-flex"
                         >
                           <div class="card py-4 px-3 w-100 d-flex flex-column" style="border-radius: 12px;">
@@ -415,9 +470,9 @@
                               {{ vuln.plugin_name }}
                             </h4>
                             <div class="d-flex justify-content-start mt-2">
-                              <i class="bi bi-microsoft me-2"></i>
-                              <h6 :title="vuln.os || 'Unknown OS'" style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 17px;margin-top: 2px" class="truncated-text">
-                                {{ vuln.os || 'Unknown OS' }}
+                              <i class="bi bi-hdd-network me-2"></i>
+                              <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 14px;margin-top: 2px">
+                                {{ vulnAssetCountMap[vuln.plugin_name] ?? 1 }} affected asset{{ (vulnAssetCountMap[vuln.plugin_name] ?? 1) !== 1 ? 's' : '' }}
                               </h6>
                             </div>
                           </div>
@@ -529,6 +584,7 @@ export default {
       mitigationLoading: false,
       mitigationByTeamData: null,
       vulnAssetCountData: null,
+      allAssets: [],
       mitigationActiveTab: "Patch Management",
       mitigationTabs: [
         { key: "Patch Management", label: "Patch Management" },
@@ -543,16 +599,52 @@ export default {
       return useAuthStore();
     },
     mitigationActiveTeamData() {
-      if (!this.mitigationByTeamData?.teams) return { count: 0, vulnerabilities: [] };
-      return this.mitigationByTeamData.teams[this.mitigationActiveTab] || { count: 0, vulnerabilities: [] };
+      if (!this.mitigationByTeamData) return { count: 0, vulnerabilities: [] };
+      const teams = this.mitigationByTeamData.teams || this.mitigationByTeamData;
+      if (!teams || typeof teams !== 'object') return { count: 0, vulnerabilities: [] };
+      if (teams[this.mitigationActiveTab]) return teams[this.mitigationActiveTab];
+      const normalize = (s) => String(s).toLowerCase().replace(/\s+/g, ' ').trim();
+      const matchedKey = Object.keys(teams).find(k => normalize(k) === normalize(this.mitigationActiveTab));
+      return matchedKey ? teams[matchedKey] : { count: 0, vulnerabilities: [] };
     },
     vulnAssetCountMap() {
-      if (!this.vulnAssetCountData?.vulnerabilities) return {};
+      if (!this.vulnAssetCountData?.teams) return {};
       const map = {};
-      for (const v of this.vulnAssetCountData.vulnerabilities) {
-        map[v.plugin_name] = v.asset_count;
+      for (const teamData of Object.values(this.vulnAssetCountData.teams)) {
+        for (const v of (teamData.vulnerabilities || [])) {
+          map[v.plugin_name] = v.asset_count;
+        }
       }
       return map;
+    },
+    uniqueMitigationVulns() {
+      const seen = new Map();
+      for (const vuln of this.mitigationActiveTeamData.vulnerabilities) {
+        const key = (vuln.plugin_name || '').trim().toLowerCase();
+        if (!seen.has(key)) seen.set(key, vuln);
+      }
+      return Array.from(seen.values());
+    },
+    teamAssets() {
+      if (!this.mitigationActiveTab || !this.allAssets.length) return [];
+      const norm = (s) => String(s).toLowerCase().trim();
+
+      // Primary: use assigned_teams if available on assets
+      const byTeam = this.allAssets.filter(a =>
+        Array.isArray(a.assigned_teams) &&
+        a.assigned_teams.some(t => norm(t) === norm(this.mitigationActiveTab))
+      );
+      if (byTeam.length > 0) return byTeam;
+
+      // Fallback: derive asset hostnames for the active team from mitigation data
+      const teamVulns = this.mitigationActiveTeamData.vulnerabilities || [];
+      const teamHostnames = new Set();
+      for (const vuln of teamVulns) {
+        if (Array.isArray(vuln.assets)) vuln.assets.forEach(h => teamHostnames.add(norm(h)));
+        else if (vuln.host_name) teamHostnames.add(norm(vuln.host_name));
+      }
+      if (teamHostnames.size === 0) return [];
+      return this.allAssets.filter(a => teamHostnames.has(norm(a.asset)));
     },
     modalSeverityLabel() {
       const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
@@ -628,6 +720,20 @@ export default {
     getMitigationRiskColor(risk) {
       const map = { Critical: "#b31c1c", High: "#f44336", Medium: "#f6b100", Low: "#4caf50" };
       return map[risk] || "#666";
+    },
+    getTopSeverity(counts) {
+      if (!counts) return null;
+      if (counts.critical > 0) return 'Critical';
+      if (counts.high > 0) return 'High';
+      if (counts.medium > 0) return 'Medium';
+      if (counts.low > 0) return 'Low';
+      return null;
+    },
+    async loadAllAssets() {
+      const result = await this.authStore.fetchAssets();
+      if (result.status) {
+        this.allAssets = this.authStore.assetRows || [];
+      }
     },
     async loadMitigationByTeam() {
       this.mitigationLoading = true;
@@ -1022,6 +1128,7 @@ export default {
       this.loadMitigationByTeam();
       this.loadVulnAssetCount();
       this.loadRiskCriteria();
+      this.loadAllAssets();
       Promise.all([
         this.authStore.fetchDashboardTotalAssets(),
         this.authStore.fetchDashboardAvgScore(),

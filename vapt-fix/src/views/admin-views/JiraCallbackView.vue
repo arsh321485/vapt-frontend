@@ -61,6 +61,32 @@ export default {
           return;
         }
 
+        // Case 1: Backend exchanged token and redirected with tokens in URL params
+        const accessToken = urlParams.get("access_token");
+        const refreshToken = urlParams.get("refresh_token");
+        if (accessToken) {
+          localStorage.setItem("jira_access_token", accessToken);
+          if (refreshToken) localStorage.setItem("jira_refresh_token", refreshToken);
+          localStorage.removeItem("jira_oauth_state");
+          // Clean tokens from URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+          this.status = "success";
+          setTimeout(() => {
+            this.$router.push({ name: "communication" });
+          }, 1500);
+          return;
+        }
+
+        // Case 2: Backend redirected with ?connected=true (server-side token storage)
+        if (urlParams.get("connected") === "true") {
+          this.status = "success";
+          localStorage.removeItem("jira_oauth_state");
+          setTimeout(() => {
+            this.$router.push({ name: "communication" });
+          }, 1500);
+          return;
+        }
+
         // Validate code exists
         if (!code) {
           this.status = "error";
@@ -85,15 +111,16 @@ export default {
           // Clean up state
           localStorage.removeItem("jira_oauth_state");
 
-          // Notify parent window
+          // Notify parent window if opened as popup
           if (window.opener) {
             window.opener.postMessage({ type: "JIRA_CONNECTED" }, "*");
+            setTimeout(() => window.close(), 2000);
+          } else {
+            // Opened as new tab — navigate to communication page
+            setTimeout(() => {
+              this.$router.push({ name: "communication" });
+            }, 1500);
           }
-
-          // Auto close after 2 seconds
-          setTimeout(() => {
-            window.close();
-          }, 2000);
         } else {
           this.status = "error";
           this.errorMessage = res.message || "Failed to connect Jira.";

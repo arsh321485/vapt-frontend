@@ -15,12 +15,6 @@
                             <div>
                                 <h2 class="ticket-head mt-3">Pending</h2>
                             </div>
-                            <div class="d-flex flex-row mt-4">
-                                <div>
-                                <router-link to="/pricingplan" class="btn pending-approval-btn rounded-pill text-decoration-none">Go Premium
-                                <i class="bi bi-arrow-right"></i></router-link>
-                                </div>
-                            </div>
                         </div>
                         <div class="row">
                             <div class="d-flex flex-row align-items-center justify-content-between mt-3">
@@ -335,7 +329,7 @@ export default {
         return;
       }
 
-      const res = await this.authStore.getOpenTickets(this.reportId);
+      const res = await this.authStore.getOpenTickets(this.reportId, true);
 
       if (res.status) {
         this.tickets = res.data;
@@ -357,17 +351,10 @@ async mounted() {
     );
   });
 
-  // STEP 1 → load vulnerability register (sets reportId)
-  if (!this.authStore.latestReportId) {
-    console.log("📡 Fetching vulnerability register first...");
-    await this.authStore.fetchVulnerabilityRegister();
-  }
-
-  // STEP 2 → get reportId
+  // Always fetch fresh on every page visit
+  await this.authStore.fetchVulnerabilityRegister();
   this.reportId = this.authStore.latestReportId;
-  console.log("📡 Using reportId:", this.reportId);
 
-  // STEP 3 → call tickets API
   if (this.reportId) {
     await this.loadOpenTickets();
   } else {

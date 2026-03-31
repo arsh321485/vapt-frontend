@@ -215,14 +215,11 @@ export const useAuthStore = defineStore("auth", {
 
   // ✅ Check scoping upload status
   async getScopingUploadStatus() {
-    try {
-      const res = await endpoint.get("/api/admin/scoping/upload-status/");
-      console.log("[upload-status] raw response:", JSON.stringify(res.data));
-      return { status: true, file_uploaded: !!res.data.file_uploaded };
-    } catch (error: any) {
-      console.error("[upload-status] error:", error?.response?.status, error?.response?.data);
-      return { status: false, file_uploaded: false };
-    }
+    const res = await endpoint.get("/api/admin/scoping/upload-status/");
+    return {
+      file_uploaded: res.data.file_uploaded === true,
+      cards_generating: res.data.cards_generating === true
+    };
   },
 
   // ✅ Submit Scoping Form
@@ -263,8 +260,13 @@ export const useAuthStore = defineStore("auth", {
       return { status: true, data: res.data.data, message: res.data.message };
     } catch (error: any) {
       const errorData = error.response?.data;
-      const errorMessage = errorData?.message || errorData?.error || errorData?.detail || "Failed to save testing methodology";
-      return { status: false, message: errorMessage };
+      let errorMessage = errorData?.message || errorData?.error || errorData?.detail || '';
+      if (!errorMessage && errorData && typeof errorData === 'object') {
+        // DRF field-level validation errors: { field: ["msg", ...], ... }
+        const messages = (Object.values(errorData) as any[]).flat().filter((v: any) => typeof v === 'string');
+        if (messages.length > 0) errorMessage = messages.join(' ');
+      }
+      return { status: false, message: errorMessage || "Failed to save testing methodology" };
     }
   },
 
@@ -744,6 +746,7 @@ export const useAuthStore = defineStore("auth", {
   },
 
   // ✅ UPDATE Risk Criteria (User side)
+// ✅ UPDATE Risk Criteria (User side)
   async updateUserRiskCriteria(payload: Record<string, string>) {
     try {
       const riskId = localStorage.getItem("riskCriteriaId") || localStorage.getItem("riskId");
@@ -753,6 +756,9 @@ export const useAuthStore = defineStore("auth", {
         `/api/user/risk_criteria/risks/${riskId}/update/`,
         payload
       );
+
+      // Clear mitigation timeline cache so dashboard reflects the new criteria immediately
+      this.cachedMitigationTimeline = {};
 
       return { status: true, message: res.data.message, data: res.data };
     } catch (err: any) {
@@ -1052,6 +1058,22 @@ export const useAuthStore = defineStore("auth", {
       return { status: false };
     }
   },
+  async subscribeTeamsWebhook(teamId: string) {
+    try {
+      const graphToken = localStorage.getItem("microsoft_graph_token");
+      const res = await endpoint.post(
+        "/api/users/teams/webhook/subscribe/",
+        { team_id: teamId },
+        { headers: { Authorization: `Bearer ${graphToken}` } }
+      );
+      console.log("Teams webhook subscribed:", res.data);
+      return { status: true, data: res.data };
+    } catch (err: any) {
+      console.error("Teams webhook subscribe failed:", err);
+      return { status: false };
+    }
+  },
+
   async fetchTeamChannels(teamId: string) {
     try {
       const graphToken = localStorage.getItem("microsoft_graph_token");
@@ -1129,7 +1151,51 @@ export const useAuthStore = defineStore("auth", {
     }
   },
 
-  // Slack 
+  // ✅ Add user to a Microsoft Teams channel
+  async addUserToTeamsChannel({
+    teamId,
+    channelId,
+    userEmail,
+    userRole = "member",
+  }: {
+    teamId: string;
+    channelId: string;
+    userEmail: string;
+    userRole?: string;
+  }) {
+    try {
+      const graphToken = localStorage.getItem("microsoft_graph_token");
+      if (!graphToken) {
+        return { status: false, message: "Graph token missing" };
+      }
+      console.log("Calling Add User to Teams Channel API...");
+      const res = await endpoint.post(
+        "/api/admin/users/teams/channels/add-user/",
+        {
+          access_token: graphToken,
+          team_id: teamId,
+          channel_id: channelId,
+          user_email: userEmail,
+          user_role: userRole,
+        }
+      );
+      console.log("Teams add user response:", res.data);
+      if (res.data?.success) {
+        return { status: true, data: res.data.data };
+      }
+      return { status: false, message: res.data?.message };
+    } catch (error: any) {
+      console.error("Add user to Teams channel error:", error);
+      return {
+        status: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to add user to Teams channel",
+      };
+    }
+  },
+
+  // Slack
   async getSlackOAuthUrl(baseUrl: string) {
       console.log("Calling POST /api/admin/users/slack/oauth-url/ with baseUrl:", baseUrl);
       const res = await endpoint.post(
@@ -1321,17 +1387,22 @@ export const useAuthStore = defineStore("auth", {
   async addUserToSlackChannel(
     accessToken: string,
     channel: string,
-    userId: string
+    userId: string,
+    userEmail?: string,
+    userName?: string
   ) {
     try {
       console.log("Calling Add User to Slack Channel API...");
+      const body: Record<string, string> = {
+        access_token: accessToken,
+        channel: channel,
+        user_id: userId,
+      };
+      if (userEmail) body.user_email = userEmail;
+      if (userName) body.user_name = userName;
       const res = await endpoint.post(
         "/api/admin/users/slack/channel/add-user/",
-        {
-          access_token: accessToken,
-          channel: channel,
-          user_id: userId,
-        }
+        body
       );
       console.log("Add user response:", res.data);
       if (res.data?.success) {
@@ -1460,15 +1531,19 @@ export const useAuthStore = defineStore("auth", {
   // 🧠 Jira OAuth - Handle Callback (exchange code for token)
   async handleJiraCallback(code: string, state: string) {
     try {
-      const res = await endpoint.get("/api/admin/users/jira/callback/", {
-        params: { code, state }
-      });
+      const res = await endpoint.post("/api/admin/users/jira/oauth/", { code });
       const data = res.data;
 
-      if (data?.access_token) {
-        localStorage.setItem("jira_access_token", data.access_token);
-        if (data.refresh_token) {
-          localStorage.setItem("jira_refresh_token", data.refresh_token);
+      if (data?.jira_tokens?.access_token) {
+        localStorage.setItem("jira_access_token", data.jira_tokens.access_token);
+        if (data.jira_tokens.refresh_token) {
+          localStorage.setItem("jira_refresh_token", data.jira_tokens.refresh_token);
+        }
+        if (data.jwt_tokens?.access) {
+          localStorage.setItem("authorization", data.jwt_tokens.access);
+        }
+        if (data.jwt_tokens?.refresh) {
+          localStorage.setItem("refresh_token", data.jwt_tokens.refresh);
         }
         return { status: true, data };
       }
@@ -1504,6 +1579,68 @@ export const useAuthStore = defineStore("auth", {
         status: false,
         message: error.response?.data?.message || "Failed to fetch Jira resources",
         details: error.response?.data || null,
+      };
+    }
+  },
+
+  // 🧠 Jira - Get Connected User Info
+  async getJiraUser() {
+    try {
+      const jiraToken = localStorage.getItem("jira_access_token");
+      if (!jiraToken) {
+        return { status: false, message: "No Jira access token found" };
+      }
+      const res = await endpoint.get("/api/admin/users/jira/user/", {
+        headers: { "Jira-Access-Token": jiraToken }
+      });
+      return { status: true, user: res.data.user };
+    } catch (error: any) {
+      console.error("❌ Jira user fetch error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Failed to fetch Jira user",
+      };
+    }
+  },
+
+  // 🧠 Jira - Validate Access Token
+  async validateJiraToken(accessToken: string) {
+    try {
+      const res = await endpoint.post("/api/admin/users/jira/validate-token/", {
+        access_token: accessToken,
+      });
+      const data = res.data;
+      return { status: true, valid: data.valid, user: data.user };
+    } catch (error: any) {
+      console.error("❌ Jira token validation error:", error);
+      return {
+        status: false,
+        valid: false,
+        message: error.response?.data?.message || "Jira token validation failed",
+      };
+    }
+  },
+
+  // 🧠 Jira - Refresh Access Token
+  async refreshJiraToken(refreshToken: string) {
+    try {
+      const res = await endpoint.post("/api/admin/users/jira/token/refresh/", {
+        refresh_token: refreshToken,
+      });
+      const data = res.data;
+      if (data?.access_token) {
+        localStorage.setItem("jira_access_token", data.access_token);
+        if (data.refresh_token) {
+          localStorage.setItem("jira_refresh_token", data.refresh_token);
+        }
+        return { status: true, access_token: data.access_token };
+      }
+      return { status: false, message: "No access token in refresh response" };
+    } catch (error: any) {
+      console.error("❌ Jira token refresh error:", error);
+      return {
+        status: false,
+        message: error.response?.data?.message || "Jira token refresh failed",
       };
     }
   },
@@ -1911,15 +2048,14 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // 🔹 USER TOTAL ASSETS BY TEAM
-    async fetchUserTotalAssets(team: string, force = false) {
+    async fetchUserTotalAssets(team?: string, force = false) {
       const key = team || '__all__';
       if (!force && this.cachedUserTotalAssets[key]) {
         return { status: true, data: this.cachedUserTotalAssets[key] };
       }
       try {
-        const res = await endpoint.get("/api/user/dashboard/total-assets/", {
-          params: { team },
-        });
+        const params = team ? { team } : {};
+        const res = await endpoint.get("/api/user/dashboard/total-assets/", { params });
         this.cachedUserTotalAssets[key] = res.data;
         return { status: true, data: res.data };
       } catch (error: any) {
@@ -3319,12 +3455,11 @@ export const useAuthStore = defineStore("auth", {
       // localStorage.removeItem("locations");
       localStorage.removeItem("google_id_token");
       localStorage.removeItem("isNewUser");
-      localStorage.removeItem("completedSteps");
+      // completedSteps is kept intentionally — onboarding milestones persist across logout
       // localStorage.removeItem("reportId");
       this.user = null;
       this.accessToken = null;
       this.refreshToken = null;
-      this.completedSteps = [];
       this.clearCache();
       console.log("🚪 User logged out, localStorage cleared");
 
@@ -3361,18 +3496,25 @@ export const useAuthStore = defineStore("auth", {
     return this.token;
   },
 
+  // ✅ Returns a user-scoped localStorage key for completedSteps
+  _stepsKey(): string {
+    const user = this.user || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null);
+    const uid = user?.id || user?.email || '';
+    return uid ? `completedSteps_${uid}` : 'completedSteps';
+  },
+
   // ✅ Mark onboarding step as completed
   markStepCompleted(stepNumber: number) {
     if (!this.completedSteps.includes(stepNumber)) {
       this.completedSteps.push(stepNumber);
-      localStorage.setItem('completedSteps', JSON.stringify(this.completedSteps));
+      localStorage.setItem(this._stepsKey(), JSON.stringify(this.completedSteps));
       console.log(`✅ Step ${stepNumber} marked as completed`);
     }
   },
 
   // ✅ Initialize completed steps from localStorage
   initCompletedSteps() {
-    const saved = localStorage.getItem('completedSteps');
+    const saved = localStorage.getItem(this._stepsKey());
     if (saved) {
       this.completedSteps = JSON.parse(saved);
       console.log('♻️ Restored completed steps:', this.completedSteps);
@@ -3382,7 +3524,7 @@ export const useAuthStore = defineStore("auth", {
   // ✅ Reset completed steps (useful for testing or new onboarding)
   resetCompletedSteps() {
     this.completedSteps = [];
-    localStorage.removeItem('completedSteps');
+    localStorage.removeItem(this._stepsKey());
     console.log('🔄 Completed steps reset');
   },
 
