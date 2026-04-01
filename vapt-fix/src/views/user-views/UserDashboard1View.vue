@@ -602,10 +602,17 @@ export default {
       if (!this.mitigationByTeamData) return { count: 0, vulnerabilities: [] };
       const teams = this.mitigationByTeamData.teams || this.mitigationByTeamData;
       if (!teams || typeof teams !== 'object') return { count: 0, vulnerabilities: [] };
-      if (teams[this.selectedTeam]) return teams[this.selectedTeam];
       const normalize = (s) => String(s).toLowerCase().replace(/\s+/g, ' ').trim();
-      const matchedKey = Object.keys(teams).find(k => normalize(k) === normalize(this.selectedTeam));
-      return matchedKey ? teams[matchedKey] : { count: 0, vulnerabilities: [] };
+      let teamData = teams[this.selectedTeam];
+      if (!teamData) {
+        const matchedKey = Object.keys(teams).find(k => normalize(k) === normalize(this.selectedTeam));
+        teamData = matchedKey ? teams[matchedKey] : null;
+      }
+      if (!teamData) return { count: 0, vulnerabilities: [] };
+      return {
+        ...teamData,
+        vulnerabilities: Array.isArray(teamData.vulnerabilities) ? teamData.vulnerabilities : [],
+      };
     },
     modalSeverityLabel() {
       const map = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
@@ -988,18 +995,22 @@ export default {
     } catch { this.userTeams = []; }
     this.selectedTeam = this.userTeams[0] || '';
 
-    await Promise.all([
-      this.fetchAssets('both'),
-      this.fetchVulns(undefined),
-      this.fetchVulnsFixed(undefined),
-      this.fetchSupportReqs(undefined),
-      this.fetchMitigation(undefined),
-      this.fetchMeanTimeRemediate(undefined),
-      this.fetchMitigationByTeam(),
-      this.fetchVulnAssetCount(),
-      this.loadUserAssetsData(),
-      this.loadRiskCriteria(),
-    ]);
+    try {
+      await Promise.all([
+        this.fetchAssets('both'),
+        this.fetchVulns(undefined),
+        this.fetchVulnsFixed(undefined),
+        this.fetchSupportReqs(undefined),
+        this.fetchMitigation(undefined),
+        this.fetchMeanTimeRemediate(undefined),
+        this.fetchMitigationByTeam(),
+        this.fetchVulnAssetCount(),
+        this.loadUserAssetsData(),
+        this.loadRiskCriteria(),
+      ]);
+    } catch (e) {
+      console.error('UserDashboard mount error:', e);
+    }
   },
 };
 </script>
