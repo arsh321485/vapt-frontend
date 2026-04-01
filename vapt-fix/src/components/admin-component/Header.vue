@@ -48,7 +48,11 @@
 
           <div class="header-cta d-flex align-items-center gap-3">
             <button type="button" class="btn hero-btn text-light" @click="handleFixNow">
-              Get Started
+              Admin Signin
+              <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
+            </button>
+            <button type="button" class="btn hero-btn text-light" @click="$router.push('/auth?mode=signin')">
+              User Signin
               <i class="bi bi-arrow-right-circle-fill fs-5 ms-1"></i>
             </button>
           </div>
@@ -94,7 +98,7 @@ export default {
   },
   methods: {
     handleFixNow() {
-      this.$router.push("/signup");
+      this.$router.push("/signin");
     }
   },
   mounted() {
