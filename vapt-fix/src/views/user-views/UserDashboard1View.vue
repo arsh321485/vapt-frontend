@@ -504,7 +504,7 @@
                             <div class="d-flex justify-content-start mt-2">
                               <i class="bi bi-hdd-network me-2"></i>
                               <h6 style="color: rgba(0, 0, 0, 1);font-weight: 500;font-size: 14px;margin-top: 2px">
-                                {{ vuln.assets.length }} affected asset{{ vuln.assets.length !== 1 ? 's' : '' }}
+                                {{ (vuln.assets?.length ?? 0) }} affected asset{{ (vuln.assets?.length ?? 0) !== 1 ? 's' : '' }}
                               </h6>
                             </div>
                             <div class="text-end">
