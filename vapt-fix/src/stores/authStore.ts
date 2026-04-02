@@ -1199,7 +1199,7 @@ async getMicrosoftOAuthUrl(redirectUri: string, adminId: string) {
   },
 
   // Slack
- async getSlackOAuthUrl(baseUrl: string, adminId: string) {
+async getSlackOAuthUrl(baseUrl: string, adminId: string) {
       if (!adminId) {
         return { status: false, message: "admin_id is required" };
       }

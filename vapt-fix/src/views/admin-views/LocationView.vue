@@ -1,1220 +1,1486 @@
 <template>
   <main>
-    <section>
-      <div class="container-fluid px-0">
-        <div class="row gx-0 no-gutters">
-          <DashboardHeader />
-        </div>
-        <div class="row">
-          <div class="col-1 ps-0 menubar-col1">
-            <DashboardMenu />
-          </div>
-
-          <div class="col-11 pt-5 mt-2 pb-3 pe-5">
-            <div class="row">
-                <div class="col-4 p-3 border-end px-0">
-                  <div class="d-flex justify-content-between ms-3 pt-3">
-                    <h5 class="mb-0 fw-semibold" style="font-weight: 500;font-size: 28px;">Assigned Assets ({{ totalAssets }})</h5>
-                    <div class="d-flex flex-row gap-3 me-3 mt-1">
-                      <i class="bi bi-trash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip"  :class="{ 'text-muted': activeAction !== '' && activeAction !== 'delete' }" @click="handleDeleteClick" title="Remove an asset"></i>
-                      <i class="bi bi-eye-slash fs-5" style="cursor: pointer;" data-bs-toggle="tooltip" :class="{ 'text-muted': activeAction !== '' && activeAction !== 'hold' }"  @click="toggleHoldMode" title="Hold mitigation"></i>
-                    </div>
-                  </div>
-
-                <div class="mb-4 pe-3 ms-3 mt-3">
-                  <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" v-model="searchQuery" style="padding-top: 6px;padding-bottom: 6px;">
-                  </form>
-                </div>
-
-                <!-- Asset List -->
-                <div v-if="loading" class="text-center py-4">
-                  <span class="spinner-border text-primary"></span>
-                </div>
-                <div v-else class="d-flex flex-column gap-3 mt-3">
-                  <div
-                    v-for="asset in pagedAssets"
-                    :key="asset.asset"
-                    class="asset-item border-bottom"
-                    :class="{ active: activeIndex === asset.asset }"
-                    :style="activeIndex === asset.asset ? 'background: linear-gradient(90deg, #FFFFFF 0%, #F2F2F2 100%);' : ''"
-                    @click="setActive(asset)"
-                  >
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex justify-content-start gap-3">
-                        <input v-if="showCheckboxes" type="checkbox" v-model="asset.selected" class="form-check-input me-2" />
-                        <input v-if="showHoldCheckboxes" type="checkbox" v-model="asset.selected" class="form-check-input me-2" />
-
-                        <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87); font-size: 22px;">
-                          {{ asset.asset }}
-                        </div>
-                        <div v-if="getTopSeverity(asset.severity_counts)">
-                          <span class="d-flex align-items-center badge-critical">
-                            <span class="rounded-circle me-1" :style="{ width: '6px', height: '6px', backgroundColor: getSeverityColor(getTopSeverity(asset.severity_counts)) }"></span>
-                            <span>{{ getTopSeverity(asset.severity_counts) }}</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="align-items-end gap-2">
-                        <div class="d-flex flex-row">
-                          <i class="bi bi-link-45deg me-1" style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"></i>
-                          <p class="mb-0">{{ asset.isInternal ? 'Internal' : 'External' }}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Severity counts row -->
-                    <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-3">
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #b31c1c"></span>
-                        <span class="text-danger fw-bold">{{ asset.severity_counts?.critical ?? 0 }}</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f44336"></span>
-                        <span class="text-danger fw-bold">{{ asset.severity_counts?.high ?? 0 }}</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f6b100"></span>
-                        <span class="text-warning fw-bold">{{ asset.severity_counts?.medium ?? 0 }}</span>
-                      </span>
-                      <span class="d-flex align-items-center">
-                        <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #4caf50"></span>
-                        <span class="text-success fw-bold">{{ asset.severity_counts?.low ?? 0 }}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- delete Modal -->
-                <div
-                  class="modal fade"
-                  id="deleteModal"
-                  tabindex="-1"
-                  aria-hidden="true"
-                >
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">Confirm Delete</h5>
-                        <button
-                          type="button"
-                          class="btn-close"
-                          data-bs-dismiss="modal"
-                          aria-label="Close"
-                        ></button>
-                      </div>
-                      <div class="modal-body">
-                        Are you sure you want to delete the selected assets?  
-                        
-                      </div>
-                      <div class="modal-footer">
-                        <button
-                          type="button"
-                          class="btn btn-secondary"
-                          data-bs-dismiss="modal" @click="cancelDelete"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          class="btn btn-danger"
-                          @click="confirmDelete"
-                          data-bs-dismiss="modal"
-                        >
-                          OK
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- hold mitigation -->
-    <div
-      class="modal fade"
-      id="holdConfirmModal"
-      tabindex="-1"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body">
-            <p>Do you want to hold to mitigation?</p>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelHold">
-              No
-            </button>
-            <button class="btn btn-primary" data-bs-dismiss="modal" @click="confirmHold">
-              Yes
-            </button>
-          </div>
-        </div>
-      </div>
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <img src="@/assets/images/logo-capital.png" alt="" class="h-50">
     </div>
 
-                <!-- Pagination -->
-                <nav v-if="totalPages > 1" class="mt-4 position-relative custom-pagination-wrapper">
-                  <ul class="pagination pagination-sm mb-0 custom-pagination">
-                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                      <a class="page-link" href="#" @click.prevent="prevPage">Prev</a>
-                    </li>
-                    <li v-for="p in pageNumbers" :key="p" class="page-item" :class="{ active: currentPage === p }">
-                      <a class="page-link" href="#" @click.prevent="goToPage(p)">{{ p }}</a>
-                    </li>
-                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                      <a class="page-link" href="#" @click.prevent="nextPage">Next</a>
-                    </li>
-                  </ul>
-                </nav>
+    <div class="app">
+      <!-- STEPPER -->
+      <Stepper />
 
-                 <!-- Held Vulnerabilities List -->
-<div v-if="showHeld && heldAssets.length" class=" py-1 px-2 mt-5">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">Mitigation on hold</h4>
-    <i
-      class="bi bi-eye fs-5"
-      @click="toggleUnholdMode"
-      title="Unhold"
-      style="cursor: pointer;"
-    ></i>
-  </div>
+      <!-- CONTENT -->
+      <div class="content">
+        <h1>Add users</h1>
+        <p>Align your team and tools for a seamless build.</p>
 
-  <div class="d-flex flex-column">
-    <div
-      v-for="(held, i) in heldAssets"
-      :key="i"
-      class="hold-asset border-bottom">
-      <div class="d-flex justify-content-between">
-        <div class="d-flex justify-content-start gap-1">
-          <!-- Checkbox only in unhold mode -->
-          <input
-            v-if="showUnholdCheckboxes"
-            type="checkbox"
-            v-model="held.selected"
-            class="form-check-input me-2"
-          />
+        <!-- Communication -->
+        <div class="section">
+          <div class="section-title">Communication platform</div>
+          <div class="chip-group selectable">
+            <div v-for="platform in communicationPlatforms" :key="platform.value" class="chip"
+              :class="{ active: selectedCommunication === platform.value }" @mousedown.prevent
+              @click.stop="handleCommunicationClick(platform.value)">
+              <img v-if="platform.icon" :src="platform.icon" />
+              {{ platform.label }}
+            </div>
+          </div>
+        </div>
 
-          <!-- Asset Name (grayed if held) -->
-          <span :class="{ 'text-muted': held.held }">{{ held.name }}</span>
-
-          <!-- Asset IP -->
-          <div
-            class="fw-semibold text-muted"
-            style="color: rgba(0, 0, 0, 0.87); font-size: 18px;"
-          >
-            {{ held.asset }}
+        <!-- Project -->
+        <div class="section">
+          <div class="section-title">Project management</div>
+          <div class="chip-group selectable">
+            <div v-for="tool in projectPlatforms" :key="tool.value" class="chip"
+              :class="{ active: selectedProject === tool.value }" @mousedown.prevent
+              @click.stop="handleProjectClick(tool.value)">
+              <img v-if="tool.icon" :src="tool.icon" />
+              {{ tool.label }}
+            </div>
           </div>
 
-          <!-- Badge -->
-          <div>
-            <span class="d-flex align-items-center badge-critical ms-2">
-              <span
-                class="rounded-circle me-1"
-                style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"
-              ></span>
-              <span>Critical</span>
+          <!-- Jira Connected User -->
+          <div v-if="jiraConnected && jiraUser" class="jira-user-card mt-3">
+            <img :src="jiraUser.picture" class="jira-user-avatar" />
+            <div class="jira-user-info">
+              <div class="jira-user-name">{{ jiraUser.name }}</div>
+              <div class="jira-user-email">{{ jiraUser.email }}</div>
+            </div>
+            <span class="jira-user-badge">
+              <i class="bi bi-check-circle-fill me-1"></i>Connected
             </span>
           </div>
-        </div>
 
-        <div class="align-items-end gap-2">
-          <div class="d-flex flex-row">
-            <div>
-              <i
-                class="bi bi-link-45deg me-1"
-                style="color: rgba(0, 0, 0, 0.6); font-size: 20px; vertical-align: -2px"
-              ></i>
+          <!-- Jira Cloud Resources -->
+          <div v-if="jiraConnected && jiraResources.length" class="jira-resources mt-3">
+            <div class="jira-resources-title">
+              <i class="bi bi-check-circle-fill text-success me-1"></i>
+              Jira Connected — Select your workspace:
             </div>
-            <div>
-              <p class="mb-0">
-  {{ held.isInternal ? 'Internal' : 'External' }}
-</p>
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Status Row (same as assets) -->
-      <div class="d-flex align-items-center gap-3 mt-3 mb-2 ms-1">
-        <span class="d-flex align-items-center">
-          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #b31c1c"></span>
-          <span class="text-danger fw-bold">{{ held.severity_counts?.critical ?? 0 }}</span>
-        </span>
-        <span class="d-flex align-items-center">
-          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f44336"></span>
-          <span class="text-danger fw-bold">{{ held.severity_counts?.high ?? 0 }}</span>
-        </span>
-        <span class="d-flex align-items-center">
-          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #f6b100"></span>
-          <span class="text-warning fw-bold">{{ held.severity_counts?.medium ?? 0 }}</span>
-        </span>
-        <span class="d-flex align-items-center">
-          <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: #4caf50"></span>
-          <span class="text-success fw-bold">{{ held.severity_counts?.low ?? 0 }}</span>
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
-
-                </div>
-
-                <div class="col-8">
-                    <div class="row py-3 px-3">
-                        <div class="d-flex justify-content-between">
-                          <p class="mt-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Vulnerability card</p>
-                          <div class="d-flex justify-content-between">
-                          </div>
-                        </div>
-                        <div v-if="selectedAsset" class="d-flex justify-content-between">
-                            <div class="d-flex justify-content-start gap-3">
-                            <div class="fw-semibold" style="color: rgba(0, 0, 0, 0.87);font-size: 22px;">{{ selectedAsset.asset }}</div>
-                            <span v-if="getTopSeverity(selectedAsset.severity_counts)" class="d-flex align-items-center badge-critical">
-                                <span class="rounded-circle me-1" :style="{ width: '6px', height: '6px', backgroundColor: getSeverityColor(getTopSeverity(selectedAsset.severity_counts)) }"></span>
-                                <span>{{ getTopSeverity(selectedAsset.severity_counts) }}</span>
-                            </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-if="selectedAsset" class="row px-3 pt-4">
-                    <div class="d-flex justify-content-start gap-5 flex-wrap">
-                        <div class="d-flex flex-column">
-                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Exposure</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.isInternal ? 'Internal' : 'External' }}</p>
-                        </div>
-                        <div v-if="selectedAsset.host_information?.['Netbios Name']" class="d-flex flex-column">
-                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Hostname</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.host_information['Netbios Name'] }}</p>
-                        </div>
-                        <div v-if="selectedAsset.host_information?.['DNS Name']" class="d-flex flex-column">
-                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">DNS Name</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.host_information['DNS Name'] }}</p>
-                        </div>
-                        <div v-if="selectedAsset.host_information?.['OS']" class="d-flex flex-column">
-                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">OS</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.host_information['OS'] }}</p>
-                        </div>
-                        <div v-if="selectedAsset.assigned_teams?.length" class="d-flex flex-column">
-                            <p class="mb-0" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 13px;">Teams</p>
-                            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ selectedAsset.assigned_teams.join(', ') }}</p>
-                        </div>
-                    </div>
-                    </div>
-
-                    <div class="row ps-3">
-                      <ul class="nav nav-tabs custom-tabs">
-      <li class="nav-item">
-        <button 
-          class="nav-link" 
-          :class="{ active: activeTab === 'vulnerabilities' }" 
-          @click="activeTab = 'vulnerabilities'">
-          Vulnerabilities
-        </button>
-      </li>
-      <li class="nav-item">
-        <button
-          class="nav-link"
-          :class="{ active: activeTab === 'exceptions' }"
-          @click="activeTab = 'exceptions'">
-          Support Requests
-          <span
-            v-if="assetSupportRequests.length > 0"
-            class="badge rounded-circle bg-danger ms-1"
-            style="font-size: 12px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;"
-          >{{ assetSupportRequests.length }}</span>
-        </button>
-      </li>
-      <li class="nav-item">
-        <button
-          class="nav-link"
-          disabled
-          style="opacity: 0.5; cursor: not-allowed;">
-          Related
-        </button>
-      </li>
-    </ul>
-
-    <!-- Tab Content -->
-    <div class="tab-content mt-3">
-      <!-- Vulnerabilities -->
-      <div v-if="activeTab === 'vulnerabilities'">
-
-        <!-- Severity filters -->
-        <div class="d-flex gap-3 mb-3">
-          <button class="btn btn-pill fw-semibold text-dark"
-            :class="activeSeverity === 'All' ? 'btn-primary active-tab' : 'btn-outline-secondary'"
-            @click="setSeverity('All')">All</button>
-          <button class="btn btn-pill"
-            :class="activeSeverity === 'Critical' ? 'btn-primary active-tab' : 'btn-outline-secondary'"
-            style="color: maroon;" @click="setSeverity('Critical')">Critical</button>
-          <button class="btn btn-pill"
-            :class="activeSeverity === 'High' ? 'btn-primary active-tab' : 'btn-outline-secondary text-danger'"
-            @click="setSeverity('High')">High</button>
-          <button class="btn btn-pill"
-            :class="activeSeverity === 'Medium' ? 'btn-primary active-tab' : 'btn-outline-secondary text-warning'"
-            @click="setSeverity('Medium')">Medium</button>
-          <button class="btn btn-pill"
-            :class="activeSeverity === 'Low' ? 'btn-primary active-tab' : 'btn-outline-secondary text-success'"
-            @click="setSeverity('Low')">Low</button>
-        </div>
-
-        <!-- Empty state -->
-        <div v-if="filteredVulnerabilities.length === 0" class="text-center text-muted py-5">
-          No vulnerabilities found for this asset.
-        </div>
-
-        <!-- Accordion list -->
-        <div v-else class="accordion border-0" id="accordionExample">
-          <div
-            v-for="(vuln, idx) in filteredVulnerabilities"
-            :key="idx"
-            class="accordion-item border-0 border-bottom"
-          >
-            <h2 class="accordion-header" :id="'heading' + idx">
-              <button
-                class="accordion-button border-bottom-0 collapsed"
-                type="button"
-                data-bs-toggle="collapse"
-                :data-bs-target="'#collapse' + idx"
-                aria-expanded="false"
-                :aria-controls="'collapse' + idx"
+            <div class="jira-resource-list mt-2">
+              <div
+                v-for="resource in jiraResources"
+                :key="resource.id"
+                class="jira-resource-item"
+                :class="{ active: selectedJiraCloudId === resource.id }"
+                @click="selectedJiraCloudId = resource.id"
               >
-                <div class="d-flex justify-content-start align-items-center gap-3">
-                  <p class="mb-0" style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;flex-shrink:0;">{{ idx + 1 }}</p>
-                  <p class="mb-0" style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.vul_name }}</p>
-                  <span class="d-flex align-items-center badge-critical" style="margin-top: 0;" :style="{ color: getSeverityColor(vuln.severity) }">
-                    <span class="rounded-circle me-1" :style="{ width: '6px', height: '6px', backgroundColor: getSeverityColor(vuln.severity) }"></span>
-                    <span>{{ vuln.severity }}</span>
-                  </span>
-                  <span
-                    class="d-flex align-items-center"
-                    :class="vuln.status === 'open' ? 'badge-open' : 'badge-close'"
-                    style="margin-top: 0;"
-                  >
-                    <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: white;"></span>
-                    <span>{{ vuln.status }}</span>
-                  </span>
+                <img :src="resource.avatarUrl" class="jira-resource-avatar" />
+                <div class="jira-resource-info">
+                  <div class="jira-resource-name">{{ resource.name }}</div>
+                  <div class="jira-resource-url">{{ resource.url }}</div>
                 </div>
-              </button>
-            </h2>
-            <div
-              :id="'collapse' + idx"
-              class="accordion-collapse collapse border-top-0"
-              :aria-labelledby="'heading' + idx"
-              data-bs-parent="#accordionExample"
-            >
-              <div class="accordion-body border-top-0">
-                <div class="d-flex justify-content-between gap-3">
-                  <div class="d-flex justify-content-start gap-5 flex-wrap">
-                    <div v-if="vuln.description" class="d-flex flex-column" style="max-width: 400px;">
-                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Description</p>
-                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 15px;">{{ vuln.description }}</p>
-                    </div>
-                    <div v-if="vuln.cvss_score" class="d-flex flex-column">
-                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">CVSS Score</p>
-                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.cvss_score }}</p>
-                    </div>
-                    <div v-if="vuln.vendor_fix_available" class="d-flex flex-column">
-                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Vendor Fix</p>
-                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.vendor_fix_available }}</p>
-                    </div>
-                    <div v-if="vuln.assigned_team" class="d-flex flex-column">
-                      <p class="mb-1" style="color: rgba(0, 0, 0, 0.6);font-weight: 500;font-size: 12px;">Assigned Team</p>
-                      <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">{{ vuln.assigned_team }}</p>
-                    </div>
-                  </div>
-                  <div class="d-flex flex-column">
-                    <router-link
-                      v-if="authStore.userLatestReportId && activeIndex"
-                      :to="{
-                        name: 'UserVulFix',
-                        params: {
-                          reportId: authStore.userLatestReportId,
-                          asset: activeIndex,
-                        },
-                        query: {
-                          plugin_name: vuln.vul_name,
-                          risk_factor: vuln.severity,
-                        }
-                      }"
-                      class="btn rounded-pill px-3 text-decoration-none"
-                      style="background-color: rgba(49, 33, 177, 1);color: white;white-space:nowrap;"
-                    >
-                      <i class="bi bi-magic"></i> Fix Now
-                    </router-link>
-                  </div>
-                </div>
+                <i v-if="selectedJiraCloudId === resource.id" class="bi bi-check-circle-fill text-success ms-auto"></i>
               </div>
             </div>
           </div>
         </div>
-        <!-- Fixed / Closed vulnerabilities -->
-        <div class="row mt-3 px-1">
-          <div v-if="loadingClosedFix" class="text-center py-3">
-            <span class="spinner-border spinner-border-sm text-secondary"></span>
-          </div>
-          <div v-else-if="closedFixVulnerabilities.length" class="card p-3 my-2">
-            <h5 class="mb-3">Fixed</h5>
-            <div
-              v-for="(item, i) in closedFixVulnerabilities"
-              :key="item.fix_vulnerability_id"
-              class="d-flex justify-content-between align-items-center py-2 border-bottom"
-            >
-              <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center" style="width:30px;height:30px;font-size:14px;flex-shrink:0;">
-                  {{ i + 1 }}
-                </div>
-                <p class="mb-0 fw-semibold" style="font-size:15px;">{{ item.plugin_name }}</p>
+
+        <!-- Users -->
+        <div class="section">
+          <div class="section-title">Users</div>
+
+          <div class="row-users">
+            <!-- User Type -->
+            <select v-model="form.user_type" class="form-select">
+              <option disabled value="">User type</option>
+              <option value="internal">Internal</option>
+              <option value="external">External</option>
+            </select>
+
+            <!-- First Name -->
+            <input class="form-control" placeholder="First name" v-model="form.first_name" />
+
+            <!-- Last Name -->
+            <input class="form-control" placeholder="Last name" v-model="form.last_name" />
+
+            <!-- Email -->
+            <input class="form-control" placeholder="Email" type="email" v-model="form.email" />
+
+            <!-- Location -->
+            <!-- <select v-model="selectedLocation" class="form-select">
+              <option disabled value="">Location</option>
+              <option v-for="loc in authStore.locations" :key="loc._id" :value="loc._id">
+                {{ loc.location_name }}
+              </option>
+            </select> -->
+
+            <!-- Member Role (Multi Select) -->
+            <div class="position-relative" ref="roleDropdown">
+              <div class="form-select" @click="isRoleOpen = !isRoleOpen">
+                {{ selectedRoles.length ? selectedRoles.join(", ") : "Role" }}
               </div>
-              <div class="d-flex align-items-center gap-3">
-                <span class="badge d-flex align-items-center gap-1" :style="{ background: getSeverityColor(item.risk_factor) + '22', color: getSeverityColor(item.risk_factor), fontSize: '12px' }">
-                  <span class="rounded-circle" :style="{ width:'6px', height:'6px', backgroundColor: getSeverityColor(item.risk_factor) }"></span>
-                  {{ item.risk_factor }}
-                </span>
-                <span class="badge d-flex align-items-center gap-1" style="background:#0a7d00;color:#fff;font-size:12px;">
-                  <span class="rounded-circle" style="width:6px;height:6px;background:#fff;"></span>
-                  Close
-                </span>
-                <button class="btn btn-sm rounded-pill text-light px-3" style="background-color: rgba(49,33,177,1);" @click="viewFixDetail(item)">
-                  View detail
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Support Requests Tab -->
-      <div v-if="activeTab === 'exceptions'">
-        <div v-if="loadingSupportRequests" class="text-center py-4">
-          <span class="spinner-border spinner-border-sm text-primary"></span>
-        </div>
-        <div v-else-if="assetSupportRequests.length === 0" class="text-center text-muted py-4">
-          No support requests for this asset.
-        </div>
-        <div v-else>
-          <div
-            v-for="(req, idx) in assetSupportRequests"
-            :key="req._id"
-            class="d-flex justify-content-between align-items-center gap-3 py-2 border-bottom"
-          >
-            <p class="mb-0 flex-shrink-0" style="background-color: black; height: 30px; width: 30px; color: white; border-radius: 50%; display: grid; place-items: center;">{{ idx + 1 }}</p>
-            <p class="mb-0 flex-grow-1 text-truncate" style="color: rgba(0,0,0,0.87); font-weight: 500; font-size: 15px;" :title="req.vul_name">{{ req.vul_name }}</p>
-            <span
-              class="badge rounded-pill px-3 py-2 flex-shrink-0"
-              :class="req.status === 'open' ? 'bg-danger' : 'bg-success'"
-              style="font-size: 12px; text-transform: capitalize;"
-            >{{ req.status }}</span>
-            <button
-              class="btn btn-sm fixes-btn flex-shrink-0"
-              data-bs-toggle="modal"
-              data-bs-target="#userSupportRequestModal"
-              @click="selectedSupportRequest = req"
-            >View raised requests</button>
-          </div>
-        </div>
-
-        <!-- Support Request Detail Modal -->
-        <div class="modal fade" id="userSupportRequestModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Issues Raised for Support</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body" v-if="selectedSupportRequest">
-                <p class="mb-1 text-muted" style="font-size: 13px;">Vulnerability</p>
-                <p class="fw-semibold mb-3" style="font-size: 15px;">{{ selectedSupportRequest.vul_name }}</p>
-
-                <p class="mb-1 fw-semibold">Steps Requested</p>
-                <div class="row g-2 mb-3">
-                  <template v-if="selectedSupportRequest.step_requested === 'all'">
-                    <div class="col-auto">
-                      <span class="badge rounded-pill bg-primary py-2 px-3" style="font-size: 12px;">All Steps</span>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div
-                      v-for="step in selectedSupportRequest.step_requested.split(',')"
-                      :key="step"
-                      class="col-auto"
-                    >
-                      <span class="badge rounded-pill bg-primary py-2 px-3" style="font-size: 12px;">Step {{ step.trim() }}</span>
-                    </div>
-                  </template>
-                </div>
-
-                <p class="mb-1 fw-semibold">Description</p>
-                <textarea class="form-control rounded-0 mb-3" rows="4" readonly>{{ selectedSupportRequest.description }}</textarea>
-
-                <div class="d-flex gap-4">
-                  <div>
-                    <p class="mb-0 text-muted" style="font-size: 12px;">Requested by</p>
-                    <p class="mb-0 fw-semibold" style="font-size: 14px;">{{ selectedSupportRequest.requested_by }}</p>
-                  </div>
-                  <div>
-                    <p class="mb-0 text-muted" style="font-size: 12px;">Date</p>
-                    <p class="mb-0 fw-semibold" style="font-size: 14px;">{{ formatRequestDate(selectedSupportRequest.requested_at) }}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <div v-if="isRoleOpen" class="dropdown-list">
+                <label v-for="role in roleOptions" :key="role.short">
+                  <input type="checkbox" :value="role.short" v-model="selectedRoles" />
+                  {{ role.full }}
+                </label>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Related -->
-      <div v-if="activeTab === 'related'">
-        <div class="accordion border-0" id="accordionExample">
-          <div class="accordion-item border-0 border-bottom">
-            <h2 class="accordion-header" id="headingOne">
-            <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-            <div class="d-flex justify-content-start align-items-center gap-3">
-            <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">1</p>
-            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22225)</p>
-            <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-              <span>High</span>
-            </span>
-          </div> 
+          <div class="row-users-btn mt-4">
+            <button class="btn btn-primary" @click="addUser">
+              Add User
             </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-            <div class="accordion-body border-top-0">
-              <table class="table table-bordered table-striped">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Resource ID</th>
-                      <td>arn:aws:ecr:ap-southeast-1:058264139340:repository/...</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Region</th>
-                      <td>ap-southeast-1</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Affected Packages</th>
-                      <td>org.apache.tomcat.embed:tomcat-embed-core</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Vendor Advisory</th>
-                      <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Reference Link</th>
-                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
-                    </tr>
-                  </tbody>
-                </table>  
-              </div>
-            </div>
           </div>
-          <div class="accordion-item border-0 border-bottom">
-            <h2 class="accordion-header" id="headingTwo">
-            <button class="accordion-button border-bottom-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-            <div class="d-flex justify-content-start align-items-center gap-3">
-            <p style="background-color: black;height: 30px;width: 30px;color: white;border-radius: 50%;display: grid;place-items: center;">2</p>
-            <p style="color: rgba(0, 0, 0, 0.87);font-weight: 500;font-size: 16px;">VMware ESXi 7.0/8.0 Sandbox Escape (CVE - 2025-22226)</p>
-            <span class="d-flex align-items-center badge-critical" style="margin-top: -17px;">
-            <span class="rounded-circle me-1" style="width: 6px; height: 6px; background-color: rgba(173, 0, 0, 1)"></span>
-              <span>High</span>
-            </span>
-          </div> 
-            </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse show border-top-0" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-            <div class="accordion-body border-top-0">
-              <table class="table table-bordered table-striped">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Resource ID</th>
-                      <td>arn:aws:ecr:ap-southeast-1:058264139340:repository/...</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Region</th>
-                      <td>ap-southeast-1</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Affected Packages</th>
-                      <td>org.apache.tomcat.embed:tomcat-embed-core</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Vendor Advisory</th>
-                      <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-52316" target="_blank">CVE-2024-52316</a></td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Reference Link</th>
-                      <td><a href="https://autohub-demo/link123" target="_blank">https://autohub-demo/link123</a></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+        </div>
+
+        <div class="cta">
+           <button class="btn btn-primary" @click="handleContinue">
+    {{ returnTo ? 'Back to Previous Page →' : 'Continue to Risk Criteria →' }}
+  </button>
+
         </div>
       </div>
     </div>
-                    </div>
-
-                </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 </template>
 
 <script>
-import DashboardMenu from "@/components/user-component/DashboardMenu.vue";
-import DashboardHeader from "@/components/user-component/DashboardHeader.vue";
+import Stepper from "@/components/admin-component/Stepper.vue";
 import { useAuthStore } from "@/stores/authStore";
+import Swal from "sweetalert2";
+import teamsIcon from "@/assets/images/teams.png";
+import slackIcon from "@/assets/images/slack.png";
+import jiraIcon from "@/assets/images/jira.png";
+import asanaIcon from "@/assets/images/asana.png";
 
 export default {
-  name: "UserAssetsView",
+  name: "LocationView",
   components: {
-    DashboardMenu,
-    DashboardHeader,
+    Stepper
   },
   data() {
     return {
       authStore: useAuthStore(),
-      selectedSeverity: "",
-      activeSeverity: "All",
-      searchQuery: "",
-      activeTab: "vulnerabilities",
-      showCheckboxes: false,
-      assets: [],
-      totalAssets: 0,
-      loading: false,
-      activeIndex: null,
-      heldAssets: [],
-      showHoldCheckboxes: false,
-      activeAction: "",
-      showHeld: true,
-      showUnholdCheckboxes: false,
-      currentPage: 1,
-      pageSize: 5,
-      closedFixVulnerabilities: [],
-      loadingClosedFix: false,
-      supportRequests: [],
-      loadingSupportRequests: false,
-      selectedSupportRequest: null,
+      locationName: "",
+      showDropdown: false,
+      filteredCountries: [],
+      avatarColors: ["#13b561", "#efbe34", "#ea4544"],
+      selectedLocation: "",
+      externalLocation: "",
+      selectedRoles: [],
+      isRoleOpen: false,
+      selectedSecondaryRoles: [],
+      isSecondaryRoleOpen: false,
+      form: {
+        admin_id: "",
+        location_id: "",
+        first_name: "",
+        last_name: "",
+        user_type: "",
+        email: "",
+        Member_role: []
+      },
+      roleOptions: [
+        { short: "PM", full: "Patch Management" },
+        { short: "CM", full: "Configuration Management" },
+        { short: "NS", full: "Network Security" },
+        { short: "AF", full: "Architectural Flaws" }
+      ],
+      selectedCommunication: null,
+      pendingCommunication: null,
+      communicationNoneSelected: false,
+      communicationPlatforms: [
+        { value: "teams", label: "Microsoft Teams", icon: teamsIcon },
+        { value: "slack", label: "Slack", icon: slackIcon },
+        // { value: "none", label: "None" }
+      ],
+      selectedProject: null,
+      pendingProject: null,
+      projectNoneSelected: false,
+      projectPlatforms: [
+        { value: "jira", label: "Jira", icon: jiraIcon },
+        // { value: "asana", label: "Asana", icon: asanaIcon },
+        // { value: "none", label: "None" }
+      ],
+      slackPopup: null,
+      slackChannels: [],
+      slackUsers: [],
+      teams: [],
+      channels: [],
+      selectedTeamId: null,
+      backendBase: "https://vaptbackend.secureitlab.com",
+      jiraResources: [],
+      jiraConnected: false,
+      jiraUser: null,
+      selectedJiraCloudId: localStorage.getItem("jira_cloud_id") || null,
     };
   },
+  watch: {
+    selectedJiraCloudId(val) {
+      if (val) {
+        localStorage.setItem("jira_cloud_id", val);
+      } else {
+        localStorage.removeItem("jira_cloud_id");
+      }
+    },
+  },
   computed: {
-    filteredVulnerabilities() {
-      const vulns = this.authStore.selectedAssetVulnerabilities.filter(v => v.status === 'open');
-      if (this.activeSeverity === 'All') return vulns;
-      return vulns.filter(v => v.severity === this.activeSeverity);
+    returnTo() {
+      return this.$route.query.returnTo || null;
     },
-    filteredAssets() {
-      if (!this.searchQuery) return this.assets;
-      const q = this.searchQuery.toLowerCase();
-      return this.assets.filter(a => a.asset?.toLowerCase().includes(q));
+    isFromOnboarding() {
+      return !this.returnTo;
     },
-    pagedAssets() {
-      const start = (this.currentPage - 1) * this.pageSize;
-      return this.filteredAssets.slice(start, start + this.pageSize);
-    },
-    totalPages() {
-      return Math.ceil(this.filteredAssets.length / this.pageSize);
-    },
-    pageNumbers() {
-      const pages = [];
-      for (let i = 1; i <= this.totalPages; i++) pages.push(i);
-      return pages;
-    },
-    selectedAsset() {
-      if (!this.activeIndex) return null;
-      return this.assets.find(a => a.asset === this.activeIndex) || null;
-    },
-    assetSupportRequests() {
-      if (!this.activeIndex) return [];
-      return this.supportRequests.filter(r => r.host_name === this.activeIndex);
-    },
+    // generatedInviteLink() {
+    //   const base = "https://vaptbackend.secureitlab.com";
+
+    //   // default: show base url
+    //   if (!this.externalLocation) {
+    //     return base;
+    //   }
+
+    //   const locationObj = this.authStore.locations.find(
+    //     loc => loc._id === this.externalLocation
+    //   );
+
+    //   if (!locationObj) return base;
+
+    //   const locationSlug = locationObj.location_name
+    //     .toLowerCase()
+    //     .replace(/\s+/g, "");
+
+    //   // only location selected
+    //   if (!this.selectedSecondaryRoles.length) {
+    //     return `${base}/${locationSlug}`;
+    //   }
+
+    //   // location + roles
+    //   const roleSlugs = this.selectedSecondaryRoles
+    //     .map(role =>
+    //       this.roleOptions.find(r => r.short === role)?.full
+    //         .toLowerCase()
+    //         .replace(/\s+/g, "")
+    //     )
+    //     .join("/");
+
+    //   return `${base}/${locationSlug}/${roleSlugs}`;
+    // },
+    // canCopyInviteLink() {
+    //   return !!this.externalLocation || this.selectedSecondaryRoles.length > 0;
+    // }
   },
   methods: {
-    setSeverity(sev) {
-      this.activeSeverity = sev;
+    initChipSelection() {
+      // Active state is handled by Vue :class binding — no manual DOM manipulation needed
     },
-    async loadSupportRequests() {
-      let reportId = this.authStore.userLatestReportId;
-      if (!reportId) {
-        await this.authStore.fetchUserVulnerabilityRegister();
-        reportId = this.authStore.userLatestReportId;
+    async addUser() {
+      // Validate required fields
+      if (!this.form.first_name?.trim()) {
+        Swal.fire("Missing Field", "Please enter the First Name.", "warning");
+        return;
       }
-      if (!reportId) return;
-      this.loadingSupportRequests = true;
-      const res = await this.authStore.fetchUserSupportRequestsByReport(reportId);
-      this.loadingSupportRequests = false;
-      if (res.status && Array.isArray(res.data)) {
-        this.supportRequests = res.data;
+      if (!this.form.last_name?.trim()) {
+        Swal.fire("Missing Field", "Please enter the Last Name.", "warning");
+        return;
       }
-    },
-    formatRequestDate(dateStr) {
-      if (!dateStr) return '';
-      return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
-    },
-    async loadAssets() {
-      this.loading = true;
-      const result = await this.authStore.fetchUserAssets();
-      if (result.status) {
-        this.assets = result.data;
-        this.totalAssets = result.total;
-        if (this.assets.length > 0) {
-          await this.setActive(this.assets[0]);
+      if (!this.form.email?.trim()) {
+        Swal.fire("Missing Field", "Please enter the Email Address.", "warning");
+        return;
+      }
+      if (!this.form.user_type) {
+        Swal.fire("Missing Field", "Please select a User Type.", "warning");
+        return;
+      }
+      if (!this.selectedRoles || this.selectedRoles.length === 0) {
+        Swal.fire("Missing Field", "Please select at least one Role.", "warning");
+        return;
+      }
+
+      const adminId = this.authStore.user?._id || this.authStore.user?.id;
+      if (!adminId) {
+        Swal.fire("Error", "Please login again", "error");
+        return;
+      }
+
+      // Gate Add User until OAuth connect is complete
+      if (this.selectedCommunication === "slack") {
+        const botToken = localStorage.getItem("slack_bot_token");
+        if (!botToken) {
+          Swal.fire("Slack not connected", "Please connect Slack first.", "warning");
+          return;
         }
       }
-      this.loading = false;
-    },
-    async loadHeldAssets() {
-      const res = await this.authStore.fetchUserHeldAssets();
-      if (res.status && res.assets.length) {
-        this.heldAssets = res.assets.map(a => ({
-          asset: a.asset,
-          ip: a.asset,
-          member_type: a.member_type,
-          severity_counts: a.severity_counts,
-          host_information: a.host_information,
-          held: true,
-          selected: false,
-          isInternal: a.member_type === 'internal',
-        }));
-        this.showHeld = true;
-        // Remove held assets from main list to avoid duplicates
-        this.assets = this.assets.filter(a => !this.heldAssets.some(h => h.asset === a.asset));
-      } else {
-        this.showHeld = false;
-        this.heldAssets = [];
-      }
-    },
-    async setActive(asset) {
-      if (!asset?.asset) return;
-      this.activeIndex = asset.asset;
-      this.authStore.fetchUserSingleAssetVulnerabilities(asset.asset);
-      this.loadingClosedFix = true;
-      const res = await this.authStore.getUserClosedVulnerabilities(asset.asset);
-      this.loadingClosedFix = false;
-      if (res.status && res.data?.results) {
-        this.closedFixVulnerabilities = res.data.results.filter(v => v.status?.toLowerCase() === 'closed');
-      } else {
-        this.closedFixVulnerabilities = [];
-      }
-    },
-    viewFixDetail(item) {
-      const reportId = this.authStore.userLatestReportId;
-      if (!reportId) return;
-      this.$router.push({
-        name: 'UserVulFix',
-        params: { reportId, asset: item.host_name || this.activeIndex },
-        query: {
-          id: item.fix_vulnerability_id,
-          plugin_name: item.plugin_name,
-          risk_factor: item.risk_factor,
+
+      if (this.selectedCommunication === "teams") {
+        const graphToken = localStorage.getItem("microsoft_graph_token");
+        const vaptfixTeam = JSON.parse(
+          localStorage.getItem("vaptfix_team") || "null"
+        );
+        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+
+        if (!graphToken || !teamId) {
+          Swal.fire(
+            "Microsoft Teams not connected",
+            "Please connect Microsoft Teams first.",
+            "warning"
+          );
+          return;
         }
+      }
+
+      // Base payload
+      const payload = {
+        admin_id: adminId,
+        first_name: this.form.first_name,
+        last_name: this.form.last_name,
+        email: this.form.email,
+        user_type: this.form.user_type,
+        Member_role: this.selectedRoles.map(
+          r => this.roleOptions.find(o => o.short === r)?.full
+        )
+      };
+
+      // MS Teams: add access_token + team_id if Teams is selected
+      if (this.selectedCommunication === "teams") {
+        const graphToken = localStorage.getItem("microsoft_graph_token");
+        const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
+        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+        if (graphToken && teamId) {
+          payload.access_token = graphToken;
+          payload.team_id = teamId;
+        }
+      }
+
+      // Slack: add slack_bot_token if Slack is selected
+      if (this.selectedCommunication === "slack") {
+        const botToken = localStorage.getItem("slack_bot_token");
+        if (botToken) {
+          payload.slack_bot_token = botToken;
+        }
+      }
+
+      console.log("FINAL PAYLOAD 👉", payload);
+
+      const res = await this.authStore.createUserDetail(payload);
+
+      if (res.status) {
+        const syncMsg = this.selectedCommunication === "teams"
+          ? " and added to Microsoft Teams"
+          : this.selectedCommunication === "slack"
+            ? " and invited to Slack channels"
+            : "";
+
+        Swal.fire({
+          icon: "success",
+          title: `User added successfully${syncMsg}`,
+          timer: 2000,
+          showConfirmButton: false,
+          allowOutsideClick: false
+        });
+
+        // Reset form
+        this.form.first_name = "";
+        this.form.last_name = "";
+        this.form.email = "";
+        this.form.user_type = "";
+        this.selectedRoles = [];
+        this.isRoleOpen = false;
+
+      } else {
+        let errorMessage = "User detail with this email already exists";
+        if (res.message && !res.message.includes("500")) {
+          errorMessage = res.message;
+        }
+        Swal.fire({
+          icon: "warning",
+          title: "User already exists",
+          text: errorMessage,
+          confirmButtonColor: "#5a44ff"
+        });
+      }
+    },
+  //   async addUser() {
+
+  // const adminId =
+  //   this.authStore.user?._id ||
+  //   this.authStore.user?.id;
+
+  // if (!adminId) {
+  //   Swal.fire("Error", "Please login again", "error");
+  //   return;
+  // }
+
+  // const botToken = localStorage.getItem("slack_bot_token");
+
+  // if (!botToken) {
+  //   Swal.fire("Error", "Slack not connected", "error");
+  //   return;
+  // }
+
+  // const payload = {
+  //   admin_id: adminId,
+  //   first_name: this.form.first_name,
+  //   last_name: this.form.last_name,
+  //   email: this.form.email,
+  //   user_type: this.form.user_type,
+
+  //   Member_role: this.selectedRoles.map(
+  //     r => this.roleOptions.find(o => o.short === r)?.full
+  //   ),
+
+  //   // 🔥 NEW FIELDS FOR SLACK SYNC
+  //   slack_bot_token: botToken,
+  //   slack_user_id: this.selectedSlackUserId  // must come from mapping
+  // };
+
+  // console.log("FINAL PAYLOAD 👉", payload);
+
+  // const res = await this.authStore.createUserDetail(payload);
+
+  // if (res.status) {
+
+  //   console.log("Slack sync result:", res.slack_sync);
+
+  //   Swal.fire({
+  //     icon: "success",
+  //     title: "User added & invited to Slack",
+  //     timer: 2000,
+  //     showConfirmButton: false
+  //   });
+
+  //   // reset form
+  //   this.form.first_name = "";
+  //   this.form.last_name = "";
+  //   this.form.email = "";
+  //   this.form.user_type = "";
+  //   this.selectedRoles = [];
+  //   this.isRoleOpen = false;
+
+  // } else {
+  //   Swal.fire({
+  //     icon: "warning",
+  //     title: "User already exists",
+  //     text: res.message,
+  //     confirmButtonColor: "#5a44ff"
+  //   });
+  // }
+  //   },
+    getInitials(name) {
+      if (!name) return "";
+      return name.substring(0, 2).toUpperCase();
+    },
+    closeOnOutside(e) {
+      const role = this.$refs.roleDropdown;
+      const secondary = this.$refs.secondaryRoleDropdown;
+      if (
+        role && !role.contains(e.target) &&
+        secondary && !secondary.contains(e.target)
+      ) {
+        this.isRoleOpen = false;
+        this.isSecondaryRoleOpen = false;
+      }
+    },
+    async handleCommunicationClick(value) {
+      // NONE logic
+      if (value === "none") {
+        this.communicationNoneSelected = !this.communicationNoneSelected;
+        this.selectedCommunication = this.communicationNoneSelected ? "none" : null;
+        return;
+      }
+
+      // If NONE active → block others
+      if (this.communicationNoneSelected) return;
+      if (!this.selectedCommunication) {
+        this.selectedCommunication = value;
+
+        if (value === "slack") {
+          await this.startSlackLogin();
+        }
+
+        // ✅ ADD THIS
+        if (value === "teams") {
+          await this.startMicrosoftLogin();
+        }
+
+
+        return;
+      }
+
+
+      // Clicking same platform → do nothing
+      if (this.selectedCommunication === value) return;
+
+      // Switching platform → ask confirmation FIRST
+      this.pendingCommunication = value;
+
+      // const res = await Swal.fire({
+      //   title: "Switch platform?",
+      //   text: "Are you sure you want to switch the communication platform?",
+      //   icon: "warning",
+      //   showCancelButton: true,
+      //   confirmButtonText: "Yes",
+      //   cancelButtonText: "No",
+      // });
+
+
+      const res = await Swal.fire({
+        title: "Switch platform?",
+        text: "Are you sure you want to switch the communication platform?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+      });
+
+      if (res.isConfirmed) {
+        this.selectedCommunication = this.pendingCommunication;
+        // ✅ VERY IMPORTANT
+        if (this.pendingCommunication === "slack") {
+          await this.startSlackLogin();
+        }
+      }
+
+      this.pendingCommunication = null;
+
+
+      // if (res.isConfirmed) {
+
+      //   this.selectedCommunication = this.pendingCommunication;
+      // }
+
+
+
+      // Cleanup
+      this.pendingCommunication = null;
+    },
+    async handleProjectClick(value) {
+      // NONE logic
+      if (value === "none") {
+        this.projectNoneSelected = !this.projectNoneSelected;
+        this.selectedProject = this.projectNoneSelected ? "none" : null;
+        return;
+      }
+
+      // If NONE active → block others
+      if (this.projectNoneSelected) return;
+
+      // First-time selection → apply immediately
+      if (!this.selectedProject) {
+        this.selectedProject = value;
+
+        // ✅ Start Jira OAuth when Jira is selected
+        if (value === "jira") {
+          await this.startJiraLogin();
+        }
+        return;
+      }
+
+      // Clicking same tool → do nothing
+      if (this.selectedProject === value) return;
+
+      // Switching tool → ask confirmation FIRST
+      this.pendingProject = value;
+
+      const res = await Swal.fire({
+        title: "Switch platform?",
+        text: "Are you sure you want to switch the project management tool?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+      });
+
+      if (res.isConfirmed) {
+        // ✅ Apply active ONLY after Yes
+        this.selectedProject = this.pendingProject;
+
+        // ✅ Start Jira OAuth when switching to Jira
+        if (this.pendingProject === "jira") {
+          await this.startJiraLogin();
+        }
+      }
+
+      // Cleanup
+      this.pendingProject = null;
+    },
+    handleContinue() {
+      // 🟢 CASE 1: Came from dashboard / assets / tickets / etc
+  if (this.returnTo) {
+    this.$router.push(this.returnTo);
+    return;
+  }
+      // Check if at least 1 location exists
+      // if (!this.authStore.locations || this.authStore.locations.length === 0) {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'No Location Added',
+      //     text: 'Please add at least one location before proceeding to Risk Criteria.',
+      //     confirmButtonColor: '#5a44ff'
+      //   });
+      //   return;
+      // }
+
+      // Mark step 1 as completed
+      this.authStore.markStepCompleted(1);
+
+      // Navigate to next page
+      this.$router.push('/riskcriteria');
+    },
+
+    // Teams Start
+    async startMicrosoftLogin() {
+  try {
+    const redirectUri = `${window.location.origin}/microsoft/callback`;
+    const adminId = this.authStore.user?._id || this.authStore.user?.id;
+    if (!adminId) {
+      Swal.fire("Error", "Please login again", "error");
+      return;
+    }
+    const res = await this.authStore.getMicrosoftOAuthUrl(redirectUri, adminId);
+    if (res.status && res.data.auth_url) {
+      // ✅ Open Microsoft OAuth in NEW TAB
+       window.open(res.data.auth_url, "_blank");
+      // window.location.href = res.data.auth_url;
+    } else {
+      Swal.fire("Error", "Failed to start Microsoft login", "error");
+    }
+  } catch (err) {
+    console.error("Microsoft login error:", err);
+    Swal.fire("Error", "Microsoft login failed", "error");
+  }
+    },
+    async onTeamsConnected(event) {
+      if (event.data?.type === "TEAMS_CONNECTED") {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Microsoft Teams connected successfully",
+          timer: 2000,
+          showConfirmButton: false
+        });
+        await this.fetchTeams();
+
+        // Subscribe to Teams webhook (one-time after connect)
+        const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
+        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+        if (teamId) {
+          await this.authStore.subscribeTeamsWebhook(teamId);
+        }
+      }
+    },
+    async fetchTeams() {
+      const res = await this.authStore.fetchMicrosoftTeams();
+      if (res?.status) {
+        this.teams = res.teams;
+
+        // Auto-fetch channels for the VAPTFIX team using the saved team ID
+        const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
+        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+        if (teamId) {
+          await this.fetchChannels(teamId);
+        }
+      } else {
+        // Token expired or invalid — clear stale data and prompt reconnect
+        localStorage.removeItem("microsoft_graph_token");
+        localStorage.removeItem("teams_connected");
+        localStorage.removeItem("vaptfix_team");
+        localStorage.removeItem("vaptfix_channels");
+        this.selectedCommunication = null;
+        this.teams = [];
+        this.channels = [];
+        Swal.fire({
+          icon: "warning",
+          title: "Microsoft Teams Session Expired",
+          text: "Please reconnect Microsoft Teams to continue.",
+          confirmButtonColor: "#5a44ff"
+        });
+      }
+    },
+    async fetchChannels(teamId) {
+    this.selectedTeamId = teamId;
+
+    const res = await this.authStore.fetchTeamChannels(teamId);
+
+    if (res?.status) {
+      this.channels = res.channels;
+    } else {
+      console.log("Channels not fetched");
+    }
+    },
+    async sendTeamsMessage(teamId, channelId, message) {
+    const res = await this.authStore.sendMessageToTeamsChannel({
+      teamId,
+      channelId,
+      message,
+    });
+
+    if (res.status) {
+      console.log("Message sent successfully", res);
+    } else {
+      console.log("Message sending failed");
+    }
+    },
+    // Teams End
+
+    // slack start
+    async startSlackLogin() {
+  try {
+    const adminId = this.authStore.user?._id || this.authStore.user?.id;
+    if (!adminId) {
+      Swal.fire("Error", "Please login again", "error");
+      return;
+    }
+    const res = await this.authStore.getSlackOAuthUrl(this.backendBase, adminId);
+
+    if (res.status && res.data?.auth_url) {
+
+      const width = 1000;
+      const height = 700;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      const popup = window.open(
+        res.data.auth_url,
+        "SlackOAuth",
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!popup) {
+        alert("Popup blocked! Please allow popups for this site.");
+      }
+
+    } else {
+      Swal.fire("Error", "Unable to start Slack login", "error");
+    }
+  } catch (error) {
+    Swal.fire("Error", "Something went wrong while connecting Slack", "error");
+  }
+    },
+    handleSlackMessage(event) {
+
+  console.log("Message received from popup:", event);
+
+  const allowedOrigins = [
+    window.location.origin,
+    "https://vaptbackend.secureitlab.com"
+  ];
+
+  if (!allowedOrigins.includes(event.origin)) {
+    console.warn("Blocked message origin:", event.origin);
+    return;
+  }
+
+  if (event.data?.type === "SLACK_CONNECTED") {
+
+    console.log("SLACK_CONNECTED event received");
+
+    // 🔹 CALL VALIDATE TOKEN
+    console.log("Calling validate token API...");
+    this.checkSlackConnection();
+    // 🔹 CALL CHANNEL LIST
+    console.log("Calling list channels API...");
+    this.fetchSlackChannels();
+    this.fetchSlackUsers();
+  }
+    },
+    async checkSlackConnection() {
+  try {
+    console.log("checkSlackConnection started");
+
+    const botToken = localStorage.getItem("slack_bot_token");
+    console.log("Bot token from storage:", botToken);
+
+    if (!botToken) {
+      console.warn("No Slack token found");
+      return;
+    }
+
+    const res = await this.authStore.validateSlackToken(botToken);
+
+    console.log("validateSlackToken response:", res);
+
+    if (res.success) {
+      this.slackConnected = true;
+    } else {
+      this.slackConnected = false;
+    }
+
+  } catch (err) {
+    console.error("Slack validation error:", err);
+  }
+    },
+    async fetchSlackChannels() {
+  try {
+    console.log("fetchSlackChannels started");
+
+    const res = await this.authStore.listSlackChannels();
+
+    console.log("listSlackChannels response:", res);
+
+    if (res.status) {
+      this.slackChannels = res.channels;
+    }
+
+  } catch (err) {
+    console.error("Slack channels fetch error:", err);
+  }
+    },
+    async sendTestMessage(channelId) {
+  try {
+    console.log("sendTestMessage triggered");
+
+    const botToken = localStorage.getItem("slack_bot_token");
+
+    if (!botToken) {
+      Swal.fire("Error", "Slack not connected", "error");
+      return;
+    }
+
+    const res = await this.authStore.sendSlackMessage(
+      botToken,
+      channelId,
+      "🚀 Message sent from VAPT Project"
+    );
+
+    if (res.status) {
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent",
+        text: "Slack message delivered successfully",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } else {
+      Swal.fire("Error", "Failed to send message", "error");
+    }
+
+  } catch (err) {
+    console.error("Send message error:", err);
+  }
+    },
+    async fetchSlackUsers() {
+  try {
+    console.log("fetchSlackUsers started");
+
+    const botToken = localStorage.getItem("slack_bot_token");
+
+    if (!botToken) {
+      console.warn("No Slack token found");
+      return;
+    }
+
+    const res = await this.authStore.listSlackUsers(botToken);
+
+    console.log("Slack users API result:", res);
+
+    if (res.status) {
+      this.slackUsers = res.users;
+    }
+
+  } catch (err) {
+    console.error("Slack users error:", err);
+  }
+    },
+    async addUserToProjectSlack(channelId, slackUserId, userEmail, userName) {
+  try {
+    const botToken = localStorage.getItem("slack_bot_token");
+
+    if (!botToken) {
+      console.warn("Slack not connected");
+      return;
+    }
+
+    const res = await this.authStore.addUserToSlackChannel(
+      botToken,
+      channelId,
+      slackUserId,
+      userEmail,
+      userName
+    );
+
+    console.log("Slack add user result:", res);
+
+  } catch (err) {
+    console.error("Slack add user error:", err);
+  }
+    },
+
+    async addUserToProjectTeams(teamId, channelId, userEmail) {
+  try {
+    const graphToken = localStorage.getItem("microsoft_graph_token");
+
+    if (!graphToken) {
+      console.warn("Microsoft Teams not connected");
+      return;
+    }
+
+    const res = await this.authStore.addUserToTeamsChannel({
+      teamId,
+      channelId,
+      userEmail,
+    });
+
+    console.log("Teams add user result:", res);
+
+  } catch (err) {
+    console.error("Teams add user error:", err);
+  }
+    },
+    async inviteProjectTeam(channelId, slackUserIds) {
+  const botToken = localStorage.getItem("slack_bot_token");
+  if (!botToken) return;
+  await this.authStore.inviteUsersToSlackChannel(
+    botToken,
+    channelId,
+    slackUserIds
+  );
+    },
+    async handleVulnerabilitySlack(channelId, slackUserIds) {
+  const botToken = localStorage.getItem("slack_bot_token");
+
+  if (!botToken) return;
+
+  // Step 1: bot joins
+  await this.authStore.joinSlackChannel(botToken, channelId);
+
+  // Step 2: invite team
+  await this.authStore.inviteUsersToSlackChannel(
+    botToken,
+    channelId,
+    slackUserIds
+  );
+
+  // Step 3: send alert
+  await this.authStore.sendSlackMessage(
+    botToken,
+    channelId,
+    "🚨 New vulnerability detected"
+  );
+    },
+    // slack end 
+
+    // ✅ Jira OAuth Login
+    async startJiraLogin() {
+      try {
+        const res = await this.authStore.getJiraAuthUrl();
+
+        if (res.status && res.url) {
+          // Store state for verification
+          localStorage.setItem("jira_oauth_state", res.state);
+
+          // Open Jira OAuth in new tab (not popup)
+          window.open(res.url, "_blank");
+        } else {
+          Swal.fire("Error", res.message || "Failed to start Jira login", "error");
+        }
+      } catch (err) {
+        console.error("Jira login error:", err);
+        Swal.fire("Error", "Jira login failed", "error");
+      }
+    },
+    // ✅ Handle Jira Connected Event
+    onJiraConnected(event) {
+      if (event.data?.type === "JIRA_CONNECTED") {
+        this.jiraConnected = true;
+        this.fetchJiraResources();
+        this.fetchJiraUser();
+        Swal.fire({
+          icon: "success",
+          title: "Jira Connected",
+          text: "Jira has been connected successfully!",
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    },
+    // ✅ Validate Jira Token (with auto-refresh on expiry)
+    async checkJiraConnection() {
+      const jiraToken = localStorage.getItem("jira_access_token");
+      if (!jiraToken) return;
+
+      const res = await this.authStore.validateJiraToken(jiraToken);
+      if (res.valid) {
+        this.jiraConnected = true;
+        this.selectedProject = "jira";
+        this.fetchJiraResources();
+        this.fetchJiraUser();
+        return;
+      }
+
+      // Token invalid — try refreshing
+      const refreshToken = localStorage.getItem("jira_refresh_token");
+      if (refreshToken) {
+        const refreshRes = await this.authStore.refreshJiraToken(refreshToken);
+        if (refreshRes.status) {
+          // Refresh succeeded — validate new token
+          this.jiraConnected = true;
+          this.selectedProject = "jira";
+          this.fetchJiraResources();
+          this.fetchJiraUser();
+          return;
+        }
+      }
+
+      // Refresh also failed — clear and ask to reconnect
+      localStorage.removeItem("jira_access_token");
+      localStorage.removeItem("jira_refresh_token");
+      localStorage.removeItem("jira_oauth_state");
+      this.jiraConnected = false;
+      this.selectedProject = null;
+      Swal.fire({
+        icon: "warning",
+        title: "Jira Session Expired",
+        text: "Please reconnect Jira to continue.",
+        confirmButtonColor: "#5a44ff",
       });
     },
-    goToPage(page) {
-      if (page < 1 || page > this.totalPages) return;
-      this.currentPage = page;
-    },
-    prevPage() {
-      if (this.currentPage > 1) this.currentPage--;
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) this.currentPage++;
-    },
-    getTopSeverity(sc) {
-      if (!sc) return null;
-      if (sc.critical > 0) return 'Critical';
-      if (sc.high > 0) return 'High';
-      if (sc.medium > 0) return 'Medium';
-      if (sc.low > 0) return 'Low';
-      return null;
-    },
-    getSeverityColor(sev) {
-      switch (sev?.toLowerCase()) {
-        case 'critical': return 'rgba(173, 0, 0, 1)';
-        case 'high': return '#AD0000';
-        case 'medium': return '#f6b100';
-        case 'low': return '#4caf50';
-        default: return '#888';
+    // ✅ Fetch Jira Resources (Cloud IDs)
+    async fetchJiraResources() {
+      const res = await this.authStore.getJiraResources();
+      if (res.status) {
+        this.jiraResources = res.data;
+        this.jiraConnected = true;
       }
     },
-    handleDeleteClick() {
-      if (this.activeAction === "hold") return;
-      this.activeAction = "delete";
-      if (!this.showCheckboxes) {
-        this.showCheckboxes = true;
-      } else {
-        const selectedAssets = this.assets.filter((a) => a.selected);
-        if (selectedAssets.length > 0) {
-          const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
-          modal.show();
-        } else {
-          this.showCheckboxes = false;
-          this.activeAction = "";
-        }
+    // ✅ Fetch Jira Connected User Info
+    async fetchJiraUser() {
+      const res = await this.authStore.getJiraUser();
+      if (res.status) {
+        this.jiraUser = res.user;
       }
-    },
-    async confirmDelete() {
-      const selected = this.assets.filter(a => a.selected);
-      for (const item of selected) {
-        const res = await this.authStore.deleteUserAsset(item.asset);
-        if (res.status) {
-          this.assets = this.assets.filter(x => x.asset !== item.asset);
-          if (this.activeIndex === item.asset) {
-            this.activeIndex = this.assets.length ? this.assets[0].asset : null;
-            if (this.activeIndex) this.authStore.fetchUserSingleAssetVulnerabilities(this.activeIndex);
-          }
-        }
-      }
-      this.totalAssets = this.assets.length + this.heldAssets.length;
-      this.showCheckboxes = false;
-      this.resetActions();
-    },
-    cancelDelete() {
-      this.assets.forEach((a) => (a.selected = false));
-      this.showCheckboxes = false;
-      this.resetActions();
-    },
-    toggleHoldMode() {
-      if (this.activeAction === "delete") return;
-      this.activeAction = "hold";
-      if (this.showHoldCheckboxes) {
-        const selectedAssets = this.assets.filter(a => a.selected);
-        if (selectedAssets.length > 0) {
-          let modal = new bootstrap.Modal(document.getElementById("holdConfirmModal"));
-          modal.show();
-        } else {
-          this.resetActions();
-        }
-      } else {
-        this.showHoldCheckboxes = true;
-      }
-    },
-    async toggleUnholdMode() {
-      if (this.activeAction === "hold" || this.activeAction === "delete") return;
-      this.activeAction = "unhold";
-      if (!this.showUnholdCheckboxes) {
-        this.showUnholdCheckboxes = true;
-        return;
-      }
-      const selected = this.heldAssets.filter(a => a.selected);
-      if (!selected.length) {
-        this.resetActions();
-        return;
-      }
-      for (const item of selected) {
-        const res = await this.authStore.unholdUserAsset(item.asset);
-        if (res.status && res.restoredAsset) {
-          const a = res.restoredAsset;
-          this.assets.unshift({
-            asset: a.asset,
-            member_type: a.member_type,
-            severity_counts: a.severity_counts,
-            host_information: a.host_information,
-            isInternal: a.member_type === 'internal',
-            held: false,
-            selected: false,
-          });
-          this.heldAssets = this.heldAssets.filter(h => h.asset !== item.asset);
-        }
-      }
-      this.totalAssets = this.assets.length + this.heldAssets.length;
-      this.showHeld = this.heldAssets.length > 0;
-      this.resetActions();
-    },
-    resetActions() {
-      this.showCheckboxes = false;
-      this.showHoldCheckboxes = false;
-      this.activeAction = "";
-      this.assets.forEach(a => (a.selected = false));
-      this.heldAssets.forEach(a => (a.selected = false));
-    },
-    cancelHold() {
-      this.assets.forEach((a) => (a.selected = false));
-      this.showHoldCheckboxes = false;
-      this.resetActions();
-    },
-    async confirmHold() {
-      const selected = this.assets.filter(a => a.selected);
-      if (!selected.length) {
-        this.showHoldCheckboxes = false;
-        this.resetActions();
-        return;
-      }
-      for (const item of selected) {
-        const res = await this.authStore.holdUserAsset(item.asset);
-        if (res.status && res.heldAsset) {
-          const a = res.heldAsset;
-          this.heldAssets.push({
-            asset: a.asset,
-            ip: a.asset,
-            member_type: a.member_type,
-            severity_counts: a.severity_counts,
-            host_information: a.host_information,
-            isInternal: a.member_type === 'internal',
-            held: true,
-            selected: false,
-          });
-          this.assets = this.assets.filter(x => x.asset !== item.asset);
-          if (this.activeIndex === item.asset) {
-            this.activeIndex = this.assets.length ? this.assets[0].asset : null;
-            if (this.activeIndex) this.authStore.fetchUserSingleAssetVulnerabilities(this.activeIndex);
-          }
-        }
-      }
-      this.totalAssets = this.assets.length + this.heldAssets.length;
-      this.showHeld = this.heldAssets.length > 0;
-      this.showHoldCheckboxes = false;
-      this.resetActions();
     },
   },
-  watch: {
-    searchQuery() {
-      this.currentPage = 1;
-    },
+  mounted() {
+    window.addEventListener("message", this.onTeamsConnected);
+
+    const graphToken = localStorage.getItem("microsoft_graph_token");
+    if (graphToken) {
+      this.selectedCommunication = "teams";
+
+      // Restore saved channels from login response immediately
+      const savedChannels = localStorage.getItem("vaptfix_channels");
+      if (savedChannels) {
+        this.channels = JSON.parse(savedChannels);
+      }
+
+      this.fetchTeams(); // will also re-fetch fresh channels via fetchChannels()
+    }
+
+    window.addEventListener("message", this.handleSlackMessage);
+    console.log("Slack message listener attached");
+
+    // Check if Slack already connected
+    const slackBotToken = localStorage.getItem("slack_bot_token");
+    if (slackBotToken) {
+      this.slackConnected = true;
+      this.selectedCommunication = "slack";
+      this.checkSlackConnection();
+      this.fetchSlackChannels();
+      this.fetchSlackUsers();
+    }
+
+
+    // ✅ Jira event listener
+    window.addEventListener("message", this.onJiraConnected);
+
+    // Check if Jira already connected (or just returned from OAuth callback)
+    const jiraToken = localStorage.getItem("jira_access_token");
+    if (jiraToken) {
+      this.checkJiraConnection();
+    } else if (this.$route.query.jira_connected === "true") {
+      // Returned from backend redirect after server-side token exchange
+      const storedToken = localStorage.getItem("jira_access_token");
+      if (storedToken) {
+        this.jiraConnected = true;
+        this.selectedProject = "jira";
+        this.fetchJiraResources();
+        this.fetchJiraUser();
+      }
+      // Clean query param from URL
+      this.$router.replace({ query: {} });
+    }
+
+    document.addEventListener("click", this.closeOnOutside);
+    console.log("Route query:", this.$route.query);
+    this.initChipSelection();
+    const user =
+      this.authStore.user ||
+      JSON.parse(localStorage.getItem("user") || "null");
+    if (user) {
+      this.authStore.user = user;
+      const adminId = user._id || user.id;
+    }
   },
-  async mounted() {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
-    await this.loadAssets();
-    await this.loadHeldAssets();
-    await this.loadSupportRequests();
+  beforeUnmount() {
+    document.removeEventListener("click", this.closeOnOutside);
+     window.removeEventListener("message", this.handleSlackMessage);
+    window.removeEventListener("message", this.onTeamsConnected);
+    window.removeEventListener("message", this.onJiraConnected);
   },
+
 };
 </script>
 
 
 <style scoped>
-  .hold-asset {
-    padding: 7px 10px;
-    position: relative;
-  }
-  .asset-item {
-    padding: 12px 16px;
-    position: relative;
-  }
-
-  .asset-item.active::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0px;
-    width: 3px;
-    height: 100%;
-    background-color: #3f37c9; 
-  }
-
-  .badge-critical {
-    background-color: rgba(255, 225, 225, 1);
-    color: rgba(173, 0, 0, 1);
-    font-weight: 600;
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    border-radius: 8px;
-  }
-
-  .badge-open {
-    background-color: rgb(194, 60, 60);
-    color: white;
-    font-weight: 600;
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    border-radius: 8px;
-  }
-
-  .badge-close {
-    background-color:green;
-    color: white;
-    font-weight: 600;
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    border-radius: 8px;
-  }
-
-  .view-link {
-    font-size: 0.85rem;
-    color: #3f37c9;
-    font-weight: 500;
-    text-decoration: none;
-  }
-
-  .view-link:hover {
-    text-decoration: underline;
-  }
-
-  .custom-pagination .page-link {
-  color: rgba(49, 33, 177, 1);
-  background-color: transparent;
-  border: none;
-  font-weight: 500;
-  padding: 6px 10px;
-  border-radius: 50%;
-  margin: 0 8px;
+  .invite-link.disabled {
+  cursor: default;
+  /* pointer-events: none; */
+  background: #f9fafb;
+  color: #9ca3af;
 }
 
-.custom-pagination .page-item.active .page-link {
-  background-color: rgba(49, 33, 177, 1);
-  color: white;
-  height: 35px;
-  width:35px;
+.chip.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  box-shadow: none;
+}
+
+.invite-link {
+  cursor: pointer;
+  background: #f9fafb;
+}
+
+.invite-link:focus {
+  box-shadow: 0 0 0 3px rgba(90, 68, 255, 0.25);
+}
+
+/* new add css */
+.dropdown-list {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #e6e9f2;
+  border-radius: 12px;
+  padding: 8px;
+  width: 100%;
+  z-index: 20;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+.dropdown-list label {
   display: flex;
-  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.dropdown-list label:hover {
+  background: #f5f6ff;
+}
+
+/* existing css */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #F3F5FA;
+  border-bottom: 1px solid #e6e9f2;
+  display: flex;
   align-items: center;
-  border-radius: 50%;
+  padding: 0 32px;
+  z-index: 1000;
 }
 
-.custom-pagination-wrapper {
-  display: inline-block;
-  position: relative;
-  padding-right: 10px;
-}
-
-.tab-wrapper {
-        position: relative;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .tab-line {
-        position: absolute;
-        bottom: 0;
-        height: 2px;
-        background-color: rgba(49, 33, 177, 1); /* Active blue color */
-        transition: all 0.3s ease;
-    }
-
-    .nav-item {
-        text-align: center;
-        cursor: pointer;
-        padding: 8px 0;
-        color: black;
-        font-weight: 500;
-        position: relative;
-        z-index: 1;
-    }
-
-    .nav-item i {
-        margin-right: 5px;
-    }
-.btn-pill {
-    border-radius: 50px;
-    padding: 6px 20px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    white-space: nowrap;
-    height: 36px;
-}
-
-.active-tab {
-    background-color: #E6E3FF;
-    color: #3121B1;
-    border: none;
-    font-size: 13px;
-}
-
-.btn-outline-secondary:hover {
-    background-color: transparent;
-}
-.accordion-button:not(.collapsed) {
-    background-color: white;
-}
-.accordion-button:focus {
-    box-shadow: none;
-}
-.accordion {
-     --bs-accordion-border-color: none;
-     --bs-accordion-body-padding-y: 0;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-    width: 200px;
-}
-
-.dropdown-btn {
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.16);
-    border-radius: 50px;
-    padding: 8px 20px 8px 12px;
-    cursor: pointer;
-    position: relative;
-}
-
-.dropdown-btn::after {
-    content: "▼"; /* arrow symbol */
-    font-size: 12px;
-    color: #333;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 100%;
-    border-radius: 12px;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    z-index: 1;
-    margin-top: 4px;
-}
-
-.dropdown-content a {
-    padding: 8px 12px;
-    display: block;
-    text-decoration: none;
-    color: black;
-    border-radius: 8px;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
-
-.dropdown.show .dropdown-content {
-    display: block;
-}
-.custom-tabs {
+.app {
   display: flex;
-  justify-content: space-around; /* equal spacing */
-  border-bottom: 1px solid #dee2e6; /* grey line */
 }
 
-.custom-tabs .nav-item {
-  flex: 1; /* each tab takes equal width */
-  text-align: center; /* center text */
+/* ===== CONTENT ===== */
+
+.content {
+  margin-left: 260px;
+  /* space for stepper */
+  margin-top: 64px;
+  /* space for topbar */
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  padding: 48px 64px;
 }
 
-.custom-tabs .nav-link {
-  color: black;
-  font-weight: 500;
-  background: transparent !important;
-  margin-bottom: -10px;
+.content h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
-.custom-tabs .nav-link.active {
-  color: rgba(49, 33, 177, 1);
+.content p {
+  color: #6b7280;
+  margin-bottom: 48px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  margin-bottom: 48px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* ===== INTEGRATION CHIPS ===== */
+.chip-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 14px 22px;
+  border-radius: 14px;
+  border: 1.5px solid #e6e9f2;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 210px;
+  justify-content: center;
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  /* box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08); */
+  box-shadow: 10px 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+
+.chip:hover {
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
+}
+
+
+.chip.active {
+  border-color: #5a44ff;
+  background: rgba(90, 68, 255, 0.06);
+  font-weight: 600;
+  box-shadow: 0 8px 18px rgba(90, 68, 255, 0.2);
+}
+
+.chip img {
+  width: 22px;
+  height: 22px;
+}
+
+.location-circle {
+  margin-top: 4px;
+}
+
+/* ===== FORMS ===== */
+.form-control,
+.form-select {
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 14px;
+  box-shadow: 10px 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #5a44ff;
+  /* box-shadow: 0 0 0 3px rgba(90, 68, 255, 0.15); */
+  box-shadow: 10px 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.row-users {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1.6fr 1.2fr;
+  gap: 14px;
+}
+
+.row-invite {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 14px;
+}
+
+/* ===== CTA ===== */
+.cta {
+  margin-top: 64px;
+  text-align: right;
+}
+
+.btn-primary {
+  background: #5a44ff;
   border: none;
-  border-bottom: 2px solid rgba(49, 33, 177, 1); 
+  border-radius: 14px;
+  padding: 16px 36px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 22px rgba(90, 68, 255, 0.28);
 }
-.fixes-btn {
-    background-color:rgba(49, 33, 177, 1);
-    border-radius: 15px;
-    color: white;
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(90, 68, 255, 0.38);
+}
+
+.chip,
+.form-control,
+.form-select,
+.btn-primary {
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+.chip:hover {
+  transform: translateY(-2px);
+}
+
+/* ===== RESPONSIVE ===== */
+/* iPad Air */
+@media (max-width: 992px) {
+  .app {
+    grid-template-columns: 720px;
+    justify-content: center;
+  }
+  .content {
+    margin-left: 0;
+    margin-top: 180px;
+    height: auto;
+    padding: 20px 40px;
+  }
+  .row-invite {
+    grid-template-columns: 1fr;
+  }
+  .row-users {
+    grid-template-columns:
+      minmax(95px, 2fr)
+      minmax(70px, 2fr)
+      minmax(70px, 2fr)
+      minmax(125px, 3fr)
+      minmax(118px, 3fr)
+      minmax(110px, 2.5fr);
+    gap: 5px;
+  }
+  .btn-primary {
+    padding: 13px 29px;
+  }
+  .row-invite[data-v-9a2bf7bb] {
+    grid-template-columns: 1fr 1fr 2fr;
+    gap: 5px;
+  }
+  .location-circle {
+    margin-top: 3px;
+  }
+}
+
+/* iPad Pro */
+@media (max-width: 1200px) {
+  .chip-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .content {
+    margin-left: 10px;
+    margin-top: 210px;
+    height: auto;
+  }
+  .cta {
+    margin-top: 174px;
+  }
+}
+
+
+/* iPad Mini */
+@media (max-width: 768px) {
+  .chip-group {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+}
+
+
+/* ── Jira Connected User ── */
+.jira-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #d1fae5;
+  border-radius: 12px;
+  background: #f0fdf4;
+}
+
+.jira-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.jira-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.jira-user-email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.jira-user-badge {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+/* ── Jira Cloud Resources ── */
+.jira-resources-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.jira-resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jira-resource-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #e6e9f2;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: #fff;
+}
+
+.jira-resource-item:hover {
+  border-color: #5a44ff;
+  background: #f5f4ff;
+}
+
+.jira-resource-item.active {
+  border-color: #5a44ff;
+  background: #f0eeff;
+}
+
+.jira-resource-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.jira-resource-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.jira-resource-url {
+  font-size: 12px;
+  color: #6b7280;
 }
 </style>
