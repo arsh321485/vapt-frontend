@@ -643,10 +643,10 @@ export default {
     Swal.fire("Error", "Microsoft login failed", "error");
   }
     },
-   async onTeamsConnected(event) {
+  async onTeamsConnected(event) {
     if (event.data?.type === "TEAMS_CONNECTED") {
 
-      // ✅ Save tokens to localStorage
+      // ✅ Step 1: localStorage mein save karo (fetchTeams se PEHLE)
       const graphToken = event.data.tokens?.access_token;
       if (graphToken) {
         localStorage.setItem("microsoft_graph_token", graphToken);
@@ -658,6 +658,7 @@ export default {
         localStorage.setItem("django_access_token", event.data.django_access_token);
       }
 
+      // ✅ Step 2: Success message
       Swal.fire({
         icon: "success",
         title: "Success",
@@ -665,9 +666,11 @@ export default {
         timer: 2000,
         showConfirmButton: false
       });
+
+      // ✅ Step 3: Ab fetchTeams safe hai (token localStorage mein hai)
       await this.fetchTeams();
 
-      // Subscribe to Teams webhook
+      // ✅ Step 4: Webhook subscribe
       const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
       const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
       if (teamId) {
