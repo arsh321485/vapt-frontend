@@ -646,7 +646,7 @@ export default {
   async onTeamsConnected(event) {
     if (event.data?.type === "TEAMS_CONNECTED") {
 
-      // ✅ Step 1: localStorage mein save karo (fetchTeams se PEHLE)
+      // Step 1: localStorage mein save karo
       const graphToken = event.data.tokens?.access_token;
       if (graphToken) {
         localStorage.setItem("microsoft_graph_token", graphToken);
@@ -658,7 +658,17 @@ export default {
         localStorage.setItem("django_access_token", event.data.django_access_token);
       }
 
-      // ✅ Step 2: Success message
+      // Step 2: Event se directly teams/channels set karo (fetchTeams() ki zaroorat nahi)
+      if (event.data.vaptfix_team) {
+        this.teams = [{
+          id: event.data.vaptfix_team.team_id,
+          displayName: event.data.vaptfix_team.team_name || "Vaptfix"
+        }];
+        this.channels = event.data.vaptfix_team.channels || [];
+        localStorage.setItem("vaptfix_channels", JSON.stringify(this.channels));
+      }
+
+      // Step 3: Success message
       Swal.fire({
         icon: "success",
         title: "Success",
@@ -667,12 +677,8 @@ export default {
         showConfirmButton: false
       });
 
-      // ✅ Step 3: Ab fetchTeams safe hai (token localStorage mein hai)
-      await this.fetchTeams();
-
-      // ✅ Step 4: Webhook subscribe
-      const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
-      const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+      // Step 4: Webhook subscribe
+      const teamId = event.data.vaptfix_team?.team_id;
       if (teamId) {
         await this.authStore.subscribeTeamsWebhook(teamId);
       }
