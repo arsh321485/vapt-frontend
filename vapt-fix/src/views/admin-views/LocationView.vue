@@ -643,25 +643,38 @@ export default {
     Swal.fire("Error", "Microsoft login failed", "error");
   }
     },
-    async onTeamsConnected(event) {
-      if (event.data?.type === "TEAMS_CONNECTED") {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Microsoft Teams connected successfully",
-          timer: 2000,
-          showConfirmButton: false
-        });
-        await this.fetchTeams();
+   async onTeamsConnected(event) {
+    if (event.data?.type === "TEAMS_CONNECTED") {
 
-        // Subscribe to Teams webhook (one-time after connect)
-        const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
-        const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
-        if (teamId) {
-          await this.authStore.subscribeTeamsWebhook(teamId);
-        }
+      // ✅ Save tokens to localStorage
+      const graphToken = event.data.tokens?.access_token;
+      if (graphToken) {
+        localStorage.setItem("microsoft_graph_token", graphToken);
       }
-    },
+      if (event.data.vaptfix_team) {
+        localStorage.setItem("vaptfix_team", JSON.stringify(event.data.vaptfix_team));
+      }
+      if (event.data.django_access_token) {
+        localStorage.setItem("django_access_token", event.data.django_access_token);
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Microsoft Teams connected successfully",
+        timer: 2000,
+        showConfirmButton: false
+      });
+      await this.fetchTeams();
+
+      // Subscribe to Teams webhook
+      const vaptfixTeam = JSON.parse(localStorage.getItem("vaptfix_team") || "null");
+      const teamId = vaptfixTeam?.id || vaptfixTeam?.team_id;
+      if (teamId) {
+        await this.authStore.subscribeTeamsWebhook(teamId);
+      }
+    }
+  },
     async fetchTeams() {
       const res = await this.authStore.fetchMicrosoftTeams();
       if (res?.status) {
