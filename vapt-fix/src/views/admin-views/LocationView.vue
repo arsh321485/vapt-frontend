@@ -773,32 +773,37 @@ export default {
   }
     },
     handleSlackMessage(event) {
+    console.log("Message received from popup:", event);
 
-  console.log("Message received from popup:", event);
+    const allowedOrigins = [
+      window.location.origin,
+      "https://vaptbackend.secureitlab.com"
+    ];
 
-  const allowedOrigins = [
-    window.location.origin,
-    "https://vaptbackend.secureitlab.com"
-  ];
+    if (!allowedOrigins.includes(event.origin)) {
+      console.warn("Blocked message origin:", event.origin);
+      return;
+    }
 
-  if (!allowedOrigins.includes(event.origin)) {
-    console.warn("Blocked message origin:", event.origin);
-    return;
-  }
+    if (event.data?.type === "SLACK_CONNECTED") {
+      console.log("SLACK_CONNECTED event received");
 
-  if (event.data?.type === "SLACK_CONNECTED") {
+      // ✅ localStorage mein save karo
+      if (event.data.bot_token) {
+        localStorage.setItem("slack_bot_token", event.data.bot_token);
+      }
+      if (event.data.slack_user_id) {
+        localStorage.setItem("slack_user_id", event.data.slack_user_id);
+      }
+      if (event.data.django_access_token) {
+        localStorage.setItem("django_access_token", event.data.django_access_token);
+      }
 
-    console.log("SLACK_CONNECTED event received");
-
-    // 🔹 CALL VALIDATE TOKEN
-    console.log("Calling validate token API...");
-    this.checkSlackConnection();
-    // 🔹 CALL CHANNEL LIST
-    console.log("Calling list channels API...");
-    this.fetchSlackChannels();
-    this.fetchSlackUsers();
-  }
-    },
+      this.checkSlackConnection();
+      this.fetchSlackChannels();
+      this.fetchSlackUsers();
+    }
+  },
     async checkSlackConnection() {
   try {
     console.log("checkSlackConnection started");
